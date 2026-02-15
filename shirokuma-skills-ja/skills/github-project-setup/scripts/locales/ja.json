@@ -2,6 +2,7 @@
   "status": {
     "Icebox": "アイデア・将来検討",
     "Backlog": "やることリスト",
+    "Planning": "計画策定中",
     "Spec Review": "要件・仕様確認中",
     "Ready": "着手可能",
     "In Progress": "作業中",

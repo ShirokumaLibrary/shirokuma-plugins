@@ -24,6 +24,7 @@ FIELD_COLORS = {
     "status": {
         "Icebox": "GRAY",
         "Backlog": "BLUE",
+        "Planning": "PURPLE",
         "Spec Review": "PINK",
         "Ready": "GREEN",
         "In Progress": "YELLOW",
@@ -55,6 +56,15 @@ FIELD_COLORS = {
         "XL": "RED",
     },
 }
+
+# Date tracking TEXT fields (no options, no locale needed)
+DATE_TEXT_FIELDS = [
+    "Planning At",
+    "Spec Review At",
+    "In Progress At",
+    "Review At",
+    "Completed At",
+]
 
 # =============================================================================
 # Locale Loading
@@ -177,6 +187,26 @@ def create_field(project_id: str, name: str, field_key: str, locale: dict) -> di
     return run_graphql(query)
 
 
+def create_text_field(project_id: str, name: str) -> dict | None:
+    """Create a new TEXT field for date tracking."""
+    query = f"""
+    mutation {{
+      createProjectV2Field(input: {{
+        projectId: "{project_id}"
+        dataType: TEXT
+        name: "{name}"
+      }}) {{
+        projectV2Field {{
+          ... on ProjectV2Field {{
+            name
+          }}
+        }}
+      }}
+    }}
+    """
+    return run_graphql(query)
+
+
 # =============================================================================
 # Main
 # =============================================================================
@@ -216,6 +246,12 @@ def main():
         for field_name, field_key in [("Priority", "priority"), ("Type", "type"), ("Size", "size")]:
             print(f"\n[{field_name}] Creating field...")
             result = create_field(args.project_id, field_name, field_key, locale)
+            if result:
+                print(f"  ✓ {field_name} created")
+
+        for field_name in DATE_TEXT_FIELDS:
+            print(f"\n[{field_name}] Creating text field...")
+            result = create_text_field(args.project_id, field_name)
             if result:
                 print(f"  ✓ {field_name} created")
 

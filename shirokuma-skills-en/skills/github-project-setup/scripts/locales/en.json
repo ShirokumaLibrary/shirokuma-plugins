@@ -2,6 +2,7 @@
   "status": {
     "Icebox": "Ideas for future",
     "Backlog": "To do list",
+    "Planning": "Planning in progress",
     "Spec Review": "Requirements review",
     "Ready": "Ready to start",
     "In Progress": "Working on it",
