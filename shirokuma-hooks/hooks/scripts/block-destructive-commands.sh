@@ -5,21 +5,24 @@ set -euo pipefail
 # Used as a PreToolUse hook for the Bash tool.
 #
 # Configuration:
-#   Rules:   shirokuma-docs.config.yaml → hooks.enabled (whitelist)
-#   Default: All rules in blocked-commands.json are active when hooks.enabled is unset
+#   Rules:   shirokuma-docs.config.yaml → hooks.allow
+#   Default: All rules in blocked-commands.json are active when hooks.allow is unset
 #
 # The CLI handles:
 #   - Reading blocked-commands.json rules
-#   - Filtering by hooks.enabled in shirokuma-docs.config.yaml
+#   - Filtering by hooks.allow in shirokuma-docs.config.yaml
 #   - Stripping quoted strings (false-positive prevention)
 #   - Pattern matching and deny JSON output
 #
-# To disable specific rules, edit shirokuma-docs.config.yaml:
+# To allow specific commands, edit shirokuma-docs.config.yaml:
 #   hooks:
-#     enabled:
-#       - force-push
-#       - hard-reset
-#       # pr-merge  ← commented out = disabled
+#     allow:
+#       - pr-merge              # Allow gh pr merge / issues merge
+#       # - force-push          # Allow git push --force
+#       # - hard-reset          # Allow git reset --hard
+#       # - discard-worktree    # Allow git checkout/restore .
+#       # - clean-untracked     # Allow git clean -f
+#       # - force-delete-branch # Allow git branch -D
 #
 # Limitation: Commands constructed via eval or variable expansion
 # (e.g., cmd="git push --force" && eval "$cmd") are not detected.
