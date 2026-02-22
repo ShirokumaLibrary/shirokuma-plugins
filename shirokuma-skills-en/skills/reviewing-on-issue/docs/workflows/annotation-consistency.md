@@ -241,7 +241,7 @@ lintAnnotations:
 shirokuma-docs lint-annotations -f terminal
 
 # JSON (machine-readable)
-shirokuma-docs lint-annotations -f json -o /tmp/annotations.json
+shirokuma-docs lint-annotations -f json -o /tmp/shirokuma-docs/annotations.json
 
 # Fix mode (auto-update annotations)
 shirokuma-docs lint-annotations --fix
