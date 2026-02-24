@@ -39,5 +39,5 @@ researching-best-practices → Discussion (Research) 作成 → 完了
 shirokuma-docs discussions create \
   --category Research \
   --title "[Research] {トピック}" \
-  --body research-result.md
+  --body-file research-result.md
 ```

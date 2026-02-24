@@ -39,5 +39,5 @@ Research results are saved to Research category Discussion:
 shirokuma-docs discussions create \
   --category Research \
   --title "[Research] {topic}" \
-  --body research-result.md
+  --body-file research-result.md
 ```
