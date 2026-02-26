@@ -1,85 +1,40 @@
-# shirokuma-docs
+# shirokuma-plugins
 
-Next.js + TypeScript プロジェクト向けのドキュメント自動生成 CLI。Claude Code スキル同梱。
+Reusable AI skills, rules, and safety hooks for [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 
-[English](README.en.md)
+## Plugins
 
-## インストール
+| Plugin | Description |
+|--------|-------------|
+| **shirokuma-skills-en** | AI skills and rules for Claude Code (English) |
+| **shirokuma-skills-ja** | AI skills and rules for Claude Code (Japanese) |
+| **shirokuma-hooks** | Safety hooks for destructive git/GitHub operations |
 
-### 推奨: インストーラスクリプト（sudo 不要）
+## Installation
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/ShirokumaLibrary/shirokuma-docs/main/install.sh | bash
-```
-
-`~/.local/` にインストールされます。Claude Code ユーザーは `~/.local/bin` が PATH に含まれているため追加設定不要です。インストーラが言語を対話的に確認します（`--lang ja` で事前指定も可）。
-
-### npm / pnpm でグローバルインストール
+### Via shirokuma-docs CLI (recommended)
 
 ```bash
-npm install -g @shirokuma-library/shirokuma-docs
-# または
-pnpm add -g @shirokuma-library/shirokuma-docs
+npx @shirokuma-library/shirokuma-docs init --with-skills
 ```
 
-## はじめかた
-
-> **前提**: git リポジトリ + GitHub リモート + `GITHUB_TOKEN` 環境変数（または `gh auth login` 済み）。詳細は [Getting Started ガイド](docs/guide/getting-started.md) を参照。
+### Via Claude Code plugin commands
 
 ```bash
-# 0. GITHUB_TOKEN を設定（Projects V2 のスコープ含む）
-export GITHUB_TOKEN="ghp_xxxxx"  # repo, read:project, project スコープ必要
+# Register the marketplace
+claude plugin marketplace add ShirokumaLibrary/shirokuma-plugins
 
-# 1. 初期化（スキル・ルール付き）
-cd /path/to/your/project
-shirokuma-docs init --with-skills --with-rules --lang ja
+# Install a plugin
+claude plugin install shirokuma-skills-en@shirokuma-library --scope project
 
-# 2. 設定ファイルをカスタマイズ
-#    shirokuma-docs.config.yaml を開いてパスを編集
-
-# 3. GitHub Project セットアップ
-shirokuma-docs projects create-project --title "プロジェクト名" --lang ja
-
-# 4. ドキュメント生成
-shirokuma-docs generate
-
-# 5. Claude Code と連携
-#    新しいセッションを開始 → /working-on-issue #42
+# Update to the latest version
+claude plugin update shirokuma-skills-en@shirokuma-library --scope project
 ```
 
-詳細は [Getting Started ガイド](docs/guide/getting-started.md) を参照してください。
+## Documentation
 
-## 機能概要
+For full documentation, configuration guides, and CLI reference, see **[shirokuma-docs](https://github.com/ShirokumaLibrary/shirokuma-docs)**.
 
-| カテゴリ | コマンド数 | 例 |
-|---------|-----------|-----|
-| ドキュメント生成 | 16 | `typedoc`, `schema`, `deps`, `portal`, `test-cases`, `coverage` |
-| 検証 | 7 | `lint-tests`, `lint-coverage`, `lint-docs`, `lint-code` |
-| GitHub 連携 | 5 | `issues`, `projects`, `discussions`, `session start/end` |
-| 管理 | 8 | `init`, `generate`, `update`, `adr`, `repo-pairs`, `md` |
-| Claude Code スキル | 22 | `working-on-issue`, `committing-on-issue`, `creating-pr-on-issue` |
-| Claude Code ルール | 21 | Git, GitHub, Next.js, shirokuma-docs 規約 |
-
-全コマンド一覧は [コマンドリファレンス](docs/guide/commands/) を、スキル・ルール一覧は [プラグイン管理](docs/guide/plugins.md) を参照してください。
-
-## 動作要件
-
-- **Node.js**: 20.0.0 以上
-- **Claude Code**: スキル・ルール連携に必要
-- **GITHUB_TOKEN**: GitHub コマンドに必要（`gh auth login` でも可）
-
-## ドキュメント
-
-| ガイド | 内容 |
-|--------|------|
-| [Getting Started](docs/guide/getting-started.md) | インストール・初期化・GitHub セットアップ |
-| [設定ファイルリファレンス](docs/guide/config.md) | `shirokuma-docs.config.yaml` の全項目 |
-| [コマンドリファレンス](docs/guide/commands/) | 全コマンドの詳細 |
-| [プラグイン管理](docs/guide/plugins.md) | スキル・ルール・フックの管理 |
-| [トラブルシューティング](docs/guide/troubleshooting.md) | よくある問題と対処法 |
-
-## ライセンス
+## License
 
 MIT
-
-サードパーティライセンスは [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。
