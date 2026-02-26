@@ -20,7 +20,7 @@ Policy 実行（日常作業）→ Reward 観測（シグナル収集）→ Poli
 
 ## シグナル永続化
 
-専用の Discussion カテゴリ「Evolution」にシグナルをコメントとして蓄積。プロジェクトごとに 1 Discussion を使用し、本文を集計サマリーとして維持する。
+専用の Issue Type「Evolution」にシグナルをコメントとして蓄積。プロジェクトごとに Evolution Issue を使用し、本文を集計サマリーとして維持する。
 
 ## 責務境界
 
