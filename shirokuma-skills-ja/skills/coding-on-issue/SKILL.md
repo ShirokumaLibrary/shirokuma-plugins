@@ -65,6 +65,7 @@ Issue の再取得は不要。
 - `context: fork` のため `TodoWrite` / `AskUserQuestion` は使用不可
 - 進捗管理はマネージャー（`working-on-issue`）が担当
 - TDD ワークフローは `working-on-issue` が `coding-on-issue` の呼び出しを TDD で包む形で管理（`coding-on-issue` 自体は実装のみに集中）
+- UI デザインタスク（新規 UI ページ、ビジュアルリデザイン、デザインシステムトークン変更）は `designing-ui-on-issue` → `designing-shadcn-ui` が担当。責務境界の詳細は `working-on-issue/docs/designing-reference.md` を参照
 
 ## 出力
 

@@ -60,7 +60,6 @@ Conventional Commits 形式:
 - 1 行目は 72 文字以内
 - 該当する場合は Issue 番号を参照
 - 本文は複雑な変更の場合のみ
-- `Co-Authored-By` 署名は付けない
 
 ### ステップ 4: コミット
 

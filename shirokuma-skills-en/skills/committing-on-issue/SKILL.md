@@ -60,7 +60,6 @@ Follow Conventional Commits format:
 - First line under 72 characters
 - Reference issue number if applicable
 - Body for complex changes only
-- Do NOT include `Co-Authored-By` signature
 
 ### Step 4: Commit
 

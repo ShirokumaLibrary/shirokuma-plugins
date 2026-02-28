@@ -1,7 +1,7 @@
 ---
 name: evolving-rules
 description: Analyzes evolution signals for rules and skills, proposing improvements. Use when "rule evolution", "rules evolution", "evolve rules", "evolution flow", "signal analysis".
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
+allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite, Skill
 ---
 
 # Rule & Skill Evolution
@@ -92,18 +92,21 @@ Apply this improvement proposal?
 
 ### Step 6: Apply
 
-Delegate approved proposals to `managing-rules` or `managing-skills` skill.
+Delegate approved proposals to `managing-rules` or `managing-skills` skill via the Skill tool. The delegated skill handles EN/JA updates and quality checks per `config-authoring-flow` rule.
 
 ```
 Skill: managing-rules (or managing-skills)
 Args: Update {target file}
 ```
 
-Update both EN/JA files simultaneously.
+**Constraints:**
+- **MUST** delegate to `managing-rules` or `managing-skills` — direct file editing (Edit/Write tools) of `plugin/` files is prohibited
+- The delegated skill is responsible for updating both EN/JA files and running `reviewing-claude-config` per `config-authoring-flow` rule
+- If the Skill tool call fails, report the error to the user instead of falling back to direct editing
 
-### Step 7: Update Records
+### Step 7: Update Records and Close Issue
 
-Update the Evolution Issue body as an aggregated summary:
+Post an analysis summary comment, update the Evolution Issue body, and close the Issue.
 
 ```bash
 # Post comment first (comment-first principle)
@@ -119,7 +122,12 @@ EOF
 
 # Update body as aggregated summary
 shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/evolution-summary.md
+
+# Close the Evolution Issue (1 analysis cycle = 1 Issue)
+gh issue close {number}
 ```
+
+New signals after closure are recorded in a new Evolution Issue (see `rule-evolution` rule, Evolution Issue Lifecycle section).
 
 ## Completion Report
 

@@ -230,4 +230,3 @@ PR created. Next steps:
 - Direct PRs to `main` are prohibited (exception: hotfixes only)
 - Include issue references for automatic linking
 - PR body should be informative but concise
-- Do not include AI attribution lines (e.g. "🤖 Generated with Claude Code") in PR body

@@ -58,6 +58,26 @@ Evolution Issue にシグナルをコメントとして蓄積する。
 
 **曖昧領域:** `discovering-codebase-rules` が既存ルールの不備を検出した場合、Evolution Issue にコメントとして記録する。`discovering-codebase-rules` 自体はルールの修正を行わない（新規提案のみ）。
 
+## Evolution Issue ライフサイクル
+
+1 分析サイクル = 1 Evolution Issue。分析完了後に Issue をクローズし、次回の `evolving-rules` 起動時に古いシグナルを再読するのを防ぐ。
+
+```
+Open → シグナル蓄積 → 分析（evolving-rules）→ Close → 次サイクルは新 Issue
+```
+
+| フェーズ | 状態 | アクション |
+|---------|------|----------|
+| シグナル蓄積中 | Open | スキル完了時の自動記録、手動記録 |
+| 分析トリガー | Open | `evolving-rules` が全コメントを読み取り処理 |
+| 分析完了 | Closed | `evolving-rules` ステップ 7 でサマリー投稿後にクローズ |
+| クローズ後の新シグナル | — | 新しい Evolution Issue が自動作成される（自動記録フロー） |
+
+**ルール:**
+- クローズ済み Evolution Issue を再オープンしない — 代わりに新しい Issue を作成
+- `evolving-rules` は常に最新の **open** な Evolution Issue を対象に操作する
+- クローズにより、分析済みシグナルの再処理を防止する
+
 ## スキル完了時の自動記録手順
 
 主要スキル（`working-on-issue`, `planning-on-issue`, `creating-item`）の完了時に、以下の手順でセッション中に発生した Evolution シグナルを自動記録する。各スキルはこのセクションを参照して自動記録を実行する。

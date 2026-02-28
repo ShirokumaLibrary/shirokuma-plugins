@@ -23,10 +23,9 @@
 
 1. **First line under 72 characters**
 2. **Reference issue number** when applicable: `(#39)`
-3. **No Co-Authored-By signature** - Do not append `Co-Authored-By: Claude ...` or any AI attribution lines to commit messages
-4. **Imperative mood** in description: "add feature" not "added feature"
-5. **Body is optional** - Use for complex changes that need explanation
-6. **Blank line** between subject and body
+3. **Imperative mood** in description: "add feature" not "added feature"
+4. **Body is optional** - Use for complex changes that need explanation
+5. **Blank line** between subject and body
 
 ## Examples
 
@@ -51,7 +50,6 @@ chore: update dependencies
 
 ## What NOT to Do
 
-- Do not include `Co-Authored-By` lines
 - Do not include `Signed-off-by` lines unless required by project
 - Do not use `--no-verify` to skip hooks
 - Do not amend commits unless explicitly asked

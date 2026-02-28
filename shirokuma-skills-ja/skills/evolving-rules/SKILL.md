@@ -1,7 +1,7 @@
 ---
 name: evolving-rules
 description: ルール・スキルの進化シグナルを分析し、改善提案を行います。「ルール進化」「rule evolution」「進化フロー」「evolve rules」「シグナル分析」で使用。
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
+allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite, Skill
 ---
 
 # ルール・スキル進化
@@ -92,18 +92,21 @@ AskUserQuestion で承認を得る:
 
 ### ステップ 6: 適用
 
-承認された提案を `managing-rules` または `managing-skills` スキルに委任して適用。
+承認された提案を Skill ツール経由で `managing-rules` または `managing-skills` スキルに委任して適用。委任先スキルが EN/JA 更新と `config-authoring-flow` ルールに基づく品質チェックを実行する。
 
 ```
 Skill: managing-rules (or managing-skills)
 Args: {対象ファイル} の更新
 ```
 
-EN/JA 両方のファイルを同時に更新すること。
+**制約:**
+- `managing-rules` または `managing-skills` への委任が**必須** — `plugin/` ディレクトリ内ファイルの直接編集（Edit/Write ツール）は禁止
+- 委任先スキルが EN/JA 両方のファイル更新と `config-authoring-flow` ルールに基づく `reviewing-claude-config` の実行を担当する
+- Skill ツールの呼び出しが失敗した場合、直接編集にフォールバックせずユーザーにエラーを報告する
 
-### ステップ 7: 記録更新
+### ステップ 7: 記録更新と Issue クローズ
 
-Evolution Issue の本文を集計サマリーとして更新:
+分析サマリーをコメントとして投稿し、Evolution Issue の本文を更新した後、Issue をクローズする。
 
 ```bash
 # 本文更新（コメントファースト原則に従い、先にコメントを投稿）
@@ -119,7 +122,12 @@ EOF
 
 # 本文を集計サマリーに更新
 shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/evolution-summary.md
+
+# Evolution Issue をクローズ（1 分析サイクル = 1 Issue）
+gh issue close {number}
 ```
+
+クローズ後に新たなシグナルが発生した場合は、新しい Evolution Issue に記録する（`rule-evolution` ルールの Evolution Issue ライフサイクルセクション参照）。
 
 ## 完了レポート
 

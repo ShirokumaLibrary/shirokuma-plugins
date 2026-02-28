@@ -18,30 +18,11 @@ Create memorable, production-grade interfaces that avoid generic "AI slop" aesth
 - Component library (shadcn/ui stable/canary)
 - i18n setup (next-intl, messages structure)
 
-### 1. Design Discovery
+### 1. Design Brief Check
 
-Before writing code, understand and document:
+When delegated from `designing-ui-on-issue`, Design Brief and Aesthetic Direction are provided. Use them as-is.
 
-```markdown
-## Design Brief
-
-**Purpose**: What problem does this interface solve?
-**Context**: Technical constraints, existing design system
-**Differentiation**: What makes this UNFORGETTABLE?
-
-## Aesthetic Direction
-
-**Tone**: [Choose ONE]
-- Brutally minimal / Maximalist chaos / Retro-futuristic
-- Organic/natural / Luxury/refined / Playful/toy-like
-- Editorial/magazine / Brutalist/raw / Art deco/geometric
-
-**Typography**: [Font pairing and rationale]
-**Color Palette**: [5-7 HEX codes]
-**Motion Strategy**: [Key animation moments]
-```
-
-After brief creation, confirm design direction with `AskUserQuestion`.
+When invoked standalone, Design Brief can be skipped. However, if aesthetic direction is unclear, minimal direction confirmation is recommended.
 
 ### 2. Implementation
 
@@ -62,15 +43,6 @@ pnpm --filter {app-name} build
 - [ ] Motion/animation adds delight
 - [ ] Layout has visual interest
 - [ ] Build passes without errors
-
-### 5. Report Generation
-
-```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Design] {component-name}" \
-  --body-file report.md
-```
 
 ## Design Guidelines
 
@@ -105,16 +77,18 @@ shirokuma-docs discussions create \
 
 ## Next Steps
 
-When invoked standalone (not via `working-on-issue` chain):
+When invoked via `designing-ui-on-issue`, control returns automatically to the orchestrator.
+
+When invoked standalone:
 
 ```
-Design complete. Next step:
+Implementation complete. Next steps:
 → `/committing-on-issue` to stage and commit your changes
+→ Use `/designing-ui-on-issue` for the full workflow
 ```
 
 ## Notes
 
 - **Memorability is the top priority**
 - **Build must pass**
-- **Report Discussion is required**
-- Do not start implementation without confirming aesthetic direction with user
+- When Design Brief is provided, implement based on it. When standalone, confirm aesthetic direction with user before implementation

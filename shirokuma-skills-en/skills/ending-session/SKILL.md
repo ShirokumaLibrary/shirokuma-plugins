@@ -77,7 +77,7 @@ git status --short
 ```
 
 If uncommitted changes exist, use AskUserQuestion to confirm whether to commit them before proceeding.
-Follow the `committing-on-issue` skill workflow: stage specific files, write a conventional commit message (no Co-Authored-By), and commit.
+Follow the `committing-on-issue` skill workflow: stage specific files, write a conventional commit message, and commit.
 
 #### 3b. Push Branch
 

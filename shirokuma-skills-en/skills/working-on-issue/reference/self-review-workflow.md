@@ -8,8 +8,10 @@ Detailed specification of the self-review loop executed within the `working-on-i
 [Chain] committing → creating-pr → Self-review start
     ↓
 [REVIEW] Launch review (Fork: reviewing-on-issue / reviewing-claude-config)
-    ↓
+    ↓  Note: fork posts PR comment (Step 6) before returning structured output
 [PARSE] Parse result + PASS/FAIL determination
+    ↓
+[PRESENT] Present self-review result summary to user (using completion report template)
     ↓
   ├── PASS → [COMPLETE]
   ├── FAIL + Auto-fixable: yes → [FIX]
@@ -25,7 +27,7 @@ Detailed specification of the self-review loop executed within the `working-on-i
 
 [REPORT] Report to user
     ↓
-[COMPLETE] Create out-of-scope Issues → Post fix comment → Status → Review
+[COMPLETE] Create out-of-scope Issues → Verify review findings comment → Post fix comment → Status → Review
 ```
 
 ## File Category Detection
@@ -136,6 +138,51 @@ shirokuma-docs issues create \
 ```
 
 **Conditional execution**: Skip if out-of-scope count is 0.
+
+## Review Findings Comment Verification
+
+In the `[COMPLETE]` state processing, verify that the fork completed Step 6 PR comment posting.
+
+### Verification Procedure
+
+```bash
+shirokuma-docs issues comments {PR#}
+```
+
+Check the comment list for review findings comments (the review summary posted by `reviewing-on-issue` / `reviewing-claude-config` in Step 6).
+
+### Fallback
+
+If review findings comments are missing:
+
+1. Display warning: `⚠ Review findings comment was not posted. Posting fallback summary comment.`
+2. Post a simplified comment from the structured output (Self-Review Result) summary:
+
+```bash
+shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-fallback.md
+```
+
+**Fallback comment template:**
+
+```markdown
+## Self-Review Findings (Fallback)
+
+**Status:** {PASS | FAIL}
+**Critical:** {n} / **Fixable-warning:** {n} / **Out-of-scope:** {n}
+
+> This comment was auto-generated from the structured output summary because the review skill's Step 6 was not executed.
+```
+
+## Expected PR Comment Pattern
+
+| Case | Review Findings Comment | Fix Comment | Total |
+|------|------------------------|-------------|-------|
+| PASS (no issues) | 1 | Not needed | 1 |
+| PASS + out-of-scope | 1 | Not needed | 1 |
+| FAIL → auto-fix → PASS | 1 per iter | 1 | iter count + 1 |
+| FAIL → cannot converge | 1 per iter | Not needed | iter count |
+
+Review findings comments are posted by the `reviewing-on-issue` / `reviewing-claude-config` fork in Step 6. Fix comments are posted by the manager (`working-on-issue`).
 
 ## Fix Summary Comment
 

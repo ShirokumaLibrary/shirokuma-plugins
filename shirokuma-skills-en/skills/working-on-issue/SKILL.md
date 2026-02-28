@@ -18,7 +18,7 @@ Register **all chain steps** in TodoWrite **before starting work**.
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Implement changes | Implementing changes | `coding-on-issue` (fork) / `designing-shadcn-ui` |
+| 1 | Implement changes | Implementing changes | `coding-on-issue` (fork) / `designing-ui-on-issue` |
 | 2 | Commit and push changes | Committing and pushing | `committing-on-issue` (fork) |
 | 3 | Create pull request | Creating pull request | `creating-pr-on-issue` (fork) |
 | 4 | Run self-review and apply fixes | Running self-review | Manager directly manages (see reference) |
@@ -115,7 +115,7 @@ For Feature type, Size M+, suggest ADR creation (AskUserQuestion).
 | Work Type | Condition | Delegate To | TDD |
 |-----------|-----------|-------------|-----|
 | General Coding | Implementation, bug fix, refactoring, config, Markdown editing | `coding-on-issue` (fork) | Yes (implementation, bug fix, refactoring) |
-| UI Design | Keywords: `design`, `UI`, `memorable`, `impressive` | `designing-shadcn-ui` | No |
+| UI Design | Keywords: `design`, `UI`, `memorable`, `impressive` | `designing-ui-on-issue` | No |
 | Research | Keywords: `research`, `investigate` | `researching-best-practices` (fork) | No |
 | Review | Keywords: `review`, `audit` | `reviewing-on-issue` (fork) | No |
 | Project Setup | Keywords: `setup project`, `initialize` | `setting-up-project` | No |
@@ -160,14 +160,18 @@ After work completes, execute the chain **automatically**. No user confirmation 
 - No confirmation between steps, one-line progress reports
 - On failure: stop chain, report status, return control to user
 
+**Chain completion guarantee**: After each fork skill returns its result, the manager **immediately proceeds to the next step**. Fork result summaries are limited to one line and do not wait for user input. The Status Update at the end of the chain is executed directly by the manager (not via fork), eliminating the risk of chain interruption.
+
 #### Self-Review Loop (Manager Directly Manages)
 
 After PR creation, the manager directly manages self-review. See [reference/self-review-workflow.md](reference/self-review-workflow.md) for details.
 
+**Constraint**: Self-review MUST be launched via Skill tool (`reviewing-on-issue` / `reviewing-claude-config`). Using Agent (general-purpose) as a substitute is prohibited. Review skills post PR comments as part of their workflow; launching via other means results in review findings not being recorded on the PR.
+
 **State transition overview:**
 
 ```text
-[REVIEW] Launch review → [PARSE] Parse result → Decision
+[REVIEW] Launch review → [PARSE] Parse result → [PRESENT] Present result → Decision
   ├── PASS → [COMPLETE]
   ├── FAIL + Auto-fixable → [FIX] Task fix → [CONVERGE] Convergence check → [REVIEW]
   └── FAIL + Not auto-fixable → [REPORT]
@@ -177,6 +181,7 @@ After PR creation, the manager directly manages self-review. See [reference/self
 |-------|--------|
 | REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` as fork |
 | PARSE | Parse result, PASS/FAIL determination |
+| PRESENT | Present self-review result summary to user |
 | FIX | Delegate fix to `Task(general-purpose)` |
 | CONVERGE | Convergence check (numeric-based, stop after 2 consecutive non-decreases) |
 | REPORT | Report remaining issues to user |

@@ -18,30 +18,11 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 - コンポーネントライブラリ（shadcn/ui stable/canary）
 - i18n セットアップ（next-intl、messages 構造）
 
-### 1. デザインディスカバリー
+### 1. Design Brief 確認
 
-コードを書く前に理解してドキュメント化:
+`designing-ui-on-issue` から委任された場合、Design Brief と Aesthetic Direction が渡される。そのまま使用する。
 
-```markdown
-## Design Brief
-
-**Purpose**: このインターフェースが解決する問題は?
-**Context**: 技術的制約、既存のデザインシステム
-**Differentiation**: 何がこれを UNFORGETTABLE にする?
-
-## Aesthetic Direction
-
-**Tone**: [ONE を選択]
-- Brutally minimal / Maximalist chaos / Retro-futuristic
-- Organic/natural / Luxury/refined / Playful/toy-like
-- Editorial/magazine / Brutalist/raw / Art deco/geometric
-
-**Typography**: [フォントペアリングと根拠]
-**Color Palette**: [5-7色の HEX コード]
-**Motion Strategy**: [キーアニメーションモーメント]
-```
-
-ブリーフ作成後、`AskUserQuestion` でデザイン方向性を確認。
+スタンドアロンで起動された場合、Design Brief はスキップ可。ただし、美学方向性が不明な場合は最低限の方向性確認を推奨する。
 
 ### 2. 実装
 
@@ -62,15 +43,6 @@ pnpm --filter {app-name} build
 - [ ] モーション/アニメーションが喜びを追加
 - [ ] レイアウトに視覚的な面白さ
 - [ ] ビルドがエラーなしで通る
-
-### 5. レポート生成
-
-```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Design] {component-name}" \
-  --body-file report.md
-```
 
 ## デザインガイドライン
 
@@ -105,16 +77,18 @@ shirokuma-docs discussions create \
 
 ## 次のステップ
 
-`working-on-issue` チェーンではなくスタンドアロンで起動された場合:
+`designing-ui-on-issue` 経由で呼ばれた場合、制御は自動的にオーケストレーターに戻る。
+
+スタンドアロンで起動された場合:
 
 ```
-Design complete. Next step:
-→ `/committing-on-issue` to stage and commit your changes
+実装完了。次のステップ:
+→ `/committing-on-issue` で変更をコミット
+→ フルワークフローが必要な場合は `/designing-ui-on-issue` を使用
 ```
 
 ## 注意事項
 
 - **記憶に残ることが最優先**
 - **ビルドが通ること必須**
-- **レポート Discussion は必須**
-- ユーザーの美学方向性の確認なしに実装開始しない
+- Design Brief が渡された場合はそれに基づいて実装。スタンドアロン時はユーザーに美学方向性を確認してから実装

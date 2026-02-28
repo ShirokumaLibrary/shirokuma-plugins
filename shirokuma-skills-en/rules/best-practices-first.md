@@ -26,7 +26,8 @@ Skills support two invocation modes:
 | planning-on-issue | Yes | Yes | Via working-on-issue or standalone |
 | coding-on-issue | Yes | — | Fork delegation from working-on-issue only |
 | coding-nextjs | Yes | Yes | Via coding-on-issue or standalone |
-| designing-shadcn-ui | Yes | Yes | Via working-on-issue or standalone |
+| designing-ui-on-issue | Yes | Yes | Via working-on-issue or standalone |
+| designing-shadcn-ui | Yes | Yes | Via designing-ui-on-issue or standalone |
 | creating-item | — | Yes | Always standalone-capable |
 | committing-on-issue | Yes | Yes | Fork (standalone also runs as fork) |
 | creating-pr-on-issue | Yes | Yes | Fork (via chain or standalone) |
@@ -48,7 +49,7 @@ Standalone invocations do not require `ending-session`. However, when standalone
 | Task Type | Route To | Method |
 |-----------|----------|--------|
 | General Coding | `coding-on-issue` | Skill (`context: fork`, via `working-on-issue`) |
-| UI Design | `designing-shadcn-ui` | Skill (via `working-on-issue`) |
+| UI Design | `designing-ui-on-issue` | Skill (via `working-on-issue`) |
 | Research | `researching-best-practices` | Skill (`context: fork`) |
 | Review | `reviewing-on-issue` | Skill (`context: fork`) |
 | Claude Config | `reviewing-claude-config` | Skill (`context: fork`) |

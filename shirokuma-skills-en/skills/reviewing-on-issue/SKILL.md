@@ -340,11 +340,17 @@ If analysis is incomplete:
 
 When invoked from `working-on-issue` delegated chain or `creating-pr-on-issue` self-review chain, return structured output that the caller can parse for automated decisions.
 
-> **Important**: Step 6 (Save Report) is non-optional even in self-review mode. When a PR number is in context, the review report MUST be posted as a PR comment before returning the structured output below.
+### Self-Review Execution Steps
+
+In self-review mode, execute the following steps **in order**:
+
+1. **Execute Steps 1-5 normally** — Role selection, knowledge loading, lint, analysis, report generation
+2. **Step 6: Post PR comment (REQUIRED)** — When a PR number is in context, post the review report as a PR comment. This step is non-optional
+3. **Return structured output** — Return a summary in the format below for the caller's automated decision-making
 
 ### Structured Output Format
 
-In addition to the normal report saving (Step 6), return a summary in this format:
+After posting the PR comment in Step 6, return a summary in this format:
 
 ```text
 ## Self-Review Result

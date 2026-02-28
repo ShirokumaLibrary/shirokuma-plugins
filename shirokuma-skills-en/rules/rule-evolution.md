@@ -58,6 +58,26 @@ Accumulate signals as comments in Evolution Issues.
 
 **Ambiguous area:** When `discovering-codebase-rules` detects existing rule deficiencies, record as a comment in an Evolution Issue. `discovering-codebase-rules` itself does not modify rules (new proposals only).
 
+## Evolution Issue Lifecycle
+
+One analysis cycle corresponds to one Evolution Issue. After analysis, the Issue is closed to prevent re-reading stale signals in subsequent invocations.
+
+```
+Open → Accumulate signals → Analyze (evolving-rules) → Close → New Issue for next cycle
+```
+
+| Phase | State | Action |
+|-------|-------|--------|
+| Signal accumulation | Open | Auto-recording at skill completion, manual recording |
+| Analysis triggered | Open | `evolving-rules` reads and processes all comments |
+| Analysis complete | Closed | `evolving-rules` Step 7 closes the Issue after posting summary |
+| New signals after close | — | New Evolution Issue is created automatically (auto-recording flow) |
+
+**Rules:**
+- Do not reopen a closed Evolution Issue — create a new one instead
+- `evolving-rules` always operates on the most recent **open** Evolution Issue
+- Closing ensures that previously analyzed signals are not re-processed
+
 ## Auto-Recording Procedure at Skill Completion
 
 At the completion of major skills (`working-on-issue`, `planning-on-issue`, `creating-item`), auto-record Evolution signals detected during the session using the following procedure. Each skill references this section to perform auto-recording.

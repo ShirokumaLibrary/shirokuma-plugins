@@ -8,8 +8,10 @@
 [チェーン] committing → creating-pr → セルフレビュー開始
     ↓
 [REVIEW] レビュー起動（Fork: reviewing-on-issue / reviewing-claude-config）
-    ↓
+    ↓  ※ fork はステップ 6 で PR コメントを投稿してから構造化出力を返す
 [PARSE] 結果パース + PASS/FAIL 判定
+    ↓
+[PRESENT] セルフレビュー結果サマリーをユーザーに提示（完了報告テンプレート使用）
     ↓
   ├── PASS → [COMPLETE]
   ├── FAIL + Auto-fixable: yes → [FIX]
@@ -25,7 +27,7 @@
 
 [REPORT] ユーザーに報告
     ↓
-[COMPLETE] out-of-scope Issue 作成 → 修正コメント投稿 → Status → Review
+[COMPLETE] out-of-scope Issue 作成 → レビュー所見コメント確認 → 修正コメント投稿 → Status → Review
 ```
 
 ## ファイルカテゴリ検出
@@ -136,6 +138,51 @@ shirokuma-docs issues create \
 ```
 
 **条件付き実行**: out-of-scope が 0 件の場合はスキップ。
+
+## レビュー所見コメント確認
+
+`[COMPLETE]` ステートの処理で、fork がステップ 6 の PR コメント投稿を完了したか確認する。
+
+### 確認手順
+
+```bash
+shirokuma-docs issues comments {PR#}
+```
+
+コメント一覧からレビュー所見コメント（`reviewing-on-issue` / `reviewing-claude-config` がステップ 6 で投稿するレビューサマリー）の有無を確認する。
+
+### フォールバック
+
+レビュー所見コメントが欠落している場合:
+
+1. 警告を表示: `⚠ レビュー所見コメントが未投稿です。フォールバックで簡易コメントを投稿します。`
+2. 構造化出力（Self-Review Result）の要約を簡易コメントとして投稿:
+
+```bash
+shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-fallback.md
+```
+
+**簡易コメントテンプレート:**
+
+```markdown
+## セルフレビュー所見（フォールバック）
+
+**Status:** {PASS | FAIL}
+**Critical:** {n} 件 / **Fixable-warning:** {n} 件 / **Out-of-scope:** {n} 件
+
+> このコメントはレビュースキルのステップ 6 が未実行だったため、構造化出力の要約から自動生成されました。
+```
+
+## 期待 PR コメントパターン
+
+| ケース | レビュー所見コメント | 修正コメント | 合計 |
+|--------|---------------------|------------|------|
+| PASS（問題なし） | 1 件 | 不要 | 1 件 |
+| PASS + out-of-scope | 1 件 | 不要 | 1 件 |
+| FAIL → 自動修正 → PASS | 各 iter 1 件 | 1 件 | iter 数 + 1 件 |
+| FAIL → 収束不能 | 各 iter 1 件 | 不要 | iter 数分 |
+
+レビュー所見コメントは `reviewing-on-issue` / `reviewing-claude-config` の fork がステップ 6 で投稿する。修正コメントはマネージャー（`working-on-issue`）が投稿する。
 
 ## 修正コメント投稿
 

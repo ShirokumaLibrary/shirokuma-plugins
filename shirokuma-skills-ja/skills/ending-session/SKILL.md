@@ -77,7 +77,7 @@ git status --short
 ```
 
 未コミット変更がある場合、AskUserQuestion でコミットするか確認。
-`committing-on-issue` スキルのワークフローに従い、特定ファイルをステージ、Conventional Commits メッセージを作成（Co-Authored-By なし）、コミット。
+`committing-on-issue` スキルのワークフローに従い、特定ファイルをステージ、Conventional Commits メッセージを作成、コミット。
 
 #### 3b. ブランチプッシュ
 
