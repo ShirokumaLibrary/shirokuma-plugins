@@ -85,7 +85,7 @@ Skill completion → Self-review via detection checklist
 
 1. Search for Evolution Issues:
    ```bash
-   shirokuma-docs search "[Evolution]" --type issues --limit 1
+   shirokuma-docs issues list --issue-type Evolution --limit 1
    ```
 2. If 0 issues found, create a general-purpose Evolution Issue:
    ```bash
@@ -110,7 +110,7 @@ Skill completion → Self-review via detection checklist
 Check for accumulated signals and display a reminder:
 
 ```bash
-shirokuma-docs search "[Evolution]" --type issues --limit 1
+shirokuma-docs issues list --issue-type Evolution --limit 1
 ```
 
 - 0 issues → display nothing
@@ -123,7 +123,7 @@ shirokuma-docs search "[Evolution]" --type issues --limit 1
 - Maximum 1 comment per skill completion (consolidate multiple signals)
 - Do not register in TodoWrite (non-blocking processing)
 - Self-review uses concise checklist format to minimize context consumption
-- When no signals detected, minimize CLI command execution (`search` once only)
+- When no signals detected, minimize CLI command execution (`issues list` once only)
 
 ## Standalone Signal Recording
 
@@ -146,7 +146,7 @@ Command snippet to record signals in Evolution Issues:
 
 ```bash
 # 1. Find Evolution Issue
-shirokuma-docs search "[Evolution]" --type issues --limit 5
+shirokuma-docs issues list --issue-type Evolution --limit 5
 
 # 2. Post signal as comment
 shirokuma-docs issues comment {issue-number} --body-file - <<'EOF'

@@ -27,6 +27,35 @@ Writing style for GitHub content (Issues, PRs, Discussions body and comments).
 | List without lead-in | Missing context, meaning unclear | Add one introductory sentence |
 | Single-item list | Bullet adds no value | Convert to prose |
 
+## Mermaid Diagrams
+
+GitHub renders Mermaid natively. Use diagrams to explain complex structures and flows.
+
+### When to Include
+
+| Condition | Include Mermaid | Diagram Type |
+|-----------|----------------|--------------|
+| 3+ tasks with dependencies | Yes | Flowchart |
+| State transitions described | Yes | State diagram |
+| 2+ components interacting | Yes | Sequence diagram |
+| Simple linear task list | No | — |
+| Single file change | No | — |
+
+### Style Rules
+
+- **Node limit**: Maximum 10 nodes per diagram. Split into sub-diagrams if exceeded
+- **Labels**: Keep concise (~10 characters per node)
+- **Direction**: Use `graph TD` (top-down) or `graph LR` (left-right) as appropriate
+- **Code block**: Wrap in ` ```mermaid `
+
+### Anti-Patterns
+
+| Pattern | Problem | Fix |
+|---------|---------|-----|
+| Diagramming what text explains well | Redundant, increases maintenance cost | Only use diagrams when conditions table applies |
+| Giant diagram with 10+ nodes | Poor readability | Split into sub-diagrams |
+| Diagram without explanation | Missing context | Add one sentence before/after the diagram |
+
 ## Scope
 
-Applies to GitHub Issues / PRs / Discussions body and comments. For skill completion report style, see `completion-report-style` rule. For Claude config file structure, see `managing-agents/documentation-structure.md`.
+Applies to GitHub Issues / PRs / Discussions body and comments. Skill completion reports (`completion-report-style` rule) are excluded. For Claude config file structure, see `managing-agents/documentation-structure.md`.

@@ -1,12 +1,12 @@
 # TDD Common Workflow
 
 Common TDD (Test-Driven Development) steps orchestrated by `working-on-issue`.
-Executed before and after the implementation skill (`coding-nextjs`, direct edit, etc.).
+Wraps the `coding-on-issue` (fork) invocation with TDD steps.
 
 ## Flow
 
-```
-Test Design → Test Creation → Test Gate → [Implementation Skill] → Test Run → Verification
+```text
+Test Design → Test Creation → Test Gate → [coding-on-issue] → Test Run → Verification
 ```
 
 ## Step 1: Test Design
@@ -45,6 +45,8 @@ it("should create a new user", async () => {
   // test implementation
 });
 ```
+
+> @testdoc content must be written in English.
 
 ## Step 3: Test Gate
 

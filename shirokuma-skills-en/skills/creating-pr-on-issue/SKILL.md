@@ -1,7 +1,9 @@
 ---
 name: creating-pr-on-issue
 description: Create a GitHub pull request for the current branch to develop (or integration branch for sub-issues). Use when "create pull request", "create PR", "open PR".
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
+context: fork
+agent: general-purpose
+allowed-tools: Bash, Read, Grep, Glob
 ---
 
 # Creating Pull Request
@@ -25,7 +27,7 @@ git log --oneline develop..HEAD
 - All changes should be committed
 - Branch should have commits ahead of `develop`
 
-If on `develop` or `main`, inform user to create a feature branch first.
+If on `develop` or `main`, return an error.
 
 ### Step 2: Push Branch
 
@@ -58,8 +60,8 @@ When a sub-issue is detected, determine the integration branch in this order:
 1. **Extract from parent issue body**: Fetch the parent issue with `shirokuma-docs issues show {parent-number}` and look for a `### Integration Branch` (EN) / `### Integration ブランチ` (JA) heading. Extract the branch name from the backtick block immediately following the heading (any prefix accepted: `epic/`, `chore/`, `feat/`, etc.)
 2. **Fallback (remote branch search)**: `git branch -r --list "origin/*/{parent-number}-*"`
    - 1 match → auto-select
-   - Multiple matches → AskUserQuestion for user selection
-   - 0 matches → fall back to `develop` and warn user
+   - Multiple matches → select first match, include alternatives in result
+   - 0 matches → fall back to `develop`, include warning in result
 3. **Final fallback**: `develop`
 
 ```bash
@@ -85,7 +87,7 @@ Understand the full scope of changes, not just the latest commit.
 
 ### Step 4: Create PR
 
-Write the PR body to a file, then create the PR:
+Write the PR body to a file, then create the PR. When changes meet the Mermaid conditions in the `github-writing-style` rule, include diagrams in the PR body.
 
 ```markdown
 <!-- /tmp/shirokuma-docs/{number}-pr-body.md -->
@@ -113,7 +115,7 @@ shirokuma-docs issues pr-create --base {base_branch} --title "{title}" --body-fi
 
 **Title examples:**
 
-```
+```text
 feat: add branch workflow rules
 fix: resolve cross-repo Projects lookup
 docs: update CLAUDE.md command table
@@ -122,7 +124,7 @@ chore: update dependencies
 
 **Bad examples (non-English text in EN plugin):**
 
-```
+```text
 feat: ブランチワークフロールールを追加    ← Wrong: not English
 docs: CLAUDE.md のコマンド一覧を更新      ← Wrong: not English
 ```
@@ -148,206 +150,6 @@ docs: CLAUDE.md のコマンド一覧を更新      ← Wrong: not English
 - Closes #{number}
 - Refs #{number}
 ```
-
-### Step 6: Self-Review Chain
-
-After PR creation, **always auto-execute** self-review.
-
-> **⚠️ Do NOT change Status**: During self-review (while Step 6 is executing), do NOT change the Issue Status. Status MUST remain **In Progress**. Transition to Review happens only in Step 7.
-
-#### 6a. File Category Detection
-
-Get changed files via `git diff --name-only develop..HEAD` and classify:
-
-| Category | Condition |
-|----------|-----------|
-| config | Files under `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/` |
-| code | `.ts`, `.tsx`, `.js`, `.jsx` files |
-| docs | `.md` files (excluding config paths above) |
-
-**Routing:**
-
-| File Composition | Review Method |
-|-----------------|---------------|
-| config only | Invoke `reviewing-claude-config` only |
-| code/docs only (no config) | Invoke `reviewing-on-issue` only (as before) |
-| mixed (config + code/docs) | Invoke `reviewing-on-issue` → `reviewing-claude-config` sequentially → merge results |
-
-**Result merging rules (mixed case):**
-- Status: either FAIL → FAIL
-- Critical: sum of both
-- Fixable-warning: sum of both
-- Out-of-scope: sum of both
-- Files with issues: merge
-- Auto-fixable: either no → no
-- Out-of-scope items: merge
-
-#### 6b. Self-Review Loop
-
-```mermaid
-graph LR
-  A[PR created] --> B[Category detection] --> C[Routing] --> D[Review] --> E{Issues found?}
-  E -->|FAIL + Auto-fixable| F[Auto-fix] --> G[Commit] --> H[Push] --> I{Convergence check}
-  I -->|Progress| D
-  I -->|Not converging or safety limit| K[Ask user]
-  E -->|FAIL + Not auto-fixable| J[Stop loop, report to user]
-  E -->|PASS| L[Done] --> M{Out-of-scope?}
-  M -->|Yes| N[Create follow-up Issues]
-  M -->|No| O[To 6c]
-  J --> M
-  K --> M
-```
-
-**PASS/FAIL criteria:**
-- **PASS**: critical = 0 and fixable-warning = 0 (out-of-scope only is still PASS)
-- **FAIL**: critical > 0 or fixable-warning > 0
-
-**Convergence check (numeric):** Compare the total count of `critical + fixable-warning` against the previous iteration.
-
-| State | Logic | Action |
-|-------|-------|--------|
-| Total decreased from previous | Progress | Continue |
-| Total same as previous | Grace period | Continue once (fix may have introduced different issues) |
-| Total not decreased for 2 consecutive iterations | Not converging | Ask user |
-| Total increased from previous | Worsening | Ask user immediately |
-| Total = 0 | Complete | PASS |
-| Safety limit (5) reached | Failsafe | Ask user |
-
-**Safety limit rationale (5 iterations)**: Up to 2 for critical fixes + up to 2 for fixable-warning fixes + 1 buffer.
-
-**Safety limit fallback**: Convert remaining fixable-warnings to follow-up Issues and treat as PASS after user confirmation.
-
-**Steps:**
-
-1. Detect category and invoke appropriate skill(s) (pass PR number as context)
-2. Check the Self-Review Result and verify that the review report was posted as a PR comment. If not posted, manually post via `shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-summary.md`:
-   - **PASS**: End loop, proceed to out-of-scope processing (6c)
-   - **FAIL + Auto-fixable: yes**: Auto-fix (critical + fixable-warning) based on findings → `git add` → `git commit` → `git push` → convergence check → re-review
-   - **FAIL + Auto-fixable: no**: Stop loop, report issues requiring manual intervention, proceed to out-of-scope processing (6c)
-3. Not converging or safety limit reached: ask user, proceed to out-of-scope processing (6c)
-
-**Safety measures:**
-- Triple guard: convergence check (numeric, 2 consecutive non-decrease → stop) + safety limit of 5
-- Safety limit fallback: convert remaining fixable-warnings to follow-up Issues for guaranteed termination
-- Accumulate feedback from each iteration (via `reviewing-on-issue` feedback accumulation)
-
-**Progress reporting:**
-
-```text
-Self-review [1/5]: Category detection → config + code (mixed)
-  Running reviewing-on-issue...
-  Running reviewing-claude-config...
-  → Merged result: 1 critical, 2 fixable-warning detected, auto-fixing...
-  → Fix complete, commit & push
-
-Self-review [2/5]: Re-reviewing...
-  → 0 critical, 1 fixable-warning detected (decreased), auto-fixing...
-
-Self-review [3/5]: Re-reviewing...
-  → PASS (0 critical, 0 fixable-warning, 1 out-of-scope)
-  → Creating follow-up Issues...
-```
-
-#### 6c. Out-of-Scope Follow-up Issue Creation
-
-After the self-review loop completes (PASS, loop stopped, or safety limit reached), if the final iteration's Self-Review Result contains `Out-of-scope items`, create follow-up Issues.
-
-**Deduplication**: Only use the out-of-scope list from the final iteration. Results from each iteration are preserved in PR comments so no information is lost.
-
-**Steps:**
-
-1. Extract the `Out-of-scope items` list from the Self-Review Result
-2. Create an Issue for each out-of-scope item via `shirokuma-docs issues create`
-3. Include `Refs #{N}` referencing the main Issue in the body
-4. Fields (Status: Backlog, Priority/Size/Type) are determined by the AI based on the nature of each finding
-
-```bash
-shirokuma-docs issues create \
-  --title "{finding title}" \
-  --body-file /tmp/shirokuma-docs/{number}-out-of-scope.md \
-  --field-status "Backlog" \
-  --field-priority "{AI-determined}" \
-  --field-size "{AI-determined}"
-```
-
-**Conditional execution**: Skip this step if out-of-scope count is 0.
-
-#### 6d. Post Fix Summary Comment and Reflect Review Results in Issue Body
-
-After the self-review loop completes (PASS or loop stopped), post a fix summary comment if auto-fixes were applied, then update the Issue body as needed.
-
-##### Fix Summary Comment
-
-| Review Result | Fix Summary Comment |
-|--------------|---------------------|
-| PASS (no issues) | Not needed. The review comment itself serves as the comment-first "comment" |
-| PASS + out-of-scope | Not needed. Follow-up Issue creation is handled in Step 6c |
-| FAIL → auto-fix → PASS | **Required**. Aggregate all fixes across iterations with commit hash references |
-
-When auto-fixes were applied, post one fix summary comment to the PR:
-
-```bash
-shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-fix-summary.md
-```
-
-**Fix summary comment template:**
-
-```markdown
-## Self-Review Fix Summary
-
-**Iterations:** {n}
-**Fixes:** {critical} critical, {fixable-warning} warning
-
-### Fix List
-| File | Fix Description | Classification | Commit |
-|------|----------------|----------------|--------|
-| `path/to/file.ts` | {fix description} | critical | {short-hash} |
-
-[If follow-up Issues exist:]
-### Follow-up Issues
-- #{follow-up-number}: {title} (out-of-scope)
-```
-
-##### Update Issue Body
-
-If review findings require Issue body updates (e.g., task list additions, security fix notes):
-
-- **Consolidate into body**: Integrate review findings into the relevant section of the Issue body (task list, deliverables, etc.). Follow the patterns described in the "Updating Body from Review Results" section of `item-maintenance.md`.
-
-**Conditional execution**: If the review is PASS with no findings, skip this step — no body update is needed.
-
-##### Self-Review Completion Report
-
-After 6d processing completes, report the self-review results to the user:
-
-```markdown
-## Self-Review Complete
-
-| Item | Count |
-|------|-------|
-| Issues detected | {total} |
-| Auto-fixed | {fixed} |
-| Remaining issues | {remaining} |
-| Follow-up Issues | {follow-up} |
-
-[No issues: "No issues were detected"]
-[PASS + out-of-scope: "No issues were detected ({n} follow-up Issues)"]
-[Remaining: "The following issues remain unresolved: {list}"]
-```
-
-After 6d completes, proceed to Step 7 (Update Status).
-
-### Step 7: Update Status
-
-> **Precondition**: Step 6 (self-review chain) must be fully complete. Do NOT execute this step while self-review is still running.
-
-After the self-review chain completes (PASS or loop stopped), update Status to Review if invoked with an issue number:
-
-```bash
-shirokuma-docs issues update {number} --field-status "Review"
-```
-
-If no issue number was provided, skip this step (`ending-session` safety net covers it).
 
 ## Batch Mode
 
@@ -376,19 +178,12 @@ git log --oneline develop..HEAD
 - {change summary from commits}
 
 ## Related Issues
-Closes #{N1}, #{N2}, #{N3}
+Closes #{N1}
+Closes #{N2}
+Closes #{N3}
 
 ## Test Plan
 - [ ] {verification steps}
-```
-
-### Batch Status Update (Step 7)
-
-Update all linked issues to Review status:
-
-```bash
-shirokuma-docs issues update {n} --field-status "Review"
-# (repeat for each issue)
 ```
 
 ## Arguments
@@ -407,22 +202,23 @@ Review reports output by `reviewing-on-issue` during self-review must also follo
 
 | Situation | Action |
 |-----------|--------|
-| On develop or main | Error: must be on a feature branch |
-| Uncommitted changes | Warn user, suggest committing first |
-| No commits ahead of base | Error: nothing to create PR for |
-| PR already exists for branch | Show existing PR URL instead |
-| Push fails | Show error, suggest `git pull --rebase` |
-| Sub-issue with no integration branch found | Use `develop` as base and warn user |
+| On develop or main | Return error: must be on a feature branch |
+| Uncommitted changes | Return error: commit first |
+| No commits ahead of base | Return error: nothing to create PR for |
+| PR already exists for branch | Include existing PR URL in result |
+| Push fails | Return error, suggest `git pull --rebase` |
+| Sub-issue with no integration branch found | Use `develop` as base, include warning in result |
 | Integration branch PR | Include `Closes #N` in body (GitHub sidebar won't show link, but CLI handles it) |
-| Multiple branches match fallback search | AskUserQuestion for user selection |
-| Base branch was wrong after PR creation | Fix via REST API: `gh api repos/{owner}/{repo}/pulls/{pr-number} --method PATCH -f base="correct-branch"` (`gh pr edit --base` fails with Projects classic error, do not use) |
+| Multiple branches match fallback search | Select first match, include alternatives in result |
+| Base branch was wrong after PR creation | Fix via REST API: `gh api repos/{owner}/{repo}/pulls/{pr-number} --method PATCH -f base="correct-branch"` |
 
 ## Next Steps (Standalone Invocation Only)
 
-When invoked from the `working-on-issue` chain, the chain continues automatically after self-review; this section does not apply. Only suggest the next workflow step when invoked standalone:
+When invoked from the `working-on-issue` chain, the chain continues automatically; this section does not apply. Only when invoked standalone:
 
-```
-PR created. Next step:
+```text
+PR created. Next steps:
+→ Run `/reviewing-on-issue` for self-review if needed
 → `/ending-session` to save handover and update issue statuses
 ```
 
@@ -432,8 +228,6 @@ PR created. Next step:
 - Never create PRs from `develop` or `main`
 - Daily work PRs target `develop`; only hotfixes target `main`
 - Direct PRs to `main` are prohibited (exception: hotfixes only)
-- If no branch exists or changes are uncommitted, use AskUserQuestion to suggest committing or creating a branch
 - Include issue references for automatic linking
 - PR body should be informative but concise
-- Self-review always runs automatically after PR creation
 - Do not include AI attribution lines (e.g. "🤖 Generated with Claude Code") in PR body

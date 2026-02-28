@@ -1,0 +1,212 @@
+# セルフレビューワークフロー リファレンス
+
+`working-on-issue` ステップ 5 チェーン内で実行されるセルフレビューループの詳細仕様。
+
+## 状態遷移
+
+```text
+[チェーン] committing → creating-pr → セルフレビュー開始
+    ↓
+[REVIEW] レビュー起動（Fork: reviewing-on-issue / reviewing-claude-config）
+    ↓
+[PARSE] 結果パース + PASS/FAIL 判定
+    ↓
+  ├── PASS → [COMPLETE]
+  ├── FAIL + Auto-fixable: yes → [FIX]
+  └── FAIL + Auto-fixable: no → [REPORT]
+
+[FIX] 修正委任（Task: general-purpose）→ 修正サマリー受取
+    ↓
+[CONVERGE] 収束判定
+    ↓
+  ├── 進捗あり → [REVIEW]（再レビュー）
+  ├── 収束不能 → [REPORT]
+  └── 安全上限（5回） → [REPORT]
+
+[REPORT] ユーザーに報告
+    ↓
+[COMPLETE] out-of-scope Issue 作成 → 修正コメント投稿 → Status → Review
+```
+
+## ファイルカテゴリ検出
+
+`git diff --name-only develop..HEAD` で変更ファイルを取得し、カテゴリを判定:
+
+| カテゴリ | 判定条件 |
+|---------|---------|
+| config | `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/` 配下 |
+| code | `.ts`, `.tsx`, `.js`, `.jsx` ファイル |
+| docs | `.md` ファイル（上記 config パス配下を除く） |
+
+### レビュールーティング
+
+| ファイル構成 | レビュー方法 |
+|-------------|-------------|
+| config のみ | `reviewing-claude-config` のみ起動 |
+| code/docs のみ（config なし） | `reviewing-on-issue` のみ起動 |
+| 混在（config + code/docs） | `reviewing-on-issue` → `reviewing-claude-config` 順次起動 → 結果統合 |
+
+### 混在時の結果統合ルール
+
+- Status: いずれかが FAIL → FAIL
+- Critical: 両方の合計
+- Fixable-warning: 両方の合計
+- Out-of-scope: 両方の合計
+- Files with issues: マージ
+- Auto-fixable: いずれかが no → no
+- Out-of-scope items: マージ
+
+## PASS/FAIL 判定
+
+- **PASS**: critical = 0 かつ fixable-warning = 0（out-of-scope のみでも PASS）
+- **FAIL**: critical > 0 または fixable-warning > 0
+
+## 収束判定ロジック
+
+`critical + fixable-warning` の合計数を前回イテレーションと比較する。
+
+| 状態 | 判定ロジック | アクション |
+|------|-------------|----------|
+| 合計数が前回未満 | 進捗あり | 継続 |
+| 合計数が前回と同数 | 猶予 | 1 回のみ継続（修正で別の指摘が出た可能性） |
+| 合計数が 2 回連続で減少しない | 収束不能 | ユーザーに報告 |
+| 合計数が前回より増加 | 悪化 | 即座にユーザーに報告 |
+| 合計数 = 0 | 完了 | PASS |
+| 安全上限（5 回）到達 | フェイルセーフ | ユーザーに報告 |
+
+**安全上限 5 回の根拠**: critical 修正に最大 2 回 + fixable-warning 修正に最大 2 回 + バッファ 1 回。
+
+**安全上限到達時のフォールバック**: 残りの fixable-warning をフォローアップ Issue 化し、ユーザー確認後に PASS として扱う。
+
+## 修正エージェント（Task）
+
+修正が必要な場合、`Task(general-purpose)` に委任する。
+
+### プロンプトテンプレート
+
+```text
+以下のセルフレビュー結果に基づき、指摘された問題を修正してください。
+
+## レビュー結果
+{reviewing-on-issue / reviewing-claude-config の fork 出力全文}
+
+## 修正対象
+- Critical: {件数} 件
+- Fixable-warning: {件数} 件
+
+## 修正手順
+1. 各指摘に対応するファイルを特定し修正
+2. 修正が完了したら `git add` でステージ
+3. コミットメッセージ: `fix: セルフレビュー指摘を修正 [iter {n}] (#{issue-number})`
+4. 修正できない指摘は「修正不可」として報告
+
+## 出力形式
+修正サマリーを以下の形式で報告:
+- 修正ファイル数: {n}
+- コミットハッシュ: {hash}
+- 修正内容リスト:
+  - `{file}`: {修正内容} ({critical/warning})
+- 修正不可リスト（あれば）:
+  - `{file}`: {理由}
+```
+
+### 修正 Task の仕様
+
+| 項目 | 内容 |
+|------|------|
+| 入力 | reviewing-on-issue / reviewing-claude-config の fork 出力全文 |
+| 出力 | 修正サマリー（ファイル数、コミットハッシュ、修正内容リスト） |
+| ツール | Read, Edit, Bash（Task general-purpose は全ツールにアクセス可能） |
+| コミットメッセージ | `fix: セルフレビュー指摘を修正 [iter {n}] (#{issue-number})` |
+| エラー時 | 修正できない指摘はサマリーに「修正不可」として報告 |
+
+## out-of-scope フォローアップ Issue 作成
+
+セルフレビューループ完了後（PASS、ループ停止、安全上限到達のいずれか）、最終イテレーションの Self-Review Result に `Out-of-scope items` がある場合にフォローアップ Issue を作成する。
+
+**重複排除**: 最終イテレーションの out-of-scope リストのみを使用。各イテレーションの結果は PR コメントに残るため情報は失われない。
+
+```bash
+shirokuma-docs issues create \
+  --title "{指摘のタイトル}" \
+  --body-file /tmp/shirokuma-docs/{number}-out-of-scope.md \
+  --field-status "Backlog" \
+  --field-priority "{AI判断}" \
+  --field-size "{AI判断}"
+```
+
+**条件付き実行**: out-of-scope が 0 件の場合はスキップ。
+
+## 修正コメント投稿
+
+自動修正が行われた場合、PR に修正内容コメントを 1 回投稿する。
+
+| レビュー結果 | 修正内容コメント |
+|-------------|----------------|
+| PASS（問題なし） | 不要 |
+| PASS + out-of-scope あり | 不要（フォローアップ Issue 作成は別処理） |
+| FAIL → 自動修正 → PASS | **必要** |
+
+```bash
+shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-fix-summary.md
+```
+
+**修正内容コメントテンプレート:**
+
+```markdown
+## セルフレビュー修正内容
+
+**イテレーション数:** {n}回
+**修正数:** {critical} critical, {fixable-warning} warning
+
+### 修正一覧
+| ファイル | 修正内容 | 分類 | コミット |
+|---------|---------|------|---------|
+| `path/to/file.ts` | {修正の説明} | critical | {short-hash} |
+
+[フォローアップ Issue がある場合:]
+### フォローアップ Issue
+- #{follow-up-number}: {タイトル}（out-of-scope）
+```
+
+## Issue 本文の更新
+
+レビュー指摘により Issue 本文の更新が必要な場合（タスクリストの追加、セキュリティ修正メモ等）:
+
+- **本文への統合**: レビュー指摘に基づき、Issue 本文の該当セクション（タスクリスト、成果物等）を更新。具体的な手順パターンは `item-maintenance.md` の「レビュー結果からの本文更新」セクションを参照。
+
+**条件付き実行**: レビューが PASS で指摘がない場合は不要。
+
+## セルフレビュー完了報告
+
+```markdown
+## セルフレビュー完了
+
+| 項目 | 数 |
+|------|-----|
+| 検出問題 | {total} 件 |
+| 自動修正 | {fixed} 件 |
+| 残存問題 | {remaining} 件 |
+| フォローアップ Issue | {follow-up} 件 |
+
+[問題なし: 「問題は検出されませんでした」]
+[PASS + out-of-scope: 「問題は検出されませんでした（フォローアップ Issue {n} 件）」]
+[残存あり: 「以下の問題が未解決です: {一覧}」]
+```
+
+## 進捗報告テンプレート
+
+```text
+セルフレビュー [1/5]: カテゴリ検出 → config + code（混在）
+  reviewing-on-issue 実行中...
+  reviewing-claude-config 実行中...
+  → 統合結果: 1 critical, 2 fixable-warning 検出、修正 Task 起動中...
+  → 修正完了、コミット・プッシュ
+
+セルフレビュー [2/5]: 再レビュー実行中...
+  → 0 critical, 1 fixable-warning 検出（前回より減少）、修正 Task 起動中...
+
+セルフレビュー [3/5]: 再レビュー実行中...
+  → PASS（0 critical, 0 fixable-warning, 1 out-of-scope）
+  → フォローアップ Issue 作成中...
+```

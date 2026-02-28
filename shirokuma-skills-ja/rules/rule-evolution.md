@@ -85,7 +85,7 @@ Evolution Issue にシグナルをコメントとして蓄積する。
 
 1. Evolution Issue を検索:
    ```bash
-   shirokuma-docs search "[Evolution]" --type issues --limit 1
+   shirokuma-docs issues list --issue-type Evolution --limit 1
    ```
 2. Issue が 0 件の場合、汎用 Evolution Issue を作成:
    ```bash
@@ -110,7 +110,7 @@ Evolution Issue にシグナルをコメントとして蓄積する。
 既存シグナルの蓄積を確認し、リマインド表示する:
 
 ```bash
-shirokuma-docs search "[Evolution]" --type issues --limit 1
+shirokuma-docs issues list --issue-type Evolution --limit 1
 ```
 
 - Issue が 0 件 → 何も表示しない
@@ -123,7 +123,7 @@ shirokuma-docs search "[Evolution]" --type issues --limit 1
 - 1 スキル完了あたり最大 1 コメント（複数シグナルは 1 コメントに集約）
 - TodoWrite に登録しない（ノンブロッキング処理）
 - 振り返りは簡潔なチェックリスト形式でコンテキスト消費を最小化
-- シグナル未検出時は CLI コマンド実行を最小化（`search` 1 回のみ）
+- シグナル未検出時は CLI コマンド実行を最小化（`issues list` 1 回のみ）
 
 ## スタンドアロンシグナル記録
 
@@ -146,7 +146,7 @@ Evolution Issue にシグナルを記録するコマンドスニペット:
 
 ```bash
 # 1. Evolution Issue を検索
-shirokuma-docs search "[Evolution]" --type issues --limit 5
+shirokuma-docs issues list --issue-type Evolution --limit 5
 
 # 2. シグナルをコメントとして投稿
 shirokuma-docs issues comment {issue-number} --body-file - <<'EOF'

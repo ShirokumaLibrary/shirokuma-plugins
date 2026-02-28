@@ -14,31 +14,21 @@ Orchestrate the full workflow from planning to implementation, commit, PR, and s
 
 Register **all chain steps** in TodoWrite **before starting work**.
 
-**Implementation / Design / Bug Fix:**
+**Implementation / Design / Bug Fix / Refactoring / Chore:**
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Implement changes | Implementing changes | `coding-nextjs` / `designing-shadcn-ui` / direct edit |
-| 2 | Commit and push changes | Committing and pushing | `committing-on-issue` |
-| 3 | Create pull request | Creating pull request | `creating-pr-on-issue` |
-| 4 | Run self-review and post results to PR | Running self-review | `creating-pr-on-issue` Step 6 |
-| 5 | Update Status to Review | Updating Status to Review | `creating-pr-on-issue` Step 7 |
-
-**Refactoring / Chore:**
-
-| # | content | activeForm | Skill |
-|---|---------|------------|-------|
-| 1 | Make changes | Making changes | Direct edit |
-| 2 | Commit and push changes | Committing and pushing | `committing-on-issue` |
-| 3 | Create pull request | Creating pull request | `creating-pr-on-issue` |
-| 4 | Run self-review and post results to PR | Running self-review | `creating-pr-on-issue` Step 6 |
-| 5 | Update Status to Review | Updating Status to Review | `creating-pr-on-issue` Step 7 |
+| 1 | Implement changes | Implementing changes | `coding-on-issue` (fork) / `designing-shadcn-ui` |
+| 2 | Commit and push changes | Committing and pushing | `committing-on-issue` (fork) |
+| 3 | Create pull request | Creating pull request | `creating-pr-on-issue` (fork) |
+| 4 | Run self-review and apply fixes | Running self-review | Manager directly manages (see reference) |
+| 5 | Update Status to Review | Updating Status to Review | `shirokuma-docs issues update` |
 
 **Research:**
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Conduct research | Conducting research | `researching-best-practices` |
+| 1 | Conduct research | Conducting research | `researching-best-practices` (fork) |
 | 2 | Save findings to Discussion | Creating Discussion | `shirokuma-docs discussions create` |
 
 Update each step to `in_progress` when starting and `completed` when done.
@@ -48,6 +38,19 @@ Update each step to `in_progress` when starting and `completed` when done.
 ### Step 1: Analyze Work
 
 **Issue number provided**: `shirokuma-docs issues show {number}` to fetch title/body/labels/status/priority/size.
+
+#### Sub-Issue Detection
+
+When `shirokuma-docs issues show {number}` output contains a `parentIssue` field, the issue is a sub-issue of an epic:
+
+1. Reference the parent issue's `## Plan` section to understand overall context
+2. Set base branch to the parent's integration branch instead of `develop` (Step 3)
+3. `creating-pr-on-issue` will self-detect the sub-issue via the `parentIssue` field, so explicit context passing is not required (if passed, it is used as supplementary; otherwise, self-detection is the fallback)
+
+```bash
+# Check parent issue
+shirokuma-docs issues show {parent-number}
+```
 
 #### Plan Check (when issue number provided)
 
@@ -65,27 +68,13 @@ Check if issue body contains `## Plan` section (detected by `^## Plan` line pref
 | Planning + no plan | → Delegate to `planning-on-issue` |
 | Planning + plan exists | → Transition to Spec Review, ask user approval |
 
-#### Sub-Issue Detection
-
-When `shirokuma-docs issues show {number}` output contains a `parentIssue` field, the issue is a sub-issue of an epic:
-
-```
-parentIssue:
-  number: 958
-  title: "Migrate to Octokit"
-```
-
-When sub-issue is detected:
-- Record the parent issue number for base branch detection in Step 3
-- `creating-pr-on-issue` will self-detect the sub-issue via the `parentIssue` field, so explicit context passing is not required (if passed, it is used as supplementary; otherwise, self-detection is the fallback)
-
 **Text description only**: Classify using dispatch condition table (Step 4) keywords.
 
 ### Step 1a: Issue Resolution (text description only)
 
 When called with text only, delegate to `creating-item` skill to ensure an issue exists.
 
-```
+```text
 Text description → creating-item → Issue number → Join Step 1
 ```
 
@@ -125,21 +114,26 @@ For Feature type, Size M+, suggest ADR creation (AskUserQuestion).
 
 | Work Type | Condition | Delegate To | TDD |
 |-----------|-----------|-------------|-----|
-| Next.js Implementation | Labels: `area:frontend`, `area:cli` + Next.js | `coding-nextjs` | Yes |
-| UI Design | Keywords: `design`, `UI`, `memorable` | `designing-shadcn-ui` | No |
-| Bug Fix | Keywords: `fix`, `bug` | `coding-nextjs` or direct edit | Yes |
-| Refactoring | Keywords: `refactor`, `clean` | Direct edit | Yes |
+| General Coding | Implementation, bug fix, refactoring, config, Markdown editing | `coding-on-issue` (fork) | Yes (implementation, bug fix, refactoring) |
+| UI Design | Keywords: `design`, `UI`, `memorable`, `impressive` | `designing-shadcn-ui` | No |
 | Research | Keywords: `research`, `investigate` | `researching-best-practices` (fork) | No |
 | Review | Keywords: `review`, `audit` | `reviewing-on-issue` (fork) | No |
-| Config/Chore | Keywords: `config`, `setup`, `chore` | Direct edit | No |
 | Project Setup | Keywords: `setup project`, `initialize` | `setting-up-project` | No |
+
+**Pre-resolution logic**: Fork workers cannot use `AskUserQuestion`, so the manager resolves edge cases before invocation:
+
+| Edge Case | Manager's Pre-action |
+|-----------|---------------------|
+| Staging target files unclear | Check `git status` and pass file list as argument |
+| Multiple branch matches | Check branch list and pass correct branch as argument |
+| Uncommitted changes present | Invoke `committing-on-issue` first |
 
 #### TDD Workflow (when TDD applies)
 
-For TDD-applicable work types, wrap the implementation skill with TDD common steps:
+For TDD-applicable work types, wrap the `coding-on-issue` invocation with TDD:
 
-```
-Test Design → Test Creation → Test Gate → [Implementation Skill] → Test Run → Verification
+```text
+Test Design → Test Creation → Test Gate → [coding-on-issue] → Test Run → Verification
 ```
 
 See [docs/tdd-workflow.md](docs/tdd-workflow.md) for details.
@@ -159,20 +153,48 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 | Work Type | Chain |
 |-----------|-------|
-| Implementation / Design / Bug Fix | Work → Commit → PR → Review |
-| Refactoring / Chore | Work → Commit → PR → Review |
+| General Coding / Design | Work → Commit → PR → Self-Review → Status Update |
 | Research | Research → Discussion |
-
-> **Definition of "Review"**: The "Review" at the end of the chain includes both self-review execution (`creating-pr-on-issue` Step 6) **and** Status → Review update (Step 7).
 
 - **Merge is NOT part of the chain**
 - No confirmation between steps, one-line progress reports
-- **Self-review loop**: After PR creation, run `reviewing-on-issue` via `creating-pr-on-issue` Step 6
-  - FAIL + Auto-fixable → auto-fix → commit → push → re-review
-  - Maximum 3 iterations
-  - Stop if issue count increases between iterations
-- After self-review, review-based Issue body updates follow comment-first principle (handled by `creating-pr-on-issue` Step 6c)
 - On failure: stop chain, report status, return control to user
+
+#### Self-Review Loop (Manager Directly Manages)
+
+After PR creation, the manager directly manages self-review. See [reference/self-review-workflow.md](reference/self-review-workflow.md) for details.
+
+**State transition overview:**
+
+```text
+[REVIEW] Launch review → [PARSE] Parse result → Decision
+  ├── PASS → [COMPLETE]
+  ├── FAIL + Auto-fixable → [FIX] Task fix → [CONVERGE] Convergence check → [REVIEW]
+  └── FAIL + Not auto-fixable → [REPORT]
+```
+
+| State | Action |
+|-------|--------|
+| REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` as fork |
+| PARSE | Parse result, PASS/FAIL determination |
+| FIX | Delegate fix to `Task(general-purpose)` |
+| CONVERGE | Convergence check (numeric-based, stop after 2 consecutive non-decreases) |
+| REPORT | Report remaining issues to user |
+| COMPLETE | Create out-of-scope Issues → Post fix comment |
+
+**Safety limit**: 5 iterations (2 critical + 2 warning + 1 buffer). On reaching limit, convert remaining fixable-warnings to follow-up Issues.
+
+**Batch mode self-review**: Run once for the entire batch PR. After completion, update all batch Issue statuses to Review.
+
+#### Status Update (End of Chain)
+
+After self-review completion, update Status to Review for issues with a number:
+
+```bash
+shirokuma-docs issues update {number} --field-status "Review"
+```
+
+**Status fallback verification**: After chain completion, check Status via `shirokuma-docs issues show {number}`. If still In Progress → directly update with `shirokuma-docs issues update {number} --field-status "Review"` (idempotent: re-updating to Review when already Review is harmless).
 
 ### Step 6: Evolution Signal Auto-Recording
 
@@ -203,13 +225,14 @@ If any issue fails eligibility, inform user and suggest individual processing.
 
 ### Batch TodoWrite Template
 
-```
+```text
 [1] Implement #N1 / Implementing #N1
 [2] Implement #N2 / Implementing #N2
 ...
 [K] Commit and push all changes / Committing and pushing
 [K+1] Create pull request / Creating pull request
 [K+2] Run self-review / Running self-review
+[K+3] Update Status to Review for all Issues / Updating Status
 ```
 
 ### Batch Workflow
@@ -229,21 +252,23 @@ If any issue fails eligibility, inform user and suggest individual processing.
 
 3. **Issue loop**: For each issue:
    - Fetch issue details: `shirokuma-docs issues show {number}`
-   - Execute implementation (select skill per dispatch table)
+   - Execute implementation (delegate to `coding-on-issue` fork)
    - Quality checkpoint: verify changed files + run related tests
    - Track `filesByIssue` mapping for scoped commits
    - **Do NOT chain** Commit → PR during the loop
 
 4. **Post-loop chain**: After all issues are implemented:
-   - Chain to `committing-on-issue` with batch context
+   - Chain to `committing-on-issue` (fork) with batch context
    - `committing-on-issue` handles per-issue scoped commits
-   - Then chain to `creating-pr-on-issue` for a single batch PR
+   - Then chain to `creating-pr-on-issue` (fork) for a single batch PR
+   - Self-review loop (once for entire batch PR)
+   - Update all Issue statuses to Review
 
 ### Batch Context
 
 Maintain across the issue loop:
 
-```
+```typescript
 {
   currentIssue: number,
   remainingIssues: number[],
@@ -279,9 +304,9 @@ Track files changed per issue using `git diff --name-only` before/after each imp
 
 | Rule | Usage |
 |------|-------|
-| `branch-workflow` | Branch naming, creation from `develop` |
+| `branch-workflow` | Branch naming, creation from `develop`, integration branch |
 | `batch-workflow` | Batch eligibility, quality standards, branch naming |
-| `epic-workflow` | Epic structure, integration branch, sub-issue workflow |
+| `epic-workflow` reference | Epic/sub-issue workflow overview |
 | `project-items` | Status workflow, field requirements |
 | `git-commit-style` | Commit message format |
 | `output-language` | GitHub output language convention |
@@ -291,15 +316,16 @@ Track files changed per issue using `git diff --name-only` before/after each imp
 
 | Tool | When |
 |------|------|
-| AskUserQuestion | Requirement clarification, approach selection, edge cases |
+| AskUserQuestion | Requirement clarification, approach selection, edge cases (manager pre-resolves) |
 | TodoWrite | Chain step registration (required for all work) |
 | Bash | Git operations, `shirokuma-docs issues` commands |
 
 ## Notes
 
-- This skill is the **orchestrator** for all work
+- This skill is the **manager** (actual work is delegated to fork workers)
 - Update issue status before starting
 - Ensure correct feature branch
-- TDD-applicable work types require tests before implementation ([docs/tdd-workflow.md](docs/tdd-workflow.md))
-- Workflow executes sequentially (Commit → PR → Review). **Merge is NOT included**
+- TDD-applicable work types wrap `coding-on-issue` invocation with TDD ([docs/tdd-workflow.md](docs/tdd-workflow.md))
+- Workflow executes sequentially (Commit → PR → Self-Review → Status Update). **Merge is NOT included**
+- Self-review is directly managed by the manager ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user

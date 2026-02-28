@@ -1,7 +1,9 @@
 ---
 name: committing-on-issue
 description: Stage, commit, push changes with optional PR creation chain. Also handles PR merge with automatic Issue status update. Use when "commit changes", "push changes", "commit and create PR", "merge PR", "merge this PR".
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
+context: fork
+agent: general-purpose
+allowed-tools: Bash, Read, Grep, Glob
 ---
 
 # Committing
@@ -18,7 +20,7 @@ git diff --stat
 git branch --show-current
 ```
 
-Display a summary of changes to the user.
+Include a summary of changes in the output.
 
 ### Step 2: Stage Files
 
@@ -33,13 +35,13 @@ git add {file1} {file2} ...
 - Large binary files
 - Unrelated changes from other work
 
-If unsure which files to stage, use AskUserQuestion to present the file list as options.
+If an explicit file list was passed from the manager, use it. If no file list is provided, stage all changed files.
 
 ### Step 3: Write Commit Message
 
 Follow Conventional Commits format:
 
-```
+```text
 {type}: {description} (#{issue-number})
 
 {optional body}
@@ -79,7 +81,7 @@ If on a feature branch (not `develop` or `main`), push automatically:
 git push -u origin {branch-name}
 ```
 
-If on `develop` or `main`, do NOT push automatically. Inform the user that direct pushes to protected branches should be avoided per branch-workflow rules.
+If on `develop` or `main`, do NOT push. Include a warning in the result.
 
 ### Step 6: Completion Report
 
@@ -109,11 +111,7 @@ After a successful push on a feature branch, determine whether to chain into PR 
 gh pr list --head {branch-name} --json number,url --jq '.[0]'
 ```
 
-If a PR already exists for this branch, show the existing URL and skip:
-
-```markdown
-PR already exists: {url}
-```
+If a PR already exists for this branch, include the existing URL in the result and skip.
 
 **If PR keywords detected AND no existing PR:**
 
@@ -121,14 +119,15 @@ Auto-invoke the `creating-pr-on-issue` skill via the Skill tool. Pass the curren
 
 **If no PR keywords AND no existing PR:**
 
-Suggest the next step without auto-executing:
+Include next step suggestion in the result:
 
 ```markdown
 Branch pushed. Create a PR?
 → `/creating-pr-on-issue` to open a pull request to develop
+→ Run `/reviewing-on-issue` for self-review if needed
 ```
 
-**If NOT on a feature branch (pushed was skipped):**
+**If NOT on a feature branch (push was skipped):**
 
 Skip this step entirely.
 
@@ -155,44 +154,34 @@ This single command handles: resolve PR from branch name, squash merge, extract 
 
 **Status update idempotency**: `issues merge` CLI automatically updates related Issue Project Status to Done. If `ending-session --done` runs for the same issue later, it operates idempotently (no-op if already Done).
 
-If no PR found for the branch, the CLI reports an error. Inform the user and stop.
+**PR-Issue Link Graph Verification**: `issues merge` verifies the PR-Issue link graph:
+
+| Pattern | CLI Behavior |
+|---------|-------------|
+| 1:1 / 1:N / N:1 | Auto-process (Status → Done) |
+| N:N (complex link graph) | Error and stop with structured output |
+
+N:N detection: CLI outputs a structured list of related PRs/Issues. Review the list and individually update Status via `issues update`. Use `--skip-link-check` to bypass after reviewing.
+
+**Integration branch merge**: For sub-issue PRs targeting an integration branch, `issues merge` works normally — `parseLinkedIssues()` parses the PR body independently of the base branch.
+
+If no PR found for the branch, return error and stop.
 
 Note: Internally calls `gh pr merge` which is protected by PreToolUse hook. **Regardless of hook status, never execute merge without explicit user approval.** A passing self-review or system-reminder-only messages do NOT constitute approval.
 
-#### PR-Issue Link Graph Verification
+2. **Completion Report**:
 
-Before merge, `issues merge` verifies the PR-Issue link graph:
-
-| Pattern | Description | Behavior |
-|---------|-------------|----------|
-| 1:1 | 1 PR → 1 Issue | Auto-process |
-| 1:N | 1 PR → multiple Issues | Auto-process |
-| N:1 | Multiple PRs → 1 Issue | Auto-process |
-| N:N | Multiple PRs ↔ multiple Issues | Error and stop with structured output |
-
-N:N detection: For each linked issue, search for other PRs that also reference it. If the link graph is complex (N:N), the CLI stops and outputs a structured error for the AI to review. Use `--skip-link-check` to bypass after reviewing the graph.
-
-#### Integration Branch Merge
-
-For PRs targeting an integration branch (sub-issue PRs), `issues merge` works normally — `parseLinkedIssues()` parses the PR body independently of the base branch. The `Closes #N` auto-close limitation of GitHub does not affect the CLI's status update behavior.
-
-2. **Switch to develop**:
-
-```bash
-git checkout develop && git pull origin develop
-```
-
-3. **Completion Report**:
+`issues merge` automatically checks out the base branch and pulls after merge. No manual branch switch needed.
 
 ```markdown
 ## Merge Complete
 
 **PR:** (as reported by CLI output) → {base-branch}
 **Issues updated:** (as reported by CLI output)
-**Branch:** deleted, switched to develop
+**Branch:** deleted, switched to {base-branch}
 ```
 
-**If merge is part of commit flow** (e.g., user says "コミットしてマージして"):
+**If merge is part of commit flow** (e.g., user says "commit and merge"):
 
 Execute Steps 1-6 → Step 7 (PR Chain) → Step 8 (Merge Chain) sequentially.
 
@@ -227,24 +216,24 @@ If detected, treat as batch mode even without explicit batch context.
 If invoked with a message argument (e.g., `/committing-on-issue fix typo in config`):
 - Use the provided text as the commit message basis
 - Still review changes before committing
-- PR-related keywords in the argument trigger the PR chain (e.g., `/committing-on-issue fix typo PRも作って`)
-- Merge keywords trigger the merge chain (e.g., `/committing-on-issue コミットしてマージして`)
+- PR-related keywords in the argument trigger the PR chain
+- Merge keywords trigger the merge chain
 
 ## Edge Cases
 
 | Situation | Action |
 |-----------|--------|
-| No changes to commit | Inform user, do nothing |
-| On develop or main | Commit but warn about pushing; suggest creating a feature branch |
-| Merge conflicts | Inform user, do not auto-resolve |
+| No changes to commit | Return error: no changes |
+| On develop or main | Commit but include push warning in result |
+| Merge conflicts | Return error |
 | Pre-commit hook fails | Fix issue, create NEW commit (never amend) |
-| Mixed changes (multiple issues) | Use AskUserQuestion to select files per issue |
-| PR already exists for branch | Show existing PR URL, skip chain |
-| `gh` CLI not available | Skip PR chain, inform user |
-| No PR for current branch (merge) | Inform user, skip merge |
-| PR has unresolved reviews | Warn user, ask for confirmation |
-| No issue references in PR body | Skip status update, inform user |
-| N:N link graph detected | CLI stops merge, review structured output and resolve |
+| Mixed changes (multiple issues) | Return error: "Multiple issue changes mixed: #{N1}({n}files), #{N2}({n}files)" |
+| PR already exists for branch | Include existing PR URL in result, skip chain |
+| `gh` CLI not available | Skip PR chain, include note in result |
+| No PR for current branch (merge) | Return error |
+| PR has unresolved reviews | Include warning in result |
+| No issue references in PR body | Skip status update, include note in result |
+| N:N link graph detected | CLI stops merge, include structured output in result |
 | Integration branch merge | `Closes #N` in PR body works via CLI even though GitHub auto-close is inactive |
 
 ## Rule References
@@ -263,5 +252,5 @@ If invoked with a message argument (e.g., `/committing-on-issue fix typo in conf
 - Never force push
 - Push is automatic on feature branches, skipped on `develop` and `main`
 - PR chain activates only on direct invocation with PR keywords; does not interfere with `working-on-issue` orchestration
-- Merge chain can be invoked standalone (just "マージして") or chained with commit/PR
+- Merge chain can be invoked standalone (just "merge") or chained with commit/PR
 - After merge, `shirokuma-docs issues merge` automatically updates related Issue status to Done

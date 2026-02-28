@@ -71,7 +71,9 @@ fix/200-201-203-batch-form-validation
 - {change description}
 
 ## Related Issues
-Closes #{N1}, #{N2}, #{N3}
+Closes #{N1}
+Closes #{N2}
+Closes #{N3}
 
 ## Test Plan
 - [ ] {verification step}

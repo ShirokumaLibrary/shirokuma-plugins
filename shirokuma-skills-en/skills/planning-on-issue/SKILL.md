@@ -77,6 +77,8 @@ Assess the plan depth level from issue content and investigation results, then c
 
 #### Standard Plan
 
+> When tasks have dependencies, include a diagram following the Mermaid guidelines in the `github-writing-style` rule.
+
 ```markdown
 ## Plan
 
@@ -92,6 +94,8 @@ Assess the plan depth level from issue content and investigation results, then c
 ```
 
 #### Detailed Plan
+
+> Follow the Mermaid guidelines in the `github-writing-style` rule to include diagrams for task dependencies, state transitions, or component interactions.
 
 ```markdown
 ## Plan
@@ -112,7 +116,9 @@ Assess the plan depth level from issue content and investigation results, then c
 
 #### Epic Plan (Issues with Sub-Issues)
 
-For issues where `subIssuesSummary.total > 0`, use the extended template that includes sub-issue structure and integration branch:
+For issues where `subIssuesSummary.total > 0`, use the extended template that includes sub-issue structure and integration branch.
+
+> Follow the Mermaid guidelines in the `github-writing-style` rule to visualize sub-issue dependencies and execution order.
 
 ```markdown
 ## Plan

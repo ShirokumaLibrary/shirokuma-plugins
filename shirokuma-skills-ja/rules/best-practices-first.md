@@ -24,11 +24,12 @@
 |--------|-----------|--------------|------|
 | working-on-issue | 対応 | 対応 | 両モードのエントリーポイント |
 | planning-on-issue | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
-| coding-nextjs | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
+| coding-on-issue | 対応 | — | working-on-issue から fork 委任のみ |
+| coding-nextjs | 対応 | 対応 | coding-on-issue 経由またはスタンドアロン |
 | designing-shadcn-ui | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
 | creating-item | — | 対応 | 常にスタンドアロン対応 |
-| committing-on-issue | 対応 | 対応 | スタンドアロン + キーワードで PR チェーン |
-| creating-pr-on-issue | 対応 | 対応 | チェーン経由またはスタンドアロン |
+| committing-on-issue | 対応 | 対応 | fork（スタンドアロンも fork で動作） |
+| creating-pr-on-issue | 対応 | 対応 | fork（スタンドアロンも fork で動作） |
 | starting-session | 対応 | — | セッション開始専用 |
 | ending-session | 対応 | — | セッション終了専用 |
 
@@ -46,7 +47,8 @@
 
 | タスクタイプ | 委任先 | メソッド |
 |-------------|--------|----------|
-| 実装 / デザイン | `coding-nextjs` / `designing-shadcn-ui` | Skill（via `working-on-issue`） |
+| コーディング全般 | `coding-on-issue` | Skill (`context: fork`, via `working-on-issue`) |
+| UI デザイン | `designing-shadcn-ui` | Skill（via `working-on-issue`） |
 | リサーチ | `researching-best-practices` | Skill (`context: fork`) |
 | レビュー | `reviewing-on-issue` | Skill (`context: fork`) |
 | Claude 設定 | `reviewing-claude-config` | Skill (`context: fork`) |

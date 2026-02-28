@@ -16,7 +16,7 @@ Evolution Issue からシグナルを取得する。
 
 ```bash
 # Evolution Issue を検索
-shirokuma-docs search "[Evolution]" --type issues --limit 10
+shirokuma-docs issues list --issue-type Evolution --limit 10
 ```
 
 Issue が見つかったら、コメントを含む詳細を取得:

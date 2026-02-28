@@ -16,7 +16,7 @@ Fetch signals from Evolution Issues.
 
 ```bash
 # Search for Evolution Issues
-shirokuma-docs search "[Evolution]" --type issues --limit 10
+shirokuma-docs issues list --issue-type Evolution --limit 10
 ```
 
 If an Issue is found, fetch details including comments:
