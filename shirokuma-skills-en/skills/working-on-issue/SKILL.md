@@ -6,6 +6,8 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
 
 # Working on Issue (Orchestrator)
 
+> **Chain Autonomous Progression**: Fork skill results are intermediate chain data, not final user-facing output. When TodoWrite has pending steps, immediately parse the `## Fork Result` block and proceed to the next step. Stopping after a fork result forces the user to manually type "continue", breaking the autonomous workflow that makes this orchestrator valuable. Log a one-line summary and invoke the next tool in the same response.
+
 Orchestrate the full workflow from planning to implementation, commit, PR, and self-review based on issue type or task description.
 
 **Note**: For session setup, use `starting-session`. This skill works both within a session and standalone (without `starting-session`). It is the primary entry point for working on a specific task in either mode.
@@ -260,76 +262,7 @@ Do not register in TodoWrite (non-blocking processing, not a work step).
 
 ## Batch Mode
 
-When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batch mode.
-
-### Batch Detection
-
-Detect multiple `#N` patterns in the arguments. If 2+ issues detected → batch mode.
-
-### Batch Eligibility Check
-
-Before starting, verify all issues meet `batch-workflow` rule criteria:
-- All issues are Size XS or S
-- Issues share a common `area:*` label or affect related files
-- Total issues ≤ 5
-
-If any issue fails eligibility, inform user and suggest individual processing.
-
-### Batch TodoWrite Template
-
-```text
-[1] Implement #N1 / Implementing #N1
-[2] Implement #N2 / Implementing #N2
-...
-[K] Commit and push all changes / Committing and pushing
-[K+1] Create pull request / Creating pull request
-[K+2] Run self-review / Running self-review
-[K+3] Update Status to Review for all Issues / Updating Status
-```
-
-### Batch Workflow
-
-1. **Bulk status update**: All issues → In Progress simultaneously
-   ```bash
-   shirokuma-docs issues update {n} --field-status "In Progress"
-   # (repeat for each issue)
-   ```
-
-2. **Branch creation** (first time only):
-   ```bash
-   git checkout develop && git pull origin develop
-   git checkout -b {type}/{issue-numbers}-batch-{slug}
-   ```
-   Type determination: single type → use it; mixed → `chore`.
-
-3. **Issue loop**: For each issue:
-   - Fetch issue details: `shirokuma-docs issues show {number}`
-   - Execute implementation (delegate to `coding-on-issue` fork)
-   - Quality checkpoint: verify changed files + run related tests
-   - Track `filesByIssue` mapping for scoped commits
-   - **Do NOT chain** Commit → PR during the loop
-
-4. **Post-loop chain**: After all issues are implemented:
-   - Chain to `committing-on-issue` (fork) with batch context
-   - `committing-on-issue` handles per-issue scoped commits
-   - Then chain to `creating-pr-on-issue` (fork) for a single batch PR
-   - Self-review loop (once for entire batch PR)
-   - Update all Issue statuses to Review
-
-### Batch Context
-
-Maintain across the issue loop:
-
-```typescript
-{
-  currentIssue: number,
-  remainingIssues: number[],
-  completedIssues: number[],
-  filesByIssue: Map<number, string[]>
-}
-```
-
-Track files changed per issue using `git diff --name-only` before/after each implementation.
+When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batch mode. See [reference/batch-workflow.md](reference/batch-workflow.md) for detection, eligibility, TodoWrite template, workflow, and context details.
 
 ## Arguments
 
@@ -381,4 +314,4 @@ Track files changed per issue using `git diff --name-only` before/after each imp
 - Workflow executes sequentially (Commit → PR → Simplify → Self-Review → Status Update). **Merge is NOT included**
 - Self-review is directly managed by the manager (main AI) ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user
-- **Chain autonomous progression (CRITICAL)**: After a fork skill returns its Fork Result, **NEVER wait for user input**. As long as TodoWrite has pending steps, immediately parse the `## Fork Result` block and execute the next step's Skill/Bash tool call. Fork Results are "internal processing data", NOT "user-facing output". Log a one-line summary and invoke the next tool in the same response
+- **Chain autonomous progression (CRITICAL)**: Fork Results are intermediate chain data — stopping after one forces the user to manually prompt continuation. As long as TodoWrite has pending steps, immediately parse the `## Fork Result` block and execute the next step's Skill/Bash tool call. Log a one-line summary and invoke the next tool in the same response

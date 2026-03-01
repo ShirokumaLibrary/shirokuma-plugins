@@ -1,5 +1,5 @@
 {
-  "description": "Safety hooks and session backup. Blocks destructive commands and auto-saves session state before context compaction.",
+  "description": "Safety hooks, session backup, and chain completion enforcement. Blocks destructive commands, auto-saves session state before context compaction, and prevents premature stop during workflow chains.",
   "hooks": {
     "PreToolUse": [
       {
@@ -19,6 +19,17 @@
           {
             "type": "command",
             "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/backup-handover.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check-chain-incomplete.sh",
             "timeout": 10
           }
         ]
