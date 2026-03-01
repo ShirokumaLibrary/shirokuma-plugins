@@ -67,11 +67,22 @@ Skill delegate to `coding-nextjs`. Pass plan section and issue context.
 - TDD workflow is managed by `working-on-issue` wrapping `coding-on-issue` calls with TDD steps (`coding-on-issue` focuses solely on implementation)
 - UI design tasks (new UI pages, visual redesigns, design system token changes) are handled by `designing-ui-on-issue` → `designing-shadcn-ui`. See `working-on-issue/docs/designing-reference.md` for responsibility boundaries
 
-## Output
+## Fork Result Return
 
-After work completes, return the following summary:
+After work completes, return the following structured data to the caller. Code changes are the deliverable, so no GitHub write is performed (GitHub writes are handled by subsequent `committing-on-issue` / `creating-pr-on-issue`).
 
-- Changed file list
-- Summary of changes
-- Test execution results (if applicable)
-- Notes (if any)
+```text
+## Fork Result
+**Status:** SUCCESS
+**Summary:** {file count} files changed. {one-line change summary}
+```
+
+On failure:
+
+```text
+## Fork Result
+**Status:** FAIL
+**Summary:** {error description}
+```
+
+**Note**: `Ref` field is omitted (no GitHub write).

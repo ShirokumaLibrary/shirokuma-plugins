@@ -101,21 +101,32 @@ shirokuma-docs issues pr-create --base {base_branch} --title "{title}" --body-fi
 
 **タイトルルール**: 70文字以内、プレフィックス(`feat:` 等)は英語、**それ以降は日本語**で記述する。Issue番号はタイトルに入れない。
 
-### ステップ 5: 完了レポート
+### ステップ 5: Fork Result 返却
 
-```markdown
-## PR 作成完了
+PR 作成自体が GitHub への書き込み（成果物）であるため、追加の GitHub 書き込みは不要。呼び出し元に以下の構造化データを返す:
 
-**PR:** {url}
-**ブランチ:** {branch} → {base-branch}
-**コミット:** {count} 件
+```text
+## Fork Result
+**Status:** SUCCESS
+**Ref:** PR #{pr-number}
+**Summary:** {branch} → {base-branch}、{count} コミット、Closes #{issue-number}
+```
 
-### 概要
-{変更内容の要約}
+失敗時:
 
-### 関連 Issue
-- Closes #{number}
-- Refs #{number}
+```text
+## Fork Result
+**Status:** FAIL
+**Summary:** {エラー内容}
+```
+
+既存 PR がある場合:
+
+```text
+## Fork Result
+**Status:** SUCCESS
+**Ref:** PR #{existing-pr-number}
+**Summary:** 既存 PR を検出、作成をスキップ
 ```
 
 ## バッチモード

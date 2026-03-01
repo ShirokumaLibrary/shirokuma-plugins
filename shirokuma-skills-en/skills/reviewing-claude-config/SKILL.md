@@ -166,15 +166,22 @@ tools: Read, Write, Edit      # Reviewers should be read-only
 
 {Overall assessment and next steps}
 
-Self-Review Result: {PASS|FAIL}
-  Critical: {count}
-  Warning: {count}
-  Info: {count}
-  Files with issues: {file1, file2, ...}
-  Auto-fixable: {yes|no}
+## Fork Result
+**Status:** {PASS | FAIL}
+**Ref:** PR #{pr-number} comment
+**Summary:** {critical} critical, {warning} warning detected
+
+### Detail
+**Critical:** {count}
+**Warning:** {count}
+**Info:** {count}
+**Auto-fixable:** {yes | no}
+**Files with issues:**
+- {file1}: {summary} [critical | warning]
+- {file2}: {summary} [critical | warning]
 ```
 
-**Self-Review Result must always be output at the end of the report.**
+**Fork Result must always be output at the end of the report.**
 
 **Status determination:**
 - Error > 0 → FAIL

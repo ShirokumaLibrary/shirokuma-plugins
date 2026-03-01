@@ -164,6 +164,7 @@ shirokuma-docs issues list --issue-type Evolution --limit 1
 - Do not register in TodoWrite (non-blocking processing)
 - Self-review uses concise checklist format to minimize context consumption
 - When no signals detected, minimize CLI command execution (`issues list` once only)
+- When `creating-item` creates an item with Issue Type Evolution, skip the entire signal recording (the Evolution Issue itself is an improvement proposal, preventing duplicate recording)
 
 ## Standalone Signal Recording
 

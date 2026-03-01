@@ -160,19 +160,32 @@ After work completes, execute the chain **automatically**. No user confirmation 
 - No confirmation between steps, one-line progress reports
 - On failure: stop chain, report status, return control to user
 
-**Chain completion guarantee**: After each fork skill returns its result, the manager (main AI) **immediately proceeds to the next step**. Fork result summaries are limited to one line and do not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via fork), eliminating the risk of chain interruption.
+**Chain completion guarantee**: After each fork skill returns its Fork Result, the manager (main AI) parses the `## Fork Result` block and **immediately proceeds to the next step**. Fork Result summaries are limited to one line and do not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via fork), eliminating the risk of chain interruption.
 
 **Post-fork-result behavior (pseudocode):**
 
 ```text
 for each step in [commit, pr, simplify, self_review, status_update]:
-  result = invoke_fork_skill(step)
-  log_one_line_summary(result)    // Summarize completion report in 1 line
+  fork_output = invoke_fork_skill(step)
+  fork_result = parse_fork_result(fork_output)  // Extract ## Fork Result block
+  if fork_result.status == "FAIL":
+    handle_failure(fork_result)
+    break
+  log_one_line_summary(fork_result.summary)
   update_todo(step, "completed")
   immediately_invoke_next_step()  // ← Do NOT wait for user input
 ```
 
-**Prohibited**: Presenting the fork result's completion report to the user and stopping. Fork results are internal data — output a one-line summary and immediately proceed to the next tool call.
+**Fork Result Status values:**
+
+| Status | Used By | Meaning |
+|--------|---------|---------|
+| SUCCESS | committing-on-issue, creating-pr-on-issue, coding-on-issue | Completed successfully |
+| PASS | reviewing-on-issue (self-review) | No issues detected |
+| FAIL | All fork skills | Error or issues requiring action |
+| NEEDS_REVISION | reviewing-on-issue (plan review) | Plan needs revision |
+
+**Prohibited**: Presenting the Fork Result to the user and stopping. Fork Results are internal data — output a one-line summary and immediately proceed to the next tool call.
 
 #### Self-Review Loop (Manager = Main AI Directly Manages)
 
@@ -195,7 +208,7 @@ After PR creation, the manager (main AI) directly manages self-review. See [refe
 |-------|--------|
 | SIMPLIFY | Invoke `/simplify` via Skill tool (only when code-category files exist; run once, skip on failure) |
 | REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` as fork |
-| PARSE | Parse result, PASS/FAIL determination |
+| PARSE | Parse Fork Result, PASS/FAIL determination |
 | PRESENT | Present self-review result summary to user |
 | FIX | Delegate fix to `Task(general-purpose)` |
 | CONVERGE | Convergence check (numeric-based, stop after 2 consecutive non-decreases) |
@@ -368,4 +381,4 @@ Track files changed per issue using `git diff --name-only` before/after each imp
 - Workflow executes sequentially (Commit → PR → Simplify → Self-Review → Status Update). **Merge is NOT included**
 - Self-review is directly managed by the manager (main AI) ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user
-- **Chain autonomous progression (CRITICAL)**: After a fork skill returns its completion report, **NEVER wait for user input**. As long as TodoWrite has pending steps, immediately execute the next step's Skill/Bash tool call. Fork completion reports are "internal processing data", NOT "user-facing output". Log a one-line summary and invoke the next tool in the same response
+- **Chain autonomous progression (CRITICAL)**: After a fork skill returns its Fork Result, **NEVER wait for user input**. As long as TodoWrite has pending steps, immediately parse the `## Fork Result` block and execute the next step's Skill/Bash tool call. Fork Results are "internal processing data", NOT "user-facing output". Log a one-line summary and invoke the next tool in the same response

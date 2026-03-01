@@ -84,13 +84,40 @@ If on `develop` or `main`, do NOT push. Include a warning in the result.
 
 ### Step 6: Completion Report
 
-```markdown
+#### 6a: Post Issue Comment
+
+When the issue number is known, post the commit result as an Issue comment:
+
+```bash
+shirokuma-docs issues comment {issue-number} --body-file - <<'EOF'
 ## Commit Complete
 
 **Branch:** {branch-name}
 **Commit:** {hash} {message}
 **Files:** {count} files changed
 **Pushed:** {yes/no}
+EOF
+```
+
+Skip comment posting if the issue number is unknown (not derivable from branch name, not passed via context).
+
+#### 6b: Fork Result Return
+
+Return the following structured data to the caller:
+
+```text
+## Fork Result
+**Status:** SUCCESS
+**Ref:** #{issue-number} comment
+**Summary:** {hash} {one-line commit message}, {count} files changed
+```
+
+On failure:
+
+```text
+## Fork Result
+**Status:** FAIL
+**Summary:** {error description}
 ```
 
 ### Step 7: PR Chain (after push)
@@ -174,12 +201,25 @@ Note: Internally calls `gh pr merge` which is protected by PreToolUse hook. **Re
 
 `issues merge` automatically checks out the base branch and pulls after merge. No manual branch switch needed.
 
-```markdown
+Post result as Issue comment:
+
+```bash
+shirokuma-docs issues comment {issue-number} --body-file - <<'EOF'
 ## Merge Complete
 
 **PR:** (as reported by CLI output) → {base-branch}
 **Issues updated:** (as reported by CLI output)
 **Branch:** deleted, switched to {base-branch}
+EOF
+```
+
+Fork Result return:
+
+```text
+## Fork Result
+**Status:** SUCCESS
+**Ref:** #{issue-number} comment
+**Summary:** PR #{pr-number} merged to {base-branch}, branch deleted
 ```
 
 **If merge is part of commit flow** (e.g., user says "commit and merge"):

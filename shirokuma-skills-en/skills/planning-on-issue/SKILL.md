@@ -151,52 +151,23 @@ For issues where `subIssuesSummary.total > 0`, use the extended template that in
 
 See `epic-workflow` reference for details.
 
-### Step 4: Plan Review (Fresh Context)
+### Step 4: Plan Review (Fork Delegation)
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to a fresh-context agent via the Task tool.
+Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `reviewing-on-issue` plan role as fork for a fresh-context review.
 
 #### Launching the Reviewer
 
-Embed the full issue body (including plan section) directly in the prompt. Do not depend on the reviewer having CLI access.
+Invoke `reviewing-on-issue` with plan role via the Skill tool. `reviewing-on-issue` will fetch the Issue body itself via `shirokuma-docs issues show {number}`, so embedding the Issue body in the prompt is not needed.
 
-```
-Task(subagent_type: "general-purpose", prompt: """
-You are a plan reviewer. Review the plan for the following issue.
-
-## Issue #{number}: {title}
-
-{full issue body}
-
-## Review Criteria
-
-| Criterion | Description | Examples |
-|-----------|-------------|----------|
-| Purpose section validity | Does `## Purpose` clearly state who, what, and why? | Is the role specific? Is "why" not omitted? |
-| Requirements coverage | Are all requirements from overview/tasks covered by the plan? | Deliverables have corresponding tasks |
-| Language & style compliance | Does plan content comply with `output-language` rule (output language) and `github-writing-style` rule (bullet-point guidelines)? | Plan written in wrong language, prose where bullets are appropriate |
-| Target file validity | Any missing or unnecessary files? | Overlooked dependent modules |
-| Task granularity | Appropriate breakdown (~1 task ≈ ~1 commit)? | Too coarse or too fine |
-| Risks | Any overlooked risks? | Breaking changes, performance impact |
-| Issue description sufficiency | Can the plan be understood and evaluated from the issue body alone? | Are technical constraints documented? Are dependencies on existing code explained? |
-
-## Output Format
-
-Return results in the following format:
-
-## Plan Review Result
-**Status:** {PASS | NEEDS_REVISION}
-**Issues:**
-- [{Plan | Issue description}] {description of the problem}
-**Suggestions:**
-- {improvement suggestion}
-
-Include Suggestions even for PASS if applicable.
-""")
+```text
+Skill(reviewing-on-issue, args: "plan #{number}")
 ```
 
-#### Processing Review Results
+The review result is posted as an Issue comment by `reviewing-on-issue`, and a Fork Result is returned.
 
-| Result | Action |
+#### Processing Fork Result
+
+| Fork Result Status | Action |
 |--------|--------|
 | PASS | Proceed to Step 5 |
 | NEEDS_REVISION | Follow "On Failure" below to fix and re-review |
@@ -205,24 +176,24 @@ Include Suggestions even for PASS if applicable.
 
 When NEEDS_REVISION is returned:
 
-1. Classify issues into **[Plan]** and **[Issue description]**
+1. Classify issues from Fork Result `### Detail` into **[Plan]** and **[Issue description]**
 2. **[Issue description]** issues → Fix the relevant sections in the issue body (overview, background, tasks, etc.)
 3. **[Plan]** issues → Fix the plan section
-4. After fixes, re-run the review via Task (same prompt template)
+4. After fixes, re-run the review via Skill (same `reviewing-on-issue` plan role)
 5. **Max retries: 2** (initial review + up to 2 fix-and-review cycles)
 6. On 3rd NEEDS_REVISION → Stop the loop, report to user for their judgment
 
 ```
-Plan → Review → NEEDS_REVISION → Fix → Re-review → PASS → Step 5
-                                              ↓ (failed twice)
-                                        Report to user
+Plan → Skill(reviewing-on-issue plan) → NEEDS_REVISION → Fix → Re-review → PASS → Step 5
+                                                                       ↓ (failed twice)
+                                                                 Report to user
 ```
 
 ### Step 5: Update Issue Body with Plan
 
 Follow the comment-first workflow (see `project-items` rule, "Workflow Order" section) in this order:
 
-#### 5a: Post Decision Rationale as Comment
+#### 5a: Post Decision Rationale as Comment (PASS only)
 
 Post the planning decision rationale as a **primary record** in a comment. Record the decision process that would only exist in comments, not a summary of the body.
 
@@ -360,7 +331,7 @@ Add GitHub writing rule references to each skill...
 | Bash | `shirokuma-docs issues show/update` |
 | Read/Grep/Glob | Codebase investigation |
 | Task (Explore) | Broad code investigation |
-| Task (general-purpose) | Step 4: Fresh-context plan review |
+| Skill (reviewing-on-issue) | Step 4: Fresh-context plan review (fork delegation) |
 | AskUserQuestion | Overwrite confirmation, issue number prompt |
 | TodoWrite | Planning step progress tracking |
 

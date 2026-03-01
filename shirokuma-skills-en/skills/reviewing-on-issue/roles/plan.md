@@ -37,6 +37,19 @@ Load these files for context:
 
 ## Review Checklist
 
+### Purpose Section Validity
+- [ ] `## Purpose` section exists
+- [ ] "Who" (role/user type) is specifically stated
+- [ ] "What" (feature/change to achieve) is clearly stated
+- [ ] "Why" (reason/motivation) is not omitted
+- [ ] Purpose and plan approach are consistent
+
+### Language & Style Compliance
+- [ ] Plan section language complies with `output-language` rule
+- [ ] Follows `github-writing-style` rule bullet-point guidelines (parallel structure, max 2 nesting levels, etc.)
+- [ ] Heading levels are appropriate (`## Plan` > `### Approach` > `### Task Breakdown` etc.)
+- [ ] Technical terms and project terminology are consistent
+
 ### Requirements Coverage
 - [ ] All requirements from the Issue "Overview" section are covered in the plan
 - [ ] All tasks from the Issue "Tasks" section map to plan task breakdown

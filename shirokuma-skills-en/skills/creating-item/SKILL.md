@@ -69,6 +69,8 @@ Item created: #{number}
 
 At the end of the item creation completion report, auto-record Evolution signals detected during the session following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule.
 
+**Skip condition:** If the created item's Issue Type is Evolution, skip the entire signal recording. The Evolution Issue itself is a skill/rule improvement proposal, so there is no need to duplicate the same content in another Evolution Issue.
+
 1. Self-review the session using the detection checklist (see `rule-evolution` rule)
 2. Signals detected → Post comment to Evolution Issue → Display 1-line recording confirmation
 3. No signals → Check for accumulated signals → Display reminder (fallback)

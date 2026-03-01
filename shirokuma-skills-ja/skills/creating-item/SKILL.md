@@ -69,6 +69,8 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 
 アイテム作成完了レポートの末尾で、`rule-evolution` ルールの「スキル完了時の自動記録手順」に従い、セッション中に発生した Evolution シグナルを自動記録する。
 
+**スキップ条件:** 作成したアイテムの Issue Type が Evolution の場合、シグナル記録全体をスキップする。Evolution Issue 自体がスキル・ルール改善の提案であり、同内容を別の Evolution Issue に重複記録する必要がないため。
+
 1. 検出チェックリスト（`rule-evolution` ルール参照）でセッション中の作業を振り返る
 2. シグナルあり → Evolution Issue にコメント投稿 → 記録完了を 1 行表示
 3. シグナルなし → 既存シグナルの蓄積確認 → リマインド表示（フォールバック）

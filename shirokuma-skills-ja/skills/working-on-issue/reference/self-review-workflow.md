@@ -10,8 +10,8 @@
 [SIMPLIFY] /simplify 初期パス（code カテゴリのファイルがある場合のみ）
     ↓  変更あり → コミット・プッシュ / 変更なし or 失敗 → スキップ
 [REVIEW] レビュー起動（Fork: reviewing-on-issue / reviewing-claude-config）
-    ↓  ※ fork はステップ 6 で PR コメントを投稿してから構造化出力を返す
-[PARSE] 結果パース + PASS/FAIL 判定
+    ↓  ※ fork はステップ 6 で PR コメントを投稿してから Fork Result を返す
+[PARSE] Fork Result パース + PASS/FAIL 判定（### Detail から修正方針を決定）
     ↓
 [PRESENT] セルフレビュー結果サマリーをユーザーに提示（完了報告テンプレート使用）
     ↓
@@ -155,7 +155,7 @@ fire-and-forget（PASS/FAIL 判定なし）。品質ゲートは後続の `[REVI
 
 | 項目 | 内容 |
 |------|------|
-| 入力 | reviewing-on-issue / reviewing-claude-config の fork 出力全文 |
+| 入力 | reviewing-on-issue / reviewing-claude-config の Fork Result（`### Detail` 含む） |
 | 出力 | 修正サマリー（ファイル数、コミットハッシュ、修正内容リスト） |
 | ツール | Read, Edit, Bash（Task general-purpose は全ツールにアクセス可能） |
 | コミットメッセージ | `fix: セルフレビュー指摘を修正 [iter {n}] (#{issue-number})` |
@@ -163,7 +163,7 @@ fire-and-forget（PASS/FAIL 判定なし）。品質ゲートは後続の `[REVI
 
 ## out-of-scope フォローアップ Issue 作成
 
-セルフレビューループ完了後（PASS、ループ停止、安全上限到達のいずれか）、最終イテレーションの Self-Review Result に `Out-of-scope items` がある場合にフォローアップ Issue を作成する。
+セルフレビューループ完了後（PASS、ループ停止、安全上限到達のいずれか）、最終イテレーションの Fork Result に `Out-of-scope items` がある場合にフォローアップ Issue を作成する。
 
 **重複排除**: 最終イテレーションの out-of-scope リストのみを使用。各イテレーションの結果は PR コメントに残るため情報は失われない。
 
@@ -195,7 +195,7 @@ shirokuma-docs issues comments {PR#}
 レビュー所見コメントが欠落している場合:
 
 1. 警告を表示: `⚠ レビュー所見コメントが未投稿です。フォールバックで簡易コメントを投稿します。`
-2. 構造化出力（Self-Review Result）の要約を簡易コメントとして投稿:
+2. Fork Resultの要約を簡易コメントとして投稿:
 
 ```bash
 shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-fallback.md
@@ -209,7 +209,7 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 **Status:** {PASS | FAIL}
 **Critical:** {n} 件 / **Fixable-warning:** {n} 件 / **Out-of-scope:** {n} 件
 
-> このコメントはレビュースキルのステップ 6 が未実行だったため、構造化出力の要約から自動生成されました。
+> このコメントはレビュースキルのステップ 6 が未実行だったため、Fork Resultの要約から自動生成されました。
 ```
 
 ## 期待 PR コメントパターン

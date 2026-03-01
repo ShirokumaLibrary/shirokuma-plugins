@@ -166,15 +166,22 @@ tools: Read, Write, Edit      # レビュアーは読み取り専用であるべ
 
 {全体的な評価と次のステップ}
 
-Self-Review Result: {PASS|FAIL}
-  Critical: {count}
-  Warning: {count}
-  Info: {count}
-  Files with issues: {file1, file2, ...}
-  Auto-fixable: {yes|no}
+## Fork Result
+**Status:** {PASS | FAIL}
+**Ref:** PR #{pr-number} comment
+**Summary:** {critical} critical, {warning} warning detected
+
+### Detail
+**Critical:** {count}
+**Warning:** {count}
+**Info:** {count}
+**Auto-fixable:** {yes | no}
+**Files with issues:**
+- {file1}: {summary} [critical | warning]
+- {file2}: {summary} [critical | warning]
 ```
 
-**Self-Review Result は必ずレポート末尾に出力する。**
+**Fork Result は必ずレポート末尾に出力する。**
 
 **Status 判定:**
 - Error > 0 → FAIL

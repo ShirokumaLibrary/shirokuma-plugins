@@ -333,7 +333,7 @@ If analysis is incomplete:
 - **Rules auto-loaded**: Project conventions from `.claude/rules/`
 - **Sub-agent mode**: Runs with `context: fork` for isolated execution
 - **Fork constraint**: TodoWrite / AskUserQuestion are unavailable due to `context: fork`; return results as a report only
-- **Self-review**: When invoked from delegated chain, return structured output (Self-Review Result)
+- **Self-review**: When invoked from delegated chain, return structured output (Fork Result)
 - **Caller's comment-first compliance**: This skill does not update bodies (due to `context: fork`), but when caller skills (`creating-pr-on-issue`, `working-on-issue`) update Issue/PR bodies based on review results, they must follow the comment-first principle in `item-maintenance.md`. See the "Updating Body from Review Results" section in `item-maintenance.md` for specific procedure patterns
 
 ## Self-Review Mode
@@ -346,22 +346,26 @@ In self-review mode, execute the following steps **in order**:
 
 1. **Execute Steps 1-5 normally** — Role selection, knowledge loading, lint, analysis, report generation
 2. **Step 6: Post PR comment (REQUIRED)** — When a PR number is in context, post the review report as a PR comment. This step is non-optional
-3. **Return structured output** — Return a summary in the format below for the caller's automated decision-making
+3. **Return Fork Result** — Return a summary in the format below for the caller's automated decision-making
 
-### Structured Output Format
+### Fork Result Format (Self-Review)
 
-After posting the PR comment in Step 6, return a summary in this format:
+After posting the PR comment in Step 6, return in the following format. Self-review includes a `### Detail` extension block in addition to the base format because `working-on-issue` needs detailed information for loop decisions:
 
 ```text
-## Self-Review Result
+## Fork Result
 **Status:** {PASS | FAIL}
-**Critical:** {n} issues
-**Fixable-warning:** {n} issues
-**Out-of-scope:** {n} issues
+**Ref:** PR #{pr-number} comment
+**Summary:** {critical} critical, {fixable-warning} fixable-warning detected
+
+### Detail
+**Critical:** {n}
+**Fixable-warning:** {n}
+**Out-of-scope:** {n}
+**Auto-fixable:** {yes | no}
 **Files with issues:**
 - {file1}: {summary} [critical | fixable-warning]
 - {file2}: {summary} [critical | fixable-warning]
-**Auto-fixable:** {yes | no}
 **Out-of-scope items:**
 - {description1}
 - {description2}
@@ -390,9 +394,9 @@ Critical/High are classified as `critical` even if out of scope. Serious issues 
 
 | Condition | Classification |
 |-----------|---------------|
-| Fix within files changed by the PR | fixable-warning |
+| Fix within files changed by the PR (including newly added files) | fixable-warning |
 | Fix in unchanged files that depend on PR-changed files | out-of-scope |
-| Requires adding new files | out-of-scope |
+| Requires creating new files outside the PR scope | out-of-scope |
 | Requires design pattern changes | out-of-scope |
 
 ### Feedback Accumulation
@@ -417,6 +421,52 @@ shirokuma-docs discussions create \
 - **Pattern**: {description}
 - **Occurrences**: {n}
 - **Proposal**: Consider adding to {rule-file}
+```
+
+## Plan Review Mode
+
+When invoked from `planning-on-issue` with plan role as fork, post the plan review result as an Issue comment and return a Fork Result.
+
+### Fork Result Format (Plan Review)
+
+```text
+## Fork Result
+**Status:** {PASS | NEEDS_REVISION}
+**Ref:** #{issue-number} comment
+**Summary:** {one-line review result summary}
+```
+
+- **PASS**: No critical issues in the plan (Suggestions may still be present)
+- **NEEDS_REVISION**: Missing requirements, significant inconsistencies, or anti-patterns detected
+
+### NEEDS_REVISION Additional Information
+
+```text
+## Fork Result
+**Status:** NEEDS_REVISION
+**Ref:** #{issue-number} comment
+**Summary:** {n} issues detected
+
+### Detail
+**Issues:**
+- [{Plan | Issue description}] {description of the problem}
+**Suggestions:**
+- {improvement suggestion}
+```
+
+`planning-on-issue` classifies `### Detail` Issues into `[Plan]` and `[Issue description]` and fixes each accordingly.
+
+## Normal Review Mode (Non-Self-Review, Non-Plan-Review)
+
+When invoked standalone or as fork, and it is neither a self-review nor a plan review, save the report to GitHub and return a Fork Result.
+
+### Fork Result Format (Normal Review)
+
+```text
+## Fork Result
+**Status:** {PASS | FAIL}
+**Ref:** {output destination reference (PR #{number} comment / Discussion #{number})}
+**Summary:** {one-line issue count summary}
 ```
 
 ## Language

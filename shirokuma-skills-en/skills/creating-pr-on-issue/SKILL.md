@@ -134,21 +134,32 @@ docs: CLAUDE.md のコマンド一覧を更新      ← Wrong: not English
 - Related Issues: `Closes #N` for completed items, `Refs #N` for related
 - Test plan: checklist of verification steps
 
-### Step 5: Completion Report
+### Step 5: Fork Result Return
 
-```markdown
-## Pull Request Created
+PR creation itself is a GitHub write (the deliverable), so no additional GitHub write is needed. Return the following structured data to the caller:
 
-**PR:** {url}
-**Branch:** {branch} → {base-branch}
-**Commits:** {count}
+```text
+## Fork Result
+**Status:** SUCCESS
+**Ref:** PR #{pr-number}
+**Summary:** {branch} → {base-branch}, {count} commits, Closes #{issue-number}
+```
 
-### Summary
-{brief description}
+On failure:
 
-### Linked Issues
-- Closes #{number}
-- Refs #{number}
+```text
+## Fork Result
+**Status:** FAIL
+**Summary:** {error description}
+```
+
+When existing PR detected:
+
+```text
+## Fork Result
+**Status:** SUCCESS
+**Ref:** PR #{existing-pr-number}
+**Summary:** Existing PR detected, creation skipped
 ```
 
 ## Batch Mode

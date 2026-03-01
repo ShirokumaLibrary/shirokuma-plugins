@@ -333,7 +333,7 @@ knowledge-manager が Web 検索で以下を最新化する：
 - **ルール自動読み込み**: `.claude/rules/` からプロジェクト規約
 - **サブエージェントモード**: `context: fork` で隔離実行
 - **fork 制約**: `context: fork` のため TodoWrite / AskUserQuestion は使用不可。結果はレポートとして返す
-- **セルフレビュー**: 委任チェーンから起動時は構造化出力（Self-Review Result）を返す
+- **セルフレビュー**: 委任チェーンから起動時は構造化出力（Fork Result）を返す
 - **呼び出し元のコメントファースト遵守**: このスキルは `context: fork` のため本文更新を行わないが、呼び出し元スキル（`creating-pr-on-issue`, `working-on-issue`）がレビュー結果に基づいて Issue/PR 本文を更新する場合は、`item-maintenance.md` のコメントファースト原則に従うこと。具体的な手順パターンは `item-maintenance.md` の「レビュー結果からの本文更新」セクションを参照
 
 ## セルフレビューモード
@@ -346,22 +346,26 @@ knowledge-manager が Web 検索で以下を最新化する：
 
 1. **ステップ 1-5 を通常通り実行** — ロール選択、ナレッジ読み込み、Lint、分析、レポート生成
 2. **ステップ 6: PR コメント投稿（必須）** — PR 番号がコンテキストにある場合、レビューレポートを PR コメントとして投稿する。このステップは省略不可
-3. **構造化出力を返却** — 呼び出し元の自動判定用に、以下の形式でサマリーを返す
+3. **Fork Result を返却** — 呼び出し元の自動判定用に、以下の形式でサマリーを返す
 
-### 構造化出力形式
+### Fork Result 形式（セルフレビュー）
 
-ステップ 6 で PR コメントを投稿した後、以下の形式でサマリーを返す：
+ステップ 6 で PR コメントを投稿した後、以下の形式で返す。セルフレビューでは `working-on-issue` のループ判定に詳細情報が必要なため、基本形式に加えて `### Detail` 拡張ブロックを含める:
 
 ```text
-## Self-Review Result
+## Fork Result
 **Status:** {PASS | FAIL}
-**Critical:** {n} issues
-**Fixable-warning:** {n} issues
-**Out-of-scope:** {n} issues
+**Ref:** PR #{pr-number} comment
+**Summary:** {critical} critical, {fixable-warning} fixable-warning detected
+
+### Detail
+**Critical:** {n}
+**Fixable-warning:** {n}
+**Out-of-scope:** {n}
+**Auto-fixable:** {yes | no}
 **Files with issues:**
 - {file1}: {summary} [critical | fixable-warning]
 - {file2}: {summary} [critical | fixable-warning]
-**Auto-fixable:** {yes | no}
 **Out-of-scope items:**
 - {description1}
 - {description2}
@@ -390,9 +394,9 @@ Critical/High はスコープ外であっても `critical` に分類する。重
 
 | 条件 | 分類 |
 |------|------|
-| 当該 PR で変更したファイル内の修正 | fixable-warning |
+| 当該 PR で変更したファイル内の修正（新規追加ファイルを含む） | fixable-warning |
 | 当該 PR で変更したファイルに依存する未変更ファイルの修正 | out-of-scope |
-| 新規ファイルの追加が必要 | out-of-scope |
+| PR スコープ外の新規ファイル作成が必要 | out-of-scope |
 | 設計パターンの変更が必要 | out-of-scope |
 
 ### フィードバック蓄積
@@ -417,6 +421,52 @@ shirokuma-docs discussions create \
 - **パターン**: {description}
 - **検出回数**: {n}
 - **提案**: {rule-file} に追加を検討
+```
+
+## 計画レビューモード
+
+`planning-on-issue` から plan ロールで fork 起動された場合、計画レビュー結果を Issue コメントに投稿し、Fork Result を返す。
+
+### Fork Result 形式（計画レビュー）
+
+```text
+## Fork Result
+**Status:** {PASS | NEEDS_REVISION}
+**Ref:** #{issue-number} comment
+**Summary:** {レビュー結果の1行要約}
+```
+
+- **PASS**: 計画に重大な問題がない（Suggestions がある場合も PASS）
+- **NEEDS_REVISION**: 要件漏れ、重大な不整合、アンチパターンの検出
+
+### NEEDS_REVISION 時の追加情報
+
+```text
+## Fork Result
+**Status:** NEEDS_REVISION
+**Ref:** #{issue-number} comment
+**Summary:** {n} 件の問題を検出
+
+### Detail
+**Issues:**
+- [{計画 | Issue記述}] {問題点の説明}
+**Suggestions:**
+- {改善提案}
+```
+
+`planning-on-issue` は `### Detail` の `Issues` を `[計画]` と `[Issue記述]` に分類し、それぞれを修正する。
+
+## 通常レビューモード（非セルフレビュー、非計画レビュー）
+
+スタンドアロンまたは fork で起動され、セルフレビューでも計画レビューでもない場合は、レポートを GitHub に保存し Fork Result を返す。
+
+### Fork Result 形式（通常レビュー）
+
+```text
+## Fork Result
+**Status:** {PASS | FAIL}
+**Ref:** {出力先の参照（PR #{number} comment / Discussion #{number}）}
+**Summary:** {問題件数の1行要約}
 ```
 
 ## 言語

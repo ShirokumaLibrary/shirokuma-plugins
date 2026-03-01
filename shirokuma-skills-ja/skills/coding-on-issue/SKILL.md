@@ -67,11 +67,22 @@ Issue の再取得は不要。
 - TDD ワークフローは `working-on-issue` が `coding-on-issue` の呼び出しを TDD で包む形で管理（`coding-on-issue` 自体は実装のみに集中）
 - UI デザインタスク（新規 UI ページ、ビジュアルリデザイン、デザインシステムトークン変更）は `designing-ui-on-issue` → `designing-shadcn-ui` が担当。責務境界の詳細は `working-on-issue/docs/designing-reference.md` を参照
 
-## 出力
+## Fork Result 返却
 
-作業完了後、以下のサマリーを返す:
+作業完了後、呼び出し元に以下の構造化データを返す。コード変更自体が成果物であるため、GitHub への書き込みは行わない（GitHub 書き込みは後続の `committing-on-issue` / `creating-pr-on-issue` が担当）。
 
-- 変更ファイルリスト
-- 変更内容の要約
-- テスト実行結果（該当する場合）
-- 注意事項（あれば）
+```text
+## Fork Result
+**Status:** SUCCESS
+**Summary:** {変更ファイル数} ファイル変更。{変更内容の1行要約}
+```
+
+失敗時:
+
+```text
+## Fork Result
+**Status:** FAIL
+**Summary:** {エラー内容}
+```
+
+**注意**: `Ref` フィールドは省略する（GitHub 書き込みなし）。
