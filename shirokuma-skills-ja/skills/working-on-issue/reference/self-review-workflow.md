@@ -7,6 +7,8 @@
 ```text
 [チェーン] committing → creating-pr → セルフレビュー開始
     ↓
+[SIMPLIFY] /simplify 初期パス（code カテゴリのファイルがある場合のみ）
+    ↓  変更あり → コミット・プッシュ / 変更なし or 失敗 → スキップ
 [REVIEW] レビュー起動（Fork: reviewing-on-issue / reviewing-claude-config）
     ↓  ※ fork はステップ 6 で PR コメントを投稿してから構造化出力を返す
 [PARSE] 結果パース + PASS/FAIL 判定
@@ -57,6 +59,43 @@
 - Files with issues: マージ
 - Auto-fixable: いずれかが no → no
 - Out-of-scope items: マージ
+
+## /simplify 初期パス
+
+セルフレビューループの前段として `/simplify` を 1 回実行する。変更コードに対して「再利用・品質・効率」の 3 並列レビュー + 自動修正を実行し、品質ベースラインを引き上げる。
+
+### 実行条件
+
+ファイルカテゴリ検出の結果、`code` カテゴリのファイルが含まれる場合のみ実行。`config` や `docs` のみの場合はスキップ。
+
+### 呼び出し方法
+
+マネージャー（メイン AI）が `Skill` ツールで実行:
+
+```text
+skill: "simplify"
+```
+
+### 出力ハンドリング
+
+fire-and-forget（PASS/FAIL 判定なし）。品質ゲートは後続の `[REVIEW]` ステートが担当。
+
+### コミット処理
+
+`/simplify` 完了後にマネージャー（メイン AI）が以下を実行:
+
+1. `git diff` で変更を確認
+2. 変更あり → `git add -A` + コミット + プッシュ
+   - コミットメッセージ: `refactor: /simplify による品質改善 (#{issue-number})`
+3. 変更なし → スキップ
+
+### 失敗時
+
+オプショナルステップのため、エラー・タイムアウト時はスキップして `[REVIEW]` に進む。
+
+### バッチモード
+
+バッチ PR 全体に対して 1 回実行（レビューループと同様）。
 
 ## PASS/FAIL 判定
 

@@ -91,6 +91,12 @@ Reviews Claude Code configuration files for quality and Anthropic's best practic
 |-------|----------|
 | Missing style definition | Error |
 
+### Plugins (`plugin/`)
+
+| Check | Severity | Detection |
+|-------|----------|-----------|
+| Any `plugin.json` `version` field doesn't match root `package.json` `version` field | Warning | Compare `plugin/shirokuma-skills-en/.claude-plugin/plugin.json`, `plugin/shirokuma-skills-ja/.claude-plugin/plugin.json`, `plugin/shirokuma-hooks/.claude-plugin/plugin.json` against `package.json` |
+
 ## Anti-Patterns to Detect
 
 ```text

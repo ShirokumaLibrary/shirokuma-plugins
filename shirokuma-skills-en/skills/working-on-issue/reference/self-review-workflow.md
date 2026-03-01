@@ -7,6 +7,8 @@ Detailed specification of the self-review loop executed within the `working-on-i
 ```text
 [Chain] committing → creating-pr → Self-review start
     ↓
+[SIMPLIFY] /simplify initial pass (only when code-category files exist)
+    ↓  Changes found → commit & push / No changes or failure → skip
 [REVIEW] Launch review (Fork: reviewing-on-issue / reviewing-claude-config)
     ↓  Note: fork posts PR comment (Step 6) before returning structured output
 [PARSE] Parse result + PASS/FAIL determination
@@ -57,6 +59,43 @@ Get changed files via `git diff --name-only develop..HEAD` and classify:
 - Files with issues: merge
 - Auto-fixable: either no → no
 - Out-of-scope items: merge
+
+## /simplify Initial Pass
+
+Run `/simplify` once as a pre-pass before the self-review loop. It performs 3-parallel review (reuse, quality, efficiency) with auto-fixes on changed code, raising the quality baseline.
+
+### Execution Condition
+
+Only run when `code` category files are present in the file category detection results. Skip if only `config` or `docs` files.
+
+### Invocation
+
+The manager (main AI) invokes via the `Skill` tool:
+
+```text
+skill: "simplify"
+```
+
+### Output Handling
+
+Fire-and-forget (no PASS/FAIL determination). The quality gate is handled by the subsequent `[REVIEW]` state.
+
+### Commit Processing
+
+After `/simplify` completes, the manager (main AI) performs:
+
+1. Check for changes via `git diff`
+2. Changes found → `git add -A` + commit + push
+   - Commit message: `refactor: apply /simplify quality improvements (#{issue-number})`
+3. No changes → skip
+
+### On Failure
+
+Optional step — on error or timeout, skip and proceed to `[REVIEW]`.
+
+### Batch Mode
+
+Run once for the entire batch PR (same as the review loop).
 
 ## PASS/FAIL Criteria
 

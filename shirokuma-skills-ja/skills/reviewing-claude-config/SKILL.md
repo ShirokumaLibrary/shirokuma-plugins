@@ -91,6 +91,12 @@ Claude Code 設定ファイルの品質と Anthropic ベストプラクティス
 |---------|--------|
 | スタイル定義がない | Error |
 
+### プラグイン（`plugin/`）
+
+| チェック | 重大度 | 検出方法 |
+|---------|--------|---------|
+| いずれかの `plugin.json` の `version` フィールドがプロジェクトルートの `package.json` の `version` フィールドと一致しない | Warning | `plugin/shirokuma-skills-en/.claude-plugin/plugin.json`、`plugin/shirokuma-skills-ja/.claude-plugin/plugin.json`、`plugin/shirokuma-hooks/.claude-plugin/plugin.json` を `package.json` と比較 |
+
 ## 検出すべきアンチパターン
 
 ```text

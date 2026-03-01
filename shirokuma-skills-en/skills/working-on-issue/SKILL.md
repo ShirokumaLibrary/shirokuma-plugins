@@ -153,7 +153,7 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 | Work Type | Chain |
 |-----------|-------|
-| General Coding / Design | Work → Commit → PR → Self-Review → Status Update |
+| General Coding / Design | Work → Commit → PR → Simplify → Self-Review → Status Update |
 | Research | Research → Discussion |
 
 - **Merge is NOT part of the chain**
@@ -165,7 +165,7 @@ After work completes, execute the chain **automatically**. No user confirmation 
 **Post-fork-result behavior (pseudocode):**
 
 ```text
-for each step in [commit, pr, self_review, status_update]:
+for each step in [commit, pr, simplify, self_review, status_update]:
   result = invoke_fork_skill(step)
   log_one_line_summary(result)    // Summarize completion report in 1 line
   update_todo(step, "completed")
@@ -183,6 +183,8 @@ After PR creation, the manager (main AI) directly manages self-review. See [refe
 **State transition overview:**
 
 ```text
+[SIMPLIFY] /simplify initial pass → commit & push (if changes)
+    ↓
 [REVIEW] Launch review → [PARSE] Parse result → [PRESENT] Present result → Decision
   ├── PASS → [COMPLETE]
   ├── FAIL + Auto-fixable → [FIX] Task fix → [CONVERGE] Convergence check → [REVIEW]
@@ -191,6 +193,7 @@ After PR creation, the manager (main AI) directly manages self-review. See [refe
 
 | State | Action |
 |-------|--------|
+| SIMPLIFY | Invoke `/simplify` via Skill tool (only when code-category files exist; run once, skip on failure) |
 | REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` as fork |
 | PARSE | Parse result, PASS/FAIL determination |
 | PRESENT | Present self-review result summary to user |
@@ -362,7 +365,7 @@ Track files changed per issue using `git diff --name-only` before/after each imp
 - Update issue status before starting
 - Ensure correct feature branch
 - TDD-applicable work types wrap `coding-on-issue` invocation with TDD ([docs/tdd-workflow.md](docs/tdd-workflow.md))
-- Workflow executes sequentially (Commit → PR → Self-Review → Status Update). **Merge is NOT included**
+- Workflow executes sequentially (Commit → PR → Simplify → Self-Review → Status Update). **Merge is NOT included**
 - Self-review is directly managed by the manager (main AI) ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user
 - **Chain autonomous progression (CRITICAL)**: After a fork skill returns its completion report, **NEVER wait for user input**. As long as TodoWrite has pending steps, immediately execute the next step's Skill/Bash tool call. Fork completion reports are "internal processing data", NOT "user-facing output". Log a one-line summary and invoke the next tool in the same response
