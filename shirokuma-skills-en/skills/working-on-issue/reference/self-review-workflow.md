@@ -182,7 +182,7 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 | FAIL → auto-fix → PASS | 1 per iter | 1 | iter count + 1 |
 | FAIL → cannot converge | 1 per iter | Not needed | iter count |
 
-Review findings comments are posted by the `reviewing-on-issue` / `reviewing-claude-config` fork in Step 6. Fix comments are posted by the manager (`working-on-issue`).
+Review findings comments are posted by the `reviewing-on-issue` / `reviewing-claude-config` fork in Step 6. Fix comments are posted by the manager (main AI, `working-on-issue`).
 
 ## Fix Summary Comment
 

@@ -5,7 +5,7 @@ Guide for delegating from `working-on-issue` to `coding-on-issue` (fork).
 ## Delegation Structure
 
 ```text
-working-on-issue (manager)
+working-on-issue (manager = main AI)
   → coding-on-issue (fork worker)
       → coding-nextjs (Skill delegation, Next.js specific)
       → direct edit (Markdown, skills, config, etc.)

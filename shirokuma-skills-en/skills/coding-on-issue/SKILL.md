@@ -63,7 +63,7 @@ Skill delegate to `coding-nextjs`. Pass plan section and issue context.
 ## Constraints
 
 - `context: fork` — `TodoWrite` / `AskUserQuestion` are not available
-- Progress management is handled by the manager (`working-on-issue`)
+- Progress management is handled by the manager (main AI, `working-on-issue`)
 - TDD workflow is managed by `working-on-issue` wrapping `coding-on-issue` calls with TDD steps (`coding-on-issue` focuses solely on implementation)
 - UI design tasks (new UI pages, visual redesigns, design system token changes) are handled by `designing-ui-on-issue` → `designing-shadcn-ui`. See `working-on-issue/docs/designing-reference.md` for responsibility boundaries
 

@@ -35,7 +35,7 @@ git add {file1} {file2} ...
 - Large binary files
 - Unrelated changes from other work
 
-If an explicit file list was passed from the manager, use it. If no file list is provided, stage all changed files.
+If an explicit file list was passed from the manager (main AI), use it. If no file list is provided, stage all changed files.
 
 ### Step 3: Write Commit Message
 

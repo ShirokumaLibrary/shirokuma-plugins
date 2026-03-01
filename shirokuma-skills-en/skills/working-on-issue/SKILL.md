@@ -21,7 +21,7 @@ Register **all chain steps** in TodoWrite **before starting work**.
 | 1 | Implement changes | Implementing changes | `coding-on-issue` (fork) / `designing-ui-on-issue` |
 | 2 | Commit and push changes | Committing and pushing | `committing-on-issue` (fork) |
 | 3 | Create pull request | Creating pull request | `creating-pr-on-issue` (fork) |
-| 4 | Run self-review and apply fixes | Running self-review | Manager directly manages (see reference) |
+| 4 | Run self-review and apply fixes | Running self-review | Manager (main AI) directly manages (see reference) |
 | 5 | Update Status to Review | Updating Status to Review | `shirokuma-docs issues update` |
 
 **Research:**
@@ -120,9 +120,9 @@ For Feature type, Size M+, suggest ADR creation (AskUserQuestion).
 | Review | Keywords: `review`, `audit` | `reviewing-on-issue` (fork) | No |
 | Project Setup | Keywords: `setup project`, `initialize` | `setting-up-project` | No |
 
-**Pre-resolution logic**: Fork workers cannot use `AskUserQuestion`, so the manager resolves edge cases before invocation:
+**Pre-resolution logic**: Fork workers cannot use `AskUserQuestion`, so the manager (main AI) resolves edge cases before invocation:
 
-| Edge Case | Manager's Pre-action |
+| Edge Case | Manager's (Main AI) Pre-action |
 |-----------|---------------------|
 | Staging target files unclear | Check `git status` and pass file list as argument |
 | Multiple branch matches | Check branch list and pass correct branch as argument |
@@ -160,11 +160,11 @@ After work completes, execute the chain **automatically**. No user confirmation 
 - No confirmation between steps, one-line progress reports
 - On failure: stop chain, report status, return control to user
 
-**Chain completion guarantee**: After each fork skill returns its result, the manager **immediately proceeds to the next step**. Fork result summaries are limited to one line and do not wait for user input. The Status Update at the end of the chain is executed directly by the manager (not via fork), eliminating the risk of chain interruption.
+**Chain completion guarantee**: After each fork skill returns its result, the manager (main AI) **immediately proceeds to the next step**. Fork result summaries are limited to one line and do not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via fork), eliminating the risk of chain interruption.
 
-#### Self-Review Loop (Manager Directly Manages)
+#### Self-Review Loop (Manager = Main AI Directly Manages)
 
-After PR creation, the manager directly manages self-review. See [reference/self-review-workflow.md](reference/self-review-workflow.md) for details.
+After PR creation, the manager (main AI) directly manages self-review. See [reference/self-review-workflow.md](reference/self-review-workflow.md) for details.
 
 **Constraint**: Self-review MUST be launched via Skill tool (`reviewing-on-issue` / `reviewing-claude-config`). Using Agent (general-purpose) as a substitute is prohibited. Review skills post PR comments as part of their workflow; launching via other means results in review findings not being recorded on the PR.
 
@@ -205,9 +205,28 @@ shirokuma-docs issues update {number} --field-status "Review"
 
 After successful chain completion (skip on chain failure), auto-record Evolution signals detected during the session following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule.
 
-1. Self-review the session using the detection checklist (see `rule-evolution` rule)
-2. Signals detected → Post comment to Evolution Issue → Display 1-line recording confirmation
-3. No signals → Check for accumulated signals → Display reminder (fallback)
+#### 6a: Introspection Checks
+
+Self-review the session using the detection checklist (see `rule-evolution` rule).
+
+#### 6b: Environment Checks (Lint Metrics)
+
+Regardless of introspection check results, fetch lint metrics once:
+
+```bash
+shirokuma-docs lint-tests -p . --format json 2>/dev/null
+```
+
+| Condition | Action |
+|-----------|--------|
+| `summary.errorCount > 0` | Record as Evolution signal + propose follow-up Issue creation |
+| `summary.warningCount > 0` | Report count (signal type: lint trend) |
+| Command failure | Skip (environment checks are best-effort) |
+
+#### 6c: Signal Recording
+
+- Introspection or environment checks detected signals → Post comment to Evolution Issue → Display 1-line recording confirmation
+- No signals → Check for accumulated signals → Display reminder (fallback)
 
 Do not register in TodoWrite (non-blocking processing, not a work step).
 
@@ -321,16 +340,16 @@ Track files changed per issue using `git diff --name-only` before/after each imp
 
 | Tool | When |
 |------|------|
-| AskUserQuestion | Requirement clarification, approach selection, edge cases (manager pre-resolves) |
+| AskUserQuestion | Requirement clarification, approach selection, edge cases (manager (main AI) pre-resolves) |
 | TodoWrite | Chain step registration (required for all work) |
 | Bash | Git operations, `shirokuma-docs issues` commands |
 
 ## Notes
 
-- This skill is the **manager** (actual work is delegated to fork workers)
+- This skill is the **manager (the main-process AI agent)** — actual work is delegated to fork workers
 - Update issue status before starting
 - Ensure correct feature branch
 - TDD-applicable work types wrap `coding-on-issue` invocation with TDD ([docs/tdd-workflow.md](docs/tdd-workflow.md))
 - Workflow executes sequentially (Commit → PR → Self-Review → Status Update). **Merge is NOT included**
-- Self-review is directly managed by the manager ([reference/self-review-workflow.md](reference/self-review-workflow.md))
+- Self-review is directly managed by the manager (main AI) ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user

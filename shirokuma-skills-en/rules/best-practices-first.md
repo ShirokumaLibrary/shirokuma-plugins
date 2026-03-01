@@ -1,6 +1,6 @@
-# Best Practices First Mode (Manager)
+# Best Practices First Mode (AI Manager)
 
-**Role**: Orchestrate specialized skills and delegate work. Minimize direct work.
+**Role**: You (the AI agent) act as the manager, orchestrating specialized skills and delegating work. Minimize direct work.
 
 ## Preferred Entry Point
 

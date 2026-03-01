@@ -86,6 +86,8 @@ At the completion of major skills (`working-on-issue`, `planning-on-issue`, `cre
 
 Self-check the following at skill completion. When in doubt, do not record (avoid false positives).
 
+#### Introspection Checks (All Target Skills)
+
 | Check Item | Signal Type | Detect (examples) | Do NOT detect (examples) |
 |-----------|------------|-------------------|--------------------------|
 | Did the user correct or override rule-based behavior? | Rule friction | User overrides commit message language rule | Typo correction request (not a rule issue) |
@@ -93,10 +95,28 @@ Self-check the following at skill completion. When in doubt, do not record (avoi
 | Did unexpected obstacles or workarounds occur? | Missing pattern | Fallback execution due to unsupported CLI option | Taking time to understand unfamiliar file structure (normal exploration) |
 | Did the same pattern of issue repeat during the session? | Review pattern | Same type of self-review finding appeared 2+ times | Sequential fixes of different types (not repetition) |
 
+#### Environment Checks (`working-on-issue` only)
+
+At the completion of skills involving code changes, verify the project's objective state. `planning-on-issue` / `creating-item` do not involve code changes and are excluded.
+
+| Check Item | Signal Type | Detection Condition | Do NOT Record |
+|-----------|------------|-------------------|---------------|
+| Check `shirokuma-docs lint-tests -p . --format json` result | Lint trend | `errorCount > 0`: always flag | `warningCount` only: report count only (no threshold) |
+
+**lint-tests execution:**
+
+```bash
+shirokuma-docs lint-tests -p . --format json 2>/dev/null
+```
+
+- `summary.errorCount > 0`: Record as Evolution signal + propose follow-up Issue creation
+- `summary.warningCount`: Report count (no hardcoded threshold)
+- Command failure: Skip (environment checks are best-effort)
+
 ### Auto-Recording Flow
 
 ```
-Skill completion → Self-review via detection checklist
+Skill completion → Introspection checks → Environment checks (working-on-issue only)
   ├─ Signals detected → Search Evolution Issue → Post comment → Display 1-line recording confirmation
   └─ No signals → Check accumulated signals → Display reminder (fallback)
 ```

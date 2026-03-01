@@ -5,7 +5,7 @@
 ## 委任構造
 
 ```text
-working-on-issue（マネージャー）
+working-on-issue（マネージャー＝メイン AI）
   → coding-on-issue（fork ワーカー）
       → coding-nextjs（Skill 委任、Next.js 固有の場合）
       → 直接編集（Markdown, スキル, 設定等）

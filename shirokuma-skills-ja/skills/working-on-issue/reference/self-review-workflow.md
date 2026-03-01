@@ -182,7 +182,7 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 | FAIL → 自動修正 → PASS | 各 iter 1 件 | 1 件 | iter 数 + 1 件 |
 | FAIL → 収束不能 | 各 iter 1 件 | 不要 | iter 数分 |
 
-レビュー所見コメントは `reviewing-on-issue` / `reviewing-claude-config` の fork がステップ 6 で投稿する。修正コメントはマネージャー（`working-on-issue`）が投稿する。
+レビュー所見コメントは `reviewing-on-issue` / `reviewing-claude-config` の fork がステップ 6 で投稿する。修正コメントはマネージャー（メイン AI、`working-on-issue`）が投稿する。
 
 ## 修正コメント投稿
 
