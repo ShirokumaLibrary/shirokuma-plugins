@@ -214,7 +214,9 @@ Review reports output by `reviewing-on-issue` during self-review must also follo
 
 ## Next Steps (Standalone Invocation Only)
 
-When invoked from the `working-on-issue` chain, the chain continues automatically; this section does not apply. Only when invoked standalone:
+**When invoked as fork from `working-on-issue` chain**: Do NOT output this section. Next step suggestions would disrupt the chain's autonomous progression. Return only the completion report (Step 5).
+
+Only when invoked standalone:
 
 ```text
 PR created. Next steps:

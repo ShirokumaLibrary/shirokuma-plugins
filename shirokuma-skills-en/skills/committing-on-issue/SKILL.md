@@ -97,6 +97,8 @@ If on `develop` or `main`, do NOT push. Include a warning in the result.
 
 After a successful push on a feature branch, determine whether to chain into PR creation.
 
+**When invoked as fork from `working-on-issue` chain**: Skip this step (Step 7) entirely. The next step (PR creation) is controlled by the calling manager (main AI). Initiating a PR chain or suggesting next steps here would break the chain's control flow.
+
 **PR keyword detection**: Check the user's **initial message** (the `/committing-on-issue` invocation and surrounding text) for PR-related keywords:
 
 | Language | Keywords |

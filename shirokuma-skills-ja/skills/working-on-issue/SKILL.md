@@ -162,6 +162,18 @@ TDD 共通ワークフローの詳細は [docs/tdd-workflow.md](docs/tdd-workflo
 
 **チェーン完了保証**: 各 fork スキルの結果が返却された後、マネージャー（メイン AI）は**次のステップに即座に進む**。fork 結果のサマリー表示は 1 行で完了し、ユーザーの入力を待たない。チェーン末尾の Status Update は fork ではなくマネージャー（メイン AI）が直接実行するため、分断リスクがない。
 
+**fork 結果受領後の動作（擬似コード）:**
+
+```text
+for each step in [commit, pr, self_review, status_update]:
+  result = invoke_fork_skill(step)
+  log_one_line_summary(result)    // 完了レポートを 1 行に要約して記録
+  update_todo(step, "completed")
+  immediately_invoke_next_step()  // ← ユーザー入力を待たず即座に次へ
+```
+
+**禁止**: fork 結果の完了レポートをそのままユーザーに提示して停止すること。fork 結果は内部データとして処理し、1 行サマリーのみ出力して次のツール呼び出しへ進む。
+
 #### セルフレビューループ（マネージャー＝メイン AI が直接管理）
 
 PR 作成後、マネージャー（メイン AI）がセルフレビューを直接管理する。詳細は [reference/self-review-workflow.md](reference/self-review-workflow.md) 参照。
@@ -353,3 +365,4 @@ Issue ループ間で以下を保持:
 - ワークフローは常に順次実行（Commit → PR → Self-Review → Status Update）。**マージは含まない**
 - セルフレビューはマネージャー（メイン AI）が直接管理（[reference/self-review-workflow.md](reference/self-review-workflow.md) 参照）
 - チェーン実行はエラー発生時に停止し、ユーザーに制御を返す
+- **チェーン自律進行（最重要）**: fork スキルが完了レポートを返した後、**絶対にユーザーの入力を待たない**。TodoWrite に pending ステップがある限り、即座に次のステップの Skill/Bash ツール呼び出しを実行する。fork の完了レポートは「ユーザーへの提示物」ではなく「内部処理データ」として扱う。1 行のサマリーを記録したら、同じレスポンス内で次のツールを呼び出す

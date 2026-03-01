@@ -162,6 +162,18 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 **Chain completion guarantee**: After each fork skill returns its result, the manager (main AI) **immediately proceeds to the next step**. Fork result summaries are limited to one line and do not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via fork), eliminating the risk of chain interruption.
 
+**Post-fork-result behavior (pseudocode):**
+
+```text
+for each step in [commit, pr, self_review, status_update]:
+  result = invoke_fork_skill(step)
+  log_one_line_summary(result)    // Summarize completion report in 1 line
+  update_todo(step, "completed")
+  immediately_invoke_next_step()  // ← Do NOT wait for user input
+```
+
+**Prohibited**: Presenting the fork result's completion report to the user and stopping. Fork results are internal data — output a one-line summary and immediately proceed to the next tool call.
+
 #### Self-Review Loop (Manager = Main AI Directly Manages)
 
 After PR creation, the manager (main AI) directly manages self-review. See [reference/self-review-workflow.md](reference/self-review-workflow.md) for details.
@@ -353,3 +365,4 @@ Track files changed per issue using `git diff --name-only` before/after each imp
 - Workflow executes sequentially (Commit → PR → Self-Review → Status Update). **Merge is NOT included**
 - Self-review is directly managed by the manager (main AI) ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user
+- **Chain autonomous progression (CRITICAL)**: After a fork skill returns its completion report, **NEVER wait for user input**. As long as TodoWrite has pending steps, immediately execute the next step's Skill/Bash tool call. Fork completion reports are "internal processing data", NOT "user-facing output". Log a one-line summary and invoke the next tool in the same response
