@@ -1,6 +1,6 @@
 ---
 name: evolving-rules
-description: ルール・スキルの進化シグナルを分析し、改善提案を行います。「ルール進化」「rule evolution」「進化フロー」「evolve rules」「シグナル分析」で使用。
+description: ルール・スキルの進化シグナルを分析し、蓄積されたフィードバックに基づく改善提案を行います。トリガー: 「ルール進化」「rule evolution」「進化フロー」「evolve rules」「シグナル分析」。
 allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite, Skill
 ---
 
@@ -99,10 +99,10 @@ Skill: managing-rules (or managing-skills)
 Args: {対象ファイル} の更新
 ```
 
-**制約:**
-- `managing-rules` または `managing-skills` への委任が**必須** — `plugin/` ディレクトリ内ファイルの直接編集（Edit/Write ツール）は禁止
+**実装アプローチ:**
+- `managing-rules` または `managing-skills` にファイル変更を委任する — `plugin/` ファイルの直接編集は EN/JA 同期と品質レビューをバイパスするため
 - 委任先スキルが EN/JA 両方のファイル更新と `config-authoring-flow` ルールに基づく `reviewing-claude-config` の実行を担当する
-- Skill ツールの呼び出しが失敗した場合、直接編集にフォールバックせずユーザーにエラーを報告する
+- Skill ツールの呼び出しが失敗した場合、直接編集にフォールバックせずユーザーにエラーを報告する（直接編集は同期/レビューのセーフガードをスキップする）
 
 ### ステップ 7: 記録更新と Issue クローズ
 

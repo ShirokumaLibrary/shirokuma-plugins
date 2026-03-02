@@ -1,6 +1,6 @@
 ---
 name: coding-nextjs
-description: Next.jsプロジェクト向けの実装スキル。フレームワーク固有のテンプレート・パターンを提供。TDD ワークフローは working-on-issue が管理。「実装して」「機能追加」「コンポーネント作成」「ページ作成」で使用。
+description: Next.jsプロジェクトの機能をフレームワーク固有のテンプレート・パターンで実装します。TDD ワークフローは working-on-issue が管理。トリガー: 「実装して」「機能追加」「コンポーネント作成」「ページ作成」。
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch, AskUserQuestion, TodoWrite
 ---
 

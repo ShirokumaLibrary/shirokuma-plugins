@@ -1,6 +1,6 @@
 ---
 name: creating-pr-on-issue
-description: Create a GitHub pull request for the current branch to develop (or integration branch for sub-issues). Use when "create pull request", "create PR", "open PR".
+description: Creates a GitHub pull request from the current branch targeting develop (or integration branch for sub-issues). Triggers: "create pull request", "create PR", "open PR", "submit PR".
 context: fork
 agent: general-purpose
 allowed-tools: Bash, Read, Grep, Glob
@@ -225,7 +225,7 @@ Review reports output by `reviewing-on-issue` during self-review must also follo
 
 ## Next Steps (Standalone Invocation Only)
 
-**When invoked as fork from `working-on-issue` chain**: Do NOT output this section. Next step suggestions would disrupt the chain's autonomous progression. Return only the completion report (Step 5).
+**When invoked as fork from `working-on-issue` chain**: Omit this section — next step suggestions disrupt the chain's autonomous progression by introducing unnecessary pauses. Return only the completion report (Step 5).
 
 Only when invoked standalone:
 
@@ -238,8 +238,8 @@ PR created. Next steps:
 ## Notes
 
 - Always push before creating PR
-- Never create PRs from `develop` or `main`
+- Create PRs from feature branches, not `develop` or `main` — PRs from protected branches have no meaningful diff
 - Daily work PRs target `develop`; only hotfixes target `main`
-- Direct PRs to `main` are prohibited (exception: hotfixes only)
+- Reserve `main` as PR target for hotfixes only — routing daily work to `main` bypasses the integration branch
 - Include issue references for automatic linking
 - PR body should be informative but concise

@@ -1,6 +1,6 @@
 ---
 name: showing-github
-description: GitHubプロジェクトデータ（ダッシュボード、アイテム、Issue、PR、引き継ぎ、仕様）を表示します。「ダッシュボード」「アイテム確認」「Issue一覧」「PR一覧」「引き継ぎ確認」「仕様一覧」「dashboard」で使用。
+description: GitHubプロジェクトデータ（ダッシュボード、アイテム、Issue、PR、引き継ぎ、仕様）を表示します。トリガー: 「ダッシュボード」「アイテム確認」「Issue一覧」「PR一覧」「引き継ぎ確認」「仕様一覧」「dashboard」「プロジェクト状況」。
 allowed-tools: Bash, Read, Glob
 ---
 

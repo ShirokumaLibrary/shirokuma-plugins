@@ -1,6 +1,6 @@
 ---
 name: working-on-issue
-description: Work dispatcher that takes an issue number or task description, selects the appropriate skill, and orchestrates the workflow. Use when "work on", "work on #42".
+description: Dispatches work by taking an issue number or task description, selecting the appropriate skill, and orchestrating the full workflow from implementation to PR. Triggers: "work on", "work on #42", "do this", "start working".
 allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
 ---
 
@@ -187,13 +187,13 @@ for each step in [commit, pr, simplify, self_review, status_update]:
 | FAIL | All fork skills | Error or issues requiring action |
 | NEEDS_REVISION | reviewing-on-issue (plan review) | Plan needs revision |
 
-**Prohibited**: Presenting the Fork Result to the user and stopping. Fork Results are internal data — output a one-line summary and immediately proceed to the next tool call.
+Fork Results are internal processing data, not user-facing output. Presenting raw fork output exposes technical intermediates that disrupt the user's workflow experience. Output only a one-line summary and immediately proceed to the next tool call.
 
 #### Self-Review Loop (Manager = Main AI Directly Manages)
 
 After PR creation, the manager (main AI) directly manages self-review. See [reference/self-review-workflow.md](reference/self-review-workflow.md) for details.
 
-**Constraint**: Self-review MUST be launched via Skill tool (`reviewing-on-issue` / `reviewing-claude-config`). Using Agent (general-purpose) as a substitute is prohibited. Review skills post PR comments as part of their workflow; launching via other means results in review findings not being recorded on the PR.
+Self-review should be launched via Skill tool (`reviewing-on-issue` / `reviewing-claude-config`), not Agent (general-purpose). Review skills post PR comments as part of their workflow — launching via other means causes review findings to not be recorded on the PR, losing the audit trail.
 
 **State transition overview:**
 
@@ -314,4 +314,4 @@ When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batc
 - Workflow executes sequentially (Commit → PR → Simplify → Self-Review → Status Update). **Merge is NOT included**
 - Self-review is directly managed by the manager (main AI) ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user
-- **Chain autonomous progression (CRITICAL)**: Fork Results are intermediate chain data — stopping after one forces the user to manually prompt continuation. As long as TodoWrite has pending steps, immediately parse the `## Fork Result` block and execute the next step's Skill/Bash tool call. Log a one-line summary and invoke the next tool in the same response
+- **Chain autonomous progression**: Fork Results are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the `## Fork Result` block and execute the next step's Skill/Bash tool call. Log a one-line summary and invoke the next tool in the same response

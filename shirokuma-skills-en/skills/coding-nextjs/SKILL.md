@@ -1,6 +1,6 @@
 ---
 name: coding-nextjs
-description: Implementation skill for Next.js projects. Provides framework-specific templates and patterns. TDD workflow is managed by working-on-issue. Use when implementing features, creating components, building pages.
+description: Implements features in Next.js projects using framework-specific templates and patterns. TDD workflow is managed by working-on-issue. Triggers: "implement", "add feature", "create component", "build page", "create page".
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch, AskUserQuestion, TodoWrite
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: reviewing-on-issue
-description: Comprehensive review workflow with specialized roles. Use when "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "計画レビュー", or when checking code quality, security, testing patterns, documentation quality, or plan quality.
+description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, documentation, and plan quality. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "code review".
 context: fork
 agent: general-purpose
 model: opus
@@ -475,8 +475,8 @@ Review reports (PR comments, Discussions) must follow the language specified in 
 
 ## Anti-Patterns
 
-- Do not modify code (report review findings only)
-- Do not load ALL knowledge files at once (load only role-specific files)
+- Avoid modifying code — the reviewer role is to report findings, not implement fixes (mixing both roles dilutes review objectivity)
+- Avoid loading all knowledge files at once — role-specific loading keeps context focused and prevents information overload
 
 ## Reference Documents
 

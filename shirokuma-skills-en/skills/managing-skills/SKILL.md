@@ -1,6 +1,6 @@
 ---
 name: managing-skills
-description: Create, update, and improve Claude Code skill files following official best practices. Use when user mentions "skill", "SKILL.md", "create skill", "update skill", "improve skill", "generate skill", "skill template", or wants help with skills.
+description: Creates, updates, and improves Claude Code skill files following official best practices. Triggers: "skill", "SKILL.md", "create skill", "update skill", "improve skill", "generate skill", "skill template", or when building or modifying skills.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -36,7 +36,7 @@ Create, update, and improve Claude Code skills following best practices.
 
 Rules: lowercase, hyphens, max 64 chars
 
-### Step 3: Description (CRITICAL)
+### Step 3: Description (Key for Discovery)
 
 **Template**: `[What it does]. Use when [conditions/triggers].`
 
@@ -344,7 +344,7 @@ When run standalone, suggest next steps (review, testing methods).
 ## Notes
 
 - Skills are **model-invoked** (automatic)
-- Description is CRITICAL for discovery
+- Description is the primary way Claude discovers and selects skills — invest time in making it specific and trigger-rich
 - Keep SKILL.md under 500 lines
 - Always use forward slashes
 - Restart Claude Code after changes

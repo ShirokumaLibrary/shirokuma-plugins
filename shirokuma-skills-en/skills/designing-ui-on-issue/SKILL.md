@@ -1,6 +1,6 @@
 ---
 name: designing-ui-on-issue
-description: Design workflow orchestrator. Manages discovery and visual evaluation loops, delegates implementation to designing-shadcn-ui. Use when "design", "UI", "memorable", "impressive".
+description: Orchestrates the design workflow including discovery and visual evaluation loops, then delegates implementation to designing-shadcn-ui. Triggers: "design", "UI", "memorable", "impressive".
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TodoWrite, Skill
 ---
 
@@ -155,6 +155,6 @@ Initial implementation delegates to `designing-shadcn-ui` only, but future deleg
 ## Notes
 
 - Non-fork skill (requires iterative user interaction via AskUserQuestion)
-- Do not start implementation without user confirmation of design direction
+- Confirm design direction with user before implementation — implementing without alignment risks extensive rework
 - Visual evaluation loop limited to 3 iterations maximum
 - `designing-shadcn-ui` handles build verification (not needed in this skill)

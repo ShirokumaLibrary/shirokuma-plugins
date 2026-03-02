@@ -2,6 +2,22 @@
 
 Detailed specification of the self-review loop executed within the `working-on-issue` Step 5 chain.
 
+## Contents
+
+- State Transitions
+- File Category Detection
+- /simplify Initial Pass
+- PASS/FAIL Criteria
+- Convergence Check Logic
+- Fix Agent (Task)
+- Out-of-Scope Follow-up Issue Creation
+- Review Findings Comment Verification
+- Expected PR Comment Pattern
+- Fix Summary Comment
+- Issue Body Update
+- Self-Review Completion Report
+- Progress Reporting Template
+
 ## State Transitions
 
 ```text

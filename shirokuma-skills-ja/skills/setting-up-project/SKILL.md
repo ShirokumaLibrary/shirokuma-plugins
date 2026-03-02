@@ -1,6 +1,6 @@
 ---
 name: setting-up-project
-description: 初期セットアップを対話式で一気通貫実行するスキル。「初期設定」「セットアップ」「setup project」「新規プロジェクト」で使用。
+description: 対話式で初期セットアップを一気通貫実行し、設定ファイル・スキル・ルールを一括インストールします。トリガー: 「初期設定」「セットアップ」「setup project」「新規プロジェクト」「初期化」。
 allowed-tools: Bash, AskUserQuestion, Read, Write, Glob, TodoWrite
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: evolving-rules
-description: Analyzes evolution signals for rules and skills, proposing improvements. Use when "rule evolution", "rules evolution", "evolve rules", "evolution flow", "signal analysis".
+description: Analyzes evolution signals for rules and skills, proposing improvements based on accumulated feedback. Triggers: "rule evolution", "rules evolution", "evolve rules", "evolution flow", "signal analysis".
 allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite, Skill
 ---
 
@@ -99,10 +99,10 @@ Skill: managing-rules (or managing-skills)
 Args: Update {target file}
 ```
 
-**Constraints:**
-- **MUST** delegate to `managing-rules` or `managing-skills` — direct file editing (Edit/Write tools) of `plugin/` files is prohibited
+**Implementation approach:**
+- Delegate to `managing-rules` or `managing-skills` for file changes — direct editing of `plugin/` files bypasses the EN/JA sync and quality review that these skills provide
 - The delegated skill is responsible for updating both EN/JA files and running `reviewing-claude-config` per `config-authoring-flow` rule
-- If the Skill tool call fails, report the error to the user instead of falling back to direct editing
+- If the Skill tool call fails, report the error to the user instead of falling back to direct editing (direct editing would skip the sync/review safeguards)
 
 ### Step 7: Update Records and Close Issue
 

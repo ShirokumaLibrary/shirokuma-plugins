@@ -1,6 +1,6 @@
 ---
 name: planning-on-issue
-description: Create an implementation plan for an issue and persist it to the issue body for user approval. Use when "plan", "plan #42", "design approach".
+description: Creates an implementation plan for an issue and persists it to the issue body for user approval. Triggers: "plan", "plan #42", "design approach", "create plan".
 allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion, TodoWrite
 ---
 
@@ -238,7 +238,7 @@ shirokuma-docs issues update {number} --field-status "Spec Review"
 
 ### Step 7: Return to User
 
-Display a plan summary and request approval. **Do not proceed to implementation.**
+Display a plan summary and request approval. The plan is a contract with the user — proceeding without approval risks wasted work on a misaligned approach.
 
 Show a summary matching the plan depth level:
 
@@ -341,6 +341,6 @@ Add GitHub writing rule references to each skill...
 
 - **Does not implement** — planning only. Implementation is `working-on-issue`'s responsibility
 - Plans are persisted in the issue body — available across sessions
-- `Spec Review` is the user approval gate — AI must not self-approve and proceed
+- `Spec Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
 - Use Explore agent during investigation to minimize context consumption
 - **Chain autonomous progression**: After the review fork (Step 4) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 5-7 based on the Fork Result status

@@ -4,6 +4,17 @@ Follow these rules for splitting files in large-scale projects.
 
 ---
 
+## Contents
+
+- Split Thresholds
+- Server Actions Split Pattern
+- i18n Messages Split Pattern
+- Components Split Pattern
+- Shared Utility Extraction
+- Split Checklist
+- Split Templates
+- References
+
 ## Split Thresholds
 
 | File Type | Threshold | Action |

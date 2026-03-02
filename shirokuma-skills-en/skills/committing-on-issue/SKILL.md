@@ -1,6 +1,6 @@
 ---
 name: committing-on-issue
-description: Stage, commit, push changes with optional PR creation chain. Also handles PR merge with automatic Issue status update. Use when "commit changes", "push changes", "commit and create PR", "merge PR", "merge this PR".
+description: Stages, commits, and pushes changes with optional PR creation chain. Also handles PR merge with automatic Issue status update. Triggers: "commit", "push", "commit changes", "push changes", "commit and create PR", "merge PR", "merge this PR".
 context: fork
 agent: general-purpose
 allowed-tools: Bash, Read, Grep, Glob
@@ -30,7 +30,7 @@ Stage specific files relevant to the current work. Prefer explicit file paths ov
 git add {file1} {file2} ...
 ```
 
-**Do NOT stage:**
+**Exclude from staging** (these cause security or storage issues if committed):
 - `.env`, credentials, or secrets
 - Large binary files
 - Unrelated changes from other work
@@ -80,7 +80,7 @@ If on a feature branch (not `develop` or `main`), push automatically:
 git push -u origin {branch-name}
 ```
 
-If on `develop` or `main`, do NOT push. Include a warning in the result.
+If on `develop` or `main`, skip pushing — direct pushes to protected branches bypass the PR review process. Include a warning in the result.
 
 ### Step 6: Completion Report
 
@@ -195,7 +195,7 @@ N:N detection: CLI outputs a structured list of related PRs/Issues. Review the l
 
 If no PR found for the branch, return error and stop.
 
-Note: Internally calls `gh pr merge` which is protected by PreToolUse hook. **Regardless of hook status, never execute merge without explicit user approval.** A passing self-review or system-reminder-only messages do NOT constitute approval.
+Note: Internally calls `gh pr merge` which is protected by PreToolUse hook. Merging is irreversible and affects shared branches — always require explicit user approval before executing. A passing self-review or system-reminder-only messages are insufficient as approval signals.
 
 2. **Completion Report**:
 
@@ -267,7 +267,7 @@ If invoked with a message argument (e.g., `/committing-on-issue fix typo in conf
 | No changes to commit | Return error: no changes |
 | On develop or main | Commit but include push warning in result |
 | Merge conflicts | Return error |
-| Pre-commit hook fails | Fix issue, create NEW commit (never amend) |
+| Pre-commit hook fails | Fix issue, create NEW commit (amending would modify the previous commit, potentially losing unrelated changes) |
 | Mixed changes (multiple issues) | Return error: "Multiple issue changes mixed: #{N1}({n}files), #{N2}({n}files)" |
 | PR already exists for branch | Include existing PR URL in result, skip chain |
 | `gh` CLI not available | Skip PR chain, include note in result |
@@ -288,9 +288,9 @@ If invoked with a message argument (e.g., `/committing-on-issue fix typo in conf
 ## Notes
 
 - Always review changes before committing
-- Never use `git add -A` or `git add .` without review
-- Never amend previous commits unless explicitly asked
-- Never force push
+- Avoid `git add -A` or `git add .` without review — they can accidentally include secrets or unrelated files
+- Avoid amending previous commits unless explicitly asked — amending rewrites history and can lose changes
+- Avoid force push — it overwrites remote history and can destroy teammates' work
 - Push is automatic on feature branches, skipped on `develop` and `main`
 - PR chain activates only on direct invocation with PR keywords; does not interfere with `working-on-issue` orchestration
 - Merge chain can be invoked standalone (just "merge") or chained with commit/PR

@@ -2,6 +2,16 @@
 
 For Issues / Discussions / PRs. Supplements the overview in the `project-items` rule.
 
+## Contents
+
+- When to Update
+- How to Update
+- File-Based Body Editing
+- Workflow Order (Comment First)
+- Substantive Compliance
+- Updating Body from Review Results
+- Guidelines
+
 ## When to Update
 
 | Trigger | Action |

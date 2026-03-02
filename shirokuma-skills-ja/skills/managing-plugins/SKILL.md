@@ -1,6 +1,6 @@
 ---
 name: managing-plugins
-description: Claude Codeプラグインをスキル、エージェント、コマンド、フックと共に作成・設定・配布します。「plugin」「plugin.json」「marketplace.json」「create plugin」「publish plugin」、機能をパッケージとして配布したい場合に使用。「プラグイン作成」「カスタムスキルをプラグインとして配布したい」「marketplace設定」がトリガー。
+description: Claude Codeプラグインをスキル、エージェント、コマンド、フックと共に作成・設定・配布します。トリガー: 「plugin」「plugin.json」「marketplace.json」「create plugin」「publish plugin」「プラグイン作成」。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 

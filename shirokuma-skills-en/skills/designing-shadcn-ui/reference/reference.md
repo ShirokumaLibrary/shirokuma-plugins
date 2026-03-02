@@ -1,5 +1,16 @@
 # Frontend Designer Reference
 
+## Contents
+
+- Next.js + Tailwind v4 + shadcn/ui Setup
+- Font Recommendations
+- Color Palette Examples
+- Animation Patterns
+- Layout Patterns
+- Background & Texture Patterns
+- shadcn/ui Customization
+- Aesthetic Mood Board Examples
+
 ## Next.js + Tailwind v4 + shadcn/ui Setup
 
 ### Complete Font Setup

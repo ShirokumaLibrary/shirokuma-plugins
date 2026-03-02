@@ -1,6 +1,6 @@
 ---
 name: discovering-codebase-rules
-description: TypeScriptアプリケーションを分析してパターンを発見し、shirokuma-docs lintルール向けのコーディング規約を提案します。「ルール発見」「rule discovery」「規約提案」「convention proposal」「パターン分析」、コードベースからパターン抽出や新しい規約提案を調査する場合に使用。
+description: TypeScriptアプリケーションを分析してパターンを発見し、shirokuma-docs lintルール向けのコーディング規約を提案します。トリガー: 「ルール発見」「rule discovery」「規約提案」「convention proposal」「パターン分析」、コードベースからパターン抽出や新しい規約提案を調査する場合。
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion, TodoWrite
 ---
 
@@ -188,8 +188,8 @@ EOF
 
 ## NGケース
 
-- 既存ルールと重複する提案をしない
-- 2回未満の観測でパターン確認済みとしない
+- 提案前に既存ルールを確認する — 重複ルールは矛盾するガイダンスとメンテナンス負荷を生む
+- パターンの確認には最低 2 回の観測を要する — 単一の出現は意図的な規約ではなく一回限りの選択である可能性がある
 
 ## クイックリファレンス
 

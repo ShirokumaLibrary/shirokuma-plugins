@@ -219,5 +219,5 @@ When reviewing skills/agents, identify which pattern they follow:
 
 ## Anti-Patterns
 
-- Do not auto-fix detected issues (report only)
-- Do not review plugin-generated rules in `.claude/rules/shirokuma/`
+- Report issues without auto-fixing — the reviewer role maintains objectivity by separating analysis from implementation
+- Exclude plugin-generated rules in `.claude/rules/shirokuma/` — these are managed by the plugin and overwritten on update

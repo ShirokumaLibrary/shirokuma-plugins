@@ -1,6 +1,6 @@
 ---
 name: coding-on-issue
-description: Generic coding skill. Delegates to framework-specific skills or performs direct editing based on work type. Automatically delegated from working-on-issue.
+description: Handles generic coding tasks by delegating to framework-specific skills or performing direct edits based on work type. Automatically delegated from working-on-issue. Not intended for direct invocation.
 context: fork
 agent: general-purpose
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch

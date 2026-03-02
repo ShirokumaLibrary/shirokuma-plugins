@@ -1,6 +1,6 @@
 ---
 name: designing-shadcn-ui
-description: 印象的でプロダクション品質のフロントエンドインターフェースを作成します。「印象的なUI」「個性的なデザイン」「memorable design」「landing page」「ランディングページ」「AIっぽくない」、ジェネリックな見た目を避けたい場合に使用。
+description: shadcn/ui を使用して印象的でプロダクション品質のフロントエンドインターフェースを作成します。トリガー: 「印象的なUI」「個性的なデザイン」「memorable design」「landing page」「ランディングページ」「AIっぽくない」、ジェネリックな見た目を避けたい場合。
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 ---
 

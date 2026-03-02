@@ -1,6 +1,6 @@
 ---
 name: publishing
-description: Manages public releases via shirokuma-docs repo-pairs CLI. Handles status checks, dry-run previews, release execution, and .shirokumaignore configuration.
+description: Manages public releases via shirokuma-docs repo-pairs CLI. Handles status checks, dry-run previews, release execution, and .shirokumaignore configuration. Triggers: "publish", "release", "public release", "repo-pairs".
 allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
 ---
 
@@ -207,8 +207,8 @@ cd - && rm -rf "$TMPDIR"
 ## Notes
 
 - Use `TodoWrite` for progress tracking
-- Do not execute a release without a dry run (`--dry-run`) first
-- Do not release when the working directory is not clean
+- Run a dry run (`--dry-run`) before every release — releases are irreversible and a dry run catches configuration errors early
+- Ensure the working directory is clean before releasing — uncommitted changes may be accidentally included or lost
 
 ## Quick Commands
 

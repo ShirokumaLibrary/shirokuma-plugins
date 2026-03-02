@@ -1,6 +1,6 @@
 ---
 name: researching-best-practices
-description: Researches official documentation and project patterns before implementation. Use when starting a new feature, when unsure about best practices, or when the user asks "research best practices for X" or "how should I implement Y".
+description: Researches official documentation and project patterns before implementation. Triggers: starting a new feature, unsure about best practices, "research best practices for X", "how should I implement Y".
 context: fork
 agent: general-purpose
 model: opus
@@ -128,9 +128,9 @@ shirokuma-docs discussions create --category Research --title "[Research] {topic
 
 ## Anti-Patterns
 
-- Do not include unverified information in recommendations
-- Do not omit source URLs
-- Do not reference outdated version documentation
+- Avoid including unverified information in recommendations — unverified claims erode trust and may lead to incorrect implementations
+- Avoid omitting source URLs — without sources, recommendations cannot be verified or updated later
+- Avoid referencing outdated version documentation — version-specific APIs change frequently and outdated references cause subtle bugs
 
 ## Completion Checklist
 

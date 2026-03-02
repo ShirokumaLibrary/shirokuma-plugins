@@ -1,6 +1,6 @@
 ---
 name: coding-on-issue
-description: 汎用コーディングスキル。作業タイプに応じてフレームワーク固有スキルに委任するか直接編集を行う。working-on-issue から自動的に委任される。
+description: 汎用的なコーディングタスクを処理し、作業タイプに応じてフレームワーク固有スキルに委任するか直接編集を行います。working-on-issue から自動的に委任されるため、直接起動は不要。
 context: fork
 agent: general-purpose
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch

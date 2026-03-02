@@ -1,6 +1,6 @@
 ---
 name: ending-session
-description: End a work session saving handover info and updating project items. Use when "end session", "finish work", "save handover".
+description: Ends the current work session by saving handover information and updating project item statuses. Triggers: "end session", "finish work", "save handover", "session end", "wrap up".
 allowed-tools: Bash, Read, Write, Grep, Glob, AskUserQuestion
 ---
 
@@ -8,13 +8,13 @@ allowed-tools: Bash, Read, Write, Grep, Glob, AskUserQuestion
 
 End the current session and auto-save handover information.
 
-## Handover is Mandatory
+## Handover Purpose
 
-Every session MUST end with a handover Discussion. This is **not optional** — even brief sessions produce useful context for future sessions.
+Every session ends with a handover Discussion — without it, the next session starts blind and may repeat work or miss important context. Even brief sessions produce useful continuity information.
 
 - If no significant work was done, write a brief summary of what was discussed or investigated
-- If the user tries to skip the handover, explain its importance and proceed with creation
-- Empty Summary or Next Steps sections are not acceptable — always provide at least one line for each
+- If the user tries to skip the handover, explain its value for session continuity and proceed with creation
+- Summary and Next Steps sections each need at least one line — empty sections provide no value to the next session
 
 ## Standalone Work Note
 
@@ -286,6 +286,6 @@ Implemented the feature...
 - `session end` handles both handover creation and status updates in one call
 - Use `--review` when PR is created, `--done` when work needs no review
 - Include PR URL in handover body for traceability
-- Never leave Summary or Next Steps empty (at least one line each)
+- Summary and Next Steps need at least one line each — empty sections break session continuity
 - Use `--review` for items with a PR already created (not `--done`)
 - Use TodoWrite to track progress when updating multiple items

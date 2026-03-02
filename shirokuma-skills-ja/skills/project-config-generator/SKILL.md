@@ -1,6 +1,6 @@
 ---
 name: project-config-generator
-description: スキル向けのプロジェクト固有設定ファイル（tech-stack、パターン、issues、セットアップ、ワークフロー）を生成・更新します。新規プロジェクトのセットアップ、プロジェクト規約の更新、スキルのプロジェクトディレクトリ設定時に使用。
+description: スキル向けのプロジェクト固有設定ファイル（tech-stack、パターン、issues、セットアップ、ワークフロー）を生成・更新します。トリガー: 新規プロジェクトのセットアップ、プロジェクト規約の更新、スキルのプロジェクトディレクトリ設定時。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -282,7 +282,7 @@ Discussion (human-readable, ユーザー言語)
 
 - 7ステップのため `TodoWrite` で進捗管理
 - 自動検出結果は `AskUserQuestion` でユーザーに確認
-- 既存ファイルをユーザー確認なしに上書きしない
+- 既存ファイルの上書き前にユーザーに確認する — 手動カスタマイズが失われるリスクがある
 - 依存関係更新後に再実行
 - tech-stack.md を package.json と同期
 - プロジェクト設定はプロジェクト間で共有しない

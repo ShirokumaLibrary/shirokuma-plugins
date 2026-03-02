@@ -1,6 +1,6 @@
 ---
 name: managing-output-styles
-description: Manage Claude Code output styles including switching between default/explanatory/learning modes and creating custom styles. Use when user mentions "output style", "explanatory mode", "learning mode", "change style", or "create custom style".
+description: Manages Claude Code output styles including switching between default, explanatory, and learning modes and creating custom styles. Triggers: "output style", "explanatory mode", "learning mode", "change style", "create custom style", "switch style".
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 

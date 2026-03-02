@@ -1,6 +1,6 @@
 ---
 name: starting-session
-description: 作業セッションを開始し、プロジェクトの状態と前回の引き継ぎを表示します。「セッション開始」「作業開始」「start session」「begin work」で起動。
+description: 作業セッションを開始し、プロジェクトの状態、前回の引き継ぎ、保留中のIssueを表示します。トリガー: 「セッション開始」「作業開始」「start session」「begin work」。
 allowed-tools: Bash, Read, Grep, AskUserQuestion
 ---
 
@@ -78,7 +78,7 @@ Args: #{number}
 
 `working-on-issue` がステータス更新、ブランチ作成、計画確認、スキル選択・実行、作業後フローを一貫して処理する。
 `planning-on-issue` が計画策定とステータス遷移を処理する。
-`starting-session` ではステータス更新やブランチ作成を行わない。
+ステータス更新やブランチ作成は `working-on-issue` の責務であり、`starting-session` で重複すると競合や二重更新が発生する。
 
 ## Other 選択時
 
@@ -196,5 +196,5 @@ shirokuma-docs issues list --issue-type Evolution --limit 1
 - セッションヘッダーに現在時刻を表示
 - 引き継ぎから サマリー / 次のステップ をパース
 - 優先度順に表示
-- アイテム選択後はステータスベースルーティングに従い `working-on-issue` または `planning-on-issue` に委任（ステータス更新・ブランチ作成を重複しない）
-- 直接 `gh` コマンドを使わない（`shirokuma-docs session start` を使用）
+- アイテム選択後はステータスベースルーティングに従い `working-on-issue` または `planning-on-issue` に委任（ステータス更新・ブランチ作成は委任先スキルが担当）
+- `shirokuma-docs session start` を使用する（直接 `gh` コマンドではなく）— CLI がハンドオーバー・Issues・PR を 1 回で集約し、コンテキストウィンドウを節約する

@@ -1,6 +1,6 @@
 ---
 name: managing-output-styles
-description: Claude Codeの出力スタイルを管理。デフォルト/説明的/学習モードの切り替えやカスタムスタイルの作成を行います。「output style」「explanatory mode」「learning mode」「change style」「create custom style」、「explanatory modeに切り替えて」「スタイル変更」「カスタムスタイル作成」がトリガー。
+description: Claude Codeの出力スタイルを管理し、デフォルト/説明的/学習モードの切り替えやカスタムスタイルの作成を行います。トリガー: 「output style」「explanatory mode」「learning mode」「change style」「create custom style」「スタイル変更」「スタイル切り替え」。
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 

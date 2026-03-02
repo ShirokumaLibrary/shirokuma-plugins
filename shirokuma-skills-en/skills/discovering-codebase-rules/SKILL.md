@@ -1,6 +1,6 @@
 ---
 name: discovering-codebase-rules
-description: Analyzes TypeScript applications to discover patterns and propose coding conventions for shirokuma-docs lint rules. Use when "rule discovery", "convention proposal", "pattern analysis", or when investigating codebases to extract patterns or propose new conventions.
+description: Analyzes TypeScript applications to discover patterns and propose coding conventions for shirokuma-docs lint rules. Triggers: "rule discovery", "convention proposal", "pattern analysis", or when investigating codebases to extract patterns or propose new conventions.
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion, TodoWrite
 ---
 
@@ -179,8 +179,8 @@ EOF
 
 ## Anti-Patterns
 
-- Do not propose rules that duplicate existing rules
-- Do not mark a pattern as confirmed with fewer than 2 observations
+- Check existing rules before proposing — duplicate rules create conflicting guidance and maintenance burden
+- Require at least 2 observations before confirming a pattern — single occurrences may be one-off choices rather than intentional conventions
 
 ## Quick Reference
 

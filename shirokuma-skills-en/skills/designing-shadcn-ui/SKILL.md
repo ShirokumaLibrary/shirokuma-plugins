@@ -1,6 +1,6 @@
 ---
 name: designing-shadcn-ui
-description: Creates distinctive, production-grade frontend interfaces. Use when "memorable design", "distinctive UI", "unique design", "landing page", avoiding generic look, or when creating unique visual aesthetics.
+description: Creates distinctive, production-grade frontend interfaces using shadcn/ui. Triggers: "memorable design", "distinctive UI", "unique design", "landing page", "impressive UI", or when avoiding generic look and creating unique visual aesthetics.
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 ---
 

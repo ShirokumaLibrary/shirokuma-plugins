@@ -1,6 +1,6 @@
 ---
 name: designing-ui-on-issue
-description: デザインワークフローオーケストレーター。ディスカバリー・視覚評価ループを管理し、designing-shadcn-ui に実装を委任する。「デザイン」「UI」「印象的」「design」で使用。
+description: デザインワークフローを統括し、ディスカバリー・視覚評価ループを管理して designing-shadcn-ui に実装を委任します。トリガー: 「デザイン」「UI」「印象的」「design」。
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TodoWrite, Skill
 ---
 
@@ -155,6 +155,6 @@ lsof -i :3000 2>/dev/null || echo "dev server not running"
 ## 注意事項
 
 - 非 fork スキル（AskUserQuestion による反復的ユーザー対話が必要）
-- デザイン方向性のユーザー確認なしに実装を開始しない
+- 実装前にデザイン方向性をユーザーに確認する — 合意なく実装すると大幅な手戻りリスクがある
 - 視覚評価ループは最大 3 イテレーション
 - `designing-shadcn-ui` がビルド検証を実施（このスキルでは不要）

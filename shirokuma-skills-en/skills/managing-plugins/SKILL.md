@@ -1,6 +1,6 @@
 ---
 name: managing-plugins
-description: Create, configure, and distribute Claude Code plugins with skills, agents, commands, and hooks. Use when user mentions "plugin", "plugin.json", "marketplace.json", "create plugin", "publish plugin", or wants to package functionality for distribution.
+description: Creates, configures, and distributes Claude Code plugins with skills, agents, commands, and hooks. Triggers: "plugin", "plugin.json", "marketplace.json", "create plugin", "publish plugin", or when packaging functionality for distribution.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: managing-skills
-description: Claude Codeのスキルファイルを公式ベストプラクティスに従って作成・更新・改善します。「skill」「SKILL.md」「create skill」「update skill」「improve skill」「generate skill」「skill template」、スキルの作成・更新・改善時に使用。「スキル作成」「PDF処理用のスキルを作って」「update the managing-agents skill」がトリガー。
+description: Claude Codeのスキルファイルを公式ベストプラクティスに従って作成・更新・改善します。トリガー: 「skill」「SKILL.md」「create skill」「update skill」「improve skill」「スキル作成」。
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -36,7 +36,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 ルール: 小文字、ハイフン、最大64文字
 
-### ステップ 3: 説明文（重要）
+### ステップ 3: 説明文（発見性の鍵）
 
 **テンプレート**: `[What it does]. Use when [conditions/triggers].`
 
@@ -341,7 +341,7 @@ SKILL.md → サポートファイル（それ以上のチェーンなし）
 ## 注意事項
 
 - スキルは**モデル起動型**（自動）
-- 説明文は発見性に極めて重要
+- 説明文は Claude がスキルを発見・選択する主要手段 — 具体的でトリガーに富む記述に時間をかける
 - SKILL.md は500行未満を維持
 - パスは常にスラッシュを使用
 - 変更後は Claude Code を再起動

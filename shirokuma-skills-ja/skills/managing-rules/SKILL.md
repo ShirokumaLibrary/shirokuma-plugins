@@ -1,6 +1,6 @@
 ---
 name: managing-rules
-description: Claude Codeのルール（.claude/rules/）を公式ベストプラクティスに従って作成・更新・整理します。「create rule」「add rule」「ルール作成」「ルール追加」、パス固有の規約設定時に使用。
+description: Claude Codeのルール（.claude/rules/）を公式ベストプラクティスに従って作成・更新・整理します。トリガー: 「create rule」「add rule」「ルール作成」「ルール追加」「ルール更新」、パス固有の規約設定時。
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
@@ -29,7 +29,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ### マネージドルール（shirokuma/）
 
 `.claude/rules/shirokuma/` は `shirokuma-docs init`（または `update-skills --with-rules`）で自動デプロイ。
-手動編集禁止 — 更新時に上書きされる。カスタマイズは `.claude/rules/`（`shirokuma/` 外）に配置。
+更新時に上書きされるため、手動編集は失われる。カスタマイズは `.claude/rules/`（`shirokuma/` 外）に配置。
 
 ### この構造の理由
 
@@ -153,7 +153,7 @@ paths:
 ├── {topic}.md              # 単一トピック
 ├── {category}/             # 関連ルールをグループ化
 │   └── {subtopic}.md
-└── shirokuma/              # 予約済み — プラグイン管理（カスタムルール禁止）
+└── shirokuma/              # 予約済み — プラグイン管理（更新時に上書きされる）
 ```
 
 **重要**: `.claude/rules/shirokuma/` は shirokuma-skills プラグインが管理。更新時に上書きされる。カスタムルールは `.claude/rules/` 直下または独自サブディレクトリに配置。
@@ -259,7 +259,7 @@ cat .claude/rules/{name}.md
 ### 言語
 
 - **ルールは英語で記述**: `.claude/rules/` ファイルはプロジェクト間再利用のため英語
-- **テーブル内の言語混在禁止**: バイリンガルコンテンツが必要な場合は言語ごとに別セクション
+- **テーブル内の言語混在を避ける**: 混在テーブルは読みにくい — バイリンガルコンテンツは言語ごとに別セクションで
 - **応答言語は自動マッチ**: AI はユーザー言語に自動対応 — ルールにバイリンガル翻訳は不要
 
 ### Don't

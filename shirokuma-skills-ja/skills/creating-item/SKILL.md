@@ -1,6 +1,6 @@
 ---
 name: creating-item
-description: 会話コンテキストからIssue/Discussionを自動推定して作成し、working-on-issueへの自動チェーンを提供する。「Issue にして」「Issue 作って」「フォローアップ Issue」「仕様作成して」で使用。
+description: 会話コンテキストからGitHub Issue/Discussionを自動推定して作成し、working-on-issueへの自動チェーンを提供します。トリガー: 「Issue にして」「Issue 作って」「フォローアップ Issue」「仕様作成して」「新規 Issue」。
 allowed-tools: Bash, AskUserQuestion, Read, Write, TodoWrite
 ---
 

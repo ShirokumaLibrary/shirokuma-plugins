@@ -1,6 +1,6 @@
 ---
 name: managing-agents
-description: Anthropicの公式ベストプラクティスに従ってClaude Codeエージェントファイルを作成・更新・改善します。「agent」「AGENT.md」「create agent」「update agent」「improve agent」「generate agent」「agent template」「workflow pattern」、エージェントの作成・更新・改善時に使用。「エージェント作成」「コードレビュー用のエージェントを作って」「エージェント改善」がトリガー。
+description: Anthropicの公式ベストプラクティスに従ってClaude Codeエージェントファイルを作成・更新・改善します。トリガー: 「agent」「AGENT.md」「create agent」「update agent」「improve agent」「エージェント作成」「エージェント改善」。
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 

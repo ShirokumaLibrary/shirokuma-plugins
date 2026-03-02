@@ -2,6 +2,17 @@
 
 Shared reference for all session/GitHub skills. Single source of truth for CLI commands, workflows, and conventions.
 
+## Contents
+
+- Architecture: Issues + Projects Hybrid
+- Prerequisites
+- DraftIssue vs Issue
+- shirokuma-docs CLI Reference
+- `--body-file` Usage Guide
+- Status Workflow
+- Labels Convention
+- Common Error Handling
+
 ## Architecture: Issues + Projects Hybrid
 
 | Component | Purpose |

@@ -2,6 +2,17 @@
 
 セッション/GitHub スキル共通リファレンス。CLI コマンド、ワークフロー、規約の単一情報源。
 
+## 目次
+
+- アーキテクチャ: Issues + Projects ハイブリッド
+- 前提条件
+- DraftIssue vs Issue
+- shirokuma-docs CLI リファレンス
+- `--body-file` 使い分け
+- ステータスワークフロー
+- ラベル規約
+- よくあるエラー対処
+
 ## アーキテクチャ: Issues + Projects ハイブリッド
 
 | コンポーネント | 用途 |

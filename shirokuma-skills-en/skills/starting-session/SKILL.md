@@ -1,6 +1,6 @@
 ---
 name: starting-session
-description: Start a work session showing project status and previous handovers. Use when "start session", "begin work".
+description: Starts a work session by loading project status, previous handovers, and pending issues. Triggers: "start session", "begin work", "session start".
 allowed-tools: Bash, Read, Grep, AskUserQuestion
 ---
 
@@ -99,7 +99,7 @@ Args: #{number}
 
 `working-on-issue` handles status update, branch creation, plan check, skill selection, execution, and post-work flow.
 `planning-on-issue` handles plan creation and status transitions.
-Do NOT duplicate status updates or branch creation in `starting-session`.
+Status updates and branch creation are `working-on-issue`'s responsibility — duplicating them in `starting-session` causes race conditions and double updates.
 
 ## When Other Selected
 
@@ -218,5 +218,5 @@ If signals are accumulated, show a single line after the Active Issues section:
 - Parse handover body for Summary and Next Steps sections
 - Show items in priority order within each status
 - Done/Released items are automatically excluded by `session start`
-- After item selection, delegate to `working-on-issue` or `planning-on-issue` based on status-based routing (do not duplicate status update or branch creation)
-- Do not use raw `gh` commands directly (use `shirokuma-docs session start` instead)
+- After item selection, delegate to `working-on-issue` or `planning-on-issue` based on status-based routing (status updates and branch creation are handled by the delegated skill)
+- Use `shirokuma-docs session start` instead of raw `gh` commands — the CLI aggregates handover, issues, and PRs in one call, saving context window

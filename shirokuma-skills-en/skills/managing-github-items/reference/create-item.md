@@ -7,6 +7,14 @@ Create a GitHub Project item (Issue or DraftIssue). When called without argument
 /create-item "Title"            # With title
 ```
 
+## Contents
+
+- Step 1: Gather Details + Type Classification
+- Step 2: Generate Body
+- Step 3: Set Fields
+- Step 4: Create
+- Step 5: Display Result and Post-Creation Review
+
 ## Step 1: Gather Details + Type Classification
 
 With arguments: Use the provided title.

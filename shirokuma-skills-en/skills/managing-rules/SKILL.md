@@ -1,6 +1,6 @@
 ---
 name: managing-rules
-description: Create, update, and organize Claude Code rules (.claude/rules/) following official best practices. Use when "create rule", "add rule", or configuring path-specific conventions.
+description: Creates, updates, and organizes Claude Code rules (.claude/rules/) following official best practices. Triggers: "create rule", "add rule", "update rule", or when configuring path-specific conventions.
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 
@@ -33,7 +33,7 @@ Create and maintain rules that provide automatic, path-specific context to Claud
 ### Managed Rules (shirokuma/)
 
 Files in `.claude/rules/shirokuma/` are auto-deployed by `shirokuma-docs init` (or `update-skills --with-rules`).
-Do NOT edit them manually - they are overwritten on update.
+These files are overwritten on every update, so manual edits will be lost.
 
 To customize behavior, create your own rules in `.claude/rules/` (outside `shirokuma/`).
 Project-specific rules always take precedence since they are loaded alongside managed rules.
@@ -162,10 +162,10 @@ User rules apply to all projects, loaded before project rules.
 ├── {topic}.md              # Single-topic rules
 ├── {category}/             # Related rules grouped
 │   └── {subtopic}.md
-└── shirokuma/              # RESERVED - plugin-managed (do NOT place custom rules here)
+└── shirokuma/              # Plugin-managed (overwritten on update)
 ```
 
-**Important**: If `.claude/rules/shirokuma/` exists, it is managed by the shirokuma-skills plugin (deployed via `shirokuma-docs init`). Files there are overwritten on update. Always place custom rules in `.claude/rules/` directly or in your own subdirectories (not `shirokuma/`).
+**Important**: `.claude/rules/shirokuma/` is managed by the shirokuma-skills plugin (deployed via `shirokuma-docs init`). Files there are overwritten on update, so custom rules placed here will be lost. Place custom rules in `.claude/rules/` directly or in your own subdirectories.
 
 **Naming**: Use descriptive, kebab-case names.
 
@@ -268,7 +268,7 @@ cat .claude/rules/{name}.md
 ### Language
 
 - **Write rules in English**: All `.claude/rules/` files use English for cross-project reuse
-- **Never mix languages in tables**: If bilingual content is needed, use separate sections per language
+- **Avoid mixing languages in tables**: Mixed-language tables are hard to scan — use separate sections per language instead
 - **Response language matching**: The AI matches the user's language automatically — rules don't need bilingual translations
 
 ### Don't

@@ -1,6 +1,6 @@
 ---
 name: showing-github
-description: Display GitHub project data (dashboard, items, issues, PRs, handovers, specs). Use when "show dashboard", "show items", "show issues", "show PRs", "show handovers", "show specs".
+description: Displays GitHub project data including dashboard, items, issues, PRs, handovers, and specs. Triggers: "dashboard", "show items", "show issues", "show PRs", "show handovers", "show specs", "project status".
 allowed-tools: Bash, Read, Glob
 ---
 

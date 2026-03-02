@@ -2,6 +2,17 @@
 
 Unified reference for working with epics (parent issue + sub-issue structure) on large-scale work.
 
+## Contents
+
+- Identifying Epics
+- Integration Branch Model
+- Base Branch Auto-Detection
+- Status Management
+- `Closes #N` Behavior and Base Branch
+- PR-Issue Link Graph
+- Epic Plan Template
+- Out of Scope (Follow-up)
+
 ## Identifying Epics
 
 Epics are identified by **structure**, not Issue Type. An issue with `subIssuesSummary.total > 0` is an epic.

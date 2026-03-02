@@ -1,6 +1,6 @@
 ---
 name: managing-agents
-description: Create, update, and improve Claude Code agent files following Anthropic's official best practices. Use when user mentions "agent", "AGENT.md", "create agent", "update agent", "improve agent", "generate agent", "agent template", "workflow pattern", or wants help with agents.
+description: Creates, updates, and improves Claude Code agent files following Anthropic's official best practices. Triggers: "agent", "AGENT.md", "create agent", "update agent", "improve agent", "generate agent", "agent template", "workflow pattern", or when building or configuring agents.
 allowed-tools: Read, Write, Edit, Glob, Grep
 ---
 

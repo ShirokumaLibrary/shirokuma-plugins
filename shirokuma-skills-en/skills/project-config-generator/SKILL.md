@@ -1,6 +1,6 @@
 ---
 name: project-config-generator
-description: Generates and updates project-specific configuration files for skills (tech-stack, patterns, issues, setup, workflows). Use when setting up a new project, updating project conventions, or configuring skill project directories.
+description: Generates and updates project-specific configuration files for skills (tech-stack, patterns, issues, setup, workflows). Triggers: setting up a new project, updating project conventions, or configuring skill project directories.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -294,7 +294,7 @@ Generate `.github/DISCUSSION_TEMPLATE/` files for the project.
 
 - Use `TodoWrite` for progress tracking (6 steps)
 - Confirm auto-detected results with the user via `AskUserQuestion`
-- Do not overwrite existing files without user confirmation
+- Confirm before overwriting existing files — users may have manual customizations that would be lost
 - Run after major dependency updates
 - Keep tech-stack.md in sync with package.json
 - Project configs are NOT shared between projects
