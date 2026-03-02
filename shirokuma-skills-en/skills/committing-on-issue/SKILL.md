@@ -108,9 +108,11 @@ Return the following structured data to the caller:
 ```text
 ## Fork Result
 **Status:** SUCCESS
+**Action:** CONTINUE
 **Ref:** #{issue-number} comment
 **Summary:** {hash} {one-line commit message}, {count} files changed
-**Next:** Proceed to creating-pr-on-issue
+
+> **CHAIN ACTION:** Invoke `creating-pr-on-issue` via Skill tool immediately. Do not wait for user input.
 ```
 
 On failure:
@@ -118,7 +120,10 @@ On failure:
 ```text
 ## Fork Result
 **Status:** FAIL
+**Action:** STOP
 **Summary:** {error description}
+
+> **CHAIN ACTION:** Stop chain. Report error to user.
 ```
 
 ### Step 7: PR Chain (after push)

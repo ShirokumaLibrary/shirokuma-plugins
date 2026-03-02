@@ -141,9 +141,11 @@ PR creation itself is a GitHub write (the deliverable), so no additional GitHub 
 ```text
 ## Fork Result
 **Status:** SUCCESS
+**Action:** CONTINUE
 **Ref:** PR #{pr-number}
 **Summary:** {branch} → {base-branch}, {count} commits, Closes #{issue-number}
-**Next:** Proceed to self-review
+
+> **CHAIN ACTION:** Proceed to self-review via `reviewing-on-issue` immediately. Do not wait for user input.
 ```
 
 On failure:
@@ -151,7 +153,10 @@ On failure:
 ```text
 ## Fork Result
 **Status:** FAIL
+**Action:** STOP
 **Summary:** {error description}
+
+> **CHAIN ACTION:** Stop chain. Report error to user.
 ```
 
 When existing PR detected:
@@ -159,9 +164,11 @@ When existing PR detected:
 ```text
 ## Fork Result
 **Status:** SUCCESS
+**Action:** CONTINUE
 **Ref:** PR #{existing-pr-number}
 **Summary:** Existing PR detected, creation skipped
-**Next:** Proceed to self-review
+
+> **CHAIN ACTION:** Proceed to self-review via `reviewing-on-issue` immediately. Do not wait for user input.
 ```
 
 ## Batch Mode

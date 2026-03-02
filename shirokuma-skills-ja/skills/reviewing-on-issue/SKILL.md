@@ -355,9 +355,11 @@ knowledge-manager が Web 検索で以下を最新化する：
 ```text
 ## Fork Result
 **Status:** {PASS | NEEDS_FIX | FAIL}
+**Action:** {CONTINUE | FIX | STOP}
 **Ref:** PR #{pr-number} comment
 **Summary:** {critical} critical, {fixable-warning} fixable-warning detected
-**Next:** {Status 更新に進む | 修正ループに入る}
+
+> **CHAIN ACTION:** {下記のステータス別ディレクティブを参照}
 
 ### Detail
 **Critical:** {n}
@@ -372,9 +374,11 @@ knowledge-manager が Web 検索で以下を最新化する：
 - {description2}
 ```
 
-- **PASS**: critical = 0 かつ fixable-warning = 0（out-of-scope のみでも PASS）→ Next: Status 更新に進む
-- **NEEDS_FIX**: (critical > 0 or fixable-warning > 0) かつ Auto-fixable = yes → Next: 修正ループに入る
-- **FAIL**: (critical > 0 or fixable-warning > 0) かつ Auto-fixable = no → チェーン停止
+ステータス別 Action と blockquote ディレクティブ:
+
+- **PASS** (Action: CONTINUE): critical = 0 かつ fixable-warning = 0（out-of-scope のみでも PASS）→ `> **CHAIN ACTION:** Status 更新を即座に実行せよ。ユーザー入力を待たない。`
+- **NEEDS_FIX** (Action: FIX): (critical > 0 or fixable-warning > 0) かつ Auto-fixable = yes → `> **CHAIN ACTION:** 修正ループに即座に入れ。ユーザー入力を待たない。`
+- **FAIL** (Action: STOP): (critical > 0 or fixable-warning > 0) かつ Auto-fixable = no → `> **CHAIN ACTION:** チェーン停止。残存問題をユーザーに報告せよ。`
 - **Out-of-scope items**: フォローアップ Issue 作成の入力となる概要リスト
 
 ### セルフレビュー 3 分類マッピング
@@ -433,20 +437,26 @@ shirokuma-docs discussions create \
 ```text
 ## Fork Result
 **Status:** {PASS | NEEDS_REVISION}
+**Action:** {CONTINUE | REVISE}
 **Ref:** #{issue-number} comment
 **Summary:** {レビュー結果の1行要約}
+
+> **CHAIN ACTION:** {CONTINUE → 次のステップに即座に進め | REVISE → 修正ループに即座に入れ}。ユーザー入力を待たない。
 ```
 
-- **PASS**: 計画に重大な問題がない（Suggestions がある場合も PASS）
-- **NEEDS_REVISION**: 要件漏れ、重大な不整合、アンチパターンの検出
+- **PASS** (Action: CONTINUE): 計画に重大な問題がない（Suggestions がある場合も PASS）
+- **NEEDS_REVISION** (Action: REVISE): 要件漏れ、重大な不整合、アンチパターンの検出
 
 ### NEEDS_REVISION 時の追加情報
 
 ```text
 ## Fork Result
 **Status:** NEEDS_REVISION
+**Action:** REVISE
 **Ref:** #{issue-number} comment
 **Summary:** {n} 件の問題を検出
+
+> **CHAIN ACTION:** 修正ループに即座に入れ。ユーザー入力を待たない。
 
 ### Detail
 **Issues:**
@@ -466,8 +476,11 @@ shirokuma-docs discussions create \
 ```text
 ## Fork Result
 **Status:** {PASS | FAIL}
+**Action:** {CONTINUE | STOP}
 **Ref:** {出力先の参照（PR #{number} comment / Discussion #{number}）}
 **Summary:** {問題件数の1行要約}
+
+> **CHAIN ACTION:** {CONTINUE → 次のステップに即座に進め | STOP → チェーン停止、ユーザーに報告せよ}。ユーザー入力を待たない。
 ```
 
 ## 言語

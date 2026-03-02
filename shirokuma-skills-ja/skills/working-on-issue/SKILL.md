@@ -162,7 +162,15 @@ TDD 共通ワークフローの詳細は [docs/tdd-workflow.md](docs/tdd-workflo
 - ステップ間で確認しない、進捗を1行で報告
 - 失敗時: チェーン停止、状況報告、ユーザーに制御を返す
 
-**チェーン完了保証**: 各 fork スキルは `## Fork Result` 形式で構造化データを返す。マネージャー（メイン AI）は `Status` フィールドのみでチェーン継続/停止を判定し、**次のステップに即座に進む**。チェーン末尾の Status Update は fork ではなくマネージャー（メイン AI）が直接実行するため、分断リスクがない。
+**チェーン完了保証**: 各 fork スキルは `## Fork Result` 形式で構造化データを返す。マネージャー（メイン AI）は `Action` フィールドでチェーン継続/停止を判定し、**次のステップに即座に進む**。チェーン末尾の Status Update は fork ではなくマネージャー（メイン AI）が直接実行するため、分断リスクがない。
+
+**Fork Result パースチェックポイント** — fork 出力を受け取ったら、以下の 3 チェックを順に実行する:
+
+1. **Status チェック**: `**Status:**` 値を抽出 → FAIL はチェーン停止
+2. **Action チェック**: `**Action:**` 値を抽出 → CONTINUE/FIX/STOP/REVISE で次の動作を決定
+3. **Blockquote ディレクティブ**: `> **CHAIN ACTION:**` 行を読み取り → ディレクティブを即座に実行
+
+Action = CONTINUE の場合、**同じレスポンス内**で次の Skill/Bash ツールを呼び出す。ツール呼び出し前の出力は 1 行サマリーのみ。
 
 **Fork Result によるチェーン進行ロジック（擬似コード）:**
 
@@ -170,27 +178,38 @@ TDD 共通ワークフローの詳細は [docs/tdd-workflow.md](docs/tdd-workflo
 for each step in [commit, pr, simplify, self_review, status_update]:
   fork_output = invoke_fork_skill(step)
   fork_result = parse_fork_result(fork_output)  // ## Fork Result ブロックをパース
-  if fork_result.status == "FAIL":
+  action = fork_result.action                    // CONTINUE | FIX | STOP | REVISE
+  if action == "STOP":
     handle_failure(fork_result)                  // チェーン停止、ユーザーに報告
     break
-  if fork_result.status == "NEEDS_FIX":
+  if action == "FIX":
     enter_fix_loop(fork_result)                  // セルフレビュー修正ループ
     // 修正ループ後、チェーンを継続
-  next_step = fork_result.next                   // Next フィールドをパースしてチェーンガイダンスに使用
+  // action == "CONTINUE" → 即座に次へ
   log_one_line_summary(fork_result.summary)      // Summary を 1 行で記録
   update_todo(step, "completed")
   immediately_invoke_next_step()                 // ← ユーザー入力を待たず即座に次へ
 ```
 
-**Fork Result パース**: fork スキルの出力から `## Fork Result` ブロックを検出し、`Status`, `Ref`, `Summary` を抽出する。セルフレビューでは追加の `### Detail` ブロックも抽出する。
+**Fork Result フィールド定義:**
 
-| Status 値 | 使用スキル | チェーン動作 |
-|-----------|-----------|------------|
-| `SUCCESS` | committing-on-issue, creating-pr-on-issue, coding-on-issue | 次のステップへ進む |
-| `PASS` | reviewing-on-issue（セルフレビュー） | 次のステップへ進む |
-| `NEEDS_FIX` | reviewing-on-issue（セルフレビュー） | 自動修正可能な問題を検出、修正ループに入る |
-| `FAIL` | 全 fork スキル | ユーザー介入が必要なエラーまたは問題 — チェーン停止 |
-| `NEEDS_REVISION` | reviewing-on-issue（計画レビュー） | 修正ループ |
+| フィールド | 必須 | 説明 |
+|-----------|------|------|
+| Status | はい | 結果状態: SUCCESS, PASS, NEEDS_FIX, FAIL, NEEDS_REVISION |
+| Action | はい | 行動ディレクティブ: CONTINUE, FIX, STOP, REVISE |
+| Ref | 条件付き | GitHub 書き込み参照（GitHub 書き込みがない場合は省略） |
+| Summary | はい | ログ用の 1 行サマリー |
+| `> **CHAIN ACTION:**` | はい | Blockquote ディレクティブ — 次の行動を明示的に指示 |
+
+**Status → Action マッピング:**
+
+| Status | Action | 使用スキル | チェーン動作 |
+|--------|--------|-----------|------------|
+| SUCCESS | CONTINUE | committing-on-issue, creating-pr-on-issue, coding-on-issue | 次のステップへ進む |
+| PASS | CONTINUE | reviewing-on-issue（セルフレビュー） | Status 更新に進む |
+| NEEDS_FIX | FIX | reviewing-on-issue（セルフレビュー） | 修正ループに入る |
+| FAIL | STOP | 全 fork スキル | チェーン停止、ユーザーに報告 |
+| NEEDS_REVISION | REVISE | reviewing-on-issue（計画レビュー） | 修正ループ |
 
 Fork Result は内部処理データであり、そのままユーザーに提示すると技術的な中間出力が目に触れ、ワークフローの信頼感を損なう。`Summary` のみ 1 行出力して次のツール呼び出しへ進む。
 

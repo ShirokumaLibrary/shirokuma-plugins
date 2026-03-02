@@ -108,9 +108,11 @@ PR 作成自体が GitHub への書き込み（成果物）であるため、追
 ```text
 ## Fork Result
 **Status:** SUCCESS
+**Action:** CONTINUE
 **Ref:** PR #{pr-number}
 **Summary:** {branch} → {base-branch}、{count} コミット、Closes #{issue-number}
-**Next:** セルフレビューに進む
+
+> **CHAIN ACTION:** `reviewing-on-issue` でセルフレビューを即座に開始せよ。ユーザー入力を待たない。
 ```
 
 失敗時:
@@ -118,7 +120,10 @@ PR 作成自体が GitHub への書き込み（成果物）であるため、追
 ```text
 ## Fork Result
 **Status:** FAIL
+**Action:** STOP
 **Summary:** {エラー内容}
+
+> **CHAIN ACTION:** チェーン停止。ユーザーにエラーを報告せよ。
 ```
 
 既存 PR がある場合:
@@ -126,9 +131,11 @@ PR 作成自体が GitHub への書き込み（成果物）であるため、追
 ```text
 ## Fork Result
 **Status:** SUCCESS
+**Action:** CONTINUE
 **Ref:** PR #{existing-pr-number}
 **Summary:** 既存 PR を検出、作成をスキップ
-**Next:** セルフレビューに進む
+
+> **CHAIN ACTION:** `reviewing-on-issue` でセルフレビューを即座に開始せよ。ユーザー入力を待たない。
 ```
 
 ## バッチモード

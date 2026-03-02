@@ -355,9 +355,11 @@ After posting the PR comment in Step 6, return in the following format. Self-rev
 ```text
 ## Fork Result
 **Status:** {PASS | NEEDS_FIX | FAIL}
+**Action:** {CONTINUE | FIX | STOP}
 **Ref:** PR #{pr-number} comment
 **Summary:** {critical} critical, {fixable-warning} fixable-warning detected
-**Next:** {Proceed to status update | Enter fix loop}
+
+> **CHAIN ACTION:** {see status-specific directive below}
 
 ### Detail
 **Critical:** {n}
@@ -372,9 +374,11 @@ After posting the PR comment in Step 6, return in the following format. Self-rev
 - {description2}
 ```
 
-- **PASS**: critical = 0 and fixable-warning = 0 (out-of-scope only is still PASS) → Next: Proceed to status update
-- **NEEDS_FIX**: (critical > 0 or fixable-warning > 0) and Auto-fixable = yes → Next: Enter fix loop
-- **FAIL**: (critical > 0 or fixable-warning > 0) and Auto-fixable = no → chain stop
+Status-specific Action and blockquote directive:
+
+- **PASS** (Action: CONTINUE): critical = 0 and fixable-warning = 0 (out-of-scope only is still PASS) → `> **CHAIN ACTION:** Invoke status update immediately. Do not wait for user input.`
+- **NEEDS_FIX** (Action: FIX): (critical > 0 or fixable-warning > 0) and Auto-fixable = yes → `> **CHAIN ACTION:** Enter fix loop immediately. Do not wait for user input.`
+- **FAIL** (Action: STOP): (critical > 0 or fixable-warning > 0) and Auto-fixable = no → `> **CHAIN ACTION:** Stop chain. Report remaining issues to user.`
 - **Out-of-scope items**: Summary list used as input for follow-up Issue creation
 
 ### Self-Review 3-Classification Mapping
@@ -433,20 +437,26 @@ When invoked from `planning-on-issue` with plan role as fork, post the plan revi
 ```text
 ## Fork Result
 **Status:** {PASS | NEEDS_REVISION}
+**Action:** {CONTINUE | REVISE}
 **Ref:** #{issue-number} comment
 **Summary:** {one-line review result summary}
+
+> **CHAIN ACTION:** {CONTINUE → Proceed to next step immediately | REVISE → Enter revision loop immediately}. Do not wait for user input.
 ```
 
-- **PASS**: No critical issues in the plan (Suggestions may still be present)
-- **NEEDS_REVISION**: Missing requirements, significant inconsistencies, or anti-patterns detected
+- **PASS** (Action: CONTINUE): No critical issues in the plan (Suggestions may still be present)
+- **NEEDS_REVISION** (Action: REVISE): Missing requirements, significant inconsistencies, or anti-patterns detected
 
 ### NEEDS_REVISION Additional Information
 
 ```text
 ## Fork Result
 **Status:** NEEDS_REVISION
+**Action:** REVISE
 **Ref:** #{issue-number} comment
 **Summary:** {n} issues detected
+
+> **CHAIN ACTION:** Enter revision loop immediately. Do not wait for user input.
 
 ### Detail
 **Issues:**
@@ -466,8 +476,11 @@ When invoked standalone or as fork, and it is neither a self-review nor a plan r
 ```text
 ## Fork Result
 **Status:** {PASS | FAIL}
+**Action:** {CONTINUE | STOP}
 **Ref:** {output destination reference (PR #{number} comment / Discussion #{number})}
 **Summary:** {one-line issue count summary}
+
+> **CHAIN ACTION:** {CONTINUE → Proceed to next step immediately | STOP → Stop chain, report to user}. Do not wait for user input.
 ```
 
 ## Language

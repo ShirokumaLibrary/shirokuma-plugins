@@ -74,8 +74,10 @@ Issue の再取得は不要。
 ```text
 ## Fork Result
 **Status:** SUCCESS
+**Action:** CONTINUE
 **Summary:** {変更ファイル数} ファイル変更。{変更内容の1行要約}
-**Next:** committing-on-issue に進む
+
+> **CHAIN ACTION:** `committing-on-issue` を即座に Skill ツールで起動せよ。ユーザー入力を待たない。
 ```
 
 失敗時:
@@ -83,7 +85,10 @@ Issue の再取得は不要。
 ```text
 ## Fork Result
 **Status:** FAIL
+**Action:** STOP
 **Summary:** {エラー内容}
+
+> **CHAIN ACTION:** チェーン停止。ユーザーにエラーを報告せよ。
 ```
 
 **注意**: `Ref` フィールドは省略する（GitHub 書き込みなし）。

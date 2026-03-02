@@ -164,33 +164,52 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 **Chain completion guarantee**: After each fork skill returns its Fork Result, the manager (main AI) parses the `## Fork Result` block and **immediately proceeds to the next step**. Fork Result summaries are limited to one line and do not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via fork), eliminating the risk of chain interruption.
 
+**Fork Result parse checkpoint** — On receiving fork output, execute these 3 checks in order:
+
+1. **Status check**: Extract `**Status:**` value → FAIL means chain stop
+2. **Action check**: Extract `**Action:**` value → CONTINUE/FIX/STOP/REVISE determines the next behavior
+3. **Blockquote directive**: Read the `> **CHAIN ACTION:**` line → execute the directive immediately
+
+If Action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. Do not output anything except a one-line summary before the tool call.
+
 **Post-fork-result behavior (pseudocode):**
 
 ```text
 for each step in [commit, pr, simplify, self_review, status_update]:
   fork_output = invoke_fork_skill(step)
   fork_result = parse_fork_result(fork_output)  // Extract ## Fork Result block
-  if fork_result.status == "FAIL":
+  action = fork_result.action                    // CONTINUE | FIX | STOP | REVISE
+  if action == "STOP":
     handle_failure(fork_result)                  // Chain stop, report to user
     break
-  if fork_result.status == "NEEDS_FIX":
+  if action == "FIX":
     enter_fix_loop(fork_result)                  // Self-review fix loop
     // After fix loop, continue chain
-  next_step = fork_result.next                   // Parse Next field for chain guidance
+  // action == "CONTINUE" → proceed immediately
   log_one_line_summary(fork_result.summary)
   update_todo(step, "completed")
   immediately_invoke_next_step()                 // ← Do NOT wait for user input
 ```
 
-**Fork Result Status values:**
+**Fork Result field definitions:**
 
-| Status | Used By | Meaning |
-|--------|---------|---------|
-| SUCCESS | committing-on-issue, creating-pr-on-issue, coding-on-issue | Completed successfully |
-| PASS | reviewing-on-issue (self-review) | No issues detected |
-| NEEDS_FIX | reviewing-on-issue (self-review) | Auto-fixable issues detected, enter fix loop |
-| FAIL | All fork skills | Error or issues requiring user intervention — chain stop |
-| NEEDS_REVISION | reviewing-on-issue (plan review) | Plan needs revision |
+| Field | Required | Description |
+|-------|----------|-------------|
+| Status | Yes | Result state: SUCCESS, PASS, NEEDS_FIX, FAIL, NEEDS_REVISION |
+| Action | Yes | Behavioral directive: CONTINUE, FIX, STOP, REVISE |
+| Ref | Conditional | GitHub write reference (omitted when no GitHub write) |
+| Summary | Yes | One-line summary for logging |
+| `> **CHAIN ACTION:**` | Yes | Blockquote directive — explicit instruction for next behavior |
+
+**Status → Action mapping:**
+
+| Status | Action | Used By | Chain Behavior |
+|--------|--------|---------|----------------|
+| SUCCESS | CONTINUE | committing-on-issue, creating-pr-on-issue, coding-on-issue | Proceed to next step |
+| PASS | CONTINUE | reviewing-on-issue (self-review) | Proceed to status update |
+| NEEDS_FIX | FIX | reviewing-on-issue (self-review) | Enter fix loop |
+| FAIL | STOP | All fork skills | Chain stop, report to user |
+| NEEDS_REVISION | REVISE | reviewing-on-issue (plan review) | Enter revision loop |
 
 Fork Results are internal processing data, not user-facing output. Presenting raw fork output exposes technical intermediates that disrupt the user's workflow experience. Output only a one-line summary and immediately proceed to the next tool call.
 

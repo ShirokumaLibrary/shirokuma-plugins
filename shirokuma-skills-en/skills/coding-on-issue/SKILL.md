@@ -74,8 +74,10 @@ After work completes, return the following structured data to the caller. Code c
 ```text
 ## Fork Result
 **Status:** SUCCESS
+**Action:** CONTINUE
 **Summary:** {file count} files changed. {one-line change summary}
-**Next:** Proceed to committing-on-issue
+
+> **CHAIN ACTION:** Invoke `committing-on-issue` via Skill tool immediately. Do not wait for user input.
 ```
 
 On failure:
@@ -83,7 +85,10 @@ On failure:
 ```text
 ## Fork Result
 **Status:** FAIL
+**Action:** STOP
 **Summary:** {error description}
+
+> **CHAIN ACTION:** Stop chain. Report error to user.
 ```
 
 **Note**: `Ref` field is omitted (no GitHub write).
