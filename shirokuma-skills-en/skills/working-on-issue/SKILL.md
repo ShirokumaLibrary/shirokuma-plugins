@@ -6,7 +6,7 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
 
 # Working on Issue (Orchestrator)
 
-> **Chain Autonomous Progression**: Fork skill results are intermediate chain data, not final user-facing output. When TodoWrite has pending steps, immediately parse the `## Fork Result` block and proceed to the next step. Stopping after a fork result forces the user to manually type "continue", breaking the autonomous workflow that makes this orchestrator valuable. Log a one-line summary and invoke the next tool in the same response.
+> **Chain Autonomous Progression**: Fork skill results are intermediate chain data, not final user-facing output. When TodoWrite has pending steps, immediately parse the YAML frontmatter and proceed to the next step. Stopping after a fork result forces the user to manually type "continue", breaking the autonomous workflow that makes this orchestrator valuable. Log a one-line summary and invoke the next tool in the same response.
 
 Orchestrate the full workflow from planning to implementation, commit, PR, and self-review based on issue type or task description.
 
@@ -155,51 +155,56 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 | Work Type | Chain |
 |-----------|-------|
-| General Coding / Design | Work → Commit → PR → Simplify → Self-Review → Status Update |
+| General Coding / Design | Work → Commit → PR → Simplify → Self-Review → Work Summary → Status Update |
 | Research | Research → Discussion |
 
 - **Merge is NOT part of the chain**
 - No confirmation between steps, one-line progress reports
 - On failure: stop chain, report status, return control to user
 
-**Chain completion guarantee**: After each fork skill returns its Fork Result, the manager (main AI) parses the `## Fork Result` block and **immediately proceeds to the next step**. Fork Result summaries are limited to one line and do not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via fork), eliminating the risk of chain interruption.
+**Chain completion guarantee**: After each fork skill returns its Fork Result, the manager (main AI) parses the YAML frontmatter and **immediately proceeds to the next step**. The body's first line is used as a one-line summary and does not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via fork), eliminating the risk of chain interruption.
 
-**Fork Result parse checkpoint** — On receiving fork output, execute these 3 checks in order:
+**Fork Result parse checkpoint** — On receiving fork output, execute these checks in order:
 
-1. **Status check**: Extract `**Status:**` value → FAIL means chain stop
-2. **Action check**: Extract `**Action:**` value → CONTINUE/FIX/STOP/REVISE determines the next behavior
-3. **Blockquote directive**: Read the `> **CHAIN ACTION:**` line → execute the directive immediately
+1. **Extract YAML frontmatter** (block delimited by `---`)
+2. **action field**: Read `action` → STOP/FIX/REVISE/CONTINUE determines the next behavior
+3. **status field**: Read `status` → log for record
+4. **Body first line**: Extract the first line of the body after the frontmatter → use as `log_one_line_summary()`
+5. **action = CONTINUE**: Immediately invoke the skill specified in the `next` field
 
-If Action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. Do not output anything except a one-line summary before the tool call.
+If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. Do not output anything except a one-line summary before the tool call.
 
 **Post-fork-result behavior (pseudocode):**
 
 ```text
-for each step in [commit, pr, simplify, self_review, status_update]:
+for each step in [commit, pr, simplify, self_review, work_summary, status_update]:
   fork_output = invoke_fork_skill(step)
-  fork_result = parse_fork_result(fork_output)  // Extract ## Fork Result block
-  action = fork_result.action                    // CONTINUE | FIX | STOP | REVISE
+  frontmatter, body = parse_yaml_frontmatter(fork_output)
+  action = frontmatter.action                    // CONTINUE | FIX | STOP | REVISE
   if action == "STOP":
-    handle_failure(fork_result)                  // Chain stop, report to user
+    handle_failure(frontmatter, body)             // Chain stop, report to user
     break
   if action == "FIX":
-    enter_fix_loop(fork_result)                  // Self-review fix loop
+    enter_fix_loop(frontmatter, body)             // Self-review fix loop
     // After fix loop, continue chain
   // action == "CONTINUE" → proceed immediately
-  log_one_line_summary(fork_result.summary)
+  summary = body.split("\n")[0]                    // Body first line as summary
+  log_one_line_summary(summary)
   update_todo(step, "completed")
-  immediately_invoke_next_step()                 // ← Do NOT wait for user input
+  invoke_skill(frontmatter.next)                  // Immediately invoke next field's skill
 ```
 
 **Fork Result field definitions:**
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| Status | Yes | Result state: SUCCESS, PASS, NEEDS_FIX, FAIL, NEEDS_REVISION |
-| Action | Yes | Behavioral directive: CONTINUE, FIX, STOP, REVISE |
-| Ref | Conditional | GitHub write reference (omitted when no GitHub write) |
-| Summary | Yes | One-line summary for logging |
-| `> **CHAIN ACTION:**` | Yes | Blockquote directive — explicit instruction for next behavior |
+| Field | Required | Values | Description |
+|-------|----------|--------|-------------|
+| `action` | Yes | `CONTINUE` / `FIX` / `STOP` / `REVISE` | Behavioral directive for orchestrator (first field) |
+| `next` | Conditional | skill name | Skill to invoke when `action: CONTINUE` |
+| `status` | Yes | `SUCCESS` / `PASS` / `NEEDS_FIX` / `FAIL` / `NEEDS_REVISION` | Result state |
+| `ref` | Conditional | GitHub reference | Human-readable reference when GitHub write occurred |
+| `comment_id` | Conditional | numeric (database_id) | Only when a comment was posted. For reply-to / edit |
+
+The `Summary` field is abolished. Instead, the **body's first line** is treated as the summary.
 
 **Status → Action mapping:**
 
@@ -244,6 +249,38 @@ Self-review should be launched via Skill tool (`reviewing-on-issue` / `reviewing
 **Safety limit**: 5 iterations (2 critical + 2 warning + 1 buffer). On reaching limit, convert remaining fixable-warnings to follow-up Issues.
 
 **Batch mode self-review**: Run once for the entire batch PR. After completion, update all batch Issue statuses to Review.
+
+#### Work Summary (Issue Comment)
+
+After self-review completion, post a technical work summary to the Issue as a comment. This is the primary context record that `starting-session #N` will restore in future sessions.
+
+The work summary focuses on **technical work details** — what was changed, which files were modified, and technical decisions made. Session-level context (cross-cutting decisions, blockers, next steps) is handled separately by `ending-session`.
+
+```bash
+shirokuma-docs issues comment {number} --body-file /tmp/shirokuma-docs/{number}-work-summary.md
+```
+
+Where `/tmp/shirokuma-docs/{number}-work-summary.md` contains:
+
+```markdown
+## Work Summary
+
+### Changes
+{What was implemented or fixed — technical details}
+
+### Modified Files
+- `path/file.ts` - {Change description}
+
+### Pull Request
+PR #{pr-number}
+
+### Technical Decisions
+- {Decision and rationale}
+```
+
+Skip this step if no issue number is associated with the work.
+
+**Standalone completion**: When `working-on-issue` completes its chain (standalone or within a session), the Work Summary is automatically posted. This eliminates the need for `ending-session` to repeat technical details — `ending-session` only adds session-level context (cross-cutting decisions, blockers, next steps).
 
 #### Status Update (End of Chain)
 
@@ -338,4 +375,4 @@ When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batc
 - Workflow executes sequentially (Commit → PR → Simplify → Self-Review → Status Update). **Merge is NOT included**
 - Self-review is directly managed by the manager (main AI) ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user
-- **Chain autonomous progression**: Fork Results are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the `## Fork Result` block and execute the next step's Skill/Bash tool call. Log a one-line summary and invoke the next tool in the same response
+- **Chain autonomous progression**: Fork Results are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the YAML frontmatter and execute the next step's Skill/Bash tool call. Log a one-line summary and invoke the next tool in the same response

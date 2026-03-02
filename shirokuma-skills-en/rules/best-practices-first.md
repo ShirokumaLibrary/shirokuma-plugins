@@ -9,14 +9,38 @@ When the user provides a task with an issue number or work description → deleg
 
 Use the decision flow below only when `working-on-issue` is not applicable (e.g., exploration, architecture, simple questions).
 
+## Development Lifecycle
+
+Each phase typically runs in a separate Claude Code conversation. Context flows between conversations via Issue body (plan) and Issue comments (work summaries).
+
+```mermaid
+graph TD
+    C1["Conversation 1: Issue creation<br/>/creating-item (standalone)"]
+    C2["Conversation 2: Planning<br/>/planning-on-issue #N (standalone)"]
+    C3["Conversation 3: Implementation<br/>Small: /working-on-issue #N (standalone)<br/>Large: /starting-session #N"]
+    C4["Conversation 4: Continuation (large only)<br/>/starting-session #N → context restore"]
+
+    C1 -->|"Backlog → user decision"| C2
+    C2 -->|"Spec Review → user approval"| C3
+    C3 -->|"context overflow"| C4
+    C3 -->|"completed"| Done["PR → Review → Done"]
+    C4 --> Done
+```
+
+Small tasks may complete planning + implementation in a single conversation.
+
 ## Session vs Standalone
 
-Skills support two invocation modes:
+### Session Usage Criteria
 
-| Mode | Description | When to Use |
-|------|-------------|-------------|
-| Session-based | Start with `starting-session`, end with `ending-session` | Multi-issue work, context continuity needed |
-| Standalone | Invoke skill directly without session | Single task, quick fix, one-off action |
+Use sessions when **context overflow risk** is high — i.e., the work is likely to span multiple conversations and context continuity provides significant value.
+
+| Use Session | Use Standalone |
+|-------------|---------------|
+| Many files modified (10+) | Completes in one conversation |
+| Epic (parent + sub-issues) | Localized changes (1-3 files) |
+| Multi-day work (M/L size) | Independent single task |
+| Two-phase work (research → implement) | Documentation, config changes |
 
 ### Skill Session Support
 
@@ -31,15 +55,17 @@ Skills support two invocation modes:
 | creating-item | — | Yes | Always standalone-capable |
 | committing-on-issue | Yes | Yes | Fork (standalone also runs as fork) |
 | creating-pr-on-issue | Yes | Yes | Fork (via chain or standalone) |
-| starting-session | Yes | — | Session start only |
+| starting-session | Yes | — | Session start only (`#N` for issue-bound, no arg for unbound) |
 | ending-session | Yes | — | Session end only |
 
 ### Standalone Handover Guideline
 
-Standalone invocations do not require `ending-session`. However, when standalone work is substantial:
+Standalone `working-on-issue` automatically posts a work summary to the Issue comment on chain completion. No `ending-session` needed.
 
-| Standalone Scope | Handover |
-|-----------------|----------|
+For substantial standalone work without `working-on-issue`:
+
+| Standalone Scope | Action |
+|-----------------|--------|
 | Quick single-skill invocation (typo fix, item creation) | Not needed |
 | Multiple commits or significant code changes | Recommend `ending-session` |
 | Research findings or architecture investigation | Recommend creating a Discussion |

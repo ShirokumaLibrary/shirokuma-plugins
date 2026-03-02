@@ -350,16 +350,17 @@ In self-review mode, execute the following steps **in order**:
 
 ### Fork Result Format (Self-Review)
 
-After posting the PR comment in Step 6, return in the following format. Self-review includes a `### Detail` extension block in addition to the base format because `working-on-issue` needs detailed information for loop decisions:
+After posting the PR comment in Step 6, return in the following format. Self-review includes a `### Detail` extension block in the body because `working-on-issue` needs detailed information for loop decisions:
 
-```text
-## Fork Result
-**Status:** {PASS | NEEDS_FIX | FAIL}
-**Action:** {CONTINUE | FIX | STOP}
-**Ref:** PR #{pr-number} comment
-**Summary:** {critical} critical, {fixable-warning} fixable-warning detected
+```yaml
+---
+action: {CONTINUE | FIX | STOP}
+status: {PASS | NEEDS_FIX | FAIL}
+ref: "PR #{pr-number} comment"
+comment_id: {comment-database-id}
+---
 
-> **CHAIN ACTION:** {see status-specific directive below}
+{critical} critical, {fixable-warning} fixable-warning detected
 
 ### Detail
 **Critical:** {n}
@@ -374,11 +375,11 @@ After posting the PR comment in Step 6, return in the following format. Self-rev
 - {description2}
 ```
 
-Status-specific Action and blockquote directive:
+Status-specific Action:
 
-- **PASS** (Action: CONTINUE): critical = 0 and fixable-warning = 0 (out-of-scope only is still PASS) → `> **CHAIN ACTION:** Invoke status update immediately. Do not wait for user input.`
-- **NEEDS_FIX** (Action: FIX): (critical > 0 or fixable-warning > 0) and Auto-fixable = yes → `> **CHAIN ACTION:** Enter fix loop immediately. Do not wait for user input.`
-- **FAIL** (Action: STOP): (critical > 0 or fixable-warning > 0) and Auto-fixable = no → `> **CHAIN ACTION:** Stop chain. Report remaining issues to user.`
+- **PASS** (action: CONTINUE): critical = 0 and fixable-warning = 0 (out-of-scope only is still PASS)
+- **NEEDS_FIX** (action: FIX): (critical > 0 or fixable-warning > 0) and Auto-fixable = yes
+- **FAIL** (action: STOP): (critical > 0 or fixable-warning > 0) and Auto-fixable = no
 - **Out-of-scope items**: Summary list used as input for follow-up Issue creation
 
 ### Self-Review 3-Classification Mapping
@@ -434,29 +435,31 @@ When invoked from `planning-on-issue` with plan role as fork, post the plan revi
 
 ### Fork Result Format (Plan Review)
 
-```text
-## Fork Result
-**Status:** {PASS | NEEDS_REVISION}
-**Action:** {CONTINUE | REVISE}
-**Ref:** #{issue-number} comment
-**Summary:** {one-line review result summary}
+```yaml
+---
+action: {CONTINUE | REVISE}
+status: {PASS | NEEDS_REVISION}
+ref: "#{issue-number}"
+comment_id: {comment-database-id}
+---
 
-> **CHAIN ACTION:** {CONTINUE → Proceed to next step immediately | REVISE → Enter revision loop immediately}. Do not wait for user input.
+{one-line review result summary}
 ```
 
-- **PASS** (Action: CONTINUE): No critical issues in the plan (Suggestions may still be present)
-- **NEEDS_REVISION** (Action: REVISE): Missing requirements, significant inconsistencies, or anti-patterns detected
+- **PASS** (action: CONTINUE): No critical issues in the plan (Suggestions may still be present)
+- **NEEDS_REVISION** (action: REVISE): Missing requirements, significant inconsistencies, or anti-patterns detected
 
 ### NEEDS_REVISION Additional Information
 
-```text
-## Fork Result
-**Status:** NEEDS_REVISION
-**Action:** REVISE
-**Ref:** #{issue-number} comment
-**Summary:** {n} issues detected
+```yaml
+---
+action: REVISE
+status: NEEDS_REVISION
+ref: "#{issue-number}"
+comment_id: {comment-database-id}
+---
 
-> **CHAIN ACTION:** Enter revision loop immediately. Do not wait for user input.
+{n} issues detected
 
 ### Detail
 **Issues:**
@@ -473,14 +476,15 @@ When invoked standalone or as fork, and it is neither a self-review nor a plan r
 
 ### Fork Result Format (Normal Review)
 
-```text
-## Fork Result
-**Status:** {PASS | FAIL}
-**Action:** {CONTINUE | STOP}
-**Ref:** {output destination reference (PR #{number} comment / Discussion #{number})}
-**Summary:** {one-line issue count summary}
+```yaml
+---
+action: {CONTINUE | STOP}
+status: {PASS | FAIL}
+ref: "{output destination reference (PR #{number} comment / Discussion #{number})}"
+comment_id: {comment-database-id}
+---
 
-> **CHAIN ACTION:** {CONTINUE → Proceed to next step immediately | STOP → Stop chain, report to user}. Do not wait for user input.
+{one-line issue count summary}
 ```
 
 ## Language

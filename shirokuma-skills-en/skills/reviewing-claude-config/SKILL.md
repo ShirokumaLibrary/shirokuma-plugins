@@ -166,10 +166,14 @@ tools: Read, Write, Edit      # Reviewers should be read-only
 
 {Overall assessment and next steps}
 
-## Fork Result
-**Status:** {PASS | FAIL}
-**Ref:** PR #{pr-number} comment
-**Summary:** {critical} critical, {warning} warning detected
+---
+action: {CONTINUE | STOP}
+status: {PASS | FAIL}
+ref: "PR #{pr-number} comment"
+comment_id: {comment-database-id}
+---
+
+{critical} critical, {warning} warning detected
 
 ### Detail
 **Critical:** {count}
@@ -181,7 +185,7 @@ tools: Read, Write, Edit      # Reviewers should be read-only
 - {file2}: {summary} [critical | warning]
 ```
 
-**Fork Result must always be output at the end of the report.**
+**Fork Result (YAML frontmatter + body) must always be output at the end of the report.**
 
 **Status determination:**
 - Error > 0 → FAIL

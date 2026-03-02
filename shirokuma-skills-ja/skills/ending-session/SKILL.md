@@ -1,20 +1,28 @@
 ---
 name: ending-session
-description: 作業セッションを終了し、引き継ぎ情報を保存してプロジェクトアイテムのステータスを更新します。トリガー: 「セッション終了」「作業終了」「end session」「引き継ぎ保存」。
+description: 作業セッションを終了し、セッションコンテキストを保存してプロジェクトアイテムのステータスを更新します。トリガー: 「セッション終了」「作業終了」「end session」「引き継ぎ保存」。
 allowed-tools: Bash, Read, Write, Grep, Glob, AskUserQuestion
 ---
 
 # セッション終了
 
-セッションを終了し、引き継ぎを自動保存する。
+セッションを終了し、セッションコンテキストを保存する。
 
-## 引き継ぎの目的
+## セッションコンテキスト保存
 
-すべてのセッションは引き継ぎ Discussion で終了する — 引き継ぎがなければ次のセッションが手探りになり、同じ調査の繰り返しや重要なコンテキストの見落としが発生する。短いセッションでも有用な継続性情報を提供する。
+セッションコンテキストは **Issue コメント**（Issue バウンドセッション）または **Handovers Discussion**（アンバウンドセッション、過渡的）に保存される。これがなければ次のセッションが手探りになり、同じ調査の繰り返しや重要なコンテキストの見落としが発生する。短いセッションでも有用な継続性情報を提供する。
 
 - 重要な作業がなくても、議論や調査の簡潔なサマリーを記載
-- ユーザーが引き継ぎをスキップしようとした場合、セッション継続性の価値を説明して作成を続行
 - サマリー と 次のステップ セクションは各セクション最低 1 行記載 — 空のセクションは次のセッションに価値を提供しない
+
+### コンテキスト保存先
+
+| セッションモード | プライマリ保存先 | セカンダリ（過渡的） |
+|----------------|-----------------|-------------------|
+| Issue バウンド（`#N` で開始） | Issue `#N` へのコメント | Handovers Discussion（`session end` 経由、冗長バックアップ） |
+| アンバウンド（`#N` なし） | Handovers Discussion（`session end` 経由） | — |
+
+Issue バウンドセッションでは、Issue コメントが**プライマリ記録**であり、`starting-session #N` が復元する。`session end` が作成する Handovers Discussion は、CLI 更新まで維持される過渡的な冗長バックアップ（フォローアップ参照）。
 
 ## スタンドアロン作業に関する注記
 
@@ -117,15 +125,58 @@ shirokuma-docs issues pr-create --base develop --title "{タイトル}" --body-f
 
 ベースブランチにいる場合（フィーチャーブランチなし）、このステップ全体をスキップ。
 
-### ステップ 3.5: 引き継ぎ本文作成
+### ステップ 3.5: セッションサマリー作成（Issue バウンドセッション）
 
-Write ツールで `/tmp/shirokuma-docs/handover.md` に引き継ぎ本文を作成する（「引き継ぎ本文テンプレート」セクションのテンプレートを使用）。
+セッションが Issue 番号（`#N`）付きで開始された場合、**セッションサマリー**を作成する。これは `starting-session #N` が復元するプライマリコンテキスト記録。
 
-ステップ 4 の `--body-file /tmp/shirokuma-docs/handover.md` でこのファイルを参照する。
+セッションサマリーは**セッションレベルのコンテキスト**に焦点を当てる — 横断的な決定、ブロッカー、次のステップ。`working-on-issue` が既に技術的な作業サマリーを Issue に投稿済みの場合、その内容は繰り返さない。
 
-### ステップ 4: 引き継ぎ保存 + ステータス更新（単一コマンド）
+Write ツールで `/tmp/shirokuma-docs/{N}-session-summary.md` を作成:
 
-ステップ 3.5 で作成したファイルを使い、実行:
+```markdown
+## セッションサマリー
+
+### サマリー
+{このセッションで達成したこと — 作業サマリーに既出の技術詳細ではなく、セッションレベルのコンテキストに焦点}
+
+### 主な決定事項
+- {決定と根拠}
+
+### ブロッカー
+- {ブロッカー、または「なし」}
+
+### 次のステップ
+- [ ] {次のタスク}
+```
+
+アンバウンドセッション（Issue 番号なし）ではこのステップをスキップ。
+
+### ステップ 3.6: 引き継ぎ本文作成（アンバウンドセッション）
+
+アンバウンドセッション（`--no-handover` を使用しない場合）は、Write ツールで `/tmp/shirokuma-docs/handover.md` に引き継ぎ本文を作成する（「引き継ぎ本文テンプレート」セクションのテンプレートを使用）。
+
+Issue バウンドセッションでは `--no-handover` を指定し、このステップをスキップする。
+
+### ステップ 4: 保存 + ステータス更新（単一コマンド）
+
+セッションモードに応じて `session end` を実行:
+
+#### Issue バウンドセッション（推奨）
+
+```bash
+shirokuma-docs session end \
+  --issue-comment {N} --issue-comment-file /tmp/shirokuma-docs/{N}-session-summary.md \
+  --no-handover \
+  --done {完了issue番号} \
+  --review {レビュー中issue番号}
+```
+
+この単一コマンドで:
+- Issue `#N` にセッションサマリーをコメント投稿
+- 指定した Issue を "Done" または "Review" ステータスに更新
+- Handover Discussion 作成をスキップ
+
+#### アンバウンドセッション
 
 ```bash
 shirokuma-docs session end \
@@ -139,9 +190,23 @@ shirokuma-docs session end \
 - 引き継ぎ Discussion を作成（Handovers カテゴリ）
 - 指定した Issue を "Done" または "Review" ステータスに更新
 
+#### フル（両方実行）
+
+```bash
+shirokuma-docs session end \
+  --title "$(date +%Y-%m-%d) - {サマリー}" \
+  --body-file /tmp/shirokuma-docs/handover.md \
+  --issue-comment {N} --issue-comment-file /tmp/shirokuma-docs/{N}-session-summary.md \
+  --done {完了issue番号} \
+  --review {レビュー中issue番号}
+```
+
 **オプション**:
-- `--title`（必須）- 引き継ぎタイトル、通常は日付 + サマリー
-- `--body-file`（必須）- 引き継ぎ本文の Markdown ファイルパス（Write ツールで作成）
+- `--title` - 引き継ぎタイトル（Handover 作成時に必須）
+- `--body-file` - 引き継ぎ本文のファイルパス（Handover 作成時に必須）
+- `--issue-comment <numbers...>` - Issue コメント投稿先の Issue 番号
+- `--issue-comment-file <file>` - Issue コメント本文ファイルパス（`--issue-comment` 使用時に必須）
+- `--no-handover` - Handover Discussion 作成をスキップ
 - `--done <numbers...>` - Done にする Issue 番号
 - `--review <numbers...>` - Review にする Issue 番号
 
@@ -173,6 +238,9 @@ shirokuma-docs session end \
 **出力**:
 ```json
 {
+  "issueComments": [
+    { "number": 42, "commentId": "IC_..." }
+  ],
   "handover": {
     "number": 31,
     "title": "2026-02-02 - Feature implementation",

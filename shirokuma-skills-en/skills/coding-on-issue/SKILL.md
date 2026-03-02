@@ -71,24 +71,29 @@ Skill delegate to `coding-nextjs`. Pass plan section and issue context.
 
 After work completes, return the following structured data to the caller. Code changes are the deliverable, so no GitHub write is performed (GitHub writes are handled by subsequent `committing-on-issue` / `creating-pr-on-issue`).
 
-```text
-## Fork Result
-**Status:** SUCCESS
-**Action:** CONTINUE
-**Summary:** {file count} files changed. {one-line change summary}
+```yaml
+---
+action: CONTINUE
+next: committing-on-issue
+status: SUCCESS
+---
 
-> **CHAIN ACTION:** Invoke `committing-on-issue` via Skill tool immediately. Do not wait for user input.
+{file count} files changed. {one-line change summary}
+
+### Changed Files
+- `src/path/file.ts` - {change description}
+- `src/path/other.ts` - {change description}
 ```
 
 On failure:
 
-```text
-## Fork Result
-**Status:** FAIL
-**Action:** STOP
-**Summary:** {error description}
+```yaml
+---
+action: STOP
+status: FAIL
+---
 
-> **CHAIN ACTION:** Stop chain. Report error to user.
+{error description}
 ```
 
-**Note**: `Ref` field is omitted (no GitHub write).
+**Note**: `ref` field is omitted (no GitHub write).

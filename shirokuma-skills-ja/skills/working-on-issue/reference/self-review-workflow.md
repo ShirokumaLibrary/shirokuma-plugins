@@ -27,7 +27,7 @@
     ↓  変更あり → コミット・プッシュ / 変更なし or 失敗 → スキップ
 [REVIEW] レビュー起動（Fork: reviewing-on-issue / reviewing-claude-config）
     ↓  ※ fork はステップ 6 で PR コメントを投稿してから Fork Result を返す
-[PARSE] Fork Result パース + PASS/FAIL 判定（### Detail から修正方針を決定）
+[PARSE] YAML フロントマターパース + PASS/FAIL 判定（本文の `### Detail` から修正方針を決定）
     ↓
 [PRESENT] セルフレビュー結果サマリーをユーザーに提示（完了報告テンプレート使用）
     ↓

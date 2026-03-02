@@ -8,6 +8,13 @@ allowed-tools: Bash, Read, Grep, AskUserQuestion
 
 新しい作業セッションを開始し、プロジェクトのコンテキストを表示する。
 
+## モード
+
+| モード | 起動方法 | コンテキストソース | ユースケース |
+|--------|---------|------------------|------------|
+| Issue バウンド | `/starting-session #N` | Issue コメント（作業サマリー） | 特定 Issue の作業を会話をまたいで継続 |
+| アンバウンド | `/starting-session` | Handovers Discussion（過渡的） | トリアージ、Issue 管理、一般的な探索 |
+
 ## ワークフロー
 
 ### ステップ 1: セッションコンテキスト取得
@@ -17,6 +24,27 @@ shirokuma-docs session start
 ```
 
 返される JSON: `repository`, `git`（ブランチ、未コミット変更）, `lastHandover`, `backups`（PreCompact バックアップ）, `issues`（アクティブ Issue + フィールド）, `total_issues`, `openPRs`（オープン PR + レビューステータス）
+
+### ステップ 1a: Issue バウンドコンテキスト復元（`#N` 指定時）
+
+Issue 番号付きで起動された場合（例: `/starting-session #42`）、Issue コメントからコンテキストを復元する:
+
+```bash
+shirokuma-docs issues comments {N}
+```
+
+コメントを逆時系列でパースし、作業サマリーを抽出する（`## 作業サマリー` または `## セッションサマリー` ヘッダーを検索）。最新のサマリーをプライマリコンテキストとして表示:
+
+```markdown
+### 前回のコンテキスト（Issue #{N} より）
+**最終作業サマリー:** {日付}
+- {サマリー内容}
+- **次のステップ:** {抽出された次のステップ}
+```
+
+Issue バウンドセッションでは、`session start` 出力の `lastHandover` フィールドは利用可能だが優先度を下げる — Issue コメントがプライマリコンテキストソース。
+
+コンテキスト表示後、自動的に `working-on-issue #{N}` にルーティングする（ステップ 3 の方向性確認をスキップ）。
 
 ### ステップ 1b: バックアップ検出
 

@@ -105,37 +105,44 @@ shirokuma-docs issues pr-create --base {base_branch} --title "{title}" --body-fi
 
 PR 作成自体が GitHub への書き込み（成果物）であるため、追加の GitHub 書き込みは不要。呼び出し元に以下の構造化データを返す:
 
-```text
-## Fork Result
-**Status:** SUCCESS
-**Action:** CONTINUE
-**Ref:** PR #{pr-number}
-**Summary:** {branch} → {base-branch}、{count} コミット、Closes #{issue-number}
+```yaml
+---
+action: CONTINUE
+next: reviewing-on-issue
+status: SUCCESS
+ref: "PR #{pr-number}"
+---
 
-> **CHAIN ACTION:** `reviewing-on-issue` でセルフレビューを即座に開始せよ。ユーザー入力を待たない。
+{branch} → {base-branch}、{count} コミット、Closes #{issue-number}
+
+### PR 本文
+## 概要
+- {箇条書き}
+...
 ```
 
 失敗時:
 
-```text
-## Fork Result
-**Status:** FAIL
-**Action:** STOP
-**Summary:** {エラー内容}
+```yaml
+---
+action: STOP
+status: FAIL
+---
 
-> **CHAIN ACTION:** チェーン停止。ユーザーにエラーを報告せよ。
+{エラー内容}
 ```
 
 既存 PR がある場合:
 
-```text
-## Fork Result
-**Status:** SUCCESS
-**Action:** CONTINUE
-**Ref:** PR #{existing-pr-number}
-**Summary:** 既存 PR を検出、作成をスキップ
+```yaml
+---
+action: CONTINUE
+next: reviewing-on-issue
+status: SUCCESS
+ref: "PR #{existing-pr-number}"
+---
 
-> **CHAIN ACTION:** `reviewing-on-issue` でセルフレビューを即座に開始せよ。ユーザー入力を待たない。
+既存 PR を検出、作成をスキップ
 ```
 
 ## バッチモード

@@ -13,10 +13,12 @@ Discussions store human-readable knowledge; Rules store AI-readable extracts.
 
 | Category | Emoji | Format | When to Use |
 |----------|-------|--------|-------------|
-| Handovers | 🤝 | Open-ended discussion | Session end - create via `/ending-session` |
+| Handovers (deprecated) | 🤝 | Open-ended discussion | **Deprecated.** Use Issue comments instead. See below |
 | ADR | 📐 | Open-ended discussion | Architecture decisions confirmed |
 | Knowledge | 💡 | Open-ended discussion | Patterns/solutions confirmed |
 | Research | 🔬 | Open-ended discussion | Investigation needed |
+
+> **Handovers deprecation**: Session context is now saved as Issue comments by `ending-session` and `working-on-issue`, not as Handovers Discussions. `starting-session #N` restores context from Issue comments. Existing Handovers are kept for reference but no new ones should be created for issue-bound sessions. Unbound sessions (triage/management) still create Handovers as a transitional measure.
 
 > Evolution signals are now managed via Issues, not Discussions. See the `rule-evolution` rule for details.
 
@@ -58,7 +60,7 @@ Knowledge→Rule extraction workflow and search command details: `managing-githu
 
 | Category | Format |
 |----------|--------|
-| Handovers | `YYYY-MM-DD [{username}] - {summary}` (username auto-inserted by CLI) |
+| Handovers (deprecated) | `YYYY-MM-DD [{username}] - {summary}` (unbound sessions only) |
 | ADR | `ADR-{NNN}: {title}` |
 | Knowledge | `{Topic Name}` |
 | Research | `[Research] {topic}` |

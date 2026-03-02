@@ -138,37 +138,44 @@ docs: CLAUDE.md のコマンド一覧を更新      ← Wrong: not English
 
 PR creation itself is a GitHub write (the deliverable), so no additional GitHub write is needed. Return the following structured data to the caller:
 
-```text
-## Fork Result
-**Status:** SUCCESS
-**Action:** CONTINUE
-**Ref:** PR #{pr-number}
-**Summary:** {branch} → {base-branch}, {count} commits, Closes #{issue-number}
+```yaml
+---
+action: CONTINUE
+next: reviewing-on-issue
+status: SUCCESS
+ref: "PR #{pr-number}"
+---
 
-> **CHAIN ACTION:** Proceed to self-review via `reviewing-on-issue` immediately. Do not wait for user input.
+{branch} → {base-branch}, {count} commits, Closes #{issue-number}
+
+### PR Body
+## Summary
+- {bullet point 1}
+...
 ```
 
 On failure:
 
-```text
-## Fork Result
-**Status:** FAIL
-**Action:** STOP
-**Summary:** {error description}
+```yaml
+---
+action: STOP
+status: FAIL
+---
 
-> **CHAIN ACTION:** Stop chain. Report error to user.
+{error description}
 ```
 
 When existing PR detected:
 
-```text
-## Fork Result
-**Status:** SUCCESS
-**Action:** CONTINUE
-**Ref:** PR #{existing-pr-number}
-**Summary:** Existing PR detected, creation skipped
+```yaml
+---
+action: CONTINUE
+next: reviewing-on-issue
+status: SUCCESS
+ref: "PR #{existing-pr-number}"
+---
 
-> **CHAIN ACTION:** Proceed to self-review via `reviewing-on-issue` immediately. Do not wait for user input.
+Existing PR detected, creation skipped
 ```
 
 ## Batch Mode

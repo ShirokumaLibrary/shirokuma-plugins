@@ -6,7 +6,7 @@ allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion, TodoWrite
 
 # Planning on Issue
 
-> **Chain Autonomous Progression**: After the plan review fork (Step 4) returns its result, immediately proceed to Steps 5-7 (post comment, update body, set Spec Review). Stopping after the review fork forces the user to manually prompt continuation, breaking the planning workflow. Parse the Fork Result status and act without waiting for user input.
+> **Chain Autonomous Progression**: After the plan review fork (Step 4) returns its result, immediately proceed to Steps 5-7 (post comment, update body, set Spec Review). Stopping after the review fork forces the user to manually prompt continuation, breaking the planning workflow. Parse the YAML frontmatter `action` field and act without waiting for user input.
 
 Analyze issue requirements, create an implementation plan, and persist it to the issue body. After planning, set status to Spec Review and return control to the user. **Does not proceed to implementation.**
 
@@ -343,4 +343,4 @@ Add GitHub writing rule references to each skill...
 - Plans are persisted in the issue body — available across sessions
 - `Spec Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
 - Use Explore agent during investigation to minimize context consumption
-- **Chain autonomous progression**: After the review fork (Step 4) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 5-7 based on the Fork Result status
+- **Chain autonomous progression**: After the review fork (Step 4) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 5-7 based on the YAML frontmatter `action` field

@@ -6,6 +6,17 @@
 
 セッション開始時のコンテキスト表示とスキルルーティング。表示に徹し、ステータス更新やブランチ作成は行わない（それらは `working-on-issue` に委任）。
 
+### 2 モード設計
+
+| モード | 起動 | コンテキストソース | ルーティング |
+|--------|------|------------------|------------|
+| Issue バウンド | `/starting-session #N` | Issue コメント（作業サマリー・セッションサマリー） | 自動 `working-on-issue #N` |
+| アンバウンド | `/starting-session` | Handovers Discussion（過渡的） | ステップ 3 で方向性確認 |
+
+**Issue バウンドモード**: Issue コメントからコンテキスト復元し、ステップ 3 をスキップして直接 `working-on-issue` に委任。`session start` の `lastHandover` は de-prioritized。
+
+**アンバウンドモード**: 従来の Handovers ベースコンテキスト。Handovers Discussion は過渡的措置で、CLI 更新後に段階的に縮小予定。
+
 ### ルーティング
 
 | Issue ステータス | 委任先 |

@@ -105,25 +105,31 @@ Skip comment posting if the issue number is unknown (not derivable from branch n
 
 Return the following structured data to the caller:
 
-```text
-## Fork Result
-**Status:** SUCCESS
-**Action:** CONTINUE
-**Ref:** #{issue-number} comment
-**Summary:** {hash} {one-line commit message}, {count} files changed
+```yaml
+---
+action: CONTINUE
+next: creating-pr-on-issue
+status: SUCCESS
+ref: "#{issue-number}"
+comment_id: {comment-database-id}
+---
 
-> **CHAIN ACTION:** Invoke `creating-pr-on-issue` via Skill tool immediately. Do not wait for user input.
+{hash} {one-line commit message}, {count} files changed
+
+### Commit Details
+- `src/path/file.ts` - {change description}
+- `src/path/other.ts` - {change description}
 ```
 
 On failure:
 
-```text
-## Fork Result
-**Status:** FAIL
-**Action:** STOP
-**Summary:** {error description}
+```yaml
+---
+action: STOP
+status: FAIL
+---
 
-> **CHAIN ACTION:** Stop chain. Report error to user.
+{error description}
 ```
 
 ### Step 7: PR Chain (after push)
@@ -221,11 +227,15 @@ EOF
 
 Fork Result return:
 
-```text
-## Fork Result
-**Status:** SUCCESS
-**Ref:** #{issue-number} comment
-**Summary:** PR #{pr-number} merged to {base-branch}, branch deleted
+```yaml
+---
+action: CONTINUE
+status: SUCCESS
+ref: "#{issue-number}"
+comment_id: {comment-database-id}
+---
+
+PR #{pr-number} merged to {base-branch}, branch deleted
 ```
 
 **If merge is part of commit flow** (e.g., user says "commit and merge"):

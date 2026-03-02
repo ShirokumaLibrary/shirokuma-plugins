@@ -8,6 +8,13 @@ allowed-tools: Bash, Read, Grep, AskUserQuestion
 
 Start a new work session and display project context.
 
+## Modes
+
+| Mode | Invocation | Context Source | Use Case |
+|------|-----------|----------------|----------|
+| Issue-bound | `/starting-session #N` | Issue comments (work summaries) | Continuing work on a specific issue across conversations |
+| Unbound | `/starting-session` | Handovers Discussion (transitional) | Triage, issue management, general exploration |
+
 ## Workflow
 
 ### Step 1: Fetch Session Context (Single Command)
@@ -24,6 +31,27 @@ This returns JSON with:
 - `issues` - Active issues with project fields (Done/Released excluded)
 - `total_issues` - Count of active issues
 - `openPRs` - Open pull requests with review status
+
+### Step 1a: Issue-Bound Context Restoration (when `#N` provided)
+
+When invoked with an issue number (e.g., `/starting-session #42`), restore context from Issue comments:
+
+```bash
+shirokuma-docs issues comments {N}
+```
+
+Parse comments in reverse chronological order and extract work summaries (look for `## Work Summary` or `## Session Summary` headers). Display the most recent summary as the primary context:
+
+```markdown
+### Previous Context (from Issue #{N})
+**Last work summary:** {date}
+- {summary content}
+- **Next Steps:** {extracted next steps}
+```
+
+This replaces the Handovers-based context for issue-bound sessions. The `lastHandover` field from `session start` output is still available but de-prioritized — Issue comments are the primary context source.
+
+After context display, automatically route to `working-on-issue #{N}` (skip Step 3 direction selection).
 
 ### Step 1b: Backup Detection
 

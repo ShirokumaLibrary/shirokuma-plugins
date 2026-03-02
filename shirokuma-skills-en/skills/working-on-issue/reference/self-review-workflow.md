@@ -27,7 +27,7 @@ Detailed specification of the self-review loop executed within the `working-on-i
     ↓  Changes found → commit & push / No changes or failure → skip
 [REVIEW] Launch review (Fork: reviewing-on-issue / reviewing-claude-config)
     ↓  Note: fork posts PR comment (Step 6) before returning Fork Result
-[PARSE] Parse Fork Result + PASS/FAIL determination
+[PARSE] Parse YAML frontmatter + PASS/FAIL determination
     ↓
 [PRESENT] Present self-review result summary to user (using completion report template)
     ↓

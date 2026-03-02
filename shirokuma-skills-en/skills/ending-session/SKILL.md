@@ -1,20 +1,28 @@
 ---
 name: ending-session
-description: Ends the current work session by saving handover information and updating project item statuses. Triggers: "end session", "finish work", "save handover", "session end", "wrap up".
+description: Ends the current work session by saving session context and updating project item statuses. Triggers: "end session", "finish work", "session end", "wrap up".
 allowed-tools: Bash, Read, Write, Grep, Glob, AskUserQuestion
 ---
 
 # Ending Session
 
-End the current session and auto-save handover information.
+End the current session and save session context for future conversations.
 
-## Handover Purpose
+## Session Context Preservation
 
-Every session ends with a handover Discussion — without it, the next session starts blind and may repeat work or miss important context. Even brief sessions produce useful continuity information.
+Session context is saved to **Issue comments** (issue-bound sessions) or **Handovers Discussion** (unbound sessions, transitional). Without this, the next session starts blind and may repeat work or miss important context. Even brief sessions produce useful continuity information.
 
 - If no significant work was done, write a brief summary of what was discussed or investigated
-- If the user tries to skip the handover, explain its value for session continuity and proceed with creation
 - Summary and Next Steps sections each need at least one line — empty sections provide no value to the next session
+
+### Context Save Destinations
+
+| Session Mode | Primary Destination | Secondary (Transitional) |
+|-------------|--------------------|-----------------------|
+| Issue-bound (started with `#N`) | Issue comment on `#N` | Handovers Discussion (via `session end`, redundant backup) |
+| Unbound (no `#N`) | Handovers Discussion (via `session end`) | — |
+
+For issue-bound sessions, the Issue comment is the **primary record** that `starting-session #N` will restore. The Handovers Discussion created by `session end` is a transitional redundant backup that will be removed when CLI is updated (see follow-up).
 
 ## Standalone Work Note
 
@@ -115,15 +123,58 @@ Save the PR URL for inclusion in the handover body.
 
 If on the base branch (no feature branch), skip this step entirely.
 
-### Step 3.5: Create Handover Body
+### Step 3.5: Create Session Summary (Issue-Bound Sessions)
 
-Use the Write tool to create `/tmp/shirokuma-docs/handover.md` with the handover content (use the template from the "Handover Body Format" section).
+If the session was started with an issue number (`#N`), create a **session summary** file. This is the primary context record for `starting-session #N` to restore.
 
-Step 4 will reference this file via `--body-file /tmp/shirokuma-docs/handover.md`.
+The session summary focuses on **session-level context** — cross-cutting decisions, blockers, and next steps. If `working-on-issue` already posted a technical work summary to this Issue, do not repeat its content.
 
-### Step 4: Save Handover + Update Statuses (Single Command)
+Use the Write tool to create `/tmp/shirokuma-docs/{N}-session-summary.md`:
 
-Using the file created in Step 3.5, run:
+```markdown
+## Session Summary
+
+### Summary
+{What was accomplished in this session — focus on session-level context, not technical details already in work summaries}
+
+### Key Decisions
+- {Decision and rationale}
+
+### Blockers
+- {Blockers, or "None"}
+
+### Next Steps
+- [ ] {Next task}
+```
+
+Skip this step for unbound sessions (no issue number).
+
+### Step 3.6: Create Handover Body (Unbound Sessions)
+
+For unbound sessions (when not using `--no-handover`), use the Write tool to create `/tmp/shirokuma-docs/handover.md` with the handover content (use the template from the "Handover Body Format" section).
+
+For issue-bound sessions, use `--no-handover` and skip this step.
+
+### Step 4: Save + Update Statuses (Single Command)
+
+Run `session end` based on the session mode:
+
+#### Issue-Bound Sessions (Recommended)
+
+```bash
+shirokuma-docs session end \
+  --issue-comment {N} --issue-comment-file /tmp/shirokuma-docs/{N}-session-summary.md \
+  --no-handover \
+  --done {completed_issue_numbers} \
+  --review {review_issue_numbers}
+```
+
+This single command:
+- Posts the session summary as a comment on Issue `#N`
+- Updates specified issues to "Done" or "Review" status
+- Skips Handover Discussion creation
+
+#### Unbound Sessions
 
 ```bash
 shirokuma-docs session end \
@@ -137,9 +188,23 @@ This single command:
 - Creates the handover Discussion (Handovers category)
 - Updates specified issues to "Done" or "Review" status
 
+#### Full (Both)
+
+```bash
+shirokuma-docs session end \
+  --title "$(date +%Y-%m-%d) - {brief summary}" \
+  --body-file /tmp/shirokuma-docs/handover.md \
+  --issue-comment {N} --issue-comment-file /tmp/shirokuma-docs/{N}-session-summary.md \
+  --done {completed_issue_numbers} \
+  --review {review_issue_numbers}
+```
+
 **Options:**
-- `--title` (required) - Handover title, typically date + summary
-- `--body-file` (required) - File path to handover body markdown (Write tool で作成)
+- `--title` - Handover title (required when creating handover)
+- `--body-file` - File path to handover body markdown (required when creating handover)
+- `--issue-comment <numbers...>` - Issue numbers to post comments to
+- `--issue-comment-file <file>` - File path to issue comment body (required when `--issue-comment` is used)
+- `--no-handover` - Skip Handover Discussion creation
 - `--done <numbers...>` - Issue numbers to mark as Done
 - `--review <numbers...>` - Issue numbers to mark as Review
 
@@ -171,6 +236,9 @@ Use the `issues[].hasMergedPr` flag and `prs` array from `session preflight` out
 **Output:**
 ```json
 {
+  "issueComments": [
+    { "number": 42, "commentId": "IC_..." }
+  ],
   "handover": {
     "number": 31,
     "title": "2026-02-02 - Feature implementation",

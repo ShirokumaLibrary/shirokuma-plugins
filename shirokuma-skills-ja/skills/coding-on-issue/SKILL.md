@@ -71,24 +71,29 @@ Issue の再取得は不要。
 
 作業完了後、呼び出し元に以下の構造化データを返す。コード変更自体が成果物であるため、GitHub への書き込みは行わない（GitHub 書き込みは後続の `committing-on-issue` / `creating-pr-on-issue` が担当）。
 
-```text
-## Fork Result
-**Status:** SUCCESS
-**Action:** CONTINUE
-**Summary:** {変更ファイル数} ファイル変更。{変更内容の1行要約}
+```yaml
+---
+action: CONTINUE
+next: committing-on-issue
+status: SUCCESS
+---
 
-> **CHAIN ACTION:** `committing-on-issue` を即座に Skill ツールで起動せよ。ユーザー入力を待たない。
+{変更ファイル数} ファイル変更。{変更内容の1行要約}
+
+### 変更ファイル
+- `src/path/file.ts` - {変更内容}
+- `src/path/other.ts` - {変更内容}
 ```
 
 失敗時:
 
-```text
-## Fork Result
-**Status:** FAIL
-**Action:** STOP
-**Summary:** {エラー内容}
+```yaml
+---
+action: STOP
+status: FAIL
+---
 
-> **CHAIN ACTION:** チェーン停止。ユーザーにエラーを報告せよ。
+{エラー内容}
 ```
 
-**注意**: `Ref` フィールドは省略する（GitHub 書き込みなし）。
+**注意**: `ref` フィールドは省略する（GitHub 書き込みなし）。

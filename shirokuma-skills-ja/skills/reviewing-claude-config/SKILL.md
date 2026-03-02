@@ -166,10 +166,14 @@ tools: Read, Write, Edit      # レビュアーは読み取り専用であるべ
 
 {全体的な評価と次のステップ}
 
-## Fork Result
-**Status:** {PASS | FAIL}
-**Ref:** PR #{pr-number} comment
-**Summary:** {critical} 件の critical, {warning} 件の warning を検出
+---
+action: {CONTINUE | STOP}
+status: {PASS | FAIL}
+ref: "PR #{pr-number} comment"
+comment_id: {comment-database-id}
+---
+
+{critical} 件の critical, {warning} 件の warning を検出
 
 ### Detail
 **Critical:** {count}
@@ -181,7 +185,7 @@ tools: Read, Write, Edit      # レビュアーは読み取り専用であるべ
 - {file2}: {summary} [critical | warning]
 ```
 
-**Fork Result は必ずレポート末尾に出力する。**
+**Fork Result（YAML フロントマター + 本文）は必ずレポート末尾に出力する。**
 
 **Status 判定:**
 - Error > 0 → FAIL
