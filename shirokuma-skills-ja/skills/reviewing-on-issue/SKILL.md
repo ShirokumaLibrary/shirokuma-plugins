@@ -472,7 +472,7 @@ shirokuma-docs discussions create \
 
 ## 言語
 
-レビューレポート（PR コメント、Discussion）の言語は `output-language` ルールに準拠する。
+レビューレポート（PR コメント、Discussion）は**日本語**で記述する。
 
 ## NGケース
 

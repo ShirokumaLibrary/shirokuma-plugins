@@ -286,6 +286,10 @@ git branch --show-current | grep -q '\-batch-'
 | `output-language` | コミットメッセージの出力言語 |
 | `branch-workflow` | ブランチモデル・プッシュ制約 |
 
+## 言語
+
+Issue コメントは**日本語**で記述する。コミットメッセージは `git-commit-style` ルールに従う（プレフィックスは英語、説明は日本語）。
+
 ## 注意事項
 
 - コミット前に必ず変更を確認

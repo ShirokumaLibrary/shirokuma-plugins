@@ -169,7 +169,7 @@ tools: Read, Write, Edit      # レビュアーは読み取り専用であるべ
 ## Fork Result
 **Status:** {PASS | FAIL}
 **Ref:** PR #{pr-number} comment
-**Summary:** {critical} critical, {warning} warning detected
+**Summary:** {critical} 件の critical, {warning} 件の warning を検出
 
 ### Detail
 **Critical:** {count}
@@ -216,6 +216,10 @@ tools: Read, Write, Edit      # レビュアーは読み取り専用であるべ
 - 修正提案時に Anthropic のベストプラクティスを参照
 - `context: fork` でメインコンテキストを汚さない隔離サブエージェントとして実行
 - **fork 制約**: `context: fork` のため TodoWrite / AskUserQuestion は使用不可。読み取り専用サブエージェントとしてレポートのみ返す
+
+## 言語
+
+レビューレポート（PR コメント）は**日本語**で記述する。
 
 ## NGケース
 
