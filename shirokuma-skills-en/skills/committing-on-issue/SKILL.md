@@ -110,6 +110,7 @@ Return the following structured data to the caller:
 **Status:** SUCCESS
 **Ref:** #{issue-number} comment
 **Summary:** {hash} {one-line commit message}, {count} files changed
+**Next:** Proceed to creating-pr-on-issue
 ```
 
 On failure:

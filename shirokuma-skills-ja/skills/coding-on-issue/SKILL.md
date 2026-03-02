@@ -75,6 +75,7 @@ Issue の再取得は不要。
 ## Fork Result
 **Status:** SUCCESS
 **Summary:** {変更ファイル数} ファイル変更。{変更内容の1行要約}
+**Next:** committing-on-issue に進む
 ```
 
 失敗時:

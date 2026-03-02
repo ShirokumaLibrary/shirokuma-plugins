@@ -354,9 +354,10 @@ After posting the PR comment in Step 6, return in the following format. Self-rev
 
 ```text
 ## Fork Result
-**Status:** {PASS | FAIL}
+**Status:** {PASS | NEEDS_FIX | FAIL}
 **Ref:** PR #{pr-number} comment
 **Summary:** {critical} critical, {fixable-warning} fixable-warning detected
+**Next:** {Proceed to status update | Enter fix loop}
 
 ### Detail
 **Critical:** {n}
@@ -371,9 +372,9 @@ After posting the PR comment in Step 6, return in the following format. Self-rev
 - {description2}
 ```
 
-- **PASS**: critical = 0 and fixable-warning = 0 (out-of-scope only is still PASS)
-- **FAIL**: critical > 0 or fixable-warning > 0
-- **Auto-fixable**: Whether critical/fixable-warning issues can be resolved by code changes (no if design changes required)
+- **PASS**: critical = 0 and fixable-warning = 0 (out-of-scope only is still PASS) → Next: Proceed to status update
+- **NEEDS_FIX**: (critical > 0 or fixable-warning > 0) and Auto-fixable = yes → Next: Enter fix loop
+- **FAIL**: (critical > 0 or fixable-warning > 0) and Auto-fixable = no → chain stop
 - **Out-of-scope items**: Summary list used as input for follow-up Issue creation
 
 ### Self-Review 3-Classification Mapping

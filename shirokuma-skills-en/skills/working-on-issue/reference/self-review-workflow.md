@@ -32,8 +32,8 @@ Detailed specification of the self-review loop executed within the `working-on-i
 [PRESENT] Present self-review result summary to user (using completion report template)
     ↓
   ├── PASS → [COMPLETE]
-  ├── FAIL + Auto-fixable: yes → [FIX]
-  └── FAIL + Auto-fixable: no → [REPORT]
+  ├── NEEDS_FIX (Auto-fixable: yes) → [FIX]
+  └── FAIL (Auto-fixable: no) → chain stop, [REPORT]
 
 [FIX] Delegate fix (Task: general-purpose) → Receive fix summary
     ↓
@@ -68,7 +68,7 @@ Get changed files via `git diff --name-only develop..HEAD` and classify:
 
 ### Result Merging Rules (Mixed Case)
 
-- Status: either FAIL → FAIL
+- Status: either FAIL → FAIL; either NEEDS_FIX (and no FAIL) → NEEDS_FIX; both PASS → PASS
 - Critical: sum of both
 - Fixable-warning: sum of both
 - Out-of-scope: sum of both
@@ -113,10 +113,11 @@ Optional step — on error or timeout, skip and proceed to `[REVIEW]`.
 
 Run once for the entire batch PR (same as the review loop).
 
-## PASS/FAIL Criteria
+## PASS/NEEDS_FIX/FAIL Criteria
 
 - **PASS**: critical = 0 and fixable-warning = 0 (out-of-scope only is still PASS)
-- **FAIL**: critical > 0 or fixable-warning > 0
+- **NEEDS_FIX**: (critical > 0 or fixable-warning > 0) and Auto-fixable = yes
+- **FAIL**: (critical > 0 or fixable-warning > 0) and Auto-fixable = no (chain stop)
 
 ## Convergence Check Logic
 
@@ -234,8 +235,8 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 |------|------------------------|-------------|-------|
 | PASS (no issues) | 1 | Not needed | 1 |
 | PASS + out-of-scope | 1 | Not needed | 1 |
-| FAIL → auto-fix → PASS | 1 per iter | 1 | iter count + 1 |
-| FAIL → cannot converge | 1 per iter | Not needed | iter count |
+| NEEDS_FIX → auto-fix → PASS | 1 per iter | 1 | iter count + 1 |
+| NEEDS_FIX → cannot converge | 1 per iter | Not needed | iter count |
 
 Review findings comments are posted by the `reviewing-on-issue` / `reviewing-claude-config` fork in Step 6. Fix comments are posted by the manager (main AI, `working-on-issue`).
 

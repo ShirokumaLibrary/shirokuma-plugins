@@ -75,6 +75,7 @@ After work completes, return the following structured data to the caller. Code c
 ## Fork Result
 **Status:** SUCCESS
 **Summary:** {file count} files changed. {one-line change summary}
+**Next:** Proceed to committing-on-issue
 ```
 
 On failure:

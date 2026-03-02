@@ -259,6 +259,76 @@ Old v1 endpoint...
 
 ---
 
+## Structured Evaluation Scenarios
+
+Formalize evaluation by creating structured scenarios in JSON format. Store them in your project's eval directory as `scenarios.json`.
+
+### Scenario Types
+
+| Type | Purpose | Minimum |
+|------|---------|---------|
+| trigger | Verify description triggers correctly (should/should-not activate) | 5+ scenarios |
+| quality | Verify workflow compliance and output correctness | 3+ scenarios |
+
+### Trigger Eval Format
+
+```json
+{
+  "id": "trigger-01",
+  "type": "trigger",
+  "prompt": "convert CSV to JSON",
+  "expected": "should_trigger",
+  "rationale": "Basic data conversion trigger"
+}
+```
+
+- **should_trigger**: Skill should activate for this prompt
+- **should_not_trigger**: Skill should NOT activate (another skill's responsibility)
+- Include both types to test precision and recall of the description field
+
+### Quality Eval Format
+
+```json
+{
+  "id": "quality-01",
+  "type": "quality",
+  "prompt": "Convert users.csv to JSON format",
+  "context": {
+    "input_format": "CSV",
+    "output_format": "JSON",
+    "has_headers": true
+  },
+  "assertions": [
+    {
+      "text": "Reads input file before processing",
+      "category": "workflow"
+    },
+    {
+      "text": "Output is valid JSON",
+      "category": "output"
+    }
+  ]
+}
+```
+
+**Assertion categories**: `workflow` (step order, precondition checks), `convention` (naming, format), `tooling` (tool usage), `output` (output format, deliverables)
+
+**Key rule**: Assertions must describe **objectively verifiable actions**, not subjective qualities. "Reads input file before processing" (verifiable) vs "Creates a good conversion" (subjective).
+
+### File Structure
+
+```json
+{
+  "skill_name": "converting-data",
+  "version": "1.0.0",
+  "scenarios": []
+}
+```
+
+Include `skill_name` (matching the name field in SKILL.md) and `version` (skill version) at the top level. When the skill is updated, check if scenarios need updating too.
+
+---
+
 ## Evaluation and Iteration
 
 ### Build Evaluations First

@@ -1,0 +1,161 @@
+{
+  "skill_name": "working-on-issue",
+  "version": "0.2.1-alpha.16",
+  "scenarios": [
+    {
+      "id": "trigger-01",
+      "type": "trigger",
+      "prompt": "#42 やって",
+      "expected": "should_trigger",
+      "rationale": "日本語の基本的なトリガー表現。Issue 番号 + 作業指示"
+    },
+    {
+      "id": "trigger-02",
+      "type": "trigger",
+      "prompt": "work on #42",
+      "expected": "should_trigger",
+      "rationale": "英語の基本的なトリガー表現"
+    },
+    {
+      "id": "trigger-03",
+      "type": "trigger",
+      "prompt": "Issue #42 に取り組む",
+      "expected": "should_trigger",
+      "rationale": "丁寧な日本語表現でのトリガー"
+    },
+    {
+      "id": "trigger-04",
+      "type": "trigger",
+      "prompt": "#42 着手して",
+      "expected": "should_trigger",
+      "rationale": "「着手」キーワードによるトリガー"
+    },
+    {
+      "id": "trigger-05",
+      "type": "trigger",
+      "prompt": "これやって #42",
+      "expected": "should_trigger",
+      "rationale": "「これやって」+ Issue 番号の組み合わせ"
+    },
+    {
+      "id": "trigger-06",
+      "type": "trigger",
+      "prompt": "#42 の計画して",
+      "expected": "should_not_trigger",
+      "rationale": "計画策定は planning-on-issue の責務"
+    },
+    {
+      "id": "trigger-07",
+      "type": "trigger",
+      "prompt": "#42 レビューして",
+      "expected": "should_not_trigger",
+      "rationale": "レビューは reviewing-on-issue の責務"
+    },
+    {
+      "id": "trigger-08",
+      "type": "trigger",
+      "prompt": "ダッシュボード見せて",
+      "expected": "should_not_trigger",
+      "rationale": "表示は showing-github の責務"
+    },
+    {
+      "id": "trigger-09",
+      "type": "trigger",
+      "prompt": "#42 の Issue 作成して",
+      "expected": "should_not_trigger",
+      "rationale": "Issue 作成は creating-item の責務"
+    },
+    {
+      "id": "trigger-10",
+      "type": "trigger",
+      "prompt": "ベストプラクティス教えて",
+      "expected": "should_not_trigger",
+      "rationale": "リサーチは researching-best-practices の責務"
+    },
+    {
+      "id": "quality-01",
+      "type": "quality",
+      "prompt": "Issue #42（新機能: ダッシュボード追加）に取り組む",
+      "context": {
+        "issue_state": "Spec Review",
+        "has_plan": true,
+        "size": "M",
+        "labels": ["area:frontend"]
+      },
+      "assertions": [
+        {
+          "text": "Issue ステータスを In Progress に更新する",
+          "category": "workflow"
+        },
+        {
+          "text": "ブランチ名が branch-workflow ルールに準拠する（feat/{number}-{slug} 形式）",
+          "category": "convention"
+        },
+        {
+          "text": "TodoWrite でチェーンステップ（実装→コミット→PR→セルフレビュー→Status 更新）を登録する",
+          "category": "tooling"
+        },
+        {
+          "text": "計画セクションをコンテキストとして実装スキルに渡す",
+          "category": "workflow"
+        },
+        {
+          "text": "Spec Review → In Progress の遷移時にユーザーに追加確認を求めない（暗黙承認モデル）",
+          "category": "workflow"
+        }
+      ]
+    },
+    {
+      "id": "quality-02",
+      "type": "quality",
+      "prompt": "ログインページのバグを修正して",
+      "context": {
+        "issue_state": null,
+        "has_plan": false
+      },
+      "assertions": [
+        {
+          "text": "creating-item スキルに委任して Issue を確保する",
+          "category": "workflow"
+        },
+        {
+          "text": "Issue 番号取得後にステップ 1 に合流して通常フローを実行する",
+          "category": "workflow"
+        },
+        {
+          "text": "テキスト説明から適切な作業タイプ（fix）を判定する",
+          "category": "workflow"
+        }
+      ]
+    },
+    {
+      "id": "quality-03",
+      "type": "quality",
+      "prompt": "#101 #102 #103 をバッチで処理して",
+      "context": {
+        "issue_state": "Backlog",
+        "has_plan": false,
+        "size": "XS",
+        "labels": ["area:plugin"]
+      },
+      "assertions": [
+        {
+          "text": "バッチモードを起動し、適格性基準（サイズ XS/S、同一エリア、独立性）を確認する",
+          "category": "workflow"
+        },
+        {
+          "text": "全 Issue を同時に In Progress に遷移する（一括ステータス更新）",
+          "category": "workflow"
+        },
+        {
+          "text": "バッチブランチ命名規約に従う（{type}/{numbers}-batch-{slug} 形式）",
+          "category": "convention"
+        },
+        {
+          "text": "1 Issue = 1 コミット以上の粒度で変更をコミットする",
+          "category": "convention"
+        }
+      ]
+    }
+  ]
+}

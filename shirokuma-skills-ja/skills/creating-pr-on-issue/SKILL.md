@@ -110,6 +110,7 @@ PR 作成自体が GitHub への書き込み（成果物）であるため、追
 **Status:** SUCCESS
 **Ref:** PR #{pr-number}
 **Summary:** {branch} → {base-branch}、{count} コミット、Closes #{issue-number}
+**Next:** セルフレビューに進む
 ```
 
 失敗時:
@@ -127,6 +128,7 @@ PR 作成自体が GitHub への書き込み（成果物）であるため、追
 **Status:** SUCCESS
 **Ref:** PR #{existing-pr-number}
 **Summary:** 既存 PR を検出、作成をスキップ
+**Next:** セルフレビューに進む
 ```
 
 ## バッチモード

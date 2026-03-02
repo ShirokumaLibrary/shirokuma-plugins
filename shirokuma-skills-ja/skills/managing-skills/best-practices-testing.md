@@ -259,6 +259,76 @@ Old v1 endpoint...
 
 ---
 
+## 構造化 eval シナリオ
+
+eval を JSON 形式の構造化シナリオで形式化する。プロジェクトの eval ディレクトリに `scenarios.json` として配置する。
+
+### シナリオ種別
+
+| 種別 | 目的 | 最低件数 |
+|------|------|---------|
+| trigger | description のトリガー精度を検証（起動すべき/すべきでない） | 5 件以上 |
+| quality | ワークフロー遵守度と出力の正確性を検証 | 3 件以上 |
+
+### trigger eval 形式
+
+```json
+{
+  "id": "trigger-01",
+  "type": "trigger",
+  "prompt": "CSV を JSON に変換して",
+  "expected": "should_trigger",
+  "rationale": "データ変換の基本的なトリガー表現"
+}
+```
+
+- **should_trigger**: このプロンプトでスキルが起動されるべき
+- **should_not_trigger**: このプロンプトでスキルが起動されるべきではない（別スキルの責務）
+- 両方を含めて description フィールドの精度と再現率をテストする
+
+### quality eval 形式
+
+```json
+{
+  "id": "quality-01",
+  "type": "quality",
+  "prompt": "users.csv を JSON 形式に変換して",
+  "context": {
+    "input_format": "CSV",
+    "output_format": "JSON",
+    "has_headers": true
+  },
+  "assertions": [
+    {
+      "text": "入力ファイルを Read で読み込んでから処理する",
+      "category": "workflow"
+    },
+    {
+      "text": "出力が有効な JSON であることを検証する",
+      "category": "output"
+    }
+  ]
+}
+```
+
+**assertion カテゴリ**: `workflow`（ステップ順序、事前条件の確認）、`convention`（命名規約、フォーマット）、`tooling`（ツール使用）、`output`（出力形式、成果物）
+
+**重要ルール**: assertion は**観測可能な行動**を記述する。主観的な品質ではない。「入力ファイルを Read で読み込む」（検証可能）vs「良い変換を行う」（主観的）。
+
+### ファイル構成
+
+```json
+{
+  "skill_name": "converting-data",
+  "version": "1.0.0",
+  "scenarios": []
+}
+```
+
+トップレベルに `skill_name`（SKILL.md の name と一致）と `version`（スキルバージョン）を含める。スキル更新時にシナリオの更新も必要か確認する。
+
+---
+
 ## Evaluation and Iteration
 
 ### Build Evaluations First

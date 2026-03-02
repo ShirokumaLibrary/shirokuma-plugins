@@ -218,12 +218,13 @@ EOF
 
 ### ステップ 10: テスト
 
-1. トリガーフレーズで起動テスト
-2. ワークフローをステップごとに実行
-3. 複数モデル（Haiku, Sonnet, Opus）でテスト
-4. 観察に基づきイテレーション
+1. トリガーフレーズで起動テスト（5+ should-trigger、5+ should-not-trigger）
+2. eval シナリオを `plugin/specs/{skill-name}/evals/scenarios.json` に作成
+3. Two-Instance 方式でワークフローをステップごとに実行（Claude A: 開発、Claude B: テスト）
+4. 複数モデル（Haiku, Sonnet, Opus）でテスト
+5. 観察に基づきイテレーション
 
-[best-practices.md](best-practices.md#testing) にテスト戦略あり。
+[best-practices-testing.md](best-practices-testing.md) に eval シナリオ形式とテスト戦略あり。
 
 ## ワークフロー: スキル更新
 

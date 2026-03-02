@@ -1,0 +1,158 @@
+{
+  "skill_name": "planning-on-issue",
+  "version": "0.2.1-alpha.16",
+  "scenarios": [
+    {
+      "id": "trigger-01",
+      "type": "trigger",
+      "prompt": "#42 の計画を立てて",
+      "expected": "should_trigger",
+      "rationale": "日本語の基本的な計画トリガー"
+    },
+    {
+      "id": "trigger-02",
+      "type": "trigger",
+      "prompt": "plan #42",
+      "expected": "should_trigger",
+      "rationale": "英語の基本的な計画トリガー"
+    },
+    {
+      "id": "trigger-03",
+      "type": "trigger",
+      "prompt": "#42 を設計して",
+      "expected": "should_trigger",
+      "rationale": "「設計」キーワードによるトリガー"
+    },
+    {
+      "id": "trigger-04",
+      "type": "trigger",
+      "prompt": "計画して #42",
+      "expected": "should_trigger",
+      "rationale": "キーワード先行 + Issue 番号"
+    },
+    {
+      "id": "trigger-05",
+      "type": "trigger",
+      "prompt": "#42 のプラン作って",
+      "expected": "should_trigger",
+      "rationale": "カタカナ「プラン」によるトリガー"
+    },
+    {
+      "id": "trigger-06",
+      "type": "trigger",
+      "prompt": "#42 やって",
+      "expected": "should_not_trigger",
+      "rationale": "作業実行は working-on-issue の責務"
+    },
+    {
+      "id": "trigger-07",
+      "type": "trigger",
+      "prompt": "#42 レビュー",
+      "expected": "should_not_trigger",
+      "rationale": "レビューは reviewing-on-issue の責務"
+    },
+    {
+      "id": "trigger-08",
+      "type": "trigger",
+      "prompt": "スキル作って",
+      "expected": "should_not_trigger",
+      "rationale": "スキル作成は managing-skills の責務"
+    },
+    {
+      "id": "trigger-09",
+      "type": "trigger",
+      "prompt": "Issue 作成して",
+      "expected": "should_not_trigger",
+      "rationale": "Issue 作成は creating-item の責務"
+    },
+    {
+      "id": "trigger-10",
+      "type": "trigger",
+      "prompt": "セッション開始",
+      "expected": "should_not_trigger",
+      "rationale": "セッション管理は starting-session の責務"
+    },
+    {
+      "id": "quality-01",
+      "type": "quality",
+      "prompt": "#42（新機能: ユーザー認証追加）の計画を立てて",
+      "context": {
+        "issue_state": "Backlog",
+        "has_plan": false,
+        "size": "M",
+        "labels": ["area:frontend"]
+      },
+      "assertions": [
+        {
+          "text": "Issue ステータスを Planning に遷移する",
+          "category": "workflow"
+        },
+        {
+          "text": "Issue にアサインする（--add-assignee @me）",
+          "category": "workflow"
+        },
+        {
+          "text": "Issue 本文に ## 計画 セクションを追記する",
+          "category": "output"
+        },
+        {
+          "text": "計画完了後にステータスを Spec Review に遷移する",
+          "category": "workflow"
+        },
+        {
+          "text": "計画にタスク分解（チェックリスト）を含める",
+          "category": "output"
+        }
+      ]
+    },
+    {
+      "id": "quality-02",
+      "type": "quality",
+      "prompt": "#42 の計画を作って",
+      "context": {
+        "issue_state": "Spec Review",
+        "has_plan": true,
+        "size": "S"
+      },
+      "assertions": [
+        {
+          "text": "既存の計画セクションを検出し、重複作成を避ける",
+          "category": "workflow"
+        },
+        {
+          "text": "既存計画の更新が必要か確認する（AskUserQuestion）",
+          "category": "tooling"
+        }
+      ]
+    },
+    {
+      "id": "quality-03",
+      "type": "quality",
+      "prompt": "#42（大規模リファクタリング）の計画を策定して",
+      "context": {
+        "issue_state": "Backlog",
+        "has_plan": false,
+        "size": "L",
+        "labels": ["area:cli"]
+      },
+      "assertions": [
+        {
+          "text": "詳細な計画深度（detailed）で計画を策定する",
+          "category": "workflow"
+        },
+        {
+          "text": "タスク分解に依存関係を示す Mermaid 図を含める",
+          "category": "output"
+        },
+        {
+          "text": "変更対象ファイルの一覧を計画に含める",
+          "category": "output"
+        },
+        {
+          "text": "リスク・懸念セクションを計画に含める",
+          "category": "output"
+        }
+      ]
+    }
+  ]
+}

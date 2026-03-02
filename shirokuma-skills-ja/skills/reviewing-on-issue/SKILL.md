@@ -354,9 +354,10 @@ knowledge-manager が Web 検索で以下を最新化する：
 
 ```text
 ## Fork Result
-**Status:** {PASS | FAIL}
+**Status:** {PASS | NEEDS_FIX | FAIL}
 **Ref:** PR #{pr-number} comment
 **Summary:** {critical} critical, {fixable-warning} fixable-warning detected
+**Next:** {Status 更新に進む | 修正ループに入る}
 
 ### Detail
 **Critical:** {n}
@@ -371,9 +372,9 @@ knowledge-manager が Web 検索で以下を最新化する：
 - {description2}
 ```
 
-- **PASS**: critical = 0 かつ fixable-warning = 0（out-of-scope のみでも PASS）
-- **FAIL**: critical > 0 または fixable-warning > 0
-- **Auto-fixable**: critical/fixable-warning がコード修正で解決可能か（設計変更が必要な場合は no）
+- **PASS**: critical = 0 かつ fixable-warning = 0（out-of-scope のみでも PASS）→ Next: Status 更新に進む
+- **NEEDS_FIX**: (critical > 0 or fixable-warning > 0) かつ Auto-fixable = yes → Next: 修正ループに入る
+- **FAIL**: (critical > 0 or fixable-warning > 0) かつ Auto-fixable = no → チェーン停止
 - **Out-of-scope items**: フォローアップ Issue 作成の入力となる概要リスト
 
 ### セルフレビュー 3 分類マッピング

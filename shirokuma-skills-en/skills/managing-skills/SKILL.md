@@ -221,12 +221,13 @@ Run `reviewing-claude-config` skill to validate:
 
 ### Step 10: Test
 
-1. Test activation with trigger phrases
-2. Follow workflow step-by-step
-3. Test across models (Haiku, Sonnet, Opus)
-4. Iterate based on observations
+1. Test activation with trigger phrases (5+ should-trigger, 5+ should-not-trigger)
+2. Create eval scenarios in `plugin/specs/{skill-name}/evals/scenarios.json`
+3. Follow workflow step-by-step with Two-Instance approach (Claude A: dev, Claude B: test)
+4. Test across models (Haiku, Sonnet, Opus)
+5. Iterate based on observations
 
-See [best-practices.md](best-practices.md#testing) for testing strategies.
+See [best-practices-testing.md](best-practices-testing.md) for eval scenario format and testing strategies.
 
 ## Workflow: Updating Skills
 

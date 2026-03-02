@@ -171,11 +171,15 @@ for each step in [commit, pr, simplify, self_review, status_update]:
   fork_output = invoke_fork_skill(step)
   fork_result = parse_fork_result(fork_output)  // Extract ## Fork Result block
   if fork_result.status == "FAIL":
-    handle_failure(fork_result)
+    handle_failure(fork_result)                  // Chain stop, report to user
     break
+  if fork_result.status == "NEEDS_FIX":
+    enter_fix_loop(fork_result)                  // Self-review fix loop
+    // After fix loop, continue chain
+  next_step = fork_result.next                   // Parse Next field for chain guidance
   log_one_line_summary(fork_result.summary)
   update_todo(step, "completed")
-  immediately_invoke_next_step()  // ← Do NOT wait for user input
+  immediately_invoke_next_step()                 // ← Do NOT wait for user input
 ```
 
 **Fork Result Status values:**
@@ -184,7 +188,8 @@ for each step in [commit, pr, simplify, self_review, status_update]:
 |--------|---------|---------|
 | SUCCESS | committing-on-issue, creating-pr-on-issue, coding-on-issue | Completed successfully |
 | PASS | reviewing-on-issue (self-review) | No issues detected |
-| FAIL | All fork skills | Error or issues requiring action |
+| NEEDS_FIX | reviewing-on-issue (self-review) | Auto-fixable issues detected, enter fix loop |
+| FAIL | All fork skills | Error or issues requiring user intervention — chain stop |
 | NEEDS_REVISION | reviewing-on-issue (plan review) | Plan needs revision |
 
 Fork Results are internal processing data, not user-facing output. Presenting raw fork output exposes technical intermediates that disrupt the user's workflow experience. Output only a one-line summary and immediately proceed to the next tool call.
@@ -202,15 +207,15 @@ Self-review should be launched via Skill tool (`reviewing-on-issue` / `reviewing
     ↓
 [REVIEW] Launch review → [PARSE] Parse result → [PRESENT] Present result → Decision
   ├── PASS → [COMPLETE]
-  ├── FAIL + Auto-fixable → [FIX] Task fix → [CONVERGE] Convergence check → [REVIEW]
-  └── FAIL + Not auto-fixable → [REPORT]
+  ├── NEEDS_FIX → [FIX] Task fix → [CONVERGE] Convergence check → [REVIEW]
+  └── FAIL → chain stop, [REPORT]
 ```
 
 | State | Action |
 |-------|--------|
 | SIMPLIFY | Invoke `/simplify` via Skill tool (only when code-category files exist; run once, skip on failure) |
 | REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` as fork |
-| PARSE | Parse Fork Result, PASS/FAIL determination |
+| PARSE | Parse Fork Result, PASS/NEEDS_FIX/FAIL determination |
 | PRESENT | Present self-review result summary to user |
 | FIX | Delegate fix to `Task(general-purpose)` |
 | CONVERGE | Convergence check (numeric-based, stop after 2 consecutive non-decreases) |

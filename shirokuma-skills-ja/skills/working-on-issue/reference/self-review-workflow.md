@@ -32,8 +32,8 @@
 [PRESENT] セルフレビュー結果サマリーをユーザーに提示（完了報告テンプレート使用）
     ↓
   ├── PASS → [COMPLETE]
-  ├── FAIL + Auto-fixable: yes → [FIX]
-  └── FAIL + Auto-fixable: no → [REPORT]
+  ├── NEEDS_FIX (Auto-fixable: yes) → [FIX]
+  └── FAIL (Auto-fixable: no) → チェーン停止、[REPORT]
 
 [FIX] 修正委任（Task: general-purpose）→ 修正サマリー受取
     ↓
@@ -68,7 +68,7 @@
 
 ### 混在時の結果統合ルール
 
-- Status: いずれかが FAIL → FAIL
+- Status: いずれかが FAIL → FAIL、いずれかが NEEDS_FIX（FAIL なし）→ NEEDS_FIX、両方 PASS → PASS
 - Critical: 両方の合計
 - Fixable-warning: 両方の合計
 - Out-of-scope: 両方の合計
@@ -113,10 +113,11 @@ fire-and-forget（PASS/FAIL 判定なし）。品質ゲートは後続の `[REVI
 
 バッチ PR 全体に対して 1 回実行（レビューループと同様）。
 
-## PASS/FAIL 判定
+## PASS/NEEDS_FIX/FAIL 判定
 
 - **PASS**: critical = 0 かつ fixable-warning = 0（out-of-scope のみでも PASS）
-- **FAIL**: critical > 0 または fixable-warning > 0
+- **NEEDS_FIX**: (critical > 0 or fixable-warning > 0) かつ Auto-fixable = yes
+- **FAIL**: (critical > 0 or fixable-warning > 0) かつ Auto-fixable = no（チェーン停止）
 
 ## 収束判定ロジック
 
@@ -234,8 +235,8 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 |--------|---------------------|------------|------|
 | PASS（問題なし） | 1 件 | 不要 | 1 件 |
 | PASS + out-of-scope | 1 件 | 不要 | 1 件 |
-| FAIL → 自動修正 → PASS | 各 iter 1 件 | 1 件 | iter 数 + 1 件 |
-| FAIL → 収束不能 | 各 iter 1 件 | 不要 | iter 数分 |
+| NEEDS_FIX → 自動修正 → PASS | 各 iter 1 件 | 1 件 | iter 数 + 1 件 |
+| NEEDS_FIX → 収束不能 | 各 iter 1 件 | 不要 | iter 数分 |
 
 レビュー所見コメントは `reviewing-on-issue` / `reviewing-claude-config` の fork がステップ 6 で投稿する。修正コメントはマネージャー（メイン AI、`working-on-issue`）が投稿する。
 

@@ -1,0 +1,116 @@
+{
+  "skill_name": "coding-on-issue",
+  "version": "0.2.1-alpha.16",
+  "scenarios": [
+    {
+      "id": "trigger-01",
+      "type": "trigger",
+      "prompt": "#42 の実装をして",
+      "expected": "should_not_trigger",
+      "rationale": "fork スキルのため直接トリガーされない。working-on-issue 経由で委任される"
+    },
+    {
+      "id": "trigger-02",
+      "type": "trigger",
+      "prompt": "コード書いて",
+      "expected": "should_not_trigger",
+      "rationale": "fork スキルのため直接トリガーされない。working-on-issue 経由で委任される"
+    },
+    {
+      "id": "trigger-03",
+      "type": "trigger",
+      "prompt": "#42 の計画して",
+      "expected": "should_not_trigger",
+      "rationale": "計画策定は planning-on-issue の責務"
+    },
+    {
+      "id": "trigger-04",
+      "type": "trigger",
+      "prompt": "UI デザインして",
+      "expected": "should_not_trigger",
+      "rationale": "UI デザインは designing-ui-on-issue → designing-shadcn-ui の責務"
+    },
+    {
+      "id": "trigger-05",
+      "type": "trigger",
+      "prompt": "#42 レビューして",
+      "expected": "should_not_trigger",
+      "rationale": "レビューは reviewing-on-issue の責務"
+    },
+    {
+      "id": "quality-01",
+      "type": "quality",
+      "prompt": "Issue #42: ダッシュボードページの追加。Next.js で実装",
+      "context": {
+        "issue_state": "In Progress",
+        "has_plan": true,
+        "size": "M",
+        "labels": ["area:frontend"]
+      },
+      "assertions": [
+        {
+          "text": "area:frontend ラベルと Next.js キーワードから coding-nextjs に Skill 委任する",
+          "category": "workflow"
+        },
+        {
+          "text": "計画セクションをコンテキストとして coding-nextjs に渡す",
+          "category": "workflow"
+        },
+        {
+          "text": "Fork Result 形式（Status: SUCCESS/FAIL + Summary）で結果を返す",
+          "category": "output"
+        }
+      ]
+    },
+    {
+      "id": "quality-02",
+      "type": "quality",
+      "prompt": "Issue #42: CLI コマンドのバグ修正。src/commands/issues.ts の引数パースエラー",
+      "context": {
+        "issue_state": "In Progress",
+        "has_plan": true,
+        "size": "S",
+        "labels": ["area:cli"]
+      },
+      "assertions": [
+        {
+          "text": "既存ファイルを Read で読み込んでから修正する",
+          "category": "workflow"
+        },
+        {
+          "text": "修正が既存のテストに影響しないことを確認する",
+          "category": "workflow"
+        },
+        {
+          "text": "Fork Result 形式で結果を返す",
+          "category": "output"
+        }
+      ]
+    },
+    {
+      "id": "quality-03",
+      "type": "quality",
+      "prompt": "Issue #42: plugin/ 配下のスキルファイル更新。EN/JA 同期",
+      "context": {
+        "issue_state": "In Progress",
+        "has_plan": true,
+        "size": "S",
+        "labels": ["area:plugin"]
+      },
+      "assertions": [
+        {
+          "text": "area:plugin で plugin/ 配下のため直接編集する（coding-nextjs に委任しない）",
+          "category": "workflow"
+        },
+        {
+          "text": "EN 版と JA 版の両方を編集する",
+          "category": "convention"
+        },
+        {
+          "text": "plugin-version-bump ルールに留意する（バージョンバンプはリリース時のみ）",
+          "category": "convention"
+        }
+      ]
+    }
+  ]
+}

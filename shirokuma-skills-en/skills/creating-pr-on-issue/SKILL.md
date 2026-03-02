@@ -143,6 +143,7 @@ PR creation itself is a GitHub write (the deliverable), so no additional GitHub 
 **Status:** SUCCESS
 **Ref:** PR #{pr-number}
 **Summary:** {branch} → {base-branch}, {count} commits, Closes #{issue-number}
+**Next:** Proceed to self-review
 ```
 
 On failure:
@@ -160,6 +161,7 @@ When existing PR detected:
 **Status:** SUCCESS
 **Ref:** PR #{existing-pr-number}
 **Summary:** Existing PR detected, creation skipped
+**Next:** Proceed to self-review
 ```
 
 ## Batch Mode
