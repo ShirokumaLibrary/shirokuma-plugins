@@ -57,7 +57,7 @@
           "category": "workflow"
         },
         {
-          "text": "Fork Result 形式（YAML フロントマター: action + status + 本文 1 行目サマリー）で結果を返す",
+          "text": "Fork Signal 形式（YAML フロントマター: action + status + 本文 1 行目サマリー）で結果を返す",
           "category": "output"
         }
       ]
@@ -82,7 +82,7 @@
           "category": "workflow"
         },
         {
-          "text": "Fork Result 形式で結果を返す",
+          "text": "Fork Signal 形式で結果を返す",
           "category": "output"
         }
       ]

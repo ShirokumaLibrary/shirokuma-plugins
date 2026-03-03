@@ -101,7 +101,7 @@ EOF
 
 Skip comment posting if the issue number is unknown (not derivable from branch name, not passed via context).
 
-#### 6b: Fork Result Return
+#### 6b: Fork Signal
 
 Return the following structured data to the caller:
 
@@ -225,7 +225,7 @@ shirokuma-docs issues comment {issue-number} --body-file - <<'EOF'
 EOF
 ```
 
-Fork Result return:
+Fork Signal:
 
 ```yaml
 ---

@@ -101,7 +101,7 @@ shirokuma-docs issues pr-create --base {base_branch} --title "{title}" --body-fi
 
 **タイトルルール**: 70文字以内、プレフィックス(`feat:` 等)は英語、**それ以降は日本語**で記述する。Issue番号はタイトルに入れない。
 
-### ステップ 5: Fork Result 返却
+### ステップ 5: Fork Signal
 
 PR 作成自体が GitHub への書き込み（成果物）であるため、追加の GitHub 書き込みは不要。呼び出し元に以下の構造化データを返す:
 

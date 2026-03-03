@@ -96,6 +96,16 @@ Simple questions, minor config edits, fine-tuning skill results, confirmation di
 - **AskUserQuestion**: Deviating from instructions, multiple approach selection, edge case decisions
 - **TodoWrite**: 3+ step tasks, multi-issue sessions, delegation chains
 
+## Fork Completion
+
+**Fork skill completion ≠ task completion.** When a fork skill (`context: fork`) returns, the main AI must:
+
+1. Parse the Fork Signal (YAML frontmatter)
+2. Check TodoWrite for remaining `pending` steps
+3. If pending steps exist → immediately proceed to the next step (do NOT stop or summarize)
+
+Fork results are intermediate chain data. Stopping after a fork result forces the user to manually type "continue" — this breaks the autonomous workflow chain.
+
 ## Error Recovery
 
 When failure occurs, analyze root cause and **always propose system improvements** (changes to config files).

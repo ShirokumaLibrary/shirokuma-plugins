@@ -26,7 +26,7 @@ Detailed specification of the self-review loop executed within the `working-on-i
 [SIMPLIFY] /simplify initial pass (only when code-category files exist)
     ↓  Changes found → commit & push / No changes or failure → skip
 [REVIEW] Launch review (Fork: reviewing-on-issue / reviewing-claude-config)
-    ↓  Note: fork posts PR comment (Step 6) before returning Fork Result
+    ↓  Note: fork posts PR comment (Step 6) before returning Fork Signal
 [PARSE] Parse YAML frontmatter + PASS/FAIL determination
     ↓
 [PRESENT] Present self-review result summary to user (using completion report template)
@@ -172,7 +172,7 @@ Report fix summary in this format:
 
 | Item | Details |
 |------|---------|
-| Input | Full fork output (Fork Result with `### Detail`) from reviewing-on-issue / reviewing-claude-config |
+| Input | Full fork output (Fork Signal with `### Detail`) from reviewing-on-issue / reviewing-claude-config |
 | Output | Fix summary (file count, commit hash, fix list) |
 | Tools | Read, Edit, Bash — Task(general-purpose) has access to all tools |
 | Commit message | `fix: address self-review findings [iter {n}] (#{issue-number})` |
@@ -180,7 +180,7 @@ Report fix summary in this format:
 
 ## Out-of-Scope Follow-up Issue Creation
 
-After the self-review loop completes (PASS, loop stopped, or safety limit reached), if the final iteration's Fork Result contains `Out-of-scope items`, create follow-up Issues.
+After the self-review loop completes (PASS, loop stopped, or safety limit reached), if the final iteration's Fork Signal contains `Out-of-scope items`, create follow-up Issues.
 
 **Deduplication**: Only use the out-of-scope list from the final iteration. Results from each iteration are preserved in PR comments so no information is lost.
 
@@ -212,7 +212,7 @@ Check the comment list for review findings comments (the review summary posted b
 If review findings comments are missing:
 
 1. Display warning: `⚠ Review findings comment was not posted. Posting fallback summary comment.`
-2. Post a simplified comment from the Fork Result summary:
+2. Post a simplified comment from the Fork Signal summary:
 
 ```bash
 shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-fallback.md
@@ -226,7 +226,7 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 **Status:** {PASS | FAIL}
 **Critical:** {n} / **Fixable-warning:** {n} / **Out-of-scope:** {n}
 
-> This comment was auto-generated from the Fork Result summary because the review skill's Step 6 was not executed.
+> This comment was auto-generated from the Fork Signal summary because the review skill's Step 6 was not executed.
 ```
 
 ## Expected PR Comment Pattern

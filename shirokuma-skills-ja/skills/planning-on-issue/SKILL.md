@@ -165,20 +165,33 @@ Skill ツールで `reviewing-on-issue` を plan ロールで起動する。`rev
 Skill(reviewing-on-issue, args: "plan #{number}")
 ```
 
-レビュー結果は `reviewing-on-issue` が Issue コメントとして投稿し、Fork Result を返却する。
+レビュー結果は `reviewing-on-issue` が Issue コメントとして投稿し、Fork Signal を返却する。
 
-#### Fork Result の処理
+#### Fork Signal の処理
 
-| Fork Result Status | アクション |
+| Fork Signal Status | アクション |
 |------|----------|
 | PASS | ステップ 5 へ進む |
 | NEEDS_REVISION | 下記「不合格時の動作」に従い修正・再レビュー |
+
+#### Fork Signal パースチェックポイント
+
+fork 出力を受け取ったら、以下のチェックを順に実行する:
+
+1. **YAML フロントマターを抽出**（`---` で囲まれたブロック）
+2. **action フィールド**: `action` を読み取り → CONTINUE（PASS）または REVISE（NEEDS_REVISION）
+3. **status フィールド**: `status` を読み取り → ログ記録用
+4. **本文の 1 行目**: フロントマター後の本文から 1 行目を抽出 → 1 行サマリー
+5. **action = CONTINUE**: ステップ 5 へ進む
+6. **action = REVISE**: 下記「不合格時の動作」に従う
+
+Fork Signal は内部処理データ — 1 行サマリーのみ出力して次に進む。
 
 #### 不合格時の動作
 
 NEEDS_REVISION が返された場合:
 
-1. Fork Result の `### Detail` から Issues を **[計画]** と **[Issue記述]** に分類
+1. Fork Signal の `### Detail` から Issues を **[計画]** と **[Issue記述]** に分類
 2. **[Issue記述]** の問題 → Issue 本文の該当セクション（概要、背景、タスク等）を修正
 3. **[計画]** の問題 → 計画セクションを修正
 4. 修正後に Skill で再レビュー（同じ `reviewing-on-issue` plan ロールで再実行）

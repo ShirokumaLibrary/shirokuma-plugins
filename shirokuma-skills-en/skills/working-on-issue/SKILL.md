@@ -162,9 +162,9 @@ After work completes, execute the chain **automatically**. No user confirmation 
 - No confirmation between steps, one-line progress reports
 - On failure: stop chain, report status, return control to user
 
-**Chain completion guarantee**: After each fork skill returns its Fork Result, the manager (main AI) parses the YAML frontmatter and **immediately proceeds to the next step**. The body's first line is used as a one-line summary and does not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via fork), eliminating the risk of chain interruption.
+**Chain completion guarantee**: After each fork skill returns its Fork Signal, the manager (main AI) parses the YAML frontmatter and **immediately proceeds to the next step**. The body's first line is used as a one-line summary and does not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via fork), eliminating the risk of chain interruption.
 
-**Fork Result parse checkpoint** — On receiving fork output, execute these checks in order:
+**Fork Signal parse checkpoint** — On receiving fork output, execute these checks in order:
 
 1. **Extract YAML frontmatter** (block delimited by `---`)
 2. **action field**: Read `action` → STOP/FIX/REVISE/CONTINUE determines the next behavior
@@ -174,10 +174,21 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. Do not output anything except a one-line summary before the tool call.
 
+**TodoWrite continuation invariant**: After each fork skill completes, check TodoWrite. If any step is still `pending`, you MUST invoke the next tool call in the same response — generating a final text-only response while pending steps remain is a chain-breaking error.
+
+**Chain delegation table (MUST follow)** — After receiving a fork skill result, invoke exactly the skill indicated by the `next` field:
+
+| Completed Skill | `next` field | Next Skill to Invoke | Prohibited Action |
+|----------------|-------------|---------------------|------------------|
+| `coding-on-issue` | `committing-on-issue` | `committing-on-issue` | Do NOT re-invoke `coding-on-issue` |
+| `committing-on-issue` | `creating-pr-on-issue` | `creating-pr-on-issue` | Do NOT delegate to `coding-on-issue` |
+| `creating-pr-on-issue` | — | Simplify → Self-Review | Managed directly by manager |
+
 **Post-fork-result behavior (pseudocode):**
 
 ```text
 for each step in [commit, pr, simplify, self_review, work_summary, status_update]:
+  // GUARD: TodoWrite has pending steps → this iteration MUST execute (do NOT stop)
   fork_output = invoke_fork_skill(step)
   frontmatter, body = parse_yaml_frontmatter(fork_output)
   action = frontmatter.action                    // CONTINUE | FIX | STOP | REVISE
@@ -191,10 +202,12 @@ for each step in [commit, pr, simplify, self_review, work_summary, status_update
   summary = body.split("\n")[0]                    // Body first line as summary
   log_one_line_summary(summary)
   update_todo(step, "completed")
-  invoke_skill(frontmatter.next)                  // Immediately invoke next field's skill
+  if todos.any(status == "pending"):              // Pending todos remain → MUST continue
+    invoke_skill(frontmatter.next)                // Invoke next skill in SAME response
+  // End of chain only when all todos are completed
 ```
 
-**Fork Result field definitions:**
+**Fork Signal field definitions:**
 
 | Field | Required | Values | Description |
 |-------|----------|--------|-------------|
@@ -216,7 +229,7 @@ The `Summary` field is abolished. Instead, the **body's first line** is treated 
 | FAIL | STOP | All fork skills | Chain stop, report to user |
 | NEEDS_REVISION | REVISE | reviewing-on-issue (plan review) | Enter revision loop |
 
-Fork Results are internal processing data, not user-facing output. Presenting raw fork output exposes technical intermediates that disrupt the user's workflow experience. Output only a one-line summary and immediately proceed to the next tool call.
+Fork Signals are internal processing data, not user-facing output. Presenting raw fork output exposes technical intermediates that disrupt the user's workflow experience. Output only a one-line summary and immediately proceed to the next tool call.
 
 #### Self-Review Loop (Manager = Main AI Directly Manages)
 
@@ -239,7 +252,7 @@ Self-review should be launched via Skill tool (`reviewing-on-issue` / `reviewing
 |-------|--------|
 | SIMPLIFY | Invoke `/simplify` via Skill tool (only when code-category files exist; run once, skip on failure) |
 | REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` as fork |
-| PARSE | Parse Fork Result, PASS/NEEDS_FIX/FAIL determination |
+| PARSE | Parse Fork Signal, PASS/NEEDS_FIX/FAIL determination |
 | PRESENT | Present self-review result summary to user |
 | FIX | Delegate fix to `Task(general-purpose)` |
 | CONVERGE | Convergence check (numeric-based, stop after 2 consecutive non-decreases) |
@@ -375,4 +388,4 @@ When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batc
 - Workflow executes sequentially (Commit → PR → Simplify → Self-Review → Status Update). **Merge is NOT included**
 - Self-review is directly managed by the manager (main AI) ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user
-- **Chain autonomous progression**: Fork Results are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the YAML frontmatter and execute the next step's Skill/Bash tool call. Log a one-line summary and invoke the next tool in the same response
+- **Chain autonomous progression**: Fork Signals are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the YAML frontmatter and execute the next step's Skill/Bash tool call. Log a one-line summary and invoke the next tool in the same response

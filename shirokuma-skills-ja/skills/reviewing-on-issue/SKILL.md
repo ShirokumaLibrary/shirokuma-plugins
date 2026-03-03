@@ -333,7 +333,7 @@ knowledge-manager が Web 検索で以下を最新化する：
 - **ルール自動読み込み**: `.claude/rules/` からプロジェクト規約
 - **サブエージェントモード**: `context: fork` で隔離実行
 - **fork 制約**: `context: fork` のため TodoWrite / AskUserQuestion は使用不可。結果はレポートとして返す
-- **セルフレビュー**: 委任チェーンから起動時は構造化出力（Fork Result）を返す
+- **セルフレビュー**: 委任チェーンから起動時は構造化出力（Fork Signal）を返す
 - **呼び出し元のコメントファースト遵守**: このスキルは `context: fork` のため本文更新を行わないが、呼び出し元スキル（`creating-pr-on-issue`, `working-on-issue`）がレビュー結果に基づいて Issue/PR 本文を更新する場合は、`item-maintenance.md` のコメントファースト原則に従うこと。具体的な手順パターンは `item-maintenance.md` の「レビュー結果からの本文更新」セクションを参照
 
 ## セルフレビューモード
@@ -346,9 +346,9 @@ knowledge-manager が Web 検索で以下を最新化する：
 
 1. **ステップ 1-5 を通常通り実行** — ロール選択、ナレッジ読み込み、Lint、分析、レポート生成
 2. **ステップ 6: PR コメント投稿（必須）** — PR 番号がコンテキストにある場合、レビューレポートを PR コメントとして投稿する。このステップは省略不可
-3. **Fork Result を返却** — 呼び出し元の自動判定用に、以下の形式でサマリーを返す
+3. **Fork Signal を返却** — 呼び出し元の自動判定用に、以下の形式でサマリーを返す
 
-### Fork Result 形式（セルフレビュー）
+### Fork Signal 形式（セルフレビュー）
 
 ステップ 6 で PR コメントを投稿した後、以下の形式で返す。セルフレビューでは `working-on-issue` のループ判定に詳細情報が必要なため、本文に `### Detail` 拡張ブロックを含める:
 
@@ -431,9 +431,9 @@ shirokuma-docs discussions create \
 
 ## 計画レビューモード
 
-`planning-on-issue` から plan ロールで fork 起動された場合、計画レビュー結果を Issue コメントに投稿し、Fork Result を返す。
+`planning-on-issue` から plan ロールで fork 起動された場合、計画レビュー結果を Issue コメントに投稿し、Fork Signal を返す。
 
-### Fork Result 形式（計画レビュー）
+### Fork Signal 形式（計画レビュー）
 
 ```yaml
 ---
@@ -472,9 +472,9 @@ comment_id: {comment-database-id}
 
 ## 通常レビューモード（非セルフレビュー、非計画レビュー）
 
-スタンドアロンまたは fork で起動され、セルフレビューでも計画レビューでもない場合は、レポートを GitHub に保存し Fork Result を返す。
+スタンドアロンまたは fork で起動され、セルフレビューでも計画レビューでもない場合は、レポートを GitHub に保存し Fork Signal を返す。
 
-### Fork Result 形式（通常レビュー）
+### Fork Signal 形式（通常レビュー）
 
 ```yaml
 ---

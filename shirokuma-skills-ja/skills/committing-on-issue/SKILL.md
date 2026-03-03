@@ -101,7 +101,7 @@ EOF
 
 Issue 番号が不明な場合（ブランチ名から推定できない、コンテキストで渡されていない）はコメント投稿をスキップ。
 
-#### 6b: Fork Result 返却
+#### 6b: Fork Signal
 
 呼び出し元に以下の構造化データを返す:
 
@@ -225,7 +225,7 @@ shirokuma-docs issues comment {issue-number} --body-file - <<'EOF'
 EOF
 ```
 
-Fork Result 返却:
+Fork Signal:
 
 ```yaml
 ---

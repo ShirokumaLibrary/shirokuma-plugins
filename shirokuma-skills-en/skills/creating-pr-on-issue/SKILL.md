@@ -134,7 +134,7 @@ docs: CLAUDE.md のコマンド一覧を更新      ← Wrong: not English
 - Related Issues: `Closes #N` for completed items, `Refs #N` for related
 - Test plan: checklist of verification steps
 
-### Step 5: Fork Result Return
+### Step 5: Fork Signal
 
 PR creation itself is a GitHub write (the deliverable), so no additional GitHub write is needed. Return the following structured data to the caller:
 

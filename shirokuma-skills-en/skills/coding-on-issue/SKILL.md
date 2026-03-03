@@ -66,8 +66,9 @@ Skill delegate to `coding-nextjs`. Pass plan section and issue context.
 - Progress management is handled by the manager (main AI, `working-on-issue`)
 - TDD workflow is managed by `working-on-issue` wrapping `coding-on-issue` calls with TDD steps (`coding-on-issue` focuses solely on implementation)
 - UI design tasks (new UI pages, visual redesigns, design system token changes) are handled by `designing-ui-on-issue` → `designing-shadcn-ui`. See `working-on-issue/docs/designing-reference.md` for responsibility boundaries
+- **Commit, push, and PR creation are outside the scope of this skill**. This skill is responsible for code changes only — `committing-on-issue` handles commits and `creating-pr-on-issue` handles PR creation in the subsequent chain. Do not directly execute `git commit` / `git push` / `gh pr create` / `shirokuma-docs issues pr-create`
 
-## Fork Result Return
+## Fork Signal
 
 After work completes, return the following structured data to the caller. Code changes are the deliverable, so no GitHub write is performed (GitHub writes are handled by subsequent `committing-on-issue` / `creating-pr-on-issue`).
 

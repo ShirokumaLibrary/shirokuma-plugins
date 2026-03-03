@@ -165,20 +165,33 @@ Invoke `reviewing-on-issue` with plan role via the Skill tool. `reviewing-on-iss
 Skill(reviewing-on-issue, args: "plan #{number}")
 ```
 
-The review result is posted as an Issue comment by `reviewing-on-issue`, and a Fork Result is returned.
+The review result is posted as an Issue comment by `reviewing-on-issue`, and a Fork Signal is returned.
 
-#### Processing Fork Result
+#### Processing Fork Signal
 
-| Fork Result Status | Action |
+| Fork Signal Status | Action |
 |--------|--------|
 | PASS | Proceed to Step 5 |
 | NEEDS_REVISION | Follow "On Failure" below to fix and re-review |
+
+#### Fork Signal Parse Checkpoint
+
+On receiving fork output, execute these checks in order:
+
+1. **Extract YAML frontmatter** (block delimited by `---`)
+2. **action field**: Read `action` → CONTINUE (PASS) or REVISE (NEEDS_REVISION)
+3. **status field**: Read `status` → log for record
+4. **Body first line**: Extract the first line after frontmatter → one-line summary
+5. **action = CONTINUE**: Proceed to Step 5
+6. **action = REVISE**: Follow "On Failure" below
+
+Fork Signal is internal processing data — output only a one-line summary before proceeding.
 
 #### On Failure
 
 When NEEDS_REVISION is returned:
 
-1. Classify issues from Fork Result `### Detail` into **[Plan]** and **[Issue description]**
+1. Classify issues from Fork Signal `### Detail` into **[Plan]** and **[Issue description]**
 2. **[Issue description]** issues → Fix the relevant sections in the issue body (overview, background, tasks, etc.)
 3. **[Plan]** issues → Fix the plan section
 4. After fixes, re-run the review via Skill (same `reviewing-on-issue` plan role)

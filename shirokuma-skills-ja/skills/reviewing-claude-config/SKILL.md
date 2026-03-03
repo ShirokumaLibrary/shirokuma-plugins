@@ -185,7 +185,7 @@ comment_id: {comment-database-id}
 - {file2}: {summary} [critical | warning]
 ```
 
-**Fork Result（YAML フロントマター + 本文）は必ずレポート末尾に出力する。**
+**Fork Signal（YAML フロントマター + 本文）は必ずレポート末尾に出力する。**
 
 **Status 判定:**
 - Error > 0 → FAIL

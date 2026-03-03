@@ -185,7 +185,7 @@ comment_id: {comment-database-id}
 - {file2}: {summary} [critical | warning]
 ```
 
-**Fork Result (YAML frontmatter + body) must always be output at the end of the report.**
+**Fork Signal (YAML frontmatter + body) must always be output at the end of the report.**
 
 **Status determination:**
 - Error > 0 → FAIL
