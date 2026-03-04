@@ -1,6 +1,31 @@
 # Manual Setup Steps
 
-Guide for settings that cannot be automated via GitHub API.
+Step-by-step guide for GitHub Projects V2 initial configuration, from project creation to all required settings.
+
+## Create the Project (Web UI)
+
+**Web UI creation is recommended** because the GitHub API cannot enable workflows after project creation. Web UI creation enables workflows (Item closed→Done, etc.) by default.
+
+**Steps:**
+1. Navigate to `https://github.com/orgs/{org}/projects/new` (Organization) or open the "Projects" tab in your repository and click "New project"
+2. Choose a template:
+   - **"Blank project"**: Full manual configuration
+   - **"Team planning"**: Includes pre-configured views (Backlog/Ready/In progress/In review/Done)
+3. Set a title and click "Create project"
+
+**Workflows enabled by default after Web UI creation:**
+
+| Workflow | Behavior |
+|----------|----------|
+| Item closed | Sets Status → Done when issue is closed |
+| Pull request merged | Sets Status → Done when PR is merged |
+| Auto-close issue | Closes issue when Status is set to Done |
+
+After creation, link the repository and configure fields via CLI:
+
+```bash
+shirokuma-docs projects setup --lang=en
+```
 
 ## Issue Types Configuration
 
@@ -32,24 +57,24 @@ Add custom Issue Types to the Organization.
 
 **Important**: Format must be **Open-ended discussion**.
 
-## Enable Built-in Automations
+## Verify Built-in Automations
+
+When created via Web UI, the following workflows are **enabled by default**. Verify and adjust as needed in the Settings page.
 
 **Steps:**
-1. Navigate to `https://github.com/orgs/{owner}/projects/{number}/workflows`
-2. Enable:
+1. Navigate to `https://github.com/orgs/{owner}/projects/{number}/workflows` (or Project → Settings → Workflows)
+2. Verify the following states:
 
-| Workflow | Target |
-|----------|--------|
-| Item closed | Done |
-| Pull request merged | Done |
+| Workflow | Recommended | Default (Web UI creation) |
+|----------|-------------|--------------------------|
+| Item closed | **Enabled** | Enabled — no change needed |
+| Pull request merged | **Enabled** | Enabled — no change needed |
+| Auto-close issue | **Enabled** | Enabled — no change needed |
+| Item added to project | Disabled | Disabled — Status managed by CLI |
+| Item reopened | Disabled | Disabled — manual decision per case |
+| Auto-archive items | Disabled | Disabled — makes Done item history hard to access |
 
-3. Keep disabled:
-
-| Workflow | Reason |
-|----------|--------|
-| Item added to project | Status managed by CLI |
-| Item reopened | Manual decision per case |
-| Auto-archive items | Makes Done item history hard to access |
+> **Note**: If the project was created via API (`projects create-project`), workflows default to disabled and must be manually enabled.
 
 ## Rename Views
 

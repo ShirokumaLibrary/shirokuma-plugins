@@ -1,6 +1,32 @@
 # 手動セットアップ手順
 
-GitHub API で自動化できない設定の手動手順ガイド。
+GitHub Projects V2 の初期設定ガイド。Project の作成から各種設定まで順を追って実施する。
+
+## Project の作成（Web UI）
+
+GitHub API ではワークフロー有効化が不可のため、**Web UI からの作成を推奨**する。Web UI 作成ではワークフロー（Item closed→Done 等）がデフォルトで有効な状態になる。
+
+**手順:**
+1. `https://github.com/orgs/{org}/projects/new`（Organization の場合）または リポジトリの「Projects」タブから「New project」を選択
+2. テンプレート選択:
+   - **「Blank project」**: カスタム設定を全て手動で行う場合
+   - **「Team planning」**: Backlog/Ready/In progress/In review/Done の初期ビューが含まれる
+3. タイトルを設定して「Create project」をクリック
+
+**作成後に自動で有効になるワークフロー（3種）:**
+
+| ワークフロー | 動作 |
+|-------------|------|
+| Item closed | Issue がクローズされると Status → Done |
+| Pull request merged | PR がマージされると Status → Done |
+| Auto-close issue | Status が Done になると Issue をクローズ |
+
+作成後、リポジトリへのリンクとフィールド設定は CLI で自動実行:
+
+```bash
+# リポジトリリンク（自動検出）
+shirokuma-docs projects setup --lang=ja
+```
 
 ## Issue Types 設定
 
@@ -32,24 +58,24 @@ Organization の Issue Types にカスタムタイプを追加する。
 
 **重要**: Format は必ず **Open-ended discussion** を選択。
 
-## ビルトイン自動化の有効化
+## ビルトイン自動化の確認
 
-**手順:**
-1. `https://github.com/orgs/{owner}/projects/{number}/workflows` に移動
-2. 有効化:
+Web UI からプロジェクトを作成した場合、以下のワークフローは**デフォルトで有効**になっている。設定画面から状態を確認・調整できる。
 
-| ワークフロー | ターゲット |
-|-------------|-----------|
-| Item closed | Done |
-| Pull request merged | Done |
+**確認手順:**
+1. `https://github.com/orgs/{owner}/projects/{number}/workflows` に移動（または Project → Settings → Workflows）
+2. 以下の状態を確認:
 
-3. 無効のまま:
+| ワークフロー | 推奨状態 | Web UI 作成時のデフォルト |
+|-------------|---------|------------------------|
+| Item closed | **有効** | 有効（変更不要） |
+| Pull request merged | **有効** | 有効（変更不要） |
+| Auto-close issue | **有効** | 有効（変更不要） |
+| Item added to project | 無効のまま | 無効 — ステータスは CLI が管理 |
+| Item reopened | 無効のまま | 無効 — ケースバイケースで手動判断 |
+| Auto-archive items | 無効のまま | 無効 — Done アイテムの履歴参照が困難 |
 
-| ワークフロー | 理由 |
-|-------------|------|
-| Item added to project | ステータスは CLI が管理 |
-| Item reopened | ケースバイケースで手動判断 |
-| Auto-archive items | Done アイテムの履歴参照が困難 |
+> **注意**: API（`projects create-project`）でプロジェクトを作成した場合、ワークフローはデフォルトで無効になるため手動で有効化が必要。
 
 ## View 名のリネーム
 

@@ -29,6 +29,8 @@ Infer from conversation context:
 | Size | Work effort |
 | Area labels | Affected code areas |
 
+**Purpose Clarity Check (required)**: If the user's message only describes a "means" (what to do) without a clear "purpose" (who / what / why), present inferred purpose candidates and confirm via `AskUserQuestion`. See [reference/purpose-criteria.md](reference/purpose-criteria.md) for criteria.
+
 ### Step 2: Delegate to `managing-github-items`
 
 After context analysis, invoke via Skill tool immediately (no pre-creation confirmation):
@@ -54,6 +56,7 @@ See [reference/chain-rules.md](reference/chain-rules.md) for chain decision deta
 | Document | Content | When to Read |
 |----------|---------|--------------|
 | [reference/chain-rules.md](reference/chain-rules.md) | Chain decision rules and inference logic | Item creation |
+| [reference/purpose-criteria.md](reference/purpose-criteria.md) | Means vs purpose criteria (JTBD-based) | Context analysis (purpose clarity check) |
 
 ## Next Steps
 

@@ -49,16 +49,23 @@ shirokuma-docs init --with-skills --project {path}
 
 ### Step 4: GitHub Projects Setup
 
-Execute `github-project-setup` functionality directly:
+**Create the project via Web UI** (recommended over API creation):
+
+1. Navigate to `https://github.com/orgs/{org}/projects/new` (for Organization) or click "New project" from the repository "Projects" tab
+2. Choose a template:
+   - **"Blank project"**: Configure everything manually
+   - **"Team planning"**: Includes initial views (Backlog, Ready, In progress, In review, Done)
+3. Set a title and click "Create project" → workflows (Item closed→Done, etc.) are enabled by default
+
+After creation, configure fields automatically:
 
 ```bash
-shirokuma-docs projects create-project --title "{project-name}" --lang={en|ja}
+shirokuma-docs projects setup --lang={en|ja}
 ```
 
-Guide manual setup items:
-- Issue Types configuration
+Then guide manual setup items:
+- Issue Types configuration (requires org admin permissions)
 - Discussion category creation
-- Built-in automation enablement
 - View renaming
 
 See [docs/manual-steps.md](docs/manual-steps.md) for details.

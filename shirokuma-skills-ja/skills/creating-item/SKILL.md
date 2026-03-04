@@ -29,6 +29,8 @@ allowed-tools: Bash, AskUserQuestion, Read, Write, TodoWrite
 | Size | 作業量 |
 | エリアラベル | 影響するコード領域 |
 
+**目的明確性チェック（必須）**: ユーザーの発話が「手段（何をするか）」のみで「目的（誰が・何を・なぜ）」が不明確な場合、推定した目的を提示して `AskUserQuestion` で確認する。判定基準は [reference/purpose-criteria.md](reference/purpose-criteria.md) 参照。
+
 ### ステップ 2: `managing-github-items` に委任
 
 コンテキスト分析後、事前確認なしで即座に Skill ツールで `managing-github-items` を起動:
@@ -54,6 +56,7 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 | ドキュメント | 内容 | 読み込みタイミング |
 |-------------|------|-------------------|
 | [reference/chain-rules.md](reference/chain-rules.md) | チェーン判定ルール・推定ロジック | アイテム作成時 |
+| [reference/purpose-criteria.md](reference/purpose-criteria.md) | 手段 vs 目的の判定基準（JTBD ベース） | コンテキスト分析時（目的明確性チェック） |
 
 ## 次のステップ
 

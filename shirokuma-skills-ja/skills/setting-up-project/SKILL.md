@@ -49,16 +49,21 @@ shirokuma-docs init --with-skills --project {path}
 
 ### ステップ 4: GitHub Projects セットアップ
 
-`github-project-setup` の機能を直接実行:
+**Web UI でプロジェクトを作成する**（API 作成より推奨）:
+
+1. `https://github.com/orgs/{org}/projects/new` または `https://github.com/{owner}?tab=projects` からプロジェクトを作成
+2. テンプレート: 「Team planning」または「Blank project」を選択
+3. タイトルを設定して作成 → ワークフロー（Item closed→Done 等）がデフォルトで有効になる
+
+作成後、フィールドを自動設定:
 
 ```bash
-shirokuma-docs projects create-project --title "{project-name}" --lang={en|ja}
+shirokuma-docs projects setup --lang={en|ja}
 ```
 
-手動セットアップが必要な項目をガイド:
-- Issue Types 設定
+その後、手動セットアップが必要な項目をガイド:
+- Issue Types 設定（組織管理者権限が必要）
 - Discussion カテゴリ作成
-- ビルトイン自動化の有効化
 - View 名のリネーム
 
 詳細は [docs/manual-steps.md](docs/manual-steps.md) 参照。

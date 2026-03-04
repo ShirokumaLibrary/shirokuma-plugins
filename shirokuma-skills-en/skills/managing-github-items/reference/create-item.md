@@ -43,20 +43,39 @@ Without arguments: Infer from conversation context:
 
 ### Purpose Clarity Check
 
-When creating an issue, verify that "who, what, and why" can be inferred from user instructions.
+When creating an issue, detect cases where the user's message only describes a "means" (what to do) without including a "purpose" (who / what / why). See `creating-item/reference/purpose-criteria.md` for detailed criteria.
+
+#### Detecting Means Patterns
+
+If the user's message is structured as "verb + implementation target" only (e.g., "fix the bug", "add an option", "consolidate the commands", "implement the feature"), classify it as a means pattern.
 
 | State | Action |
 |-------|--------|
-| Purpose can be inferred | Fill in the purpose template |
-| Purpose is unclear | Propose 2-3 candidates and use AskUserQuestion to select (block creation without a purpose) |
+| Purpose (beneficiary, outcome, motivation) is clear | Fill in inferred purpose and create |
+| Means pattern detected or purpose unclear | Propose 2-3 purpose candidates and confirm via AskUserQuestion (block creation without purpose) |
+| XS size / purpose already stated in conversation | Skip confirmation and create (prevent over-detection) |
+
+#### Example Purpose Proposals
 
 ```
 Example: User says "add --format option to deps command"
 
+→ Means pattern detected (add = means)
+
 Proposals:
-A) "Enable CLI users to choose output format based on use case. Currently SVG-only, which is inconvenient for CI or document embedding."
-B) "Enable CLI users to get dependency info in JSON format. For pipeline integration with other tools."
+A) "Enable CLI users to choose output format based on use case.
+    Currently SVG-only, which is inconvenient for CI or document embedding."
+B) "Enable CLI users to get dependency info in JSON format.
+    For pipeline integration with other tools."
 C) Other (please specify)
+```
+
+#### The 3 Elements of a Purpose
+
+A well-formed purpose contains **beneficiary + expected outcome + motivation**:
+
+```
+"{Beneficiary} can {expected outcome}. Because {motivation}."
 ```
 
 Label options (for impact scope classification — area labels):
