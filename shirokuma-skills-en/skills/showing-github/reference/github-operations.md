@@ -54,7 +54,7 @@ Prefer shirokuma-docs CLI over direct `gh` commands. Config in `shirokuma-docs.c
 shirokuma-docs issues list                          # Open issues
 shirokuma-docs issues list --all                    # Include closed
 shirokuma-docs issues list --status "In Progress"   # Filter by status
-shirokuma-docs issues show {number}                  # Details
+shirokuma-docs show {number}                  # Details
 shirokuma-docs issues create \
   --title "Title" --body-file /tmp/shirokuma-docs/body.md \
   --labels "area:cli" --issue-type "Feature" \
@@ -104,7 +104,7 @@ shirokuma-docs projects update {number} --field-status "Done"
 
 ```bash
 shirokuma-docs discussions list --category Handovers --limit 5
-shirokuma-docs discussions show {number}
+shirokuma-docs show {number}
 shirokuma-docs discussions create \
   --category Handovers \
   --title "$(date +%Y-%m-%d) - Summary" \

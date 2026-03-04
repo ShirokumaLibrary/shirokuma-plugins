@@ -134,7 +134,7 @@ See project-specific workflow documentation for detailed fix instructions.
 
 **Plan role:**
 
-1. Fetch Issue body via `shirokuma-docs issues show {number}`
+1. Fetch Issue body via `shirokuma-docs show {number}`
 2. Extract `## Plan` / `## 計画` section
 3. Evaluate each item in review checklist (`roles/plan.md`)
 4. Check against anti-patterns

@@ -18,7 +18,7 @@
 エピックは Issue Type ではなく**構造**で判定する。`subIssuesSummary.total > 0` の Issue がエピック。
 
 ```bash
-shirokuma-docs issues show {number}
+shirokuma-docs show {number}
 # → subIssuesSummary: { total: 3, completed: 1 }
 ```
 
@@ -55,7 +55,7 @@ develop
 
 ## ベースブランチ自動判定
 
-子 Issue が親を持つ場合（`shirokuma-docs issues show` の `parentIssue` フィールドで検出）、以下の順序で integration ブランチを検出する:
+子 Issue が親を持つ場合（`shirokuma-docs show` の `parentIssue` フィールドで検出）、以下の順序で integration ブランチを検出する:
 
 1. **親 Issue の本文から抽出**: `### Integration ブランチ`（JA）/ `### Integration Branch`（EN）ヘッディングを探し、直後のバッククォート内のブランチ名を採用。プレフィックスは `epic/`, `chore/`, `feat/` 等任意
 2. **フォールバック（リモートブランチ検索）**: `git branch -r --list "origin/*/{parent-number}-*"` で検索
@@ -66,7 +66,7 @@ develop
 
 ```bash
 # 親 Issue の計画からブランチ名を取得
-shirokuma-docs issues show {parent-number}
+shirokuma-docs show {parent-number}
 # → 本文の「### Integration ブランチ」セクション直後の `chore/958-octokit-migration` を抽出
 
 # フォールバック

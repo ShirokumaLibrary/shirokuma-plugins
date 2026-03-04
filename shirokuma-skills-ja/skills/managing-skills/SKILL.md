@@ -151,7 +151,7 @@ allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash
 
 ```markdown
 ## 現在の Issue データ
-!`shirokuma-docs issues show $ARGUMENTS`
+!`shirokuma-docs show $ARGUMENTS`
 ```
 
 常に同じコンテキストが必要なスキルに最適。引数に追加テキストが含まれる場合は避ける。

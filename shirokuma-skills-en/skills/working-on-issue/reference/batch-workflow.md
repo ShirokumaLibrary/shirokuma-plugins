@@ -43,7 +43,7 @@ If any issue fails eligibility, inform user and suggest individual processing.
    Type determination: single type → use it; mixed → `chore`.
 
 3. **Issue loop**: For each issue:
-   - Fetch issue details: `shirokuma-docs issues show {number}`
+   - Fetch issue details: `shirokuma-docs show {number}`
    - Execute implementation (delegate to `coding-on-issue` fork)
    - Quality checkpoint: verify changed files + run related tests
    - Track `filesByIssue` mapping for scoped commits

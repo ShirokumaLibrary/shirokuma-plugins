@@ -14,7 +14,7 @@ Quality review of the plan section (`## Plan` / `## 計画`) in Issue body:
 | Aspect | `planning-on-issue` built-in review | `reviewing-on-issue` plan role |
 |--------|-------------------------------------|-------------------------------|
 | Timing | Immediate check right after planning | User-initiated at any time |
-| Data retrieval | Issue body embedded in Task agent | Fetched via `shirokuma-docs issues show` by Issue number |
+| Data retrieval | Issue body embedded in Task agent | Fetched via `shirokuma-docs show` by Issue number |
 | Purpose | Initial quality gate for plan | Independent second opinion |
 | Invocation | Auto-executed at `planning-on-issue` step 4 | `/reviewing-on-issue plan #N` or Spec Review Issue |
 
@@ -28,7 +28,7 @@ Load these files for context:
 
 ```
 1. Role selection: "plan review" or Spec Review Issue
-2. Fetch Issue body: shirokuma-docs issues show {number}
+2. Fetch Issue body: shirokuma-docs show {number}
 3. Lint execution: Skip (target is not code files)
 4. Plan analysis: Review the "## Plan" section against review criteria
 5. Report generation: Template format

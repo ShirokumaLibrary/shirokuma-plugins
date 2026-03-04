@@ -43,7 +43,7 @@ Default is `develop`. When invoked with an issue number, automatically detect su
 
 #### Sub-Issue Auto-Detection
 
-If the `shirokuma-docs issues show {number}` output contains a `parentIssue` field, the issue is a sub-issue:
+If the `shirokuma-docs show {number}` output contains a `parentIssue` field, the issue is a sub-issue:
 
 ```yaml
 parentIssue:
@@ -57,7 +57,7 @@ If context was passed from `working-on-issue`, use it; otherwise, self-detect us
 
 When a sub-issue is detected, determine the integration branch in this order:
 
-1. **Extract from parent issue body**: Fetch the parent issue with `shirokuma-docs issues show {parent-number}` and look for a `### Integration Branch` (EN) / `### Integration ブランチ` (JA) heading. Extract the branch name from the backtick block immediately following the heading (any prefix accepted: `epic/`, `chore/`, `feat/`, etc.)
+1. **Extract from parent issue body**: Fetch the parent issue with `shirokuma-docs show {parent-number}` and look for a `### Integration Branch` (EN) / `### Integration ブランチ` (JA) heading. Extract the branch name from the backtick block immediately following the heading (any prefix accepted: `epic/`, `chore/`, `feat/`, etc.)
 2. **Fallback (remote branch search)**: `git branch -r --list "origin/*/{parent-number}-*"`
    - 1 match → auto-select
    - Multiple matches → select first match, include alternatives in result

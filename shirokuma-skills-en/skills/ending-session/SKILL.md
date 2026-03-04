@@ -229,7 +229,7 @@ Example: `2026-02-19 - Plugin feature` → `2026-02-19 [alice] - Plugin feature`
 | 3 | Work complete, no PR needed | `--done` |
 | 4 | Work still in progress | Do not update status |
 
-Use the `issues[].hasMergedPr` flag and `prs` array from `session preflight` output to determine the action. Issues with `hasMergedPr: true` use `--done`; issues with an open PR use `--review`. No additional `shirokuma-docs issues show` call is needed.
+Use the `issues[].hasMergedPr` flag and `prs` array from `session preflight` output to determine the action. Issues with `hasMergedPr: true` use `--done`; issues with an open PR use `--review`. No additional `shirokuma-docs show` call is needed.
 
 **Idempotency**: If `creating-pr-on-issue` already set Review after self-review, `--review` is a no-op. If `committing-on-issue` merge chain already set Done, `--done` is a no-op. `ending-session` acts as a safety net, catching any status updates that other skills missed.
 

@@ -39,11 +39,11 @@ Update each step to `in_progress` when starting and `completed` when done.
 
 ### Step 1: Analyze Work
 
-**Issue number provided**: `shirokuma-docs issues show {number}` to fetch title/body/labels/status/priority/size.
+**Issue number provided**: `shirokuma-docs show {number}` to fetch title/body/labels/status/priority/size.
 
 #### Sub-Issue Detection
 
-When `shirokuma-docs issues show {number}` output contains a `parentIssue` field, the issue is a sub-issue of an epic:
+When `shirokuma-docs show {number}` output contains a `parentIssue` field, the issue is a sub-issue of an epic:
 
 1. Reference the parent issue's `## Plan` section to understand overall context
 2. Set base branch to the parent's integration branch instead of `develop` (Step 3)
@@ -51,7 +51,7 @@ When `shirokuma-docs issues show {number}` output contains a `parentIssue` field
 
 ```bash
 # Check parent issue
-shirokuma-docs issues show {parent-number}
+shirokuma-docs show {parent-number}
 ```
 
 #### Plan Check (when issue number provided)
@@ -305,7 +305,7 @@ After self-review completion, update Status to Review for issues with a number:
 shirokuma-docs issues update {number} --field-status "Review"
 ```
 
-**Status fallback verification**: After chain completion, check Status via `shirokuma-docs issues show {number}`. If still In Progress → directly update with `shirokuma-docs issues update {number} --field-status "Review"` (idempotent: re-updating to Review when already Review is harmless).
+**Status fallback verification**: After chain completion, check Status via `shirokuma-docs show {number}`. If still In Progress → directly update with `shirokuma-docs issues update {number} --field-status "Review"` (idempotent: re-updating to Review when already Review is harmless).
 
 ### Step 6: Evolution Signal Auto-Recording
 

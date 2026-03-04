@@ -134,7 +134,7 @@ shirokuma-docs lint-docs -p . -f terminal
 
 **plan ロール:**
 
-1. `shirokuma-docs issues show {number}` で Issue 本文を取得
+1. `shirokuma-docs show {number}` で Issue 本文を取得
 2. `## 計画` セクションを抽出
 3. レビューチェックリスト（`roles/plan.md`）の各項目を評価
 4. アンチパターンとの照合

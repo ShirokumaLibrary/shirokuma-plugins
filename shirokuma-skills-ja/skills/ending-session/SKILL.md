@@ -231,7 +231,7 @@ shirokuma-docs session end \
 | 3 | PR 不要で作業完了 | `--done` |
 | 4 | 作業継続中（未完了） | ステータス更新しない |
 
-判定に必要な情報は `session preflight` 出力の `issues[].hasMergedPr` フラグと `prs` 配列で確認する。`hasMergedPr` が `true` の Issue は `--done`、オープン PR がある Issue は `--review` とする。追加の `shirokuma-docs issues show` 呼び出しは不要。
+判定に必要な情報は `session preflight` 出力の `issues[].hasMergedPr` フラグと `prs` 配列で確認する。`hasMergedPr` が `true` の Issue は `--done`、オープン PR がある Issue は `--review` とする。追加の `shirokuma-docs show` 呼び出しは不要。
 
 **冪等性**: `creating-pr-on-issue` がセルフレビュー完了時に既に Review に更新済みの場合、`--review` は no-op。`committing-on-issue` のマージチェーンが Done に更新済みの場合、`--done` は no-op。`ending-session` はセーフティネットとして機能し、スキルが更新し損ねた Status を補完する。
 

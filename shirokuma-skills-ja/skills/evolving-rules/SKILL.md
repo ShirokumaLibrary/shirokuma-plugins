@@ -22,7 +22,7 @@ shirokuma-docs issues list --issue-type Evolution --limit 10
 Issue が見つかったら、コメントを含む詳細を取得:
 
 ```bash
-shirokuma-docs issues show {number}
+shirokuma-docs show {number}
 shirokuma-docs issues comments {number}
 ```
 

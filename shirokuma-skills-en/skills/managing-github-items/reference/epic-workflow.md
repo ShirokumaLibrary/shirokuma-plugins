@@ -18,7 +18,7 @@ Unified reference for working with epics (parent issue + sub-issue structure) on
 Epics are identified by **structure**, not Issue Type. An issue with `subIssuesSummary.total > 0` is an epic.
 
 ```bash
-shirokuma-docs issues show {number}
+shirokuma-docs show {number}
 # → subIssuesSummary: { total: 3, completed: 1 }
 ```
 
@@ -55,7 +55,7 @@ develop
 
 ## Base Branch Auto-Detection
 
-When a child issue has a parent (detected via the `parentIssue` field in `shirokuma-docs issues show` output), detect the integration branch in this order:
+When a child issue has a parent (detected via the `parentIssue` field in `shirokuma-docs show` output), detect the integration branch in this order:
 
 1. **Extract from parent issue body**: Look for a `### Integration Branch` (EN) / `### Integration ブランチ` (JA) heading and extract the branch name from the backtick block immediately following. Any prefix is accepted: `epic/`, `chore/`, `feat/`, etc.
 2. **Fallback (remote branch search)**: `git branch -r --list "origin/*/{parent-number}-*"`
@@ -66,7 +66,7 @@ When a child issue has a parent (detected via the `parentIssue` field in `shirok
 
 ```bash
 # Get branch name from parent issue body
-shirokuma-docs issues show {parent-number}
+shirokuma-docs show {parent-number}
 # → Extract `chore/958-octokit-migration` from "### Integration Branch" section
 
 # Fallback

@@ -43,7 +43,7 @@
    type の決定: 単一 type → その type。混在 → `chore`。
 
 3. **Issue ループ**: 各 Issue に対して:
-   - Issue 詳細取得: `shirokuma-docs issues show {number}`
+   - Issue 詳細取得: `shirokuma-docs show {number}`
    - 実装実行（`coding-on-issue` に fork 委任）
    - 品質チェックポイント: 変更ファイル確認 + 関連テスト実行
    - `filesByIssue` マッピングを記録（スコープ付きコミット用）

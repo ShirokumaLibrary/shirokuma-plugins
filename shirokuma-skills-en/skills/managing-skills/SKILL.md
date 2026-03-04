@@ -154,7 +154,7 @@ Use `` !`command` `` in the skill body to inject command output at invocation ti
 
 ```markdown
 ## Current Issue Data
-!`shirokuma-docs issues show $ARGUMENTS`
+!`shirokuma-docs show $ARGUMENTS`
 ```
 
 Best for skills that always need the same context data. Avoid when arguments may contain extra text (e.g., delegation keywords).

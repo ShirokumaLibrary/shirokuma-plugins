@@ -14,7 +14,7 @@ Issue 本文の計画セクション（`## 計画`）の品質レビュー:
 | 観点 | `planning-on-issue` 内蔵レビュー | `reviewing-on-issue` plan ロール |
 |------|--------------------------------|--------------------------------|
 | タイミング | 計画策定直後の即時チェック | ユーザーが任意タイミングで依頼 |
-| データ取得 | Task エージェントに Issue 本文を埋め込み | Issue 番号から `shirokuma-docs issues show` で取得 |
+| データ取得 | Task エージェントに Issue 本文を埋め込み | Issue 番号から `shirokuma-docs show` で取得 |
 | 目的 | 計画の初期品質ゲート | 独立したセカンドオピニオン |
 | 起動方法 | `planning-on-issue` のステップ 4 で自動実行 | `/reviewing-on-issue plan #N` または Spec Review Issue 指定 |
 
@@ -28,7 +28,7 @@ Issue 本文の計画セクション（`## 計画`）の品質レビュー:
 
 ```
 1. ロール選択: "plan review" or Spec Review Issue
-2. Issue 本文取得: shirokuma-docs issues show {number}
+2. Issue 本文取得: shirokuma-docs show {number}
 3. Lint 実行: スキップ（対象がコードファイルではないため）
 4. 計画分析: Issue 本文の「## 計画」セクションをレビュー観点で分析
 5. レポート生成: テンプレート形式

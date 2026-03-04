@@ -38,7 +38,7 @@ If any criterion matches a higher level, use that level.
 ### Step 1: Fetch Issue
 
 ```bash
-shirokuma-docs issues show {number}
+shirokuma-docs show {number}
 ```
 
 Review title, body, type, priority, size, labels, and comments.
@@ -155,7 +155,7 @@ See `epic-workflow` reference for details.
 
 ### Step 4: Write Plan to Issue Body
 
-Write the plan section to the Issue body before review. This enables `reviewing-on-issue` to retrieve the plan content via `shirokuma-docs issues show {number}`.
+Write the plan section to the Issue body before review. This enables `reviewing-on-issue` to retrieve the plan content via `shirokuma-docs show {number}`.
 
 Append a `## Plan` section to the existing issue body. Use the template from the depth level determined in Step 3.
 
@@ -169,7 +169,7 @@ shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-b
 
 ### Step 5: Plan Review (Fork Delegation)
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `reviewing-on-issue` plan role as fork for a fresh-context review. Since the plan was written to the Issue body in Step 4, the reviewer can retrieve it via `shirokuma-docs issues show {number}`.
+Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `reviewing-on-issue` plan role as fork for a fresh-context review. Since the plan was written to the Issue body in Step 4, the reviewer can retrieve it via `shirokuma-docs show {number}`.
 
 #### Skill Availability Check (Fallback)
 
@@ -190,7 +190,7 @@ If all checks pass, proceed to Step 6.
 
 #### Launching the Reviewer
 
-Invoke `reviewing-on-issue` with plan role via the Skill tool. `reviewing-on-issue` will fetch the Issue body itself via `shirokuma-docs issues show {number}` (which now includes the plan written in Step 4).
+Invoke `reviewing-on-issue` with plan role via the Skill tool. `reviewing-on-issue` will fetch the Issue body itself via `shirokuma-docs show {number}` (which now includes the plan written in Step 4).
 
 ```text
 Skill(reviewing-on-issue, args: "plan #{number}")
@@ -384,7 +384,7 @@ Add GitHub writing rule references to each skill...
 
 | Tool | When |
 |------|------|
-| Bash | `shirokuma-docs issues show/update` |
+| Bash | `shirokuma-docs show/update` |
 | Read/Grep/Glob | Codebase investigation |
 | Task (Explore) | Broad code investigation |
 | Skill (reviewing-on-issue) | Step 5: Fresh-context plan review (fork delegation) |
