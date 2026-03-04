@@ -6,7 +6,7 @@ allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion, TodoWrite
 
 # Planning on Issue
 
-> **Chain Autonomous Progression**: After the plan review fork (Step 4) returns its result, immediately proceed to Steps 5-7 (post comment, update body, set Spec Review). Stopping after the review fork forces the user to manually prompt continuation, breaking the planning workflow. Parse the YAML frontmatter `action` field and act without waiting for user input.
+> **Chain Autonomous Progression**: After the plan review fork (Step 5) returns its result, immediately proceed to Steps 6-7 (update status, return to user). Stopping after the review fork forces the user to manually prompt continuation, breaking the planning workflow. Parse the YAML frontmatter `action` field and act without waiting for user input.
 
 Analyze issue requirements, create an implementation plan, and persist it to the issue body. After planning, set status to Spec Review and return control to the user. **Does not proceed to implementation.**
 
@@ -153,13 +153,44 @@ For issues where `subIssuesSummary.total > 0`, use the extended template that in
 
 See `epic-workflow` reference for details.
 
-### Step 4: Plan Review (Fork Delegation)
+### Step 4: Write Plan to Issue Body
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `reviewing-on-issue` plan role as fork for a fresh-context review.
+Write the plan section to the Issue body before review. This enables `reviewing-on-issue` to retrieve the plan content via `shirokuma-docs issues show {number}`.
+
+Append a `## Plan` section to the existing issue body. Use the template from the depth level determined in Step 3.
+
+```bash
+shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-body.md
+```
+
+**Important**: Preserve the existing body (overview, tasks, deliverables). **Append** the `## Plan` section. If an existing `## Tasks` section exists, the plan's `### Task Breakdown` coexists as more specific implementation steps.
+
+> Plan section headings and content must comply with the `output-language` rule. Follow `github-writing-style` rule bullet-point guidelines.
+
+### Step 5: Plan Review (Fork Delegation)
+
+Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `reviewing-on-issue` plan role as fork for a fresh-context review. Since the plan was written to the Issue body in Step 4, the reviewer can retrieve it via `shirokuma-docs issues show {number}`.
+
+#### Skill Availability Check (Fallback)
+
+Before launching the fork, verify that `reviewing-on-issue` is available in the skill list.
+
+| State | Action |
+|-------|--------|
+| Skill available | Proceed to "Launching the Reviewer" below |
+| Skill unavailable | Use "Fallback (self-check)" instead |
+
+**Fallback (self-check)**: When `reviewing-on-issue` is unavailable, verify plan quality using this checklist:
+- [ ] Does the plan address all requirements in the Issue?
+- [ ] Are there any missing tasks?
+- [ ] Is the deliverable (definition of done) clearly defined?
+- [ ] Are risks/concerns identified (for complex Issues)?
+
+If all checks pass, proceed to Step 6.
 
 #### Launching the Reviewer
 
-Invoke `reviewing-on-issue` with plan role via the Skill tool. `reviewing-on-issue` will fetch the Issue body itself via `shirokuma-docs issues show {number}`, so embedding the Issue body in the prompt is not needed.
+Invoke `reviewing-on-issue` with plan role via the Skill tool. `reviewing-on-issue` will fetch the Issue body itself via `shirokuma-docs issues show {number}` (which now includes the plan written in Step 4).
 
 ```text
 Skill(reviewing-on-issue, args: "plan #{number}")
@@ -171,7 +202,7 @@ The review result is posted as an Issue comment by `reviewing-on-issue`, and a F
 
 | Fork Signal Status | Action |
 |--------|--------|
-| PASS | Proceed to Step 5 |
+| PASS | Follow "On PASS" below |
 | NEEDS_REVISION | Follow "On Failure" below to fix and re-review |
 
 #### Fork Signal Parse Checkpoint
@@ -182,31 +213,36 @@ On receiving fork output, execute these checks in order:
 2. **action field**: Read `action` → CONTINUE (PASS) or REVISE (NEEDS_REVISION)
 3. **status field**: Read `status` → log for record
 4. **Body first line**: Extract the first line after frontmatter → one-line summary
-5. **action = CONTINUE**: Proceed to Step 5
+5. **action = CONTINUE**: Follow "On PASS" below
 6. **action = REVISE**: Follow "On Failure" below
 
 Fork Signal is internal processing data — output only a one-line summary before proceeding.
 
-#### On Failure
+#### On PASS
 
-When NEEDS_REVISION is returned:
+1. Post a **plan review response comment** (evidence that the review passed):
 
-1. Classify issues from Fork Signal `### Detail` into **[Plan]** and **[Issue description]**
-2. **[Issue description]** issues → Fix the relevant sections in the issue body (overview, background, tasks, etc.)
-3. **[Plan]** issues → Fix the plan section
-4. After fixes, re-run the review via Skill (same `reviewing-on-issue` plan role)
-5. **Max retries: 2** (initial review + up to 2 fix-and-review cycles)
-6. On 3rd NEEDS_REVISION → Stop the loop, report to user for their judgment
+```bash
+shirokuma-docs issues comment {number} --body-file - <<'EOF'
+## Plan Review Response Complete
 
-```
-Plan → Skill(reviewing-on-issue plan) → NEEDS_REVISION → Fix → Re-review → PASS → Step 5
-                                                                       ↓ (failed twice)
-                                                                 Report to user
+**Review result:** PASS
+**Fixes:** None (plan approved as-is)
+EOF
 ```
 
-### Step 5: Update Issue Body with Plan
+If PASS was reached after NEEDS_REVISION cycles:
 
-Follow the comment-first workflow (see `project-items` rule, "Workflow Order" section) in this order:
+```bash
+shirokuma-docs issues comment {number} --body-file - <<'EOF'
+## Plan Review Response Complete
+
+**Review result:** PASS (after {n} revision(s))
+**Fixes:** {summary of changes made}
+EOF
+```
+
+2. Proceed to Step 5a below.
 
 #### 5a: Post Decision Rationale as Comment (PASS only)
 
@@ -231,19 +267,24 @@ EOF
 
 > Comment language and style must comply with the `output-language` rule and `github-writing-style` rule.
 
-#### 5b: Append Plan Section to Issue Body
+#### On Failure
 
-Append a `## Plan` section to the existing issue body. Use the template from the depth level determined in Step 3.
+When NEEDS_REVISION is returned:
 
-```bash
-shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-body.md
+1. Classify issues from Fork Signal `### Detail` into **[Plan]** and **[Issue description]**
+2. **[Issue description]** issues → Fix the relevant sections in the issue body (overview, background, tasks, etc.)
+3. **[Plan]** issues → Fix the plan section and update the `## Plan` section in the Issue body with the revised content
+4. After fixes, re-run the review via Skill (same `reviewing-on-issue` plan role)
+5. **Max retries: 2** (initial review + up to 2 fix-and-review cycles)
+6. On 3rd NEEDS_REVISION → Stop the loop, report to user for their judgment
+
+```
+Plan → Body write → Skill(reviewing-on-issue plan) → NEEDS_REVISION → Fix + Update body → Re-review → PASS → Response comment → Step 5a
+                                                                                        ↓ (failed twice)
+                                                                                   Report to user
 ```
 
-**Important**: Preserve the existing body (overview, tasks, deliverables). **Append** the `## Plan` section. If an existing `## Tasks` section exists, the plan's `### Task Breakdown` coexists as more specific implementation steps.
-
-> Plan section headings and content must comply with the `output-language` rule. Follow `github-writing-style` rule bullet-point guidelines.
-
-### Step 6: Update Status
+### Step 6: Update Status (After Plan Review)
 
 ```bash
 shirokuma-docs issues update {number} --field-status "Spec Review"
@@ -346,7 +387,7 @@ Add GitHub writing rule references to each skill...
 | Bash | `shirokuma-docs issues show/update` |
 | Read/Grep/Glob | Codebase investigation |
 | Task (Explore) | Broad code investigation |
-| Skill (reviewing-on-issue) | Step 4: Fresh-context plan review (fork delegation) |
+| Skill (reviewing-on-issue) | Step 5: Fresh-context plan review (fork delegation) |
 | AskUserQuestion | Overwrite confirmation, issue number prompt |
 | TodoWrite | Planning step progress tracking |
 
@@ -356,4 +397,4 @@ Add GitHub writing rule references to each skill...
 - Plans are persisted in the issue body — available across sessions
 - `Spec Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
 - Use Explore agent during investigation to minimize context consumption
-- **Chain autonomous progression**: After the review fork (Step 4) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 5-7 based on the YAML frontmatter `action` field
+- **Chain autonomous progression**: After the review fork (Step 5) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 6-7 based on the YAML frontmatter `action` field

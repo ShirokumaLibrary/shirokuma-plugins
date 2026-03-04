@@ -323,3 +323,52 @@ from pathlib import Path
 script_path = Path("scripts") / "helper.py"
 config_path = Path("config") / "settings.json"
 ```
+
+---
+
+## 暗黙参照禁止（セッション独立した書き込み）
+
+スキルが GitHub（Issue コメント、PR 本文、Discussion）に書き込む内容は、**次のセッションの AI が会話履歴にアクセスできない**前提で書く必要がある。
+
+### なぜ必要か
+
+セッションが移転すると、次の AI は GitHub に書き込まれた内容のみを参照できる。`starting-session #N` は `shirokuma-docs issues comments {N}` で Issue コメントを取得してコンテキストを復元するため、書き込み品質がセッション継続性に直結する。
+
+### 避けるべきパターン（暗黙参照）
+
+| NG パターン | 問題 | 修正 |
+|------------|------|------|
+| 「先ほど議論した通り」 | 会話履歴への暗黙参照 | 議論した内容を直接記述する |
+| 「上述の通り」 | 同一コメント内の前の記述への参照 | 具体的な内容を再掲する |
+| 「as discussed」 | セッション内の口頭合意 | 合意した内容を明示する |
+| 「as mentioned earlier」 | 過去のコメントへの参照 | コメント番号 or 内容を引用する |
+| 「前回のセッションで決定した」 | セッションまたぎの暗黙参照 | 決定内容を具体的に記述する |
+
+### 推奨パターン
+
+```markdown
+# NG: 暗黙参照
+先ほど議論した通り、アプローチ A を採用します。
+
+# OK: 自己完結した記述
+アプローチ A（`src/utils/parser.ts` に新しい parseXml 関数を追加）を採用します。
+理由: アプローチ B は既存の JSON パーサーと競合するリスクがあるため。
+```
+
+```markdown
+# NG: 暗黙参照
+as discussed, this fixes the issue.
+
+# OK: 自己完結した記述
+This commit fixes the null pointer exception in `getUser()` (Issue #342).
+Root cause: The `id` field was not validated before database lookup.
+```
+
+### スキル設計への影響
+
+GitHub 書き込みテンプレートを設計する際:
+- テンプレートに「前回の議論を参照」「上記の通り」等のフレーズを含めない
+- 変数プレースホルダー（`{具体的な内容}`）で自己完結した記述を強制する
+- Issue 番号 (`#{number}`) や git コマンドで取得した値（コミットハッシュ等）を活用する
+
+詳細は `best-practices.md` の「GitHub Output Quality」セクションも参照。

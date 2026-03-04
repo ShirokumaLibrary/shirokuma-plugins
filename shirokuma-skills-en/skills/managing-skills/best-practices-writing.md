@@ -323,3 +323,52 @@ from pathlib import Path
 script_path = Path("scripts") / "helper.py"
 config_path = Path("config") / "settings.json"
 ```
+
+---
+
+## No Implicit References (Session-Independent Writing)
+
+Content that skills write to GitHub (Issue comments, PR bodies, Discussions) must be written assuming **the next session's AI has no access to the conversation history**.
+
+### Why This Matters
+
+When a session transfers, the next AI can only access what was written to GitHub. `starting-session #N` restores context by fetching Issue comments via `shirokuma-docs issues comments {N}`, so the quality of GitHub writes directly affects session continuity.
+
+### Patterns to Avoid (Implicit References)
+
+| NG Pattern | Problem | Fix |
+|-----------|---------|-----|
+| "as discussed earlier" | Implicit reference to conversation | Write the discussed content explicitly |
+| "as mentioned above" | Reference to earlier text in same comment | Repeat the specific content |
+| "as we agreed" | Implicit reference to in-session agreement | State the agreement explicitly |
+| "as mentioned earlier" | Reference to a prior comment | Quote the comment ID or content |
+| "as decided in the previous session" | Cross-session implicit reference | Describe the decision concretely |
+
+### Recommended Pattern
+
+```markdown
+# NG: Implicit reference
+As discussed, we'll go with Approach A.
+
+# OK: Self-contained
+We adopt Approach A (add a new parseXml function in `src/utils/parser.ts`).
+Reason: Approach B risks conflicting with the existing JSON parser.
+```
+
+```markdown
+# NG: Implicit reference
+as discussed, this fixes the issue.
+
+# OK: Self-contained
+This commit fixes the null pointer exception in `getUser()` (Issue #342).
+Root cause: The `id` field was not validated before the database lookup.
+```
+
+### Impact on Skill Design
+
+When designing GitHub write templates:
+- Avoid phrases like "see previous discussion" or "as above" in templates
+- Use variable placeholders (`{concrete content}`) to enforce self-contained descriptions
+- Leverage Issue numbers (`#{number}`) and values obtained via git/CLI commands (commit hashes, etc.)
+
+See also `best-practices.md` for the "GitHub Output Quality" section.

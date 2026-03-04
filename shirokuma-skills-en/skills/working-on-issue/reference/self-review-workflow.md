@@ -45,7 +45,7 @@ Detailed specification of the self-review loop executed within the `working-on-i
 
 [REPORT] Report to user
     ↓
-[COMPLETE] Create out-of-scope Issues → Verify review findings comment → Post fix comment → Status → Review
+[COMPLETE] Create out-of-scope Issues → Verify review findings comment → Post response complete comment (required) → Status → Review
 ```
 
 ## File Category Detection
@@ -112,6 +112,8 @@ Optional step — on error or timeout, skip and proceed to `[REVIEW]`.
 ### Batch Mode
 
 Run once for the entire batch PR (same as the review loop).
+
+> **⚠ Required**: SIMPLIFY is a quality-baseline **pre-pass**, not a substitute for self-review. After SIMPLIFY completes (changes, no changes, or failure), always proceed to the `[REVIEW]` state and invoke `reviewing-on-issue` / `reviewing-claude-config` via the Skill tool. Skipping `[REVIEW]` after SIMPLIFY is prohibited.
 
 ## PASS/NEEDS_FIX/FAIL Criteria
 
@@ -231,36 +233,38 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 
 ## Expected PR Comment Pattern
 
-| Case | Review Findings Comment | Fix Comment | Total |
-|------|------------------------|-------------|-------|
-| PASS (no issues) | 1 | Not needed | 1 |
-| PASS + out-of-scope | 1 | Not needed | 1 |
-| NEEDS_FIX → auto-fix → PASS | 1 per iter | 1 | iter count + 1 |
-| NEEDS_FIX → cannot converge | 1 per iter | Not needed | iter count |
+| Case | Review Findings Comment | Response Complete Comment | Total |
+|------|------------------------|--------------------------|-------|
+| PASS (no issues) | 1 | 1 (required) | 2 |
+| PASS + out-of-scope | 1 | 1 (required) | 2 |
+| NEEDS_FIX → auto-fix → PASS | 1 per iter | 1 (required) | iter count + 1 |
+| NEEDS_FIX → cannot converge | 1 per iter | 1 (required) | iter count + 1 |
 
-Review findings comments are posted by the `reviewing-on-issue` / `reviewing-claude-config` fork in Step 6. Fix comments are posted by the manager (main AI, `working-on-issue`).
+Review findings comments are posted by the `reviewing-on-issue` / `reviewing-claude-config` fork in Step 6. The response complete comment is posted by the manager (main AI, `working-on-issue`) in the `[COMPLETE]` state — always required.
 
-## Fix Summary Comment
+## Response Complete Comment (Required)
 
-When auto-fixes were applied, post one fix summary comment to the PR.
-
-| Review Result | Fix Summary Comment |
-|--------------|---------------------|
-| PASS (no issues) | Not needed |
-| PASS + out-of-scope | Not needed (follow-up Issue creation handled separately) |
-| FAIL → auto-fix → PASS | **Required** |
+After self-review finishes (PASS or cannot converge), **always** post a response complete comment to the PR. Recording both the review result and the corresponding response as a pair makes review handling traceable.
 
 ```bash
-shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-fix-summary.md
+shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
 ```
 
-**Fix summary comment template:**
+**Template (no fixes — PASS):**
 
 ```markdown
-## Self-Review Fix Summary
+## Self-Review Response Complete
+
+**Fixed:** None (no issues detected)
+```
+
+**Template (fixes applied — PASS):**
+
+```markdown
+## Self-Review Response Complete
 
 **Iterations:** {n}
-**Fixes:** {critical} critical, {fixable-warning} warning
+**Fixed:** {critical} critical, {fixable-warning} warning
 
 ### Fix List
 | File | Fix Description | Classification | Commit |
@@ -270,6 +274,20 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-fix
 [If follow-up Issues exist:]
 ### Follow-up Issues
 - #{follow-up-number}: {title} (out-of-scope)
+```
+
+**Template (cannot converge):**
+
+```markdown
+## Self-Review Response Complete (Not Converged)
+
+**Iterations:** {n}
+**Unresolved:** {critical} critical, {fixable-warning} warning
+
+### Remaining Issues
+- {issue description}
+
+Manual review and fixes required.
 ```
 
 ## Issue Body Update

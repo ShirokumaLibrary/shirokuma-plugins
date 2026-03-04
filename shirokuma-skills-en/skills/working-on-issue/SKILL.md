@@ -240,18 +240,20 @@ Self-review should be launched via Skill tool (`reviewing-on-issue` / `reviewing
 **State transition overview:**
 
 ```text
-[SIMPLIFY] /simplify initial pass → commit & push (if changes)
-    ↓
-[REVIEW] Launch review → [PARSE] Parse result → [PRESENT] Present result → Decision
+[SIMPLIFY] /simplify initial pass → commit & push (if changes) [pre-pass, skippable]
+    ↓ Regardless of SIMPLIFY outcome (changes/no changes/failure), always proceed to [REVIEW]
+[REVIEW] Launch review → [PARSE] Parse result → [PRESENT] Present result → Decision [NOT skippable]
   ├── PASS → [COMPLETE]
   ├── NEEDS_FIX → [FIX] Task fix → [CONVERGE] Convergence check → [REVIEW]
   └── FAIL → chain stop, [REPORT]
 ```
 
+> **⚠ SIMPLIFY ≠ Self-Review**: SIMPLIFY is a quality-baseline pre-pass, not a substitute for self-review. After SIMPLIFY completes (changes, no changes, or failure), always proceed to [REVIEW] and invoke `reviewing-on-issue` / `reviewing-claude-config` via the Skill tool. Skipping [REVIEW] after SIMPLIFY is prohibited.
+
 | State | Action |
 |-------|--------|
-| SIMPLIFY | Invoke `/simplify` via Skill tool (only when code-category files exist; run once, skip on failure) |
-| REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` as fork |
+| SIMPLIFY | Invoke `/simplify` via Skill tool (only when code-category files exist; run once, skip on failure) **← pre-pass, skippable** |
+| REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` as fork **← NOT skippable. Must run after SIMPLIFY.** |
 | PARSE | Parse Fork Signal, PASS/NEEDS_FIX/FAIL determination |
 | PRESENT | Present self-review result summary to user |
 | FIX | Delegate fix to `Task(general-purpose)` |

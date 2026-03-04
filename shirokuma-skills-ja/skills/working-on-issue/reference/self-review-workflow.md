@@ -45,7 +45,7 @@
 
 [REPORT] ユーザーに報告
     ↓
-[COMPLETE] out-of-scope Issue 作成 → レビュー所見コメント確認 → 修正コメント投稿 → Status → Review
+[COMPLETE] out-of-scope Issue 作成 → レビュー所見コメント確認 → 対応完了コメント投稿（必須） → Status → Review
 ```
 
 ## ファイルカテゴリ検出
@@ -112,6 +112,8 @@ fire-and-forget（PASS/FAIL 判定なし）。品質ゲートは後続の `[REVI
 ### バッチモード
 
 バッチ PR 全体に対して 1 回実行（レビューループと同様）。
+
+> **⚠ 必須**: SIMPLIFY は品質ベースライン向上の**前処理**であり、セルフレビューの代替ではない。SIMPLIFY 完了後（変更あり・なし・失敗いずれの場合も）、必ず次の `[REVIEW]` ステートに進み `reviewing-on-issue` / `reviewing-claude-config` を Skill ツールで起動すること。SIMPLIFY のみで `[REVIEW]` をスキップすることは禁止。
 
 ## PASS/NEEDS_FIX/FAIL 判定
 
@@ -231,36 +233,38 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 
 ## 期待 PR コメントパターン
 
-| ケース | レビュー所見コメント | 修正コメント | 合計 |
-|--------|---------------------|------------|------|
-| PASS（問題なし） | 1 件 | 不要 | 1 件 |
-| PASS + out-of-scope | 1 件 | 不要 | 1 件 |
-| NEEDS_FIX → 自動修正 → PASS | 各 iter 1 件 | 1 件 | iter 数 + 1 件 |
-| NEEDS_FIX → 収束不能 | 各 iter 1 件 | 不要 | iter 数分 |
+| ケース | レビュー所見コメント | 対応完了コメント | 合計 |
+|--------|---------------------|----------------|------|
+| PASS（問題なし） | 1 件 | 1 件（必須） | 2 件 |
+| PASS + out-of-scope | 1 件 | 1 件（必須） | 2 件 |
+| NEEDS_FIX → 自動修正 → PASS | 各 iter 1 件 | 1 件（必須） | iter 数 + 1 件 |
+| NEEDS_FIX → 収束不能 | 各 iter 1 件 | 1 件（必須） | iter 数 + 1 件 |
 
-レビュー所見コメントは `reviewing-on-issue` / `reviewing-claude-config` の fork がステップ 6 で投稿する。修正コメントはマネージャー（メイン AI、`working-on-issue`）が投稿する。
+レビュー所見コメントは `reviewing-on-issue` / `reviewing-claude-config` の fork がステップ 6 で投稿する。対応完了コメントはマネージャー（メイン AI、`working-on-issue`）が `[COMPLETE]` ステートで必ず投稿する。
 
-## 修正コメント投稿
+## 対応完了コメント投稿（必須）
 
-自動修正が行われた場合、PR に修正内容コメントを 1 回投稿する。
-
-| レビュー結果 | 修正内容コメント |
-|-------------|----------------|
-| PASS（問題なし） | 不要 |
-| PASS + out-of-scope あり | 不要（フォローアップ Issue 作成は別処理） |
-| FAIL → 自動修正 → PASS | **必要** |
+セルフレビュー完了後（PASS・収束不能いずれの場合も）、PR に対応完了コメントを**必ず**投稿する。レビュー結果とそれに対する対応内容を一対で記録することで、レビュー対応の経緯を追跡可能にする。
 
 ```bash
-shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-fix-summary.md
+shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
 ```
 
-**修正内容コメントテンプレート:**
+**テンプレート（修正なし・PASS）:**
 
 ```markdown
-## セルフレビュー修正内容
+## セルフレビュー対応完了
+
+**修正済み:** なし（問題検出なし）
+```
+
+**テンプレート（修正あり・PASS）:**
+
+```markdown
+## セルフレビュー対応完了
 
 **イテレーション数:** {n}回
-**修正数:** {critical} critical, {fixable-warning} warning
+**修正済み:** {critical} critical, {fixable-warning} warning
 
 ### 修正一覧
 | ファイル | 修正内容 | 分類 | コミット |
@@ -270,6 +274,20 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-fix
 [フォローアップ Issue がある場合:]
 ### フォローアップ Issue
 - #{follow-up-number}: {タイトル}（out-of-scope）
+```
+
+**テンプレート（収束不能）:**
+
+```markdown
+## セルフレビュー対応完了（未収束）
+
+**イテレーション数:** {n}回
+**未解決:** {critical} critical, {fixable-warning} warning
+
+### 残存問題
+- {問題の説明}
+
+手動での確認・修正が必要です。
 ```
 
 ## Issue 本文の更新

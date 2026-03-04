@@ -134,3 +134,4 @@ Before committing:
 - [ ] **NG cases**: Skill-specific prohibitions and checklists present
 - [ ] Coder skills: Known concept explanations removed, reference only
 - [ ] Reviewer skills: Checklist coverage is sufficient
+- [ ] **Write quality**: GitHub write templates contain no implicit references (see "No Implicit References" section in `best-practices-writing.md`)
