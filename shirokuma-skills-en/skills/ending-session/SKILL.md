@@ -98,7 +98,7 @@ git push -u origin {branch-name}
 Follow the `creating-pr-on-issue` skill workflow. Create a PR targeting `develop` (see `branch-workflow` rule):
 
 ```bash
-shirokuma-docs issues pr-create --base develop --title "{title}" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --base develop --title "{title}" --body-file /tmp/shirokuma-docs/pr-body.md
 ```
 
 Where `/tmp/shirokuma-docs/pr-body.md` contains:
@@ -343,7 +343,7 @@ Implemented the feature...
 | No changes in session | Still save a brief handover |
 | Issue not in project | Warn and continue |
 | `git push` fails | Warn user, save handover without PR |
-| `issues pr-create` fails | Warn user, include branch name in handover |
+| `pr create` fails | Warn user, include branch name in handover |
 | On base branch (no feature branch) | Skip push/PR steps, save handover only |
 
 ## Notes

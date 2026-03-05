@@ -93,7 +93,7 @@ AI MUST update issue status at these points:
 | Plan created | → Spec Review | `planning-on-issue` | `issues update {n} --field-status "Spec Review"` |
 | User approves plan, starts work | → In Progress + branch | `working-on-issue` | `issues update {n} --field-status "In Progress"` |
 | Self-review complete | → Review | `creating-pr-on-issue` | `issues update {n} --field-status "Review"` (Status MUST remain In Progress **during** self-review. Transition to Review only after self-review completes) |
-| PR merged | → Done | `committing-on-issue` (via `issues merge`) | Automatic |
+| PR merged | → Done | `committing-on-issue` (via `pr merge`) | Automatic |
 | Blocked by dependency | → Pending | Manual | `issues update {n} --field-status "Pending"` + comment |
 | Complete (no PR needed) | → Done | `ending-session` | `session end --done {n}` |
 | Cancelled | → Not Planned | `issues cancel` | `issues cancel {n}` |
@@ -134,7 +134,7 @@ Epic Done is determined by the final integration branch merge, not by individual
 
 1. **One In Progress at a time** - Move previous item out before starting new one (exception: batch mode allows multiple simultaneous In Progress per `batch-workflow` rule; epic issue and sub-issues can be simultaneously In Progress due to parent-child relationship)
 2. **Branch per issue** - Create a feature branch when starting work (see `branch-workflow` rule; exception: batch mode shares one branch per `batch-workflow` rule; epics use integration branch + sub-issue branches per `epic-workflow` reference)
-3. **Event-driven**: Status changes happen immediately when events occur (`creating-pr-on-issue` sets Review after self-review completion, `issues merge` sets Done)
+3. **Event-driven**: Status changes happen immediately when events occur (`creating-pr-on-issue` sets Review after self-review completion, `pr merge` sets Done)
 4. **Session end safety net** - `ending-session` catches any missed status updates
 5. **Pending requires reason** - Add a comment explaining the blocker
 6. **Idempotency** - If status is already correct, skip the update (no error)

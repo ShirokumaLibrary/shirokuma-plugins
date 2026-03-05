@@ -320,7 +320,7 @@ shirokuma-docs issues update {number} --field-status "Review"
 内省チェックの結果に関わらず、lint メトリクスを 1 回取得して確認する:
 
 ```bash
-shirokuma-docs lint-tests -p . --format json 2>/dev/null
+shirokuma-docs lint tests -p . --format json 2>/dev/null
 ```
 
 | 条件 | アクション |

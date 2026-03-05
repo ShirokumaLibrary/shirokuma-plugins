@@ -24,16 +24,16 @@ Load these files for context:
 
 ## Review Checklist
 
-### Test Documentation (shirokuma-docs lint-tests)
+### Test Documentation (shirokuma-docs lint tests)
 
 Run test documentation lint before reviewing:
 
 ```bash
 # Run test documentation lint
-shirokuma-docs lint-tests -p . -c shirokuma-docs.config.yaml -f summary
+shirokuma-docs lint tests -p . -c shirokuma-docs.config.yaml -f summary
 
 # For detailed report
-shirokuma-docs lint-tests -p . -c shirokuma-docs.config.yaml -f terminal
+shirokuma-docs lint tests -p . -c shirokuma-docs.config.yaml -f terminal
 ```
 
 Check for:
@@ -54,18 +54,18 @@ JSDoc format for test documentation:
 it("english test name", () => { ... });
 ```
 
-### Implementation-Test Coverage (shirokuma-docs lint-coverage)
+### Implementation-Test Coverage (shirokuma-docs lint coverage)
 
 Run coverage check:
 ```bash
 # Check source-test file mapping
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml
 
 # Summary only
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml -f summary
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml -f summary
 
 # Strict mode (fail on missing tests)
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml -s
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml -s
 ```
 
 Check for:

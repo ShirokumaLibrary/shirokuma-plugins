@@ -341,5 +341,5 @@ export type NewModuleType = typeof tableName.$inferInsert
 
 ```bash
 # shirokuma-docs で検証
-cd [project] && node ../shirokuma-docs/dist/index.js lint-code -v
+cd [project] && node ../shirokuma-docs/dist/index.js lint code -v
 ```

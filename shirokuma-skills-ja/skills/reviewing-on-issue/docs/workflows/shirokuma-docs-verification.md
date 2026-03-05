@@ -22,29 +22,29 @@ shirokuma-docs を使用したコード品質検証のワークフロー。
 cd /path/to/project
 
 # 1. Test documentation check
-shirokuma-docs lint-tests -p . -c shirokuma-docs.config.yaml -f terminal
+shirokuma-docs lint tests -p . -c shirokuma-docs.config.yaml -f terminal
 
 # 2. Implementation-test coverage
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml
 
 # 3. Documentation structure (if OVERVIEW.md/ADR exists)
-shirokuma-docs lint-docs -p . -c shirokuma-docs.config.yaml
+shirokuma-docs lint docs -p . -c shirokuma-docs.config.yaml
 
 # 4. Code structure check (Server Actions) - NEW
-shirokuma-docs lint-code -p . -c shirokuma-docs.config.yaml -f terminal
+shirokuma-docs lint code -p . -c shirokuma-docs.config.yaml -f terminal
 ```
 
 **Expected Output**:
-- `lint-tests`: Missing/duplicate @testdoc warnings
-- `lint-coverage`: Uncovered source files list
-- `lint-docs`: Missing sections/files warnings
-- `lint-code`: Server Action structure issues, missing annotations
+- `lint tests`: Missing/duplicate @testdoc warnings
+- `lint coverage`: Uncovered source files list
+- `lint docs`: Missing sections/files warnings
+- `lint code`: Server Action structure issues, missing annotations
 
 ---
 
 ## Step 2: Analyze Issues
 
-### lint-tests Issues
+### lint tests Issues
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
@@ -52,14 +52,14 @@ shirokuma-docs lint-code -p . -c shirokuma-docs.config.yaml -f terminal
 | `Duplicate @testdoc` | Same description used | Make descriptions unique |
 | `Missing Japanese` | @testdoc not in Japanese | Write in Japanese |
 
-### lint-coverage Issues
+### lint coverage Issues
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
 | `No test file` | Source has no test | Create test file OR add `@skip-test` |
 | `Orphan test` | Test has no source | Remove or link to source |
 
-### lint-docs Issues
+### lint docs Issues
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
@@ -67,7 +67,7 @@ shirokuma-docs lint-code -p . -c shirokuma-docs.config.yaml -f terminal
 | `Missing section` | Section not in doc | Add the section |
 | `Invalid frontmatter` | YAML error | Fix frontmatter syntax |
 
-### lint-code Issues (NEW)
+### lint code Issues (NEW)
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
@@ -127,18 +127,18 @@ export async function getProjects() { ... }
 
 ```bash
 # Run checks again after fixes
-shirokuma-docs lint-tests -p . -c shirokuma-docs.config.yaml -f summary
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml -f summary
+shirokuma-docs lint tests -p . -c shirokuma-docs.config.yaml -f summary
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml -f summary
 
 # Strict mode for CI (exits with error code if issues remain)
-shirokuma-docs lint-tests -p . --strict
-shirokuma-docs lint-coverage -p . --strict -s
+shirokuma-docs lint tests -p . --strict
+shirokuma-docs lint coverage -p . --strict -s
 ```
 
 **Pass Criteria**:
-- `lint-tests`: No errors (warnings acceptable)
-- `lint-coverage`: All source files have tests OR @skip-test
-- `lint-docs`: All required sections present
+- `lint tests`: No errors (warnings acceptable)
+- `lint coverage`: All source files have tests OR @skip-test
+- `lint docs`: All required sections present
 
 ---
 
@@ -149,17 +149,17 @@ Include in review report:
 ```markdown
 ## shirokuma-docs Verification
 
-### lint-tests
+### lint tests
 - Total tests: 150
 - With @testdoc: 148 (98.7%)
 - Issues: 2 warnings (duplicate descriptions)
 
-### lint-coverage
+### lint coverage
 - Source files: 45
 - Covered: 42 (93.3%)
 - Skipped: 3 (with @skip-test)
 
-### lint-docs
+### lint docs
 - OVERVIEW.md: ✅ All sections present
 - ADR count: 5/3 required ✅
 ```
@@ -172,16 +172,16 @@ Include in review report:
 
 ```bash
 # Quick check (summary only)
-shirokuma-docs lint-tests -p . -f summary
-shirokuma-docs lint-coverage -p . -f summary
+shirokuma-docs lint tests -p . -f summary
+shirokuma-docs lint coverage -p . -f summary
 
 # Detailed report
-shirokuma-docs lint-tests -p . -f terminal
-shirokuma-docs lint-coverage -p .
+shirokuma-docs lint tests -p . -f terminal
+shirokuma-docs lint coverage -p .
 
 # CI mode (fail on error)
-shirokuma-docs lint-tests -p . --strict
-shirokuma-docs lint-coverage -p . -s
+shirokuma-docs lint tests -p . --strict
+shirokuma-docs lint coverage -p . -s
 
 # Generate documentation
 shirokuma-docs generate -p .
@@ -212,8 +212,8 @@ lintCoverage:
 ## Integration with Review Roles
 
 This workflow integrates with:
-- **Testing Role**: `shirokuma-docs lint-tests` + `lint-coverage`
-- **Code Role**: `shirokuma-docs lint-code` (Server Action structure)
+- **Testing Role**: `shirokuma-docs lint tests` + `lint coverage`
+- **Code Role**: `shirokuma-docs lint code` (Server Action structure)
 - **Next.js Role**: All linters + `feature-map` generation
 
 See [../AGENT.md](../AGENT.md) for role-specific instructions.

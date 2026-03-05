@@ -4,7 +4,7 @@
 
 ## コンセプト
 
-Private → Public リポジトリへのリリースを `repo-pairs` CLI でオーケストレーション。ドライランプレビューを必須とし、安全なリリースフローを実現する。
+Private → Public リポジトリへのリリースを `repo pairs` CLI でオーケストレーション。ドライランプレビューを必須とし、安全なリリースフローを実現する。
 
 ### リリースフロー
 
@@ -28,5 +28,5 @@ status 確認 → dry-run プレビュー → ユーザー確認 → release 実
 
 SKILL.md の frontmatter `description` フィールドに定義。スキル選択はこのフィールドでマッチングされる。
 
-- `shirokuma-docs repo-pairs` CLI を使用したリリース管理
+- `shirokuma-docs repo pairs` CLI を使用したリリース管理
 - `releasing-shirokuma-docs` スキルから委任されることが多い

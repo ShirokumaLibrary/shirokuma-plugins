@@ -1,12 +1,12 @@
 ---
 name: publishing
-description: Manages public releases via shirokuma-docs repo-pairs CLI. Handles status checks, dry-run previews, release execution, and .shirokumaignore configuration. Triggers: "publish", "release", "public release", "repo-pairs".
+description: Manages public releases via shirokuma-docs repo pairs CLI. Handles status checks, dry-run previews, release execution, and .shirokumaignore configuration. Triggers: "publish", "release", "public release", "repo pairs".
 allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
 ---
 
 # Publishing
 
-Manages the release workflow from private development repositories to public repositories using `shirokuma-docs repo-pairs` CLI.
+Manages the release workflow from private development repositories to public repositories using `shirokuma-docs repo pairs` CLI.
 
 ## When to Use
 
@@ -14,14 +14,14 @@ Automatically invoke when the user:
 - Wants to "publish" or "release" to the public repo
 - Says "公開リポに反映", "パブリックに出して", "リリースして"
 - Asks about release status or diff with public repo
-- Mentions "repo-pairs", ".shirokumaignore", or public repository sync
+- Mentions "repo pairs", ".shirokumaignore", or public repository sync
 
 ## Prerequisites
 
 - `shirokuma-docs` CLI installed and available in PATH
 - `gh` CLI authenticated (`gh auth status`)
 - `shirokuma-docs.config.yaml` exists in project root
-- Repo pair configured (`shirokuma-docs repo-pairs list`)
+- Repo pair configured (`shirokuma-docs repo pairs list`)
 
 ## CLI Reference
 
@@ -29,25 +29,25 @@ Automatically invoke when the user:
 
 ```bash
 # List all configured repo pairs
-shirokuma-docs repo-pairs list
+shirokuma-docs repo pairs list
 
 # Check release status (latest tags on both repos)
-shirokuma-docs repo-pairs status <alias>
+shirokuma-docs repo pairs status <alias>
 
 # Preview release (no changes made)
-shirokuma-docs repo-pairs release <alias> --tag <version> --dry-run
+shirokuma-docs repo pairs release <alias> --tag <version> --dry-run
 
 # Execute release
-shirokuma-docs repo-pairs release <alias> --tag <version>
+shirokuma-docs repo pairs release <alias> --tag <version>
 
 # Verbose output for debugging
-shirokuma-docs repo-pairs release <alias> --tag <version> -v
+shirokuma-docs repo pairs release <alias> --tag <version> -v
 ```
 
 ### Initialize a New Repo Pair
 
 ```bash
-shirokuma-docs repo-pairs init <alias> \
+shirokuma-docs repo pairs init <alias> \
   --private <owner/repo> \
   --public <owner/repo> \
   --exclude ".claude/" --exclude "docs/internal/"
@@ -66,13 +66,13 @@ Run these checks before any release:
 git status
 
 # 2. Check current release status
-shirokuma-docs repo-pairs status <alias>
+shirokuma-docs repo pairs status <alias>
 
 # 3. Review what will be excluded
 cat .shirokumaignore
 
 # 4. Preview the release
-shirokuma-docs repo-pairs release <alias> --tag <version> --dry-run
+shirokuma-docs repo pairs release <alias> --tag <version> --dry-run
 ```
 
 Report findings to the user:
@@ -100,13 +100,13 @@ Suggest a version based on changes since last release:
 git log $(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")..HEAD --oneline
 
 # If no tags exist on private, check public repo's latest tag
-shirokuma-docs repo-pairs status <alias>
+shirokuma-docs repo pairs status <alias>
 ```
 
 ### Step 3: Execute Release
 
 ```bash
-shirokuma-docs repo-pairs release <alias> --tag <version>
+shirokuma-docs repo pairs release <alias> --tag <version>
 ```
 
 The CLI handles:
@@ -119,7 +119,7 @@ The CLI handles:
 
 ```bash
 # Verify the release tag
-shirokuma-docs repo-pairs status <alias>
+shirokuma-docs repo pairs status <alias>
 
 # Check public repo contents via GitHub API
 gh repo view <public-owner/repo> --json description
@@ -154,19 +154,19 @@ shirokuma-docs.config.yaml
 | `.claude/` | Project-specific AI config |
 | `.mcp.json` | Local MCP server config |
 
-### Exclude via Config (repo-pairs init)
+### Exclude via Config (repo pairs init)
 
-Patterns set during `repo-pairs init` are stored in config and always applied:
+Patterns set during `repo pairs init` are stored in config and always applied:
 
 ```bash
-shirokuma-docs repo-pairs list  # Shows configured exclude patterns
+shirokuma-docs repo pairs list  # Shows configured exclude patterns
 ```
 
 ## Error Handling
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `repo pair not found` | Alias not configured | Run `repo-pairs init` |
+| `repo pair not found` | Alias not configured | Run `repo pairs init` |
 | `tag already exists` | Version already released | Increment version |
 | `working directory not clean` | Uncommitted changes | Commit or stash first |
 | `authentication failed` | gh not logged in | Run `gh auth login` |
@@ -175,7 +175,7 @@ shirokuma-docs repo-pairs list  # Shows configured exclude patterns
 
 ## Manual Workflow (Fallback)
 
-If `repo-pairs release` fails or `.shirokumaignore` is not yet supported:
+If `repo pairs release` fails or `.shirokumaignore` is not yet supported:
 
 ```bash
 ALIAS="<alias>"

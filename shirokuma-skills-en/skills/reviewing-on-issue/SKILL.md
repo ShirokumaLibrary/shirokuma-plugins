@@ -79,36 +79,36 @@ Read required knowledge files based on role:
 
 | Role | Lint Commands |
 |------|--------------|
-| code, code+annotation, nextjs | lint-tests, lint-coverage, lint-code, lint-structure, lint-annotations (all 5) |
-| security | lint-code, lint-structure (security-related only) |
-| testing | lint-tests, lint-coverage (test-related only) |
-| docs | lint-docs (document structure only) |
+| code, code+annotation, nextjs | lint tests, lint coverage, lint code, lint structure, lint annotations (all 5) |
+| security | lint code, lint structure (security-related only) |
+| testing | lint tests, lint coverage (test-related only) |
+| docs | lint docs (document structure only) |
 | plan | Skip (target is Issue body, not code/document files) |
 
 **code / code+annotation / nextjs roles:**
 
 ```bash
 # Test documentation (@testdoc, @skip-reason)
-shirokuma-docs lint-tests -p . -f terminal
+shirokuma-docs lint tests -p . -f terminal
 
 # Implementation-test coverage
-shirokuma-docs lint-coverage -p . -f summary
+shirokuma-docs lint coverage -p . -f summary
 
 # Code structure (Server Actions, annotations)
-shirokuma-docs lint-code -p . -f terminal
+shirokuma-docs lint code -p . -f terminal
 
 # Project structure (directories, naming)
-shirokuma-docs lint-structure -p . -f terminal
+shirokuma-docs lint structure -p . -f terminal
 
 # Annotation consistency (@usedComponents, @screen)
-shirokuma-docs lint-annotations -p . -f terminal
+shirokuma-docs lint annotations -p . -f terminal
 ```
 
 **docs role:**
 
 ```bash
 # Document structure validation
-shirokuma-docs lint-docs -p . -f terminal
+shirokuma-docs lint docs -p . -f terminal
 ```
 
 **Key rules to check:**
@@ -117,7 +117,7 @@ shirokuma-docs lint-docs -p . -f terminal
 |------|-------------|
 | `skipped-test-report` | Reports `.skip` tests (ensure `@skip-reason` present) |
 | `testdoc-required` | All tests need `@testdoc` |
-| `lint-coverage` | Source files need corresponding tests |
+| `lint coverage` | Source files need corresponding tests |
 | `annotation-required` | Server Actions need `@serverAction` |
 
 See project-specific workflow documentation for detailed fix instructions.

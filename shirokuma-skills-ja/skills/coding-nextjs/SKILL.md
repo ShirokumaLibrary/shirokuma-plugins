@@ -76,7 +76,7 @@ shirokuma-docs discussions create \
 ### ステップ 5: ポータル更新（重要な変更の場合）
 
 ```bash
-shirokuma-docs portal -p . -o docs/portal
+shirokuma-docs generate portal -p . -o docs/portal
 ```
 
 **トリガー**: 新しい Server Actions、画面/ページ、DB スキーマ変更

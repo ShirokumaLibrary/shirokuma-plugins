@@ -117,13 +117,13 @@ GitHub's native behavior: `Closes #N` auto-close and sidebar links only work for
 |---------|----------|
 | GitHub sidebar issue link | **Not displayed** (limitation) |
 | `Closes #N` auto-close | **Does not work** |
-| shirokuma-docs CLI `issues merge` | **Works correctly** (`parseLinkedIssues()` parses PR body independently) |
+| shirokuma-docs CLI `pr merge` | **Works correctly** (`parseLinkedIssues()` parses PR body independently) |
 
 Use `Closes #N` in sub-issue PRs regardless. Accept the GitHub sidebar limitation; the CLI serves as a substitute.
 
 ## PR-Issue Link Graph
 
-In epic structures, PRs and issues can form many-to-many relationships. `issues merge` parses related issues from PR body and adjusts behavior based on link complexity.
+In epic structures, PRs and issues can form many-to-many relationships. `pr merge` parses related issues from PR body and adjusts behavior based on link complexity.
 
 | Pattern | Description | CLI Behavior |
 |---------|-------------|-------------|

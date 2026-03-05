@@ -2,7 +2,7 @@
 
 ## When Review Comments Are Received
 
-1. Fetch all review threads: `shirokuma-docs issues pr-comments <PR#>`
+1. Fetch all review threads: `shirokuma-docs pr comments <PR#>`
 2. For each **unresolved** thread, determine the response type:
 
 ### Code Fix Required
@@ -11,11 +11,11 @@
 2. Commit and push
 3. Reply referencing the commit:
    ```bash
-   shirokuma-docs issues pr-reply <PR#> --reply-to <database_id> --body-file - <<'EOF'
+   shirokuma-docs pr reply <PR#> --reply-to <database_id> --body-file - <<'EOF'
    Reply content
    EOF
    ```
-4. Resolve: `shirokuma-docs issues resolve <PR#> --thread-id <PRRT_id>`
+4. Resolve: `shirokuma-docs pr resolve <PR#> --thread-id <PRRT_id>`
 
 ### Comment Content Fix Required
 

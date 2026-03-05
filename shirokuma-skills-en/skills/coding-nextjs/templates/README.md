@@ -79,7 +79,7 @@ When a file grows beyond threshold:
 
 ## Standard Template (JSDoc Compliant)
 
-See [server-action.md](./server-action.md) for the **shirokuma-docs lint-code compliant** template.
+See [server-action.md](./server-action.md) for the **shirokuma-docs lint code compliant** template.
 
 This template ensures:
 - Module header with `@serverAction`, `@feature`, `@dbTables` tags
@@ -91,7 +91,7 @@ This template ensures:
 
 ```bash
 # Check compliance with shirokuma-docs
-node shirokuma-docs/dist/index.js lint-code -p path/to/project -v
+node shirokuma-docs/dist/index.js lint code -p path/to/project -v
 ```
 
 ## Server Action Template Features

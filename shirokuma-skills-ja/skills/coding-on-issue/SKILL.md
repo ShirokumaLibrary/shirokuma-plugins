@@ -66,7 +66,7 @@ Issue の再取得は不要。
 - 進捗管理はマネージャー（メイン AI、`working-on-issue`）が担当
 - TDD ワークフローは `working-on-issue` が `coding-on-issue` の呼び出しを TDD で包む形で管理（`coding-on-issue` 自体は実装のみに集中）
 - UI デザインタスク（新規 UI ページ、ビジュアルリデザイン、デザインシステムトークン変更）は `designing-ui-on-issue` → `designing-shadcn-ui` が担当。責務境界の詳細は `working-on-issue/docs/designing-reference.md` を参照
-- **コミット・プッシュ・PR 作成は本スキルの責務外**。コード変更のみを担当し、コミットは `committing-on-issue`、PR 作成は `creating-pr-on-issue` が後続チェーンで担当する。`git commit` / `git push` / `gh pr create` / `shirokuma-docs issues pr-create` を直接実行しないこと
+- **コミット・プッシュ・PR 作成は本スキルの責務外**。コード変更のみを担当し、コミットは `committing-on-issue`、PR 作成は `creating-pr-on-issue` が後続チェーンで担当する。`git commit` / `git push` / `gh pr create` / `shirokuma-docs pr create` を直接実行しないこと
 
 ## Fork Signal
 

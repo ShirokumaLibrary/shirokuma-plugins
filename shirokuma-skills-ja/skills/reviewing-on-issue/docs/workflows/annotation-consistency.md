@@ -82,7 +82,7 @@ grep -E "^import.*from" apps/public/components/nav-tags.tsx | \
 
 ```bash
 # Proposed command
-shirokuma-docs lint-annotations -p . -c shirokuma-docs.config.yaml
+shirokuma-docs lint annotations -p . -c shirokuma-docs.config.yaml
 
 # Output format
 Annotation consistency check:
@@ -216,7 +216,7 @@ Add to **code** role as sub-check:
 
 ## Future: CLI Integration
 
-### Proposed shirokuma-docs lint-annotations
+### Proposed shirokuma-docs lint annotations
 
 ```yaml
 # shirokuma-docs.config.yaml
@@ -238,13 +238,13 @@ lintAnnotations:
 
 ```bash
 # Terminal (human-readable)
-shirokuma-docs lint-annotations -f terminal
+shirokuma-docs lint annotations -f terminal
 
 # JSON (machine-readable)
-shirokuma-docs lint-annotations -f json -o /tmp/shirokuma-docs/annotations.json
+shirokuma-docs lint annotations -f json -o /tmp/shirokuma-docs/annotations.json
 
 # Fix mode (auto-update annotations)
-shirokuma-docs lint-annotations --fix
+shirokuma-docs lint annotations --fix
 ```
 
 ---

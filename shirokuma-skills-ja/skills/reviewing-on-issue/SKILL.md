@@ -79,36 +79,36 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 
 | ロール | 実行する lint コマンド |
 |--------|----------------------|
-| code, code+annotation, nextjs | lint-tests, lint-coverage, lint-code, lint-structure, lint-annotations（全5種） |
-| security | lint-code, lint-structure（セキュリティ関連のみ） |
-| testing | lint-tests, lint-coverage（テスト関連のみ） |
-| docs | lint-docs（ドキュメント構造のみ） |
+| code, code+annotation, nextjs | lint tests, lint coverage, lint code, lint structure, lint annotations（全5種） |
+| security | lint code, lint structure（セキュリティ関連のみ） |
+| testing | lint tests, lint coverage（テスト関連のみ） |
+| docs | lint docs（ドキュメント構造のみ） |
 | plan | スキップ（対象が Issue 本文であり、コード/ドキュメントファイルではないため） |
 
 **code / code+annotation / nextjs ロール:**
 
 ```bash
 # テストドキュメント（@testdoc, @skip-reason）
-shirokuma-docs lint-tests -p . -f terminal
+shirokuma-docs lint tests -p . -f terminal
 
 # 実装-テストカバレッジ
-shirokuma-docs lint-coverage -p . -f summary
+shirokuma-docs lint coverage -p . -f summary
 
 # コード構造（Server Actions、アノテーション）
-shirokuma-docs lint-code -p . -f terminal
+shirokuma-docs lint code -p . -f terminal
 
 # プロジェクト構造（ディレクトリ、命名）
-shirokuma-docs lint-structure -p . -f terminal
+shirokuma-docs lint structure -p . -f terminal
 
 # アノテーション整合性（@usedComponents, @screen）
-shirokuma-docs lint-annotations -p . -f terminal
+shirokuma-docs lint annotations -p . -f terminal
 ```
 
 **docs ロール:**
 
 ```bash
 # ドキュメント構造検証
-shirokuma-docs lint-docs -p . -f terminal
+shirokuma-docs lint docs -p . -f terminal
 ```
 
 **主要チェックルール：**
@@ -117,7 +117,7 @@ shirokuma-docs lint-docs -p . -f terminal
 |--------|------|
 | `skipped-test-report` | `.skip` テストを報告（`@skip-reason` の存在確認） |
 | `testdoc-required` | 全テストに `@testdoc` が必要 |
-| `lint-coverage` | ソースファイルに対応テストが必要 |
+| `lint coverage` | ソースファイルに対応テストが必要 |
 | `annotation-required` | Server Actions に `@serverAction` が必要 |
 
 プロジェクト固有の修正手順はワークフロードキュメントを参照。

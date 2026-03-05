@@ -8,7 +8,7 @@
 # Correct
 shirokuma-docs session start
 shirokuma-docs issues list
-shirokuma-docs lint-tests -p .
+shirokuma-docs lint tests -p .
 
 # Wrong - unnecessary overhead
 npx shirokuma-docs session start

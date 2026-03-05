@@ -187,14 +187,14 @@ Handles PR merge with automatic Issue status update. Activated by merge keywords
 1. **Merge the PR and update related Issues**:
 
 ```bash
-shirokuma-docs issues merge --head {current-branch}
+shirokuma-docs pr merge --head {current-branch}
 ```
 
 This single command handles: resolve PR from branch name, squash merge, extract linked Issues from PR body (`Closes/Fixes/Resolves #N`), update their Project Status to "Done", and delete the branch.
 
-**Status update idempotency**: `issues merge` CLI automatically updates related Issue Project Status to Done. If `ending-session --done` runs for the same issue later, it operates idempotently (no-op if already Done).
+**Status update idempotency**: `pr merge` CLI automatically updates related Issue Project Status to Done. If `ending-session --done` runs for the same issue later, it operates idempotently (no-op if already Done).
 
-**PR-Issue Link Graph Verification**: `issues merge` verifies the PR-Issue link graph:
+**PR-Issue Link Graph Verification**: `pr merge` verifies the PR-Issue link graph:
 
 | Pattern | CLI Behavior |
 |---------|-------------|
@@ -203,7 +203,7 @@ This single command handles: resolve PR from branch name, squash merge, extract 
 
 N:N detection: CLI outputs a structured list of related PRs/Issues. Review the list and individually update Status via `issues update`. Use `--skip-link-check` to bypass after reviewing.
 
-**Integration branch merge**: For sub-issue PRs targeting an integration branch, `issues merge` works normally — `parseLinkedIssues()` parses the PR body independently of the base branch.
+**Integration branch merge**: For sub-issue PRs targeting an integration branch, `pr merge` works normally — `parseLinkedIssues()` parses the PR body independently of the base branch.
 
 If no PR found for the branch, return error and stop.
 
@@ -211,7 +211,7 @@ Note: Internally calls `gh pr merge` which is protected by PreToolUse hook. Merg
 
 2. **Completion Report**:
 
-`issues merge` automatically checks out the base branch and pulls after merge. No manual branch switch needed.
+`pr merge` automatically checks out the base branch and pulls after merge. No manual branch switch needed.
 
 Post result as Issue comment:
 
@@ -310,4 +310,4 @@ If invoked with a message argument (e.g., `/committing-on-issue fix typo in conf
 - Push is automatic on feature branches, skipped on `develop` and `main`
 - PR chain activates only on direct invocation with PR keywords; does not interfere with `working-on-issue` orchestration
 - Merge chain can be invoked standalone (just "merge") or chained with commit/PR
-- After merge, `shirokuma-docs issues merge` automatically updates related Issue status to Done
+- After merge, `shirokuma-docs pr merge` automatically updates related Issue status to Done

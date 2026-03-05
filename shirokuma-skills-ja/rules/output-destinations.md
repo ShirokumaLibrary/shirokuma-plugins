@@ -34,7 +34,7 @@ shirokuma-docs discussions create \
 **用途**: 完成した機能ドキュメント、API リファレンス、アーキテクチャ図
 
 ```bash
-shirokuma-docs portal -p . -o docs/portal
+shirokuma-docs generate portal -p . -o docs/portal
 ```
 
 **特徴**: 作業完了後に作成、永続的なプロジェクトドキュメント、コードアノテーションから自動生成

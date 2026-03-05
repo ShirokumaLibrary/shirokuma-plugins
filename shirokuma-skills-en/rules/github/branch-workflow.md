@@ -149,7 +149,7 @@ When work is complete or session ends:
 
 ```bash
 git push -u origin {branch-name}
-shirokuma-docs issues pr-create --base develop --title "{title}" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --base develop --title "{title}" --body-file /tmp/shirokuma-docs/pr-body.md
 ```
 
 - PR title: concise summary (under 70 characters)
@@ -187,7 +187,7 @@ git checkout -b hotfix/{issue-number}-{slug}
 
 # 3. Create PR to main
 git push -u origin hotfix/{issue-number}-{slug}
-shirokuma-docs issues pr-create --base main --title "hotfix: {description}" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --base main --title "hotfix: {description}" --body-file /tmp/shirokuma-docs/pr-body.md
 
 # 4. After merge to main, sync to develop
 git checkout develop
@@ -207,7 +207,7 @@ Releases are created by merging `develop` into `main`.
 
 ```bash
 # 1. Create PR from develop to main
-shirokuma-docs issues pr-create --base main --head develop --title "release: v{version}" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --base main --head develop --title "release: v{version}" --body-file /tmp/shirokuma-docs/pr-body.md
 
 # 2. After PR merge, tag the release
 git checkout main
@@ -307,7 +307,7 @@ Defined in `hooks/blocked-commands.json`:
 
 | Rule ID | Blocked Command | Reason |
 |---------|-----------------|--------|
-| `pr-merge` | `gh pr merge` / `issues merge` | PR merge requires explicit user approval |
+| `pr-merge` | `gh pr merge` / `pr merge` | PR merge requires explicit user approval |
 | `force-push` | `git push --force` / `git push -f` | Force push overwrites remote history |
 | `hard-reset` | `git reset --hard` | Discards all uncommitted changes |
 | `discard-worktree` | `git checkout .` / `git restore .` | Discards working tree changes |
@@ -324,7 +324,7 @@ Projects can allow specific commands via `shirokuma-docs.config.yaml`:
 # shirokuma-docs.config.yaml
 hooks:
   allow:
-    - pr-merge              # Allow gh pr merge / issues merge
+    - pr-merge              # Allow gh pr merge / pr merge
     # - force-push          # Allow git push --force
     # - hard-reset          # Allow git reset --hard
     # - discard-worktree    # Allow git checkout/restore .

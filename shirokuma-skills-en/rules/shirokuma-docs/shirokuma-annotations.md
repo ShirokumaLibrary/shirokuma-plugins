@@ -73,6 +73,6 @@ export type Project = typeof projects.$inferSelect
 ## Verification
 
 ```bash
-shirokuma-docs lint-tests -p . -f terminal
-shirokuma-docs lint-coverage -p . -f summary
+shirokuma-docs lint tests -p . -f terminal
+shirokuma-docs lint coverage -p . -f summary
 ```

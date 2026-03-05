@@ -96,7 +96,7 @@ Closes #{N3}
 |---------|----------|
 | バッチ開始 | 全 Issue → In Progress（一括更新） |
 | PR 作成 | 全 Issue → Review（PR の `Closes` リンク経由） |
-| PR マージ | 全 Issue → Done（`issues merge` で自動） |
+| PR マージ | 全 Issue → Done（`pr merge` で自動） |
 | バッチ中断 | 完了分は In Progress のまま。中断リカバリー参照 |
 
 ## 中断リカバリー

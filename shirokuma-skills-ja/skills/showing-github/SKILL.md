@@ -24,7 +24,7 @@ allowed-tools: Bash, Read, Glob
 1. リポジトリ情報取得: `gh repo view --json nameWithOwner -q '.nameWithOwner'`
 2. 並列実行:
    - `shirokuma-docs issues list`（ステータス別アイテム + `total_issues` でオープン Issue 数を導出）
-   - `shirokuma-docs issues pr-list`（オープン PR 一覧 + 行数から PR 数を導出）
+   - `shirokuma-docs pr list`（オープン PR 一覧 + 行数から PR 数を導出）
    - `gh api repos/{owner}/{repo}/commits?per_page=5`（最近のコミット）
    - `shirokuma-docs discussions list --category Handovers --limit 3`（最近の引き継ぎ）
 
@@ -171,17 +171,17 @@ PR 一覧・詳細を表示。
 
 ```bash
 # デフォルト（オープン PR）
-shirokuma-docs issues pr-list
+shirokuma-docs pr list
 
 # フィルター付き
-shirokuma-docs issues pr-list --state merged --limit 10
-shirokuma-docs issues pr-list --state all
+shirokuma-docs pr list --state merged --limit 10
+shirokuma-docs pr list --state all
 ```
 
 **詳細表示:**
 
 ```bash
-shirokuma-docs issues pr-show {number}
+shirokuma-docs pr show {number}
 ```
 
 ### 表示フォーマット（一覧）

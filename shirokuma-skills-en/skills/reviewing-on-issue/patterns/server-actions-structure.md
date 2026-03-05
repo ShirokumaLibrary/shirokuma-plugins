@@ -269,4 +269,4 @@ This rule is used by the following shirokuma-docs features:
 
 1. **feature-map**: Auto-classification via `@serverAction`, `@feature` tags
 2. **details**: Module detail pages show Types, Utilities sections
-3. **lint-code** (planned): Automated structure and tag validation
+3. **lint code** (planned): Automated structure and tag validation

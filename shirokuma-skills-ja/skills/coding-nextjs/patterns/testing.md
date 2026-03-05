@@ -50,26 +50,26 @@ describe("createUser", () => {
 
 ```bash
 # テストドキュメントカバレッジチェック
-shirokuma-docs lint-tests -p . -c shirokuma-docs.config.yaml -f summary
+shirokuma-docs lint tests -p . -c shirokuma-docs.config.yaml -f summary
 
 # 詳細レポート
-shirokuma-docs lint-tests -p . -c shirokuma-docs.config.yaml -f terminal
+shirokuma-docs lint tests -p . -c shirokuma-docs.config.yaml -f terminal
 
 # CI モード（閾値付き）
-shirokuma-docs lint-tests -p . --strict --coverage-threshold 50
+shirokuma-docs lint tests -p . --strict --coverage-threshold 50
 ```
 
 ### 実装-テストカバレッジチェック
 
 ```bash
 # ソースファイルとテストファイルの対応チェック
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml
 
 # サマリーのみ
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml -f summary
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml -f summary
 
 # strict モード（テスト不足で失敗）
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml -s
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml -s
 ```
 
 ### @skip-test アノテーション

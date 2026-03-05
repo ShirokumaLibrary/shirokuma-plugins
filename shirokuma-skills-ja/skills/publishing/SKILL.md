@@ -1,12 +1,12 @@
 ---
 name: publishing
-description: shirokuma-docs repo-pairs CLIを使用して公開リリースを管理します。ステータスチェック、ドライランプレビュー、リリース実行、.shirokumaignore設定を処理します。トリガー: 「publish」「release」「公開リリース」「リリース」。
+description: shirokuma-docs repo pairs CLIを使用して公開リリースを管理します。ステータスチェック、ドライランプレビュー、リリース実行、.shirokumaignore設定を処理します。トリガー: 「publish」「release」「公開リリース」「リリース」。
 allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
 ---
 
 # パブリッシング
 
-`shirokuma-docs repo-pairs` CLI で Private → Public リポジトリへのリリースを管理。
+`shirokuma-docs repo pairs` CLI で Private → Public リポジトリへのリリースを管理。
 
 ## いつ使うか
 
@@ -14,14 +14,14 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
 - "publish" や "release" で公開リポに反映したい場合
 - "公開リポに反映", "パブリックに出して", "リリースして"
 - リリース状況や公開リポとの差分を確認したい場合
-- "repo-pairs", ".shirokumaignore", 公開リポ同期に言及した場合
+- "repo pairs", ".shirokumaignore", 公開リポ同期に言及した場合
 
 ## 前提条件
 
 - `shirokuma-docs` CLI が PATH で利用可能
 - `gh` CLI 認証済み（`gh auth status`）
 - `shirokuma-docs.config.yaml` がプロジェクトルートに存在
-- リポジトリペアが設定済み（`shirokuma-docs repo-pairs list`）
+- リポジトリペアが設定済み（`shirokuma-docs repo pairs list`）
 
 ## CLI リファレンス
 
@@ -29,25 +29,25 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
 
 ```bash
 # 設定済みリポペア一覧
-shirokuma-docs repo-pairs list
+shirokuma-docs repo pairs list
 
 # リリース状況確認（両リポの最新タグ）
-shirokuma-docs repo-pairs status <alias>
+shirokuma-docs repo pairs status <alias>
 
 # リリースプレビュー（変更なし）
-shirokuma-docs repo-pairs release <alias> --tag <version> --dry-run
+shirokuma-docs repo pairs release <alias> --tag <version> --dry-run
 
 # リリース実行
-shirokuma-docs repo-pairs release <alias> --tag <version>
+shirokuma-docs repo pairs release <alias> --tag <version>
 
 # デバッグ用の詳細出力
-shirokuma-docs repo-pairs release <alias> --tag <version> -v
+shirokuma-docs repo pairs release <alias> --tag <version> -v
 ```
 
 ### 新しいリポペアの初期化
 
 ```bash
-shirokuma-docs repo-pairs init <alias> \
+shirokuma-docs repo pairs init <alias> \
   --private <owner/repo> \
   --public <owner/repo> \
   --exclude ".claude/" --exclude "docs/internal/"
@@ -66,13 +66,13 @@ shirokuma-docs repo-pairs init <alias> \
 git status
 
 # 2. 現在のリリース状況確認
-shirokuma-docs repo-pairs status <alias>
+shirokuma-docs repo pairs status <alias>
 
 # 3. 除外対象を確認
 cat .shirokumaignore
 
 # 4. リリースプレビュー
-shirokuma-docs repo-pairs release <alias> --tag <version> --dry-run
+shirokuma-docs repo pairs release <alias> --tag <version> --dry-run
 ```
 
 ユーザーに報告:
@@ -100,13 +100,13 @@ shirokuma-docs repo-pairs release <alias> --tag <version> --dry-run
 git log $(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")..HEAD --oneline
 
 # Private にタグがない場合、Public リポの最新タグを確認
-shirokuma-docs repo-pairs status <alias>
+shirokuma-docs repo pairs status <alias>
 ```
 
 ### ステップ 3: リリース実行
 
 ```bash
-shirokuma-docs repo-pairs release <alias> --tag <version>
+shirokuma-docs repo pairs release <alias> --tag <version>
 ```
 
 CLI の処理内容:
@@ -119,7 +119,7 @@ CLI の処理内容:
 
 ```bash
 # リリースタグを検証
-shirokuma-docs repo-pairs status <alias>
+shirokuma-docs repo pairs status <alias>
 
 # GitHub API で公開リポの内容を確認
 gh repo view <public-owner/repo> --json description
@@ -154,19 +154,19 @@ shirokuma-docs.config.yaml
 | `.claude/` | プロジェクト固有の AI 設定 |
 | `.mcp.json` | ローカル MCP サーバー設定 |
 
-### 設定経由の除外（repo-pairs init）
+### 設定経由の除外（repo pairs init）
 
-`repo-pairs init` 時に設定したパターンは設定に保存され常時適用:
+`repo pairs init` 時に設定したパターンは設定に保存され常時適用:
 
 ```bash
-shirokuma-docs repo-pairs list  # 設定済みの除外パターンを表示
+shirokuma-docs repo pairs list  # 設定済みの除外パターンを表示
 ```
 
 ## エラーハンドリング
 
 | エラー | 原因 | 修正 |
 |-------|------|------|
-| `repo pair not found` | エイリアス未設定 | `repo-pairs init` を実行 |
+| `repo pair not found` | エイリアス未設定 | `repo pairs init` を実行 |
 | `tag already exists` | バージョンリリース済み | バージョンを上げる |
 | `working directory not clean` | 未コミット変更あり | コミットまたは stash |
 | `authentication failed` | gh 未ログイン | `gh auth login` を実行 |
@@ -175,7 +175,7 @@ shirokuma-docs repo-pairs list  # 設定済みの除外パターンを表示
 
 ## 手動ワークフロー（フォールバック）
 
-`repo-pairs release` が失敗した場合、または `.shirokumaignore` が未サポートの場合:
+`repo pairs release` が失敗した場合、または `.shirokumaignore` が未サポートの場合:
 
 ```bash
 ALIAS="<alias>"

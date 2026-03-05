@@ -3,7 +3,7 @@
   "rules": [
     {
       "id": "pr-merge",
-      "pattern": "(gh pr merge|issues merge)",
+      "pattern": "(gh pr merge|pr merge)",
       "reason": "PR merge requires explicit user approval. Ask the user before merging.",
       "enabled": true
     },

@@ -71,20 +71,20 @@ shirokuma-docs issues close {number}
 shirokuma-docs issues reopen {number}
 ```
 
-### Issues — Pull Requests
+### Pull Requests
 
 ```bash
-shirokuma-docs issues pr-create --base develop --title "feat: title (#42)" --body-file /tmp/shirokuma-docs/pr-body.md
-shirokuma-docs issues pr-create --base main --head develop --title "release: v0.2.0"  # Release workflow
-shirokuma-docs issues pr-list                               # PR list (default: open)
-shirokuma-docs issues pr-list --state merged --limit 5     # Filtering
-shirokuma-docs issues pr-show {number}                      # PR details (body, diff stats, linked issues)
-shirokuma-docs issues pr-comments {number}                  # Review comments and threads
-shirokuma-docs issues merge {number} --squash               # Merge + status update
-shirokuma-docs issues pr-reply {number} --reply-to {id} --body-file - <<'EOF'
+shirokuma-docs pr create --base develop --title "feat: title (#42)" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --base main --head develop --title "release: v0.2.0"  # Release workflow
+shirokuma-docs pr list                                      # PR list (default: open)
+shirokuma-docs pr list --state merged --limit 5            # Filtering
+shirokuma-docs pr show {number}                             # PR details (body, diff stats, linked issues)
+shirokuma-docs pr comments {number}                         # Review comments and threads
+shirokuma-docs pr merge {number} --squash                   # Merge + status update
+shirokuma-docs pr reply {number} --reply-to {id} --body-file - <<'EOF'
 Reply content
 EOF
-shirokuma-docs issues resolve {number} --thread-id {id}    # Resolve thread
+shirokuma-docs pr resolve {number} --thread-id {id}        # Resolve thread
 ```
 
 ### Projects (Low-level Access)

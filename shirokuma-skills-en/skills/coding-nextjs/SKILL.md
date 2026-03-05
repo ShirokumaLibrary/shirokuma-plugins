@@ -70,7 +70,7 @@ shirokuma-docs discussions create \
 ### Step 5: Portal Update (for significant changes)
 
 ```bash
-shirokuma-docs portal -p . -o docs/portal
+shirokuma-docs generate portal -p . -o docs/portal
 ```
 
 **Trigger**: New Server Actions, screens/pages, DB schema changes

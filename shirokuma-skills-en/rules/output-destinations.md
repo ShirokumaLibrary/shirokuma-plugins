@@ -14,7 +14,7 @@ Claude Code skills produce two types of output. Route each to the appropriate de
 | Type | Purpose | Destination | Lifetime |
 |------|---------|-------------|----------|
 | **Working reports** | Human review during work | GitHub Discussions (Reports) | Temporary |
-| **Final documentation** | Project-wide records | shirokuma-docs portal | Permanent |
+| **Final documentation** | Project-wide records | shirokuma-docs generate portal | Permanent |
 
 ## Working Reports
 
@@ -40,11 +40,11 @@ shirokuma-docs discussions create \
 
 **Use for**: Complete feature docs, API references, architecture diagrams
 
-**Destination**: shirokuma-docs portal
+**Destination**: shirokuma-docs generate portal
 
 ```bash
 # Build portal
-shirokuma-docs portal -p . -o docs/portal
+shirokuma-docs generate portal -p . -o docs/portal
 
 # Or via skill
 /shirokuma-md build
@@ -67,7 +67,7 @@ logs/reviews/YYYY-MM-DD-*.md
 **New pattern**:
 ```
 Working → GitHub Discussions (Reports)
-Final   → shirokuma-docs portal
+Final   → shirokuma-docs generate portal
 ```
 
 ## Skill Updates

@@ -320,7 +320,7 @@ Self-review the session using the detection checklist (see `rule-evolution` rule
 Regardless of introspection check results, fetch lint metrics once:
 
 ```bash
-shirokuma-docs lint-tests -p . --format json 2>/dev/null
+shirokuma-docs lint tests -p . --format json 2>/dev/null
 ```
 
 | Condition | Action |

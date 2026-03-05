@@ -98,7 +98,7 @@ git push -u origin {branch-name}
 `creating-pr-on-issue` スキルのワークフローに従い、`develop` ターゲットで PR を作成（`branch-workflow` ルール参照）:
 
 ```bash
-shirokuma-docs issues pr-create --base develop --title "{タイトル}" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --base develop --title "{タイトル}" --body-file /tmp/shirokuma-docs/pr-body.md
 ```
 
 `/tmp/shirokuma-docs/pr-body.md` の内容:
@@ -345,7 +345,7 @@ Implemented the feature...  ← 日本語設定では不正
 | セッション中に変更なし | 簡潔でも引き継ぎを保存 |
 | Issue がプロジェクトにない | 警告して続行 |
 | `git push` 失敗 | ユーザーに警告、PR なしで引き継ぎ保存 |
-| `issues pr-create` 失敗 | ユーザーに警告、ブランチ名を引き継ぎに含める |
+| `pr create` 失敗 | ユーザーに警告、ブランチ名を引き継ぎに含める |
 | ベースブランチにいる（フィーチャーブランチなし） | プッシュ/PR ステップをスキップ、引き継ぎのみ保存 |
 
 ## 注意事項

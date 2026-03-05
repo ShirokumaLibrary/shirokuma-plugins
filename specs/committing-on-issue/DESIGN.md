@@ -10,7 +10,7 @@
 |---------|-------------------|--------|
 | Commit only | "コミットして" | Stage → Commit → Push |
 | Commit + PR | "コミットして PR 作って" | Stage → Commit → Push → `creating-pr-on-issue` |
-| Merge | "マージして" | `issues merge` → Status Done → Branch delete |
+| Merge | "マージして" | `pr merge` → Status Done → Branch delete |
 
 ### 設計上の制約
 

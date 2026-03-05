@@ -8,7 +8,7 @@
 # 正しい
 shirokuma-docs session start
 shirokuma-docs issues list
-shirokuma-docs lint-tests -p .
+shirokuma-docs lint tests -p .
 
 # 間違い - 不要なオーバーヘッド
 npx shirokuma-docs session start

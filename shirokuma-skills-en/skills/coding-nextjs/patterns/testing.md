@@ -50,26 +50,26 @@ describe("createUser", () => {
 
 ```bash
 # Check test documentation coverage
-shirokuma-docs lint-tests -p . -c shirokuma-docs.config.yaml -f summary
+shirokuma-docs lint tests -p . -c shirokuma-docs.config.yaml -f summary
 
 # Detailed report
-shirokuma-docs lint-tests -p . -c shirokuma-docs.config.yaml -f terminal
+shirokuma-docs lint tests -p . -c shirokuma-docs.config.yaml -f terminal
 
 # CI mode with threshold
-shirokuma-docs lint-tests -p . --strict --coverage-threshold 50
+shirokuma-docs lint tests -p . --strict --coverage-threshold 50
 ```
 
 ### Implementation-Test Coverage Check
 
 ```bash
 # Check source-test file mapping
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml
 
 # Summary only
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml -f summary
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml -f summary
 
 # Strict mode (fail on missing tests)
-shirokuma-docs lint-coverage -p . -c shirokuma-docs.config.yaml -s
+shirokuma-docs lint coverage -p . -c shirokuma-docs.config.yaml -s
 ```
 
 ### @skip-test Annotation

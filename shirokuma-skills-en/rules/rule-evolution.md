@@ -101,12 +101,12 @@ At the completion of skills involving code changes, verify the project's objecti
 
 | Check Item | Signal Type | Detection Condition | Do NOT Record |
 |-----------|------------|-------------------|---------------|
-| Check `shirokuma-docs lint-tests -p . --format json` result | Lint trend | `errorCount > 0`: always flag | `warningCount` only: report count only (no threshold) |
+| Check `shirokuma-docs lint tests -p . --format json` result | Lint trend | `errorCount > 0`: always flag | `warningCount` only: report count only (no threshold) |
 
-**lint-tests execution:**
+**lint tests execution:**
 
 ```bash
-shirokuma-docs lint-tests -p . --format json 2>/dev/null
+shirokuma-docs lint tests -p . --format json 2>/dev/null
 ```
 
 - `summary.errorCount > 0`: Record as Evolution signal + propose follow-up Issue creation

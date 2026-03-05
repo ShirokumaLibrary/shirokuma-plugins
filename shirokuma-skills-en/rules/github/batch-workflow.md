@@ -96,7 +96,7 @@ Batch mode creates controlled exceptions to `project-items` rules:
 |-------|--------|
 | Batch starts | All issues → In Progress (bulk update) |
 | PR created | All issues → Review (via PR `Closes` links) |
-| PR merged | All issues → Done (automatic via `issues merge`) |
+| PR merged | All issues → Done (automatic via `pr merge`) |
 | Batch interrupted | Completed issues stay In Progress; see Interruption Recovery |
 
 ## Interruption Recovery

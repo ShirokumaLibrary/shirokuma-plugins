@@ -24,7 +24,7 @@ Full project dashboard aggregating GitHub data.
 1. Get repository info: `gh repo view --json nameWithOwner -q '.nameWithOwner'`
 2. Run in parallel:
    - `shirokuma-docs issues list` (project items by status + derive open issue count from `total_issues`)
-   - `shirokuma-docs issues pr-list` (open PRs list + derive PR count from line count)
+   - `shirokuma-docs pr list` (open PRs list + derive PR count from line count)
    - `gh api repos/{owner}/{repo}/commits?per_page=5` (recent commits)
    - `shirokuma-docs discussions list --category Handovers --limit 3` (recent handovers)
 
@@ -171,17 +171,17 @@ PR list and details.
 
 ```bash
 # Default (open PRs)
-shirokuma-docs issues pr-list
+shirokuma-docs pr list
 
 # With filters
-shirokuma-docs issues pr-list --state merged --limit 10
-shirokuma-docs issues pr-list --state all
+shirokuma-docs pr list --state merged --limit 10
+shirokuma-docs pr list --state all
 ```
 
 **Detail view:**
 
 ```bash
-shirokuma-docs issues pr-show {number}
+shirokuma-docs pr show {number}
 ```
 
 ### Display Format (List)

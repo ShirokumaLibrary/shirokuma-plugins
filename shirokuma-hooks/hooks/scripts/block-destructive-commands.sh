@@ -17,7 +17,7 @@ set -euo pipefail
 # To allow specific commands, edit shirokuma-docs.config.yaml:
 #   hooks:
 #     allow:
-#       - pr-merge              # Allow gh pr merge / issues merge
+#       - pr-merge              # Allow gh pr merge / pr merge
 #       # - force-push          # Allow git push --force
 #       # - hard-reset          # Allow git reset --hard
 #       # - discard-worktree    # Allow git checkout/restore .

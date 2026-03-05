@@ -2,7 +2,7 @@
 
 ## レビューコメント受領時
 
-1. すべてのレビュースレッドを取得: `shirokuma-docs issues pr-comments <PR#>`
+1. すべてのレビュースレッドを取得: `shirokuma-docs pr comments <PR#>`
 2. 各**未解決**スレッドについて、レスポンスタイプを判断：
 
 ### コード修正が必要
@@ -11,11 +11,11 @@
 2. コミットしてプッシュ
 3. コミットを参照して返信:
    ```bash
-   shirokuma-docs issues pr-reply <PR#> --reply-to <database_id> --body-file - <<'EOF'
+   shirokuma-docs pr reply <PR#> --reply-to <database_id> --body-file - <<'EOF'
    返信内容
    EOF
    ```
-4. 解決: `shirokuma-docs issues resolve <PR#> --thread-id <PRRT_id>`
+4. 解決: `shirokuma-docs pr resolve <PR#> --thread-id <PRRT_id>`
 
 ### コメント内容の修正が必要
 

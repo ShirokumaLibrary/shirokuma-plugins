@@ -72,7 +72,7 @@ base_branch="{type}/{parent-number}-{slug}"
 base_branch="develop"
 ```
 
-**Note**: For PRs targeting the integration branch, the GitHub sidebar will not display the issue link. `Closes #N` should still be included in the PR body (the CLI's `issues merge` parses it independently and works correctly).
+**Note**: For PRs targeting the integration branch, the GitHub sidebar will not display the issue link. `Closes #N` should still be included in the PR body (the CLI's `pr merge` parses it independently and works correctly).
 
 ### Step 3: Analyze Changes
 
@@ -104,7 +104,7 @@ Write the PR body to a file, then create the PR. When changes meet the Mermaid c
 ```
 
 ```bash
-shirokuma-docs issues pr-create --base {base_branch} --title "{title}" --body-file /tmp/shirokuma-docs/{number}-pr-body.md
+shirokuma-docs pr create --base {base_branch} --title "{title}" --body-file /tmp/shirokuma-docs/{number}-pr-body.md
 ```
 
 **Title rules:**

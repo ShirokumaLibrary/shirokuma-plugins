@@ -71,20 +71,20 @@ shirokuma-docs issues close {number}
 shirokuma-docs issues reopen {number}
 ```
 
-### Issues — Pull Requests
+### Pull Requests
 
 ```bash
-shirokuma-docs issues pr-create --base develop --title "feat: タイトル (#42)" --body-file /tmp/shirokuma-docs/pr-body.md
-shirokuma-docs issues pr-create --base main --head develop --title "release: v0.2.0"  # リリースワークフロー
-shirokuma-docs issues pr-list                               # PR 一覧（デフォルト: open）
-shirokuma-docs issues pr-list --state merged --limit 5     # フィルタリング
-shirokuma-docs issues pr-show {number}                      # PR 詳細（body, diff stats, linked issues）
-shirokuma-docs issues pr-comments {number}                  # レビューコメント・スレッド
-shirokuma-docs issues merge {number} --squash               # マージ + ステータス更新
-shirokuma-docs issues pr-reply {number} --reply-to {id} --body-file - <<'EOF'
+shirokuma-docs pr create --base develop --title "feat: タイトル (#42)" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --base main --head develop --title "release: v0.2.0"  # リリースワークフロー
+shirokuma-docs pr list                                      # PR 一覧（デフォルト: open）
+shirokuma-docs pr list --state merged --limit 5            # フィルタリング
+shirokuma-docs pr show {number}                             # PR 詳細（body, diff stats, linked issues）
+shirokuma-docs pr comments {number}                         # レビューコメント・スレッド
+shirokuma-docs pr merge {number} --squash                   # マージ + ステータス更新
+shirokuma-docs pr reply {number} --reply-to {id} --body-file - <<'EOF'
 返信内容
 EOF
-shirokuma-docs issues resolve {number} --thread-id {id}    # スレッド解決
+shirokuma-docs pr resolve {number} --thread-id {id}        # スレッド解決
 ```
 
 ### Projects（低レベルアクセス）

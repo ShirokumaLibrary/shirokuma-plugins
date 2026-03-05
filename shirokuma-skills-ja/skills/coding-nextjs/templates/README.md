@@ -79,7 +79,7 @@ cat templates/server-action.ts.template | sed 's/{{name}}/post/g; s/{{Name}}/Pos
 
 ## 標準テンプレート（JSDoc 準拠）
 
-**shirokuma-docs lint-code 準拠**のテンプレートは [server-action.md](./server-action.md) を参照。
+**shirokuma-docs lint code 準拠**のテンプレートは [server-action.md](./server-action.md) を参照。
 
 このテンプレートが保証する内容：
 - モジュールヘッダーに `@serverAction`, `@feature`, `@dbTables` タグ
@@ -91,7 +91,7 @@ cat templates/server-action.ts.template | sed 's/{{name}}/post/g; s/{{Name}}/Pos
 
 ```bash
 # shirokuma-docs でコンプライアンスチェック
-node shirokuma-docs/dist/index.js lint-code -p path/to/project -v
+node shirokuma-docs/dist/index.js lint code -p path/to/project -v
 ```
 
 ## Server Action テンプレートの機能

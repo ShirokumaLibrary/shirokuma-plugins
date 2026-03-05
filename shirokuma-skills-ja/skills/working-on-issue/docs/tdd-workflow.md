@@ -84,20 +84,20 @@ pnpm --filter {app} tsc --noEmit
 
 ```bash
 # テストドキュメント lint
-shirokuma-docs lint-tests -p . -f terminal
+shirokuma-docs lint tests -p . -f terminal
 
 # 実装-テストカバレッジチェック
-shirokuma-docs lint-coverage -p . -f summary
+shirokuma-docs lint coverage -p . -f summary
 
 # コード構造チェック
-shirokuma-docs lint-code -p . -f terminal
+shirokuma-docs lint code -p . -f terminal
 ```
 
 | チェック | パス基準 | 修正方法 |
 |---------|---------|---------|
 | `skipped-test-report` | すべての `.skip` に `@skip-reason` あり | `@skip-reason` 追加 |
 | `testdoc-required` | すべてのテストに `@testdoc` あり | 説明を追加 |
-| `lint-coverage` | 新規ファイルにテストあり | テスト作成 or `@skip-test` |
+| `lint coverage` | 新規ファイルにテストあり | テスト作成 or `@skip-test` |
 
 ## 必須ルール
 

@@ -269,4 +269,4 @@ export type NewItem = typeof table.$inferInsert
 
 1. **feature-map**: `@serverAction`, `@feature` タグで自動分類
 2. **details**: モジュール詳細ページに Types, Utilities セクション表示
-3. **lint-code** (予定): 構造・タグの機械的チェック
+3. **lint code** (予定): 構造・タグの機械的チェック
