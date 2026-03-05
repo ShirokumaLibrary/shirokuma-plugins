@@ -103,6 +103,8 @@ At the completion of skills involving code changes, verify the project's objecti
 |-----------|------------|-------------------|---------------|
 | Check `shirokuma-docs lint tests -p . --format json` result | Lint trend | `errorCount > 0`: always flag | `warningCount` only: report count only (no threshold) |
 
+> **Note:** Use `shirokuma-docs lint all -p .` for running all lint types at once. However, environment checks require `--format json` parsing, so `lint tests` is run individually here.
+
 **lint tests execution:**
 
 ```bash

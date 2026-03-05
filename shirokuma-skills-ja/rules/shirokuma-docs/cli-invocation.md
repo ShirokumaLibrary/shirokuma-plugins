@@ -13,3 +13,10 @@ shirokuma-docs lint tests -p .
 # 間違い - 不要なオーバーヘッド
 npx shirokuma-docs session start
 ```
+
+## Verbose オプション
+
+デフォルト出力は最小限（エラー・警告・成功メッセージのみ）。進捗ログや詳細情報は抑制される。
+
+- AI ワークフローでは `--verbose` を**使用しない** — コンテキストウィンドウを消費する
+- `--verbose` は人間のデバッグ用途のみ

@@ -79,7 +79,7 @@ Read required knowledge files based on role:
 
 | Role | Lint Commands |
 |------|--------------|
-| code, code+annotation, nextjs | lint tests, lint coverage, lint code, lint structure, lint annotations (all 5) |
+| code, code+annotation, nextjs | `lint all` (all types at once) recommended. Individual: lint tests, lint coverage, lint code, lint structure, lint annotations |
 | security | lint code, lint structure (security-related only) |
 | testing | lint tests, lint coverage (test-related only) |
 | docs | lint docs (document structure only) |
@@ -88,6 +88,10 @@ Read required knowledge files based on role:
 **code / code+annotation / nextjs roles:**
 
 ```bash
+# Recommended: run all lints at once
+shirokuma-docs lint all -p .
+
+# Individual execution (when only specific lints are needed):
 # Test documentation (@testdoc, @skip-reason)
 shirokuma-docs lint tests -p . -f terminal
 

@@ -79,7 +79,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 
 | ロール | 実行する lint コマンド |
 |--------|----------------------|
-| code, code+annotation, nextjs | lint tests, lint coverage, lint code, lint structure, lint annotations（全5種） |
+| code, code+annotation, nextjs | `lint all`（全種一括）を推奨。個別実行も可: lint tests, lint coverage, lint code, lint structure, lint annotations |
 | security | lint code, lint structure（セキュリティ関連のみ） |
 | testing | lint tests, lint coverage（テスト関連のみ） |
 | docs | lint docs（ドキュメント構造のみ） |
@@ -88,6 +88,10 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 **code / code+annotation / nextjs ロール:**
 
 ```bash
+# 推奨: 全種一括実行
+shirokuma-docs lint all -p .
+
+# 個別実行（特定の lint のみ必要な場合）:
 # テストドキュメント（@testdoc, @skip-reason）
 shirokuma-docs lint tests -p . -f terminal
 
