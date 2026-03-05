@@ -45,8 +45,12 @@ Detailed specification of the self-review loop executed within the `working-on-i
 
 [REPORT] Report to user
     ↓
-[COMPLETE] Create out-of-scope Issues → Verify review findings comment → Post response complete comment (required) → Status → Review
+[COMPLETE] Create out-of-scope Issues → Verify review findings comment → Post response complete comment (required)
+    ↓
+[POST-REVIEW] Post Work Summary → Status → Review update → Evolution signal recording
 ```
+
+> **POST-REVIEW steps**: Even after reaching COMPLETE, TodoWrite still has pending steps (Work Summary, Status Update). The manager MUST immediately proceed to the next step as long as pending steps remain.
 
 ## File Category Detection
 
@@ -65,6 +69,15 @@ Get changed files via `git diff --name-only develop..HEAD` and classify:
 | config only | Invoke `reviewing-claude-config` only |
 | code/docs only (no config) | Invoke `reviewing-on-issue` only |
 | mixed (config + code/docs) | Invoke `reviewing-on-issue` → `reviewing-claude-config` sequentially → merge results |
+
+#### Fallback When `reviewing-claude-config` Is Unavailable
+
+When `reviewing-claude-config` is not in the skill list, apply these fallbacks:
+
+| File Composition | Fallback |
+|-----------------|----------|
+| config only | Use `reviewing-on-issue` docs role as substitute. If docs role is also unavailable, fall back to a self-check checklist (manually verify config file structure, consistency, and best-practice compliance) |
+| mixed (config + code/docs) | Continue with `reviewing-on-issue` only (config portion review is omitted) |
 
 ### Result Merging Rules (Mixed Case)
 

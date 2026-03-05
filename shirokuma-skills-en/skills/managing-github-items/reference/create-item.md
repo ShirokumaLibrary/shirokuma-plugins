@@ -105,8 +105,8 @@ Use the type-specific template. All types require a `## Purpose` section.
 ## Background
 {current problems, relevant constraints and dependencies}
 
-## Tasks
-- [ ] Task 1
+## Considerations
+- {Perspectives, constraints, and technical considerations for the planning phase}
 
 ## Deliverable
 {definition of done — include user-verifiable outcomes}
@@ -130,8 +130,8 @@ Use the type-specific template. All types require a `## Purpose` section.
 ## Expected Behavior
 {correct behavior}
 
-## Tasks
-- [ ] Task 1
+## Considerations
+- {Root cause investigation angles, impact scope, regression test perspectives}
 
 ## Deliverable
 {how to verify the fix}
@@ -151,8 +151,8 @@ Developers can {what}. {current problem}.
 ## Background
 {motivation, current issues, quantitative evidence if available}
 
-## Tasks
-- [ ] Task 1
+## Considerations
+- {Impact scope, compatibility with existing code, performance implications}
 
 ## Deliverable
 {how to verify improvement — quantitative metrics if possible}
@@ -249,8 +249,8 @@ When creating sub-issues of an epic (parent issue):
 ## Parent Issue
 Refs #{parent-number} — {parent issue title}
 
-## Tasks
-- [ ] Task 1
+## Considerations
+- {Alignment with parent issue plan, dependencies}
 
 ## Deliverable
 {Definition of done}

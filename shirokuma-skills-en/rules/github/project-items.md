@@ -73,9 +73,8 @@ Ideas and proposals start as **Discussions** (Research or Knowledge category), n
 ## Background
 {Current problems, relevant constraints and dependencies}
 
-## Tasks
-- [ ] Task 1
-- [ ] Task 2
+## Considerations
+- {Perspectives and constraints for the planning phase}
 
 ## Deliverable
 {What "done" looks like}

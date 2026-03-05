@@ -45,8 +45,12 @@
 
 [REPORT] ユーザーに報告
     ↓
-[COMPLETE] out-of-scope Issue 作成 → レビュー所見コメント確認 → 対応完了コメント投稿（必須） → Status → Review
+[COMPLETE] out-of-scope Issue 作成 → レビュー所見コメント確認 → 対応完了コメント投稿（必須）
+    ↓
+[POST-REVIEW] Work Summary 投稿 → Status → Review 更新 → Evolution シグナル記録
 ```
+
+> **POST-REVIEW ステップ**: COMPLETE 到達後も TodoWrite に pending ステップ（Work Summary、Status Update）が残っている。pending が残っている限り、マネージャーは即座に次のステップを実行すること。
 
 ## ファイルカテゴリ検出
 
@@ -65,6 +69,15 @@
 | config のみ | `reviewing-claude-config` のみ起動 |
 | code/docs のみ（config なし） | `reviewing-on-issue` のみ起動 |
 | 混在（config + code/docs） | `reviewing-on-issue` → `reviewing-claude-config` 順次起動 → 結果統合 |
+
+#### `reviewing-claude-config` 利用不可時のフォールバック
+
+スキルリストに `reviewing-claude-config` がない環境では、以下のフォールバックを適用する:
+
+| ファイル構成 | フォールバック |
+|-------------|--------------|
+| config のみ | `reviewing-on-issue` の docs ロールで代替。docs ロールも利用不可の場合は自己チェックリスト（設定ファイルの構造・一貫性・ベストプラクティス準拠を手動確認）で代替 |
+| 混在（config + code/docs） | `reviewing-on-issue` のみで続行（config 部分のレビューは省略） |
 
 ### 混在時の結果統合ルール
 

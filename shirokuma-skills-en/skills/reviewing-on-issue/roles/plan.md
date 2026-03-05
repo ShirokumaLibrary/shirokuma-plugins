@@ -52,7 +52,7 @@ Load these files for context:
 
 ### Requirements Coverage
 - [ ] All requirements from the Issue "Overview" section are covered in the plan
-- [ ] All tasks from the Issue "Tasks" section map to plan task breakdown
+- [ ] All items from the Issue "Considerations" section are addressed in the plan
 - [ ] Each item in "Deliverables" section has a corresponding task
 - [ ] Implicit requirements (tests, version bump, etc.) are not overlooked
 

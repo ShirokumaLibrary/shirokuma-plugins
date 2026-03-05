@@ -15,17 +15,17 @@ allowed-tools: Bash, Read, Grep, Glob
 ### ステップ 1: ブランチ状態確認
 
 ```bash
-git branch --show-current
-git status --short
-git log --oneline develop..HEAD
+shirokuma-docs git check
 ```
 
-**事前チェック:**
-- フィーチャーブランチにいること（`develop` や `main` ではない）
-- 変更がコミット済み
-- `develop` より先にコミットあり
+1コマンドで branch, baseBranch, isFeatureBranch, uncommittedChanges, unpushedCommits, recentCommits, diffStat, warnings を JSON で取得。
 
-`develop` または `main` にいる場合、エラーを返す。
+**事前チェック（JSON の値で判定）:**
+- `isFeatureBranch` が `true`（`develop` や `main` ではない）
+- `hasUncommittedChanges` が `false`（変更がコミット済み）
+- `recentCommits` に `baseBranch` より先のコミットあり
+
+`isFeatureBranch` が `false` の場合、エラーを返す。
 
 ### ステップ 2: プッシュ
 
@@ -72,12 +72,7 @@ base_branch="develop"
 
 ### ステップ 3: 変更分析
 
-```bash
-git log --oneline {base_branch}..HEAD
-git diff --stat {base_branch}..HEAD
-```
-
-最新コミットだけでなく全コミットを把握。
+ステップ 1 の `shirokuma-docs git check` の JSON 出力から `recentCommits` と `diffStat` を使用。最新コミットだけでなく全コミットを把握。
 
 ### ステップ 4: PR作成
 

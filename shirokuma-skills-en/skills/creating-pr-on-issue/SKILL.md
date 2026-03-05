@@ -17,17 +17,17 @@ Create a GitHub pull request from the current feature branch.
 PRs target `develop` for daily work (see `branch-workflow` rule):
 
 ```bash
-git branch --show-current
-git status --short
-git log --oneline develop..HEAD
+shirokuma-docs git check
 ```
 
-**Pre-checks:**
-- Must be on a feature branch (not `develop` or `main`)
-- All changes should be committed
-- Branch should have commits ahead of `develop`
+Single command returns branch, baseBranch, isFeatureBranch, uncommittedChanges, unpushedCommits, recentCommits, diffStat, and warnings as JSON.
 
-If on `develop` or `main`, return an error.
+**Pre-checks (use JSON values):**
+- `isFeatureBranch` is `true` (not `develop` or `main`)
+- `hasUncommittedChanges` is `false` (all changes committed)
+- `recentCommits` has commits ahead of `baseBranch`
+
+If `isFeatureBranch` is `false`, return an error.
 
 ### Step 2: Push Branch
 
@@ -76,14 +76,7 @@ base_branch="develop"
 
 ### Step 3: Analyze Changes
 
-Review all commits on the branch to draft PR content:
-
-```bash
-git log --oneline {base_branch}..HEAD
-git diff --stat {base_branch}..HEAD
-```
-
-Understand the full scope of changes, not just the latest commit.
+Use `recentCommits` and `diffStat` from the Step 1 `shirokuma-docs git check` JSON output. Understand the full scope of changes, not just the latest commit.
 
 ### Step 4: Create PR
 

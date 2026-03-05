@@ -15,12 +15,10 @@ Stage, commit, and optionally push changes to the remote.
 ### Step 1: Review Changes
 
 ```bash
-git status --short
-git diff --stat
-git branch --show-current
+shirokuma-docs git check
 ```
 
-Include a summary of changes in the output.
+Single command returns branch, baseBranch, uncommittedChanges, unpushedCommits, recentCommits, diffStat, and warnings as JSON. Include a summary of changes in the output.
 
 ### Step 2: Stage Files
 

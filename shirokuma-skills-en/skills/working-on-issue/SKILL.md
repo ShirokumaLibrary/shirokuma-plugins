@@ -23,8 +23,9 @@ Register **all chain steps** in TodoWrite **before starting work**.
 | 1 | Implement changes | Implementing changes | `coding-on-issue` (fork) / `designing-ui-on-issue` |
 | 2 | Commit and push changes | Committing and pushing | `committing-on-issue` (fork) |
 | 3 | Create pull request | Creating pull request | `creating-pr-on-issue` (fork) |
-| 4 | Run self-review and apply fixes | Running self-review | Manager (main AI) directly manages (see reference) |
-| 5 | Update Status to Review | Updating Status to Review | `shirokuma-docs issues update` |
+| 4 | Run self-review and apply fixes | Running self-review | Manager direct: SIMPLIFY → REVIEW → COMPLETE |
+| 5 | Post work summary | Posting work summary | Manager direct: `issues comment` |
+| 6 | Update Status to Review | Updating Status to Review | Manager direct: `issues update` |
 
 **Research:**
 
@@ -182,7 +183,18 @@ If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. 
 |----------------|-------------|---------------------|------------------|
 | `coding-on-issue` | `committing-on-issue` | `committing-on-issue` | Do NOT re-invoke `coding-on-issue` |
 | `committing-on-issue` | `creating-pr-on-issue` | `creating-pr-on-issue` | Do NOT delegate to `coding-on-issue` |
-| `creating-pr-on-issue` | — | Simplify → Self-Review | Managed directly by manager |
+| `creating-pr-on-issue` | — | **Start manager-managed steps** (see below) | Do NOT delegate to fork |
+
+**Manager-managed steps after `creating-pr-on-issue` (required checklist):**
+
+When `creating-pr-on-issue` returns its result, execute the following steps **within the same chain** sequentially. Each step is registered as `pending` in TodoWrite — do NOT stop while pending steps remain:
+
+1. **SIMPLIFY**: Invoke `/simplify` via Skill tool (code category only, skip on failure) → commit & push if changes
+2. **REVIEW**: Invoke `reviewing-on-issue` / `reviewing-claude-config` via Skill tool → PASS/NEEDS_FIX/FAIL determination
+3. **COMPLETE**: Create out-of-scope Issues → Post response complete comment
+4. **Work Summary**: Post work summary as Issue comment
+5. **Status Update**: `shirokuma-docs issues update {number} --field-status "Review"`
+6. **Evolution**: Auto-record signals (Step 6)
 
 **Post-fork-result behavior (pseudocode):**
 
@@ -259,7 +271,9 @@ Self-review should be launched via Skill tool (`reviewing-on-issue` / `reviewing
 | FIX | Delegate fix to `Task(general-purpose)` |
 | CONVERGE | Convergence check (numeric-based, stop after 2 consecutive non-decreases) |
 | REPORT | Report remaining issues to user |
-| COMPLETE | Create out-of-scope Issues → Post fix comment |
+| COMPLETE | Create out-of-scope Issues → Post response complete comment → **Subsequent steps**: Post Work Summary → Status → Review update → Evolution signal recording |
+
+**Subsequent steps after COMPLETE are managed as pending in TodoWrite. Even after reaching COMPLETE, immediately proceed to the next step as long as pending steps remain.**
 
 **Safety limit**: 5 iterations (2 critical + 2 warning + 1 buffer). On reaching limit, convert remaining fixable-warnings to follow-up Issues.
 

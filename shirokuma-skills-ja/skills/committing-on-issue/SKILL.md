@@ -15,12 +15,10 @@ allowed-tools: Bash, Read, Grep, Glob
 ### ステップ 1: 変更の確認
 
 ```bash
-git status --short
-git diff --stat
-git branch --show-current
+shirokuma-docs git check
 ```
 
-変更のサマリーを出力に含める。
+1コマンドで branch, baseBranch, uncommittedChanges, unpushedCommits, recentCommits, diffStat, warnings を JSON で取得。変更のサマリーを出力に含める。
 
 ### ステップ 2: ファイルのステージング
 
