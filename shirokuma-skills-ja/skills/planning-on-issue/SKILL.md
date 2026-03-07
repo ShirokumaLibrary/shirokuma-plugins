@@ -327,6 +327,32 @@ shirokuma-docs issues update {number} --field-status "Spec Review"
 修正が必要な場合はフィードバックをお願いします。
 ```
 
+#### エピック計画の場合（サブ Issue 構成あり）
+
+計画にサブ Issue 構成（`### サブ Issue 構成` セクション）が含まれる場合、エピック固有の完了レポートを表示する:
+
+```markdown
+## 計画完了: #{number} {title}
+
+**ステータス:** Spec Review（承認待ち）
+**レベル:** 詳細（エピック）
+
+### 計画サマリー
+- **アプローチ:** {1行要約}
+- **サブ Issue 数:** {N}件
+- **Integration ブランチ:** `epic/{number}-{slug}`
+
+### 次のステップ
+1. `/working-on-issue #{number}` を実行 — 以下が自動で実行されます:
+   - 計画からサブ Issue を一括作成
+   - Integration ブランチを作成
+   - 依存関係に基づく実行順序を提案
+   - 最初のサブ Issue の作業を開始
+
+計画を確認し、問題なければ `/working-on-issue #{number}` で開始してください。
+修正が必要な場合はフィードバックをお願いします。
+```
+
 #### Evolution シグナル自動記録
 
 計画完了レポートの末尾で、`rule-evolution` ルールの「スキル完了時の自動記録手順」に従い、セッション中に発生した Evolution シグナルを自動記録する。

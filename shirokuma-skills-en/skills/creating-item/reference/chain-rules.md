@@ -19,7 +19,7 @@ Follow `managing-github-items`'s `reference/create-item.md`.
 
 ## Chain Decision
 
-Whether to chain to `working-on-issue` after creation:
+Whether to chain to `planning-on-issue` after creation:
 
 | Condition | Chain | Reason |
 |-----------|-------|--------|
@@ -40,3 +40,5 @@ Keep in Backlog without chaining when:
 ## Relationship with `working-on-issue` Step 1a
 
 When `working-on-issue` is invoked with text description only (no issue number), Step 1a calls `creating-item`. `creating-item` creates the Issue and returns the number, and `working-on-issue` continues. In this case, chain decision is not needed (as `working-on-issue` automatically continues).
+
+> **Note:** The chain from `creating-item` delegates directly to `planning-on-issue`, not `working-on-issue`. Since a newly created Issue has no plan, routing through `working-on-issue` is redundant.

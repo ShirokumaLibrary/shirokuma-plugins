@@ -46,7 +46,7 @@ After creation, confirm next action via AskUserQuestion:
 
 | Option | Action |
 |--------|--------|
-| Start planning | Delegate to `working-on-issue` with `#{number}` (starts with planning) |
+| Start planning | Delegate to `planning-on-issue` with `#{number}` |
 | Keep in Backlog | End (status remains Backlog) |
 
 See [reference/chain-rules.md](reference/chain-rules.md) for chain decision details.
@@ -64,7 +64,7 @@ When invoked standalone (not via `working-on-issue` chain):
 
 ```
 Item created: #{number}
-→ `/working-on-issue #{number}` to start planning
+→ `/planning-on-issue #{number}` to start planning
 → Or keep in Backlog
 ```
 

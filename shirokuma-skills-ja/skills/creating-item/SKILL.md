@@ -46,7 +46,7 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 
 | 選択肢 | アクション |
 |--------|----------|
-| 計画を立てる | `working-on-issue` に `#{number}` で委任（計画から開始） |
+| 計画を立てる | `planning-on-issue` に `#{number}` で委任 |
 | Backlog に置く | 終了（ステータスは Backlog のまま） |
 
 チェーン判定の詳細は [reference/chain-rules.md](reference/chain-rules.md) 参照。
@@ -64,7 +64,7 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 
 ```
 アイテム作成完了: #{number}
-→ `/working-on-issue #{number}` で計画から開始
+→ `/planning-on-issue #{number}` で計画から開始
 → またはそのまま Backlog に配置
 ```
 

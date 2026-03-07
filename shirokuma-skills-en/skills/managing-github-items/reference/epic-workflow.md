@@ -172,6 +172,34 @@ Extended template used by `planning-on-issue` when `subIssuesSummary.total > 0` 
 - {Dependency risks between sub-issues}
 ```
 
+## Post-Plan Approval Entry Point
+
+After `planning-on-issue` creates an epic plan (with `### Sub-Issue Structure`) and the user approves it, the entry point is:
+
+```
+/working-on-issue #{epic-number}
+```
+
+This single command triggers the full epic kickoff:
+
+1. **Detect epic**: `working-on-issue` reads the issue, finds `subIssuesSummary` or `### Sub-Issue Structure` in the plan
+2. **Create integration branch**: From `### Integration Branch` section → `git checkout -b epic/{number}-{slug}`
+3. **Create sub-issues**: Parse `### Sub-Issue Structure` table → `shirokuma-docs issues create` for each row with `--parent {epic-number}`
+4. **Update plan**: Replace placeholder issue references in the plan with actual sub-issue numbers
+5. **Propose order**: Present dependency-based execution order via AskUserQuestion
+6. **Start first sub-issue**: `working-on-issue #{first-sub}` — auto-detects integration branch via `parentIssue`
+
+### Session Recommendation
+
+| Pattern | When |
+|---------|------|
+| Parent issue bound session (`/starting-session #{epic}`) + sub-issue standalone | Multiple sub-issues across days; parent session tracks cross-cutting context |
+| Standalone per sub-issue | Independent sub-issues completable in single conversations |
+
+### Relationship to `creating-item`
+
+Sub-issue creation in the epic kickoff uses `shirokuma-docs issues create` directly, not `creating-item`. The plan already specifies all sub-issue metadata, making `creating-item`'s inference logic unnecessary.
+
 ## Out of Scope (Follow-up)
 
 The following are out of scope for now and will be addressed in separate issues:

@@ -327,6 +327,32 @@ Review the plan. If approved, run `/working-on-issue #{number}` to start impleme
 If changes are needed, provide feedback.
 ```
 
+#### For Epic Plans (Sub-Issue Structure)
+
+When the plan includes a sub-issue structure (`### Sub-Issue Structure` section), display an epic-specific completion report with next steps guidance:
+
+```markdown
+## Plan Complete: #{number} {title}
+
+**Status:** Spec Review (awaiting approval)
+**Level:** Detailed (Epic)
+
+### Plan Summary
+- **Approach:** {one-line summary}
+- **Sub-issues:** {N} issues
+- **Integration branch:** `epic/{number}-{slug}`
+
+### Next Steps
+1. Run `/working-on-issue #{number}` — this will automatically:
+   - Create all sub-issues from the plan
+   - Create the integration branch
+   - Propose execution order based on dependencies
+   - Start work on the first sub-issue
+
+Review the plan. If approved, run `/working-on-issue #{number}` to begin.
+If changes are needed, provide feedback.
+```
+
 #### Evolution Signal Auto-Recording
 
 At the end of the plan completion report, auto-record Evolution signals detected during the session following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule.

@@ -29,6 +29,24 @@ graph TD
 
 Small tasks may complete planning + implementation in a single conversation.
 
+### Epic Pattern (XL Issues with Sub-Issues)
+
+```mermaid
+graph TD
+    E1["Conversation 1: Epic planning<br/>/planning-on-issue #N"]
+    E2["Conversation 2: Epic kickoff<br/>/working-on-issue #N<br/>(auto-creates sub-issues + integration branch)"]
+    E3["Conversation 3+: Sub-issue work<br/>/working-on-issue #sub (standalone)<br/>or /starting-session #sub"]
+
+    E1 -->|"Spec Review → user approval"| E2
+    E2 -->|"sub-issues created"| E3
+    E3 -->|"all sub-issues done"| Final["Final PR: integration → develop"]
+```
+
+Key points:
+- `/working-on-issue #{epic}` auto-creates sub-issues from the plan and creates the integration branch
+- Each sub-issue is worked on independently (standalone or session)
+- Parent issue session recommended for managing cross-cutting context across sub-issues
+
 ## Session vs Standalone
 
 ### Session Usage Criteria
@@ -38,7 +56,7 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 | Use Session | Use Standalone |
 |-------------|---------------|
 | Many files modified (10+) | Completes in one conversation |
-| Epic (parent + sub-issues) | Localized changes (1-3 files) |
+| Epic (parent issue bound session + sub-issue standalone) | Localized changes (1-3 files) |
 | Multi-day work (M/L size) | Independent single task |
 | Two-phase work (research → implement) | Documentation, config changes |
 

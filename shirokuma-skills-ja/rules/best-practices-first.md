@@ -29,6 +29,24 @@ graph TD
 
 小規模タスクは 1 会話で計画+製造を完結することもある。
 
+### エピックパターン（サブ Issue を持つ XL Issue）
+
+```mermaid
+graph TD
+    E1["会話 1: エピック計画<br/>/planning-on-issue #N"]
+    E2["会話 2: エピック開始<br/>/working-on-issue #N<br/>（サブ Issue + integration ブランチを自動作成）"]
+    E3["会話 3+: サブ Issue 作業<br/>/working-on-issue #sub（スタンドアロン）<br/>or /starting-session #sub"]
+
+    E1 -->|"Spec Review → ユーザー承認"| E2
+    E2 -->|"サブ Issue 作成完了"| E3
+    E3 -->|"全サブ Issue 完了"| Final["最終 PR: integration → develop"]
+```
+
+ポイント:
+- `/working-on-issue #{epic}` が計画からサブ Issue を自動作成し、integration ブランチを作成
+- 各サブ Issue は独立して作業（スタンドアロンまたはセッション）
+- 親 Issue バウンドセッションでサブ Issue 間の横断的コンテキストを管理するのが推奨
+
 ## セッション vs スタンドアロン
 
 ### セッション使用基準
@@ -38,7 +56,7 @@ graph TD
 | セッションを使う | スタンドアロンで十分 |
 |-----------------|-------------------|
 | 修正対象ファイルが多い（10+） | 1 会話で完結する |
-| エピック（親 Issue + サブ Issue） | 局所的な変更（1-3 ファイル） |
+| エピック（親 Issue バウンドセッション + サブ Issue スタンドアロン） | 局所的な変更（1-3 ファイル） |
 | 複数日にわたる作業（M/L サイズ） | 独立した単発タスク |
 | 調査 → 実装の 2 フェーズ作業 | ドキュメント、設定変更 |
 

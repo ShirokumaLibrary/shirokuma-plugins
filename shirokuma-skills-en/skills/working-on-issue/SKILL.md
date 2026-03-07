@@ -373,7 +373,46 @@ When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batc
 | Wrong branch | AskUserQuestion: switch or continue |
 | Chain failure | Report completed/remaining steps, return control |
 | Sub-issue with no integration branch | Use `develop` as base, warn user |
-| Epic issue selected directly | Propose working on a sub-issue instead |
+| Epic issue selected directly | See "Epic Issue Entry Point" below |
+
+## Epic Issue Entry Point
+
+When an epic issue is directly specified (detected by `subIssuesSummary.total > 0` or a `### Sub-Issue Structure` section in the plan), execute the following flow instead of standard implementation dispatch.
+
+### Pre-condition: Plan with Sub-Issue Structure
+
+The epic must have a `## Plan` with a `### Sub-Issue Structure` section. If no plan exists, delegate to `planning-on-issue` first (standard flow).
+
+### Epic Workflow
+
+1. **Create integration branch**: Extract branch name from `### Integration Branch` in the plan, create from `develop`:
+   ```bash
+   git checkout develop && git pull origin develop
+   git checkout -b epic/{number}-{slug}
+   git push -u origin epic/{number}-{slug}
+   ```
+
+2. **Create sub-issues in batch**: Parse the `### Sub-Issue Structure` table from the plan. For each row, create a sub-issue via CLI:
+   ```bash
+   shirokuma-docs issues create --title "{title}" --issue-type "{type}" \
+     --size "{size}" --parent {epic-number} --field-status "Backlog"
+   ```
+   Body: Minimal stub referencing the parent plan (`See #{epic-number} for full plan`).
+   After creation, update the epic's `### Sub-Issue Structure` table with actual issue numbers.
+
+3. **Propose execution order**: Based on the `### Execution Order` section or dependency column, present the recommended order via AskUserQuestion:
+   ```
+   Sub-issues created. Recommended execution order:
+   1. #{sub1} - {title} (no dependencies)
+   2. #{sub2} - {title} (depends on #{sub1})
+   Start with #{sub1}?
+   ```
+
+4. **Start first sub-issue**: After user confirmation, set epic → In Progress, then recursively invoke `working-on-issue #{first-sub-issue}`. The sub-issue flow auto-detects the integration branch via `parentIssue`.
+
+### Responsibility Note
+
+Sub-issue creation in this flow uses `shirokuma-docs issues create` directly (not `creating-item`). The plan already specifies sub-issue details, so `creating-item`'s inference logic is unnecessary.
 
 ## Rule References
 
