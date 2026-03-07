@@ -89,7 +89,7 @@ Write the PR body to a file, then create the PR. When changes meet the Mermaid c
 - {bullet point 2}
 
 ## Related Issues
-{Closes #N or Refs #N}
+Closes #{issue-number}
 
 ## Test plan
 - [ ] {test item 1}
@@ -124,7 +124,7 @@ docs: CLAUDE.md のコマンド一覧を更新      ← Wrong: not English
 
 **Body rules:**
 - Summary: 1-3 bullet points of what changed
-- Related Issues: `Closes #N` for completed items, `Refs #N` for related
+- Related Issues: Always use `Closes #N` (not `Refs #N` — the CLI's `parseLinkedIssues()` only matches `Closes/Fixes/Resolves` patterns)
 - Test plan: checklist of verification steps
 
 ### Step 5: Fork Signal
@@ -228,7 +228,7 @@ Review reports output by `reviewing-on-issue` during self-review must also follo
 | PR already exists for branch | Include existing PR URL in result |
 | Push fails | Return error, suggest `git pull --rebase` |
 | Sub-issue with no integration branch found | Use `develop` as base, include warning in result |
-| Integration branch PR | Include `Closes #N` in body (GitHub sidebar won't show link, but CLI handles it) |
+| Integration branch PR | Always include `Closes #N` in body (not `Refs` — CLI's `parseLinkedIssues()` only matches `Closes/Fixes/Resolves`. GitHub sidebar won't show link, but CLI handles it) |
 | Multiple branches match fallback search | Select first match, include alternatives in result |
 | Base branch was wrong after PR creation | Fix via REST API: `gh api repos/{owner}/{repo}/pulls/{pr-number} --method PATCH -f base="correct-branch"` |
 
@@ -250,5 +250,5 @@ PR created. Next steps:
 - Create PRs from feature branches, not `develop` or `main` — PRs from protected branches have no meaningful diff
 - Daily work PRs target `develop`; only hotfixes target `main`
 - Reserve `main` as PR target for hotfixes only — routing daily work to `main` bypasses the integration branch
-- Include issue references for automatic linking
+- Always use `Closes #N` for issue references (not `Refs #N` — the CLI's `parseLinkedIssues()` cannot parse `Refs`, so Issues won't close on merge)
 - PR body should be informative but concise

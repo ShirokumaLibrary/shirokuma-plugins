@@ -201,7 +201,7 @@ This single command handles: resolve PR from branch name, squash merge, extract 
 
 N:N detection: CLI outputs a structured list of related PRs/Issues. Review the list and individually update Status via `issues update`. Use `--skip-link-check` to bypass after reviewing.
 
-**Integration branch merge**: For sub-issue PRs targeting an integration branch, `pr merge` works normally — `parseLinkedIssues()` parses the PR body independently of the base branch.
+**Integration branch merge (important)**: For sub-issue PRs targeting an integration branch, GitHub's native auto-close does NOT work (it only triggers on merges to the default branch). Therefore, `shirokuma-docs pr merge` is **required** — merging via `gh pr merge` or the GitHub UI will not update Issue status. The PR body must include `Closes #N` (not `Refs` — `parseLinkedIssues()` cannot parse `Refs`).
 
 If no PR found for the branch, return error and stop.
 
@@ -289,7 +289,7 @@ If invoked with a message argument (e.g., `/committing-on-issue fix typo in conf
 | PR has unresolved reviews | Include warning in result |
 | No issue references in PR body | Skip status update, include note in result |
 | N:N link graph detected | CLI stops merge, include structured output in result |
-| Integration branch merge | `Closes #N` in PR body works via CLI even though GitHub auto-close is inactive |
+| Integration branch merge | `shirokuma-docs pr merge` required (GitHub auto-close is inactive). PR body must use `Closes #N` (not `Refs`) |
 
 ## Rule References
 

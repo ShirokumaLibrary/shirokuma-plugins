@@ -201,7 +201,7 @@ shirokuma-docs pr merge --head {current-branch}
 
 N:N が検出された場合、CLI は関連 PR/Issue のリストを構造化出力する。AI はリストを確認し、個別に `issues update` で Status を更新する。リンクグラフ検証をスキップするには `--skip-link-check` を使用する。
 
-**Integration ブランチへのマージ**: サブ Issue の PR が integration ブランチにマージされる場合も `Closes #N` を使用する。GitHub のネイティブ自動クローズは動作しないが、`pr merge` の `parseLinkedIssues()` がベースブランチに依存せず PR 本文を解析するため正常にステータスを更新する。
+**Integration ブランチへのマージ（重要）**: サブ Issue の PR が integration ブランチにマージされる場合、GitHub のネイティブ自動クローズは動作しない（デフォルトブランチへのマージでのみ有効）。そのため `shirokuma-docs pr merge` の使用が**必須**であり、`gh pr merge` や GitHub UI からのマージでは Issue ステータスが更新されない。PR 本文には必ず `Closes #N` を含めること（`Refs` では `parseLinkedIssues()` が解析不可）。
 
 ブランチに PR が見つからない場合は CLI がエラーを報告。エラーを返却して停止。
 
@@ -289,7 +289,7 @@ git branch --show-current | grep -q '\-batch-'
 | 未解決レビューあり | 警告を結果に記載 |
 | PR 本文に Issue 参照なし | ステータス更新をスキップ、結果に記載 |
 | N:N リンクグラフ検出 | CLI がエラー停止、構造化出力を結果に含める |
-| integration ブランチへのマージ | `Closes #N` で CLI がステータス更新（GitHub 自動クローズは非動作） |
+| integration ブランチへのマージ | `shirokuma-docs pr merge` 必須（GitHub 自動クローズは非動作）。PR 本文に `Closes #N` 必須（`Refs` は不可） |
 
 ## ルール参照
 
