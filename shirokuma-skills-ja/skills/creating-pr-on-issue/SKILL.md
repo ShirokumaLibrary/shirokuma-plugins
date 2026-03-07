@@ -96,6 +96,22 @@ shirokuma-docs pr create --base {base_branch} --title "{title}" --body-file /tmp
 
 **タイトルルール**: 70文字以内、プレフィックス(`feat:` 等)は英語、**それ以降は日本語**で記述する。Issue番号はタイトルに入れない。
 
+### ステップ 4b: PR リンクコメント（デフォルトブランチ以外がベースの場合のみ）
+
+ベースブランチがリポジトリのデフォルトブランチでない場合（integration ブランチベースの PR 等）、GitHub のサイドバー PR リンクが表示されないため、関連 Issue に PR リンクコメントを自動投稿する。
+
+**条件**: `base_branch !== default_branch`
+
+```bash
+shirokuma-docs issues comment {issue-number} --body-file - <<'EOF'
+🔗 PR #{pr-number} がこの Issue に関連しています。
+EOF
+```
+
+バッチモードの場合、`Closes` で参照されている各 Issue に対して投稿する。
+
+デフォルトブランチベースの PR ではこのステップをスキップする（GitHub ネイティブの PR リンクが正常に動作するため）。
+
 ### ステップ 5: Fork Signal
 
 PR 作成自体が GitHub への書き込み（成果物）であるため、追加の GitHub 書き込みは不要。呼び出し元に以下の構造化データを返す:

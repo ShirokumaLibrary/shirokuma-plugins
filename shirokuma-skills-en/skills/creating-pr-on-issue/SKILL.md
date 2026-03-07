@@ -127,6 +127,22 @@ docs: CLAUDE.md のコマンド一覧を更新      ← Wrong: not English
 - Related Issues: Always use `Closes #N` (not `Refs #N` — the CLI's `parseLinkedIssues()` only matches `Closes/Fixes/Resolves` patterns)
 - Test plan: checklist of verification steps
 
+### Step 4b: PR Link Comment (non-default base branch only)
+
+When the base branch is not the repository's default branch (e.g., integration branch-based PR), GitHub's sidebar PR link is not displayed. Automatically post a PR link comment to the related issues.
+
+**Condition**: `base_branch !== default_branch`
+
+```bash
+shirokuma-docs issues comment {issue-number} --body-file - <<'EOF'
+🔗 PR #{pr-number} is linked to this issue.
+EOF
+```
+
+In batch mode, post to each issue referenced by `Closes`.
+
+Skip this step for default branch-based PRs (GitHub's native PR link works correctly).
+
 ### Step 5: Fork Signal
 
 PR creation itself is a GitHub write (the deliverable), so no additional GitHub write is needed. Return the following structured data to the caller:
