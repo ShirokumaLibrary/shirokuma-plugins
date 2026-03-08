@@ -98,10 +98,10 @@ git push -u origin {branch-name}
 `creating-pr-on-issue` スキルのワークフローに従い、`develop` ターゲットで PR を作成（`branch-workflow` ルール参照）:
 
 ```bash
-shirokuma-docs pr create --base develop --title "{タイトル}" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
 ```
 
-`/tmp/shirokuma-docs/pr-body.md` の内容:
+`/tmp/shirokuma-docs/pr.md` の内容:
 ```markdown
 ## 概要
 {達成内容の箇条書き 1-3 点}

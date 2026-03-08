@@ -131,9 +131,7 @@ Skill completion → Introspection checks → Environment checks (working-on-iss
    ```
 2. If 0 issues found, create a general-purpose Evolution Issue:
    ```bash
-   shirokuma-docs issues create --issue-type Evolution --title "[Evolution] Skill & Rule Improvement Signals" --body-file - <<'EOF'
-   Issue for accumulating Evolution signals. Used for both auto-recording at skill completion and manual recording.
-   EOF
+   shirokuma-docs issues create --from-file /tmp/shirokuma-docs/evolution.md
    ```
 3. Post signals as a comment (consolidate multiple signals into 1 comment):
    ```bash

@@ -394,8 +394,8 @@ The epic must have a `## Plan` with a `### Sub-Issue Structure` section. If no p
 
 2. **Create sub-issues in batch**: Parse the `### Sub-Issue Structure` table from the plan. For each row, create a sub-issue via CLI:
    ```bash
-   shirokuma-docs issues create --title "{title}" --issue-type "{type}" \
-     --size "{size}" --parent {epic-number} --field-status "Backlog"
+   shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{slug}.md \
+     --parent {epic-number} --field-status "Backlog"
    ```
    Body: Minimal stub referencing the parent plan (`See #{epic-number} for full plan`).
    After creation, update the epic's `### Sub-Issue Structure` table with actual issue numbers.

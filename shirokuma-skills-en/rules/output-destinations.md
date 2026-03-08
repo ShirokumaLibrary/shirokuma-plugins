@@ -23,11 +23,8 @@ Claude Code skills produce two types of output. Route each to the appropriate de
 **Destination**: GitHub Discussions → Reports category
 
 ```bash
-# Create via shirokuma-docs CLI
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "Review: {target}" \
-  --body-file /tmp/shirokuma-docs/report.md
+# Create via shirokuma-docs CLI (--from-file includes metadata in frontmatter)
+shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/report.md
 ```
 
 **Characteristics**:

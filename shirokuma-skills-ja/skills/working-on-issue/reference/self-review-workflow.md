@@ -200,12 +200,8 @@ fire-and-forget（PASS/FAIL 判定なし）。品質ゲートは後続の `[REVI
 **重複排除**: 最終イテレーションの out-of-scope リストのみを使用。各イテレーションの結果は PR コメントに残るため情報は失われない。
 
 ```bash
-shirokuma-docs issues create \
-  --title "{指摘のタイトル}" \
-  --body-file /tmp/shirokuma-docs/{number}-out-of-scope.md \
-  --field-status "Backlog" \
-  --field-priority "{AI判断}" \
-  --field-size "{AI判断}"
+shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{number}-out-of-scope.md \
+  --field-status "Backlog"
 ```
 
 **条件付き実行**: out-of-scope が 0 件の場合はスキップ。

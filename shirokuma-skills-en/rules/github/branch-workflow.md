@@ -149,7 +149,7 @@ When work is complete or session ends:
 
 ```bash
 git push -u origin {branch-name}
-shirokuma-docs pr create --base develop --title "{title}" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
 ```
 
 - PR title: concise summary (under 70 characters)
@@ -187,7 +187,7 @@ git checkout -b hotfix/{issue-number}-{slug}
 
 # 3. Create PR to main
 git push -u origin hotfix/{issue-number}-{slug}
-shirokuma-docs pr create --base main --title "hotfix: {description}" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
 
 # 4. After merge to main, sync to develop
 git checkout develop
@@ -207,7 +207,7 @@ Releases are created by merging `develop` into `main`.
 
 ```bash
 # 1. Create PR from develop to main
-shirokuma-docs pr create --base main --head develop --title "release: v{version}" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
 
 # 2. After PR merge, tag the release
 git checkout main

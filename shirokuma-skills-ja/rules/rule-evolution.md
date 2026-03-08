@@ -131,9 +131,7 @@ shirokuma-docs lint tests -p . --format json 2>/dev/null
    ```
 2. Issue が 0 件の場合、汎用 Evolution Issue を作成:
    ```bash
-   shirokuma-docs issues create --issue-type Evolution --title "[Evolution] スキル・ルール改善シグナル" --body-file - <<'EOF'
-   Evolution シグナルの蓄積用 Issue。スキル完了時の自動記録と手動記録の両方で使用する。
-   EOF
+   shirokuma-docs issues create --from-file /tmp/shirokuma-docs/evolution.md
    ```
 3. シグナルをコメントとして投稿（複数シグナルは 1 コメントに集約）:
    ```bash

@@ -83,7 +83,7 @@ Use `recentCommits` and `diffStat` from the Step 1 `shirokuma-docs git check` JS
 Write the PR body to a file, then create the PR. When changes meet the Mermaid conditions in the `github-writing-style` rule, include diagrams in the PR body.
 
 ```markdown
-<!-- /tmp/shirokuma-docs/{number}-pr-body.md -->
+<!-- /tmp/shirokuma-docs/{number}-pr.md -->
 ## Summary
 - {bullet point 1}
 - {bullet point 2}
@@ -97,7 +97,7 @@ Closes #{issue-number}
 ```
 
 ```bash
-shirokuma-docs pr create --base {base_branch} --title "{title}" --body-file /tmp/shirokuma-docs/{number}-pr-body.md
+shirokuma-docs pr create --from-file /tmp/shirokuma-docs/{number}-pr.md
 ```
 
 **Title rules:**

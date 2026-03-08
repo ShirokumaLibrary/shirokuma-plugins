@@ -8,7 +8,7 @@
 - 前提条件
 - DraftIssue vs Issue
 - shirokuma-docs CLI リファレンス
-- `--body-file` 使い分け
+- `--from-file` vs `--body-file` 使い分け
 - ステータスワークフロー
 - ラベル規約
 - よくあるエラー対処
@@ -55,10 +55,7 @@ shirokuma-docs issues list                          # オープン Issue 一覧
 shirokuma-docs issues list --all                    # クローズ含む
 shirokuma-docs issues list --status "In Progress"   # ステータスフィルタ
 shirokuma-docs show {number}                  # 詳細
-shirokuma-docs issues create \
-  --title "Title" --body-file /tmp/shirokuma-docs/body.md \
-  --labels "area:cli" --issue-type "Feature" \
-  --field-status "Backlog" --priority "Medium" --size "M"
+shirokuma-docs issues create --from-file /tmp/shirokuma-docs/new-issue.md  # メタデータ+本文を一括入力
 shirokuma-docs issues update {number} --field-status "In Progress"
 shirokuma-docs issues update {number} --add-label "area:cli"       # ラベル追加
 shirokuma-docs issues update {number} --remove-label "area:docs"   # ラベル削除
@@ -74,8 +71,8 @@ shirokuma-docs issues reopen {number}
 ### Pull Requests
 
 ```bash
-shirokuma-docs pr create --base develop --title "feat: タイトル (#42)" --body-file /tmp/shirokuma-docs/pr-body.md
-shirokuma-docs pr create --base main --head develop --title "release: v0.2.0"  # リリースワークフロー
+shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md             # メタデータ+本文を一括入力
+shirokuma-docs pr create --base main --head develop --title "release: v0.2.0"  # リリースワークフロー（メタデータのみ）
 shirokuma-docs pr list                                      # PR 一覧（デフォルト: open）
 shirokuma-docs pr list --state merged --limit 5            # フィルタリング
 shirokuma-docs pr show {number}                             # PR 詳細（body, diff stats, linked issues）
@@ -105,10 +102,7 @@ shirokuma-docs projects update {number} --field-status "Done"
 ```bash
 shirokuma-docs discussions list --category Handovers --limit 5
 shirokuma-docs show {number}
-shirokuma-docs discussions create \
-  --category Handovers \
-  --title "$(date +%Y-%m-%d) - Summary" \
-  --body-file /tmp/shirokuma-docs/body.md
+shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/discussion.md  # メタデータ+本文を一括入力
 ```
 
 ### Repository
@@ -122,7 +116,7 @@ shirokuma-docs repo labels
 
 ```bash
 shirokuma-docs issues list --repo docs
-shirokuma-docs issues create --repo docs --title "Title" --body-file /tmp/shirokuma-docs/body.md
+shirokuma-docs issues create --repo docs --from-file /tmp/shirokuma-docs/new-issue.md
 ```
 
 ### gh フォールバック（CLI 未対応の操作のみ）
@@ -141,12 +135,45 @@ gh auth status
 
 ```
 
-## `--body-file` 使い分け
+## `--from-file` vs `--body-file` 使い分け
+
+| パターン | 使用コマンド | 理由 |
+|---------|-------------|------|
+| `--from-file` 推奨 | `issues create`, `pr create`, `discussions create` | メタデータ+本文を1ファイルに集約、フラグ組み合わせミス防止 |
+| `--body-file` 維持 | `issues comment`, `pr reply`, `issues comment-edit`, `session end` | 本文のみでメタデータ不要 |
+| `--body-file` 維持 | `issues update`（本文のみ更新） | 既存 Issue の本文書き換えは `--body-file` で十分 |
+| `--from-file` 併記 | `issues update`（メタデータ+本文の一括更新） | ラウンドトリップ: `--to-file` → 編集 → `--from-file` |
+
+### `--from-file` フロントマター形式
+
+```markdown
+---
+title: Issue タイトル
+type: Feature
+priority: Medium
+size: M
+labels: [area:cli]
+---
+
+本文をここに記述する。
+```
+
+フロントマターの安全フィールドはコマンド種別で異なる:
+
+| コマンド | 安全フィールド |
+|---------|--------------|
+| `issues create` / `issues update` | `title`, `type`, `priority`, `size`, `labels` |
+| `pr create` | `title`, `base`, `head` |
+| `discussions create` | `title`, `category` |
+
+CLI フラグが設定済みの場合はフラグを優先。`--from-file` と `--body-file` は排他（同時指定でエラー）。
+
+### `--body-file` Tier ガイド
 
 | Tier | パターン | 用途 |
 |------|---------|------|
 | Tier 1 (stdin) | `--body-file - <<'EOF'...EOF` | コメント、返信、短い理由 |
-| Tier 2 (file) | Write → `--body-file /tmp/shirokuma-docs/xxx.md` | Issue/Discussion 本文、引き継ぎ |
+| Tier 2 (file) | Write → `--body-file /tmp/shirokuma-docs/xxx.md` | 本文更新、引き継ぎ |
 
 heredoc delimiter は `<<'EOF'`（シングルクォートで変数展開防止）。Tier 2 で本文を反復更新する場合は Write/Edit パターン（初回 Write → 以降 Edit で差分更新）を適用する。詳細は `item-maintenance.md` の「ファイルベース本文編集」セクション参照。
 

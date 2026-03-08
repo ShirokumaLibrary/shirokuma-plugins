@@ -91,11 +91,11 @@ Use [templates/convention-proposal.md](templates/convention-proposal.md)
 Before proposing a rule, save findings as a Knowledge Discussion to preserve context and rationale.
 
 ```bash
-# For confirmed patterns → Knowledge category
-shirokuma-docs discussions create --category Knowledge --title "{Pattern Name}" --body-file /tmp/shirokuma-docs/body.md
+# For confirmed patterns → Knowledge category (--from-file for metadata + body in one file)
+shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/knowledge.md
 
 # For investigations still in progress → Research category
-shirokuma-docs discussions create --category Research --title "[Research] convention-{category}" --body-file /tmp/shirokuma-docs/body.md
+shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/research.md
 ```
 
 **Choose the category based on confidence level:**

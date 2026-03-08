@@ -210,17 +210,14 @@ Issue numbers are assigned by GitHub at creation time — they are unknown befor
 | After creation | `/tmp/shirokuma-docs/{number}-body.md` allowed | `/tmp/shirokuma-docs/42-body.md` |
 
 ```bash
-# Issue (recommended - supports #number)
-shirokuma-docs issues create \
-  --title "Title" --body-file /tmp/shirokuma-docs/add-format-option-body.md \
-  --labels "area:cli" --issue-type "Feature" \
-  --field-status "Backlog" --priority "Medium" --size "M"
+# Issue (recommended — --from-file for metadata + body in one file)
+shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{slug}.md
 
-# Sub-Issue (--parent links to parent issue)
-shirokuma-docs issues create \
-  --title "Child task" --body-file /tmp/shirokuma-docs/{slug}-body.md \
-  --parent 958 --issue-type "Feature" \
-  --field-status "Backlog" --priority "Medium" --size "S"
+# --from-file + individual flags (flags take precedence)
+shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{slug}.md --field-status "Backlog"
+
+# Sub-Issue (--from-file + --parent links to parent issue)
+shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{slug}.md --parent 958
 
 # DraftIssue (lightweight)
 shirokuma-docs projects create \

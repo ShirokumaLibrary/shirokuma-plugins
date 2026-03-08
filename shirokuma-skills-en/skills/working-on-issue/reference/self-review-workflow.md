@@ -200,12 +200,8 @@ After the self-review loop completes (PASS, loop stopped, or safety limit reache
 **Deduplication**: Only use the out-of-scope list from the final iteration. Results from each iteration are preserved in PR comments so no information is lost.
 
 ```bash
-shirokuma-docs issues create \
-  --title "{finding title}" \
-  --body-file /tmp/shirokuma-docs/{number}-out-of-scope.md \
-  --field-status "Backlog" \
-  --field-priority "{AI-determined}" \
-  --field-size "{AI-determined}"
+shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{number}-out-of-scope.md \
+  --field-status "Backlog"
 ```
 
 **Conditional execution**: Skip if out-of-scope count is 0.

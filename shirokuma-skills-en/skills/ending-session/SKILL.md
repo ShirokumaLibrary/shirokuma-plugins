@@ -98,10 +98,10 @@ git push -u origin {branch-name}
 Follow the `creating-pr-on-issue` skill workflow. Create a PR targeting `develop` (see `branch-workflow` rule):
 
 ```bash
-shirokuma-docs pr create --base develop --title "{title}" --body-file /tmp/shirokuma-docs/pr-body.md
+shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
 ```
 
-Where `/tmp/shirokuma-docs/pr-body.md` contains:
+Where `/tmp/shirokuma-docs/pr.md` contains:
 ```markdown
 ## Summary
 {1-3 bullet points of what was done}

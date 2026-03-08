@@ -210,17 +210,14 @@ Issue 番号は GitHub が作成時に採番するため、作成前には不明
 | 作成後 | `/tmp/shirokuma-docs/{number}-body.md` 可 | `/tmp/shirokuma-docs/42-body.md` |
 
 ```bash
-# Issue（推奨 — #番号をサポート）
-shirokuma-docs issues create \
-  --title "Title" --body-file /tmp/shirokuma-docs/add-format-option-body.md \
-  --labels "area:cli" --issue-type "Feature" \
-  --field-status "Backlog" --priority "Medium" --size "M"
+# Issue（推奨 — --from-file でメタデータ+本文を一括入力）
+shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{slug}.md
 
-# サブ Issue として作成（--parent で親 Issue を指定）
-shirokuma-docs issues create \
-  --title "子タスク" --body-file /tmp/shirokuma-docs/{slug}-body.md \
-  --parent 958 --issue-type "Feature" \
-  --field-status "Backlog" --priority "Medium" --size "S"
+# --from-file + 個別フラグ併用（フラグが優先）
+shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{slug}.md --field-status "Backlog"
+
+# サブ Issue として作成（--from-file + --parent で親 Issue を指定）
+shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{slug}.md --parent 958
 
 # DraftIssue（軽量）
 shirokuma-docs projects create \

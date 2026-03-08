@@ -79,7 +79,7 @@ base_branch="develop"
 PR 本文をファイルに書き出してから PR を作成する。変更内容が `github-writing-style` ルールの Mermaid 使用条件を満たす場合、PR 本文に図を含める。
 
 ```markdown
-<!-- /tmp/shirokuma-docs/{number}-pr-body.md -->
+<!-- /tmp/shirokuma-docs/{number}-pr.md -->
 ## 概要
 - {箇条書き}
 
@@ -91,7 +91,7 @@ Closes #{issue-number}
 ```
 
 ```bash
-shirokuma-docs pr create --base {base_branch} --title "{title}" --body-file /tmp/shirokuma-docs/{number}-pr-body.md
+shirokuma-docs pr create --from-file /tmp/shirokuma-docs/{number}-pr.md
 ```
 
 **タイトルルール**: 70文字以内、プレフィックス(`feat:` 等)は英語、**それ以降は日本語**で記述する。Issue番号はタイトルに入れない。

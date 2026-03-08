@@ -100,11 +100,11 @@ find apps/ -name "*.tsx" | xargs basename -a | sort | uniq -c | sort -rn
 ルール提案前に、コンテキストと根拠を保存するため Knowledge Discussion を作成。
 
 ```bash
-# 確認済みパターン → Knowledge カテゴリ
-shirokuma-docs discussions create --category Knowledge --title "{パターン名}" --body-file /tmp/shirokuma-docs/body.md
+# 確認済みパターン → Knowledge カテゴリ（--from-file でメタデータ+本文を一括入力）
+shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/knowledge.md
 
 # 調査中 → Research カテゴリ
-shirokuma-docs discussions create --category Research --title "[Research] convention-{category}" --body-file /tmp/shirokuma-docs/body.md
+shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/research.md
 ```
 
 **確信度に基づきカテゴリを選択：**

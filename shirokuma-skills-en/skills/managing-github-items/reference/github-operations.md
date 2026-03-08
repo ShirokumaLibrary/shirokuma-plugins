@@ -8,7 +8,7 @@ Shared reference for all session/GitHub skills. Single source of truth for CLI c
 - Prerequisites
 - DraftIssue vs Issue
 - shirokuma-docs CLI Reference
-- `--body-file` Usage Guide
+- `--from-file` vs `--body-file` Usage Guide
 - Status Workflow
 - Labels Convention
 - Common Error Handling
@@ -55,10 +55,7 @@ shirokuma-docs issues list                          # Open issues
 shirokuma-docs issues list --all                    # Include closed
 shirokuma-docs issues list --status "In Progress"   # Filter by status
 shirokuma-docs show {number}                  # Details
-shirokuma-docs issues create \
-  --title "Title" --body-file /tmp/shirokuma-docs/body.md \
-  --labels "area:cli" --issue-type "Feature" \
-  --field-status "Backlog" --priority "Medium" --size "M"
+shirokuma-docs issues create --from-file /tmp/shirokuma-docs/new-issue.md  # Metadata + body in one file
 shirokuma-docs issues update {number} --field-status "In Progress"
 shirokuma-docs issues update {number} --add-label "area:cli"       # Add label
 shirokuma-docs issues update {number} --remove-label "area:docs"   # Remove label
@@ -74,8 +71,8 @@ shirokuma-docs issues reopen {number}
 ### Pull Requests
 
 ```bash
-shirokuma-docs pr create --base develop --title "feat: title (#42)" --body-file /tmp/shirokuma-docs/pr-body.md
-shirokuma-docs pr create --base main --head develop --title "release: v0.2.0"  # Release workflow
+shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md             # Metadata + body in one file
+shirokuma-docs pr create --base main --head develop --title "release: v0.2.0"  # Release workflow (metadata only)
 shirokuma-docs pr list                                      # PR list (default: open)
 shirokuma-docs pr list --state merged --limit 5            # Filtering
 shirokuma-docs pr show {number}                             # PR details (body, diff stats, linked issues)
@@ -105,10 +102,7 @@ shirokuma-docs projects update {number} --field-status "Done"
 ```bash
 shirokuma-docs discussions list --category Handovers --limit 5
 shirokuma-docs show {number}
-shirokuma-docs discussions create \
-  --category Handovers \
-  --title "$(date +%Y-%m-%d) - Summary" \
-  --body-file /tmp/shirokuma-docs/body.md
+shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/discussion.md  # Metadata + body in one file
 ```
 
 ### Repository
@@ -122,7 +116,7 @@ shirokuma-docs repo labels
 
 ```bash
 shirokuma-docs issues list --repo docs
-shirokuma-docs issues create --repo docs --title "Title" --body-file /tmp/shirokuma-docs/body.md
+shirokuma-docs issues create --repo docs --from-file /tmp/shirokuma-docs/new-issue.md
 ```
 
 ### gh Fallback (CLI unsupported only)
@@ -141,12 +135,45 @@ gh auth status
 
 ```
 
-## `--body-file` Usage Guide
+## `--from-file` vs `--body-file` Usage Guide
+
+| Pattern | Commands | Reason |
+|---------|----------|--------|
+| `--from-file` recommended | `issues create`, `pr create`, `discussions create` | Metadata + body in one file, prevents flag combination errors |
+| `--body-file` kept | `issues comment`, `pr reply`, `issues comment-edit`, `session end` | Body only, no metadata needed |
+| `--body-file` kept | `issues update` (body-only update) | `--body-file` is sufficient for rewriting existing Issue body |
+| `--from-file` also | `issues update` (metadata + body bulk update) | Round-trip: `--to-file` → edit → `--from-file` |
+
+### `--from-file` Frontmatter Format
+
+```markdown
+---
+title: Issue Title
+type: Feature
+priority: Medium
+size: M
+labels: [area:cli]
+---
+
+Body content goes here.
+```
+
+Safe frontmatter fields vary by command:
+
+| Command | Safe Fields |
+|---------|-------------|
+| `issues create` / `issues update` | `title`, `type`, `priority`, `size`, `labels` |
+| `pr create` | `title`, `base`, `head` |
+| `discussions create` | `title`, `category` |
+
+CLI flags take precedence when set. `--from-file` and `--body-file` are mutually exclusive (error if both specified).
+
+### `--body-file` Tier Guide
 
 | Tier | Pattern | Usage |
 |------|---------|-------|
 | Tier 1 (stdin) | `--body-file - <<'EOF'...EOF` | Comments, replies, short reasons |
-| Tier 2 (file) | Write → `--body-file /tmp/shirokuma-docs/xxx.md` | Issue/Discussion body, handovers |
+| Tier 2 (file) | Write → `--body-file /tmp/shirokuma-docs/xxx.md` | Body updates, handovers |
 
 Use `<<'EOF'` as heredoc delimiter (single quotes prevent variable expansion). When iteratively updating bodies via Tier 2, apply the Write/Edit pattern (initial Write → subsequent Edit for diff-only updates). See the "File-Based Body Editing" section in `item-maintenance.md` for details.
 
