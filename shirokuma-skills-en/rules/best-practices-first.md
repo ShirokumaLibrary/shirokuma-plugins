@@ -66,13 +66,13 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 |-------|---------|------------|-------|
 | working-on-issue | Yes | Yes | Entry point for both modes |
 | planning-on-issue | Yes | Yes | Via working-on-issue or standalone |
-| coding-on-issue | Yes | — | Fork delegation from working-on-issue only |
+| coding-on-issue | Yes | — | Subagent delegation from working-on-issue only |
 | coding-nextjs | Yes | Yes | Via coding-on-issue or standalone |
 | designing-ui-on-issue | Yes | Yes | Via working-on-issue or standalone |
 | designing-shadcn-ui | Yes | Yes | Via designing-ui-on-issue or standalone |
 | creating-item | — | Yes | Always standalone-capable |
-| committing-on-issue | Yes | Yes | Fork (standalone also runs as fork) |
-| creating-pr-on-issue | Yes | Yes | Fork (via chain or standalone) |
+| committing-on-issue | Yes | Yes | Subagent (standalone also runs as subagent) |
+| creating-pr-on-issue | Yes | Yes | Subagent (via chain or standalone) |
 | starting-session | Yes | — | Session start only (`#N` for issue-bound, no arg for unbound) |
 | ending-session | Yes | — | Session end only |
 
@@ -92,11 +92,11 @@ For substantial standalone work without `working-on-issue`:
 
 | Task Type | Route To | Method |
 |-----------|----------|--------|
-| General Coding | `coding-on-issue` | Skill (`context: fork`, via `working-on-issue`) |
+| General Coding | `coding-on-issue` | Agent (custom subagent, via `working-on-issue`) |
 | UI Design | `designing-ui-on-issue` | Skill (via `working-on-issue`) |
-| Research | `researching-best-practices` | Skill (`context: fork`) |
-| Review | `reviewing-on-issue` | Skill (`context: fork`) |
-| Claude Config | `reviewing-claude-config` | Skill (`context: fork`) |
+| Research | `researching-best-practices` | Agent (custom subagent) |
+| Review | `reviewing-on-issue` | Agent (custom subagent) |
+| Claude Config | `reviewing-claude-config` | Agent (custom subagent) |
 | Issue / Discussion creation | `creating-item` | Skill |
 | GitHub data display | `showing-github` | Skill |
 | Project setup | `setting-up-project` | Skill |
@@ -114,15 +114,15 @@ Simple questions, minor config edits, fine-tuning skill results, confirmation di
 - **AskUserQuestion**: Deviating from instructions, multiple approach selection, edge case decisions
 - **TodoWrite**: 3+ step tasks, multi-issue sessions, delegation chains
 
-## Fork Completion
+## Subagent Completion
 
-**Fork skill completion ≠ task completion.** When a fork skill (`context: fork`) returns, the main AI must:
+**Subagent skill completion ≠ task completion.** When a custom sub-agent (e.g., `pr-worker`, `commit-worker`, `review-worker`) returns via the Agent tool, the main AI must:
 
-1. Parse the Fork Signal (YAML frontmatter)
+1. Parse the output template (YAML frontmatter)
 2. Check TodoWrite for remaining `pending` steps
-3. If pending steps exist → immediately proceed to the next step (do NOT stop or summarize)
+3. If pending steps exist → **immediately proceed to the next step in the same response** (do NOT stop, summarize, or ask the user)
 
-Fork results are intermediate chain data. Stopping after a fork result forces the user to manually type "continue" — this breaks the autonomous workflow chain.
+The Agent tool returning is a chain mid-point, not a completion signal. Stopping after a subagent result forces the user to manually type "continue" — this breaks the autonomous workflow chain.
 
 ## Error Recovery
 

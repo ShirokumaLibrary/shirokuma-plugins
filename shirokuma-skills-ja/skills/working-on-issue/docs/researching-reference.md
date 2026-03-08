@@ -11,7 +11,7 @@
 
 ## 実行コンテキスト
 
-`researching-best-practices` は `context: fork` で実行される（サブエージェント）。メインコンテキストを汚さない。
+`researching-best-practices` は Agent ツール（サブエージェント）として実行される。メインコンテキストを汚さない。
 
 ## TDD 非適用
 

@@ -12,8 +12,8 @@ graph LR
 
 | スキル | 役割 | context | 理由 |
 |--------|------|---------|------|
-| `designing-ui-on-issue` | ワークフロー管理（ディスカバリー、評価ループ） | 非 fork | AskUserQuestion による反復的ユーザー対話が必要 |
-| `designing-shadcn-ui` | デザイン実装（ガイドライン、パターン、ビルド検証） | 非 fork | Skill 委任で呼び出し |
+| `designing-ui-on-issue` | ワークフロー管理（ディスカバリー、評価ループ） | 非サブエージェント | AskUserQuestion による反復的ユーザー対話が必要 |
+| `designing-shadcn-ui` | デザイン実装（ガイドライン、パターン、ビルド検証） | 非サブエージェント | Skill 委任で呼び出し |
 
 ## 委任タイミング
 

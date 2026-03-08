@@ -11,10 +11,10 @@ working-on-issue → coding-on-issue → coding-nextjs（Next.js 関連）
                                     → 直接編集（Markdown, plugin/, config 等）
 ```
 
-### fork スキル
+### サブエージェント動作
 
-`context: fork` で動作するため、`TodoWrite` / `AskUserQuestion` は使用不可。進捗管理とユーザー対話はマネージャー（`working-on-issue`）が担当する。
+カスタムサブエージェントとして動作するため、`TodoWrite` / `AskUserQuestion` は使用不可。進捗管理とユーザー対話はマネージャー（`working-on-issue`）が担当する。
 
 ## トリガーキーワード
 
-fork スキルのため `description` による直接トリガーは想定しない。`working-on-issue` のディスパッチ条件テーブルに基づき委任される。
+サブエージェントとして動作するため `description` による直接トリガーは想定しない。`working-on-issue` のディスパッチ条件テーブルに基づき委任される。

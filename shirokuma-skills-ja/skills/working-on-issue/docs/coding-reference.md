@@ -1,12 +1,12 @@
 # 実装ワークタイプ リファレンス
 
-`working-on-issue` から `coding-on-issue`（fork）に委任する際のガイド。
+`working-on-issue` から `coding-on-issue`（subagent）に委任する際のガイド。
 
 ## 委任構造
 
 ```text
 working-on-issue（マネージャー＝メイン AI）
-  → coding-on-issue（fork ワーカー）
+  → coding-on-issue（subagent ワーカー）
       → coding-nextjs（Skill 委任、Next.js 固有の場合）
       → 直接編集（Markdown, スキル, 設定等）
 ```
@@ -41,4 +41,4 @@ working-on-issue（マネージャー＝メイン AI）
 
 ## スタンドアロン起動
 
-ユーザーは `/coding-nextjs` を直接呼び出すことも可能（非 fork、TodoWrite/AskUserQuestion 利用可）。`coding-on-issue` は `working-on-issue` からの標準ルートだが、既存のスタンドアロン起動パスは維持される。
+ユーザーは `/coding-nextjs` を直接呼び出すことも可能（非サブエージェント、TodoWrite/AskUserQuestion 利用可）。`coding-on-issue` は `working-on-issue` からの標準ルートだが、既存のスタンドアロン起動パスは維持される。

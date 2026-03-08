@@ -1,8 +1,6 @@
 ---
 name: creating-pr-on-issue
 description: 現在のブランチから develop（またはサブIssueの integration ブランチ）をターゲットに GitHub プルリクエストを作成します。トリガー: 「PR作成」「プルリクエスト作成」「create pull request」「PRを開く」。
-context: fork
-agent: general-purpose
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
@@ -112,7 +110,7 @@ EOF
 
 デフォルトブランチベースの PR ではこのステップをスキップする（GitHub ネイティブの PR リンクが正常に動作するため）。
 
-### ステップ 5: Fork Signal
+### ステップ 5: 出力テンプレート
 
 PR 作成自体が GitHub への書き込み（成果物）であるため、追加の GitHub 書き込みは不要。呼び出し元に以下の構造化データを返す:
 
@@ -224,7 +222,7 @@ docs: update CLAUDE.md command table     ← 日本語設定では不正
 
 ## 次のステップ（スタンドアロン起動時のみ）
 
-**`working-on-issue` チェーンから fork で呼ばれた場合**: このセクションを省略する — 次のステップ提案は不要な停止を生み、チェーンの自律進行を阻害する。完了レポート（ステップ 5）のみを返す。
+**`working-on-issue` チェーンからサブエージェントとして呼ばれた場合**: このセクションを省略する — 次のステップ提案は不要な停止を生み、チェーンの自律進行を阻害する。完了レポート（ステップ 5）のみを返す。
 
 スタンドアロンで起動された場合:
 

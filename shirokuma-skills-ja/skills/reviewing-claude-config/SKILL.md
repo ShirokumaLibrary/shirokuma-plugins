@@ -1,9 +1,6 @@
 ---
 name: reviewing-claude-config
 description: Claude Code 設定ファイル（skills、rules、agents、output-styles、plugins）の品質・一貫性・Anthropic ベストプラクティス準拠をレビューする。.claude/ 設定の作成・更新後にプロアクティブに使用すること。トリガー: "設定レビュー", "スキルの品質チェック", "エージェント設定確認", "config review", "skill quality check".
-context: fork
-agent: general-purpose
-model: opus
 allowed-tools: Read, Grep, Glob, WebSearch, WebFetch
 ---
 
@@ -185,7 +182,7 @@ comment_id: {comment-database-id}
 - {file2}: {summary} [critical | warning]
 ```
 
-**Fork Signal（YAML フロントマター + 本文）は必ずレポート末尾に出力する。**
+**出力テンプレート（YAML フロントマター + 本文）は必ずレポート末尾に出力する。**
 
 **Status 判定:**
 - Error > 0 → FAIL
@@ -218,8 +215,8 @@ comment_id: {comment-database-id}
 - エラーは修正必須、警告は推奨
 - レポートは簡潔でスキャンしやすく保つ
 - 修正提案時に Anthropic のベストプラクティスを参照
-- `context: fork` でメインコンテキストを汚さない隔離サブエージェントとして実行
-- **fork 制約**: `context: fork` のため TodoWrite / AskUserQuestion は使用不可。読み取り専用サブエージェントとしてレポートのみ返す
+- Agent ツール（サブエージェント）としてメインコンテキストを汚さない隔離実行
+- **サブエージェント制約**: サブエージェントモードのため TodoWrite / AskUserQuestion は使用不可。読み取り専用サブエージェントとしてレポートのみ返す
 
 ## 言語
 

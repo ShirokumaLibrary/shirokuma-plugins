@@ -114,36 +114,26 @@ allowed-tools: Read, Grep, Glob
 
 | フィールド | 用途 | 例 |
 |-----------|------|-----|
-| `context: fork` | サブエージェント実行（分離コンテキスト） | レビュー、リサーチ |
-| `agent` | サブエージェントタイプ（`context: fork` と併用） | `general-purpose`, `Explore` |
 | `model` | モデルオーバーライド | `opus`, `sonnet`, `haiku` |
 
-**`context: fork` 移行パターン**（Agent → Skill）:
+**Agent ツール（サブエージェント）呼び出し**:
+
+隔離実行が必要なスキル（レビュー、リサーチ、コミット）は Agent ツールでサブエージェントとして起動される。親オーケストレーター（`working-on-issue`）が Agent ツール経由で呼び出し、メイン会話を汚さない隔離コンテキストを提供する。
 
 ```yaml
-# 以前: Agent (AGENT.md)
----
-name: best-practices-researcher
-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash
-model: opus
----
-
-# 現在: Skill with context: fork (SKILL.md)
+# サブエージェントスキルの例（SKILL.md）
 ---
 name: researching-best-practices
-context: fork
-agent: general-purpose
-model: opus
 allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash
 ---
 ```
 
-**スキルのメリット**:
-- 統一管理（全機能がスキル）
+**Agent ツール呼び出しのメリット**:
+- 隔離コンテキスト（メイン会話を汚さない）
+- 親モデルを使用（モデルオーバーライド不要）
 - `claude plugin install` で配布
 - 一貫した命名規約（動名詞形）
 - `allowed-tools` で明示的ツール制約
-- Skill ツールで起動（Task ツール + subagent_type より簡潔）
 
 #### 動的コンテキスト注入
 

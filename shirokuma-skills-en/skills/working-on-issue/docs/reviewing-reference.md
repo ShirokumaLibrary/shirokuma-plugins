@@ -11,7 +11,7 @@ Guide for delegating from `working-on-issue` to `reviewing-on-issue` skill.
 
 ## Execution Context
 
-`reviewing-on-issue` runs with `context: fork` (sub-agent). Does not pollute main context.
+`reviewing-on-issue` runs as an Agent tool (subagent). Does not pollute main context.
 
 ## TDD Not Applied
 

@@ -107,7 +107,7 @@ CLI には常にファイル名を渡す（`--body-file /tmp/shirokuma-docs/{num
 
 ### 注意
 
-- `reviewing-on-issue` は `context: fork` で動作するため、コメント投稿のみを行い本文更新は行わない
+- `reviewing-on-issue` は Agent ツール（サブエージェント）として動作するため、コメント投稿のみを行い本文更新は行わない
 - 本文更新は呼び出し元スキル（`creating-pr-on-issue`, `working-on-issue`）の責任
 - **PASS の場合**: レビューコメント自体が一次記録として機能するため、追加のコメント投稿は不要（レビューコメント = コメントファーストの「コメント」に該当）
 - **自動修正が行われた場合**: セルフレビューループ完了後に修正内容を集約したコメントを別途投稿してから本文を更新する（`creating-pr-on-issue` Step 6d 参照）

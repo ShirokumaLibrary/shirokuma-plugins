@@ -1,8 +1,6 @@
 ---
 name: creating-pr-on-issue
 description: Creates a GitHub pull request from the current branch targeting develop (or integration branch for sub-issues). Triggers: "create pull request", "create PR", "open PR", "submit PR".
-context: fork
-agent: general-purpose
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
@@ -143,7 +141,7 @@ In batch mode, post to each issue referenced by `Closes`.
 
 Skip this step for default branch-based PRs (GitHub's native PR link works correctly).
 
-### Step 5: Fork Signal
+### Step 5: Output Template
 
 PR creation itself is a GitHub write (the deliverable), so no additional GitHub write is needed. Return the following structured data to the caller:
 
@@ -250,7 +248,7 @@ Review reports output by `reviewing-on-issue` during self-review must also follo
 
 ## Next Steps (Standalone Invocation Only)
 
-**When invoked as fork from `working-on-issue` chain**: Omit this section — next step suggestions disrupt the chain's autonomous progression by introducing unnecessary pauses. Return only the completion report (Step 5).
+**When invoked as subagent from `working-on-issue` chain**: Omit this section — next step suggestions disrupt the chain's autonomous progression by introducing unnecessary pauses. Return only the completion report (Step 5).
 
 Only when invoked standalone:
 

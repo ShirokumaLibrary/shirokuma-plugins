@@ -11,7 +11,7 @@ Guide for delegating from `working-on-issue` to `researching-best-practices` ski
 
 ## Execution Context
 
-`researching-best-practices` runs with `context: fork` (sub-agent). Does not pollute main context.
+`researching-best-practices` runs as an Agent tool (subagent). Does not pollute main context.
 
 ## TDD Not Applied
 

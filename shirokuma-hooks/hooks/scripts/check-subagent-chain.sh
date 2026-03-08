@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# Notify the main agent to continue the workflow chain when a fork skill (subagent) completes.
+# Notify the main agent to continue the workflow chain when a subagent completes.
 # Used as a SubagentStop hook (Layer 0) to complement the existing Stop hook (Layers 1-2).
 #
 # The CLI handles:

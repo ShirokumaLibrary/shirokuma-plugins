@@ -115,38 +115,26 @@ allowed-tools: Read, Grep, Glob
 
 | Field | Purpose | Example |
 |-------|---------|---------|
-| `context: fork` | Run as sub-agent (isolated context) | Review skills, research skills |
-| `agent` | Sub-agent type (with `context: fork`) | `general-purpose`, `Explore` |
 | `model` | Model override | `opus`, `sonnet`, `haiku` |
 
-**`context: fork` Migration Pattern** (Agent → Skill):
+**Agent Tool (Subagent) Invocation**:
 
-Previously, specialized tasks required standalone agents (AGENT.md in `.claude/agents/`). With `context: fork`, these can be skills:
+Skills that need isolated execution (reviews, research, commits) are invoked via the Agent tool as subagents. The parent orchestrator (`working-on-issue`) calls them through the Agent tool, which provides isolated context without polluting the main conversation.
 
 ```yaml
-# Before: Agent (AGENT.md)
----
-name: best-practices-researcher
-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash
-model: opus
----
-
-# After: Skill with context: fork (SKILL.md)
+# Subagent skill example (SKILL.md)
 ---
 name: researching-best-practices
-context: fork
-agent: general-purpose
-model: opus
 allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash
 ---
 ```
 
-**Benefits of skills over agents:**
-- Unified management (all capabilities are skills)
+**Benefits of Agent tool invocation:**
+- Isolated context (does not pollute main conversation)
+- Parent model is used (no model override needed)
 - Plugin distribution via `claude plugin install`
 - Consistent naming convention (gerund form)
 - `allowed-tools` for explicit tool constraints
-- Invoked via Skill tool (simpler than Task tool with subagent_type)
 
 #### Dynamic Context Injection
 

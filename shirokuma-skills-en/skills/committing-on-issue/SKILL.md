@@ -1,8 +1,6 @@
 ---
 name: committing-on-issue
 description: Stages, commits, and pushes changes with optional PR creation chain. Also handles PR merge with automatic Issue status update. Triggers: "commit", "push", "commit changes", "push changes", "commit and create PR", "merge PR", "merge this PR".
-context: fork
-agent: general-purpose
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
@@ -99,7 +97,7 @@ EOF
 
 Skip comment posting if the issue number is unknown (not derivable from branch name, not passed via context).
 
-#### 6b: Fork Signal
+#### 6b: Output Template
 
 Return the following structured data to the caller:
 
@@ -134,7 +132,7 @@ status: FAIL
 
 After a successful push on a feature branch, determine whether to chain into PR creation.
 
-**When invoked as fork from `working-on-issue` chain**: Skip this step (Step 7) entirely. The next step (PR creation) is controlled by the calling manager (main AI). Initiating a PR chain or suggesting next steps here would break the chain's control flow.
+**When invoked as subagent from `working-on-issue` chain**: Skip this step (Step 7) entirely. The next step (PR creation) is controlled by the calling manager (main AI). Initiating a PR chain or suggesting next steps here would break the chain's control flow.
 
 **PR keyword detection**: Check the user's **initial message** (the `/committing-on-issue` invocation and surrounding text) for PR-related keywords:
 
@@ -223,7 +221,7 @@ shirokuma-docs issues comment {issue-number} --body-file - <<'EOF'
 EOF
 ```
 
-Fork Signal:
+Output template:
 
 ```yaml
 ---

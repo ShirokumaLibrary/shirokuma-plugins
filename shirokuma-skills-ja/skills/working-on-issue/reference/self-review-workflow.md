@@ -25,8 +25,8 @@
     ↓
 [SIMPLIFY] /simplify 初期パス（code カテゴリのファイルがある場合のみ）
     ↓  変更あり → コミット・プッシュ / 変更なし or 失敗 → スキップ
-[REVIEW] レビュー起動（Fork: reviewing-on-issue / reviewing-claude-config）
-    ↓  ※ fork はステップ 6 で PR コメントを投稿してから Fork Signal を返す
+[REVIEW] レビュー起動（Subagent: reviewing-on-issue / reviewing-claude-config）
+    ↓  ※ サブエージェントはステップ 6 で PR コメントを投稿してから構造化データを返す
 [PARSE] YAML フロントマターパース + PASS/FAIL 判定（本文の `### Detail` から修正方針を決定）
     ↓
 [PRESENT] セルフレビュー結果サマリーをユーザーに提示（完了報告テンプレート使用）
@@ -161,7 +161,7 @@ fire-and-forget（PASS/FAIL 判定なし）。品質ゲートは後続の `[REVI
 以下のセルフレビュー結果に基づき、指摘された問題を修正してください。
 
 ## レビュー結果
-{reviewing-on-issue / reviewing-claude-config の fork 出力全文}
+{reviewing-on-issue / reviewing-claude-config のサブエージェント出力全文}
 
 ## 修正対象
 - Critical: {件数} 件
@@ -187,7 +187,7 @@ fire-and-forget（PASS/FAIL 判定なし）。品質ゲートは後続の `[REVI
 
 | 項目 | 内容 |
 |------|------|
-| 入力 | reviewing-on-issue / reviewing-claude-config の Fork Signal（`### Detail` 含む） |
+| 入力 | reviewing-on-issue / reviewing-claude-config の構造化データ（`### Detail` 含む） |
 | 出力 | 修正サマリー（ファイル数、コミットハッシュ、修正内容リスト） |
 | ツール | Read, Edit, Bash（Task general-purpose は全ツールにアクセス可能） |
 | コミットメッセージ | `fix: セルフレビュー指摘を修正 [iter {n}] (#{issue-number})` |
@@ -195,7 +195,7 @@ fire-and-forget（PASS/FAIL 判定なし）。品質ゲートは後続の `[REVI
 
 ## out-of-scope フォローアップ Issue 作成
 
-セルフレビューループ完了後（PASS、ループ停止、安全上限到達のいずれか）、最終イテレーションの Fork Signal に `Out-of-scope items` がある場合にフォローアップ Issue を作成する。
+セルフレビューループ完了後（PASS、ループ停止、安全上限到達のいずれか）、最終イテレーションの構造化データに `Out-of-scope items` がある場合にフォローアップ Issue を作成する。
 
 **重複排除**: 最終イテレーションの out-of-scope リストのみを使用。各イテレーションの結果は PR コメントに残るため情報は失われない。
 
@@ -208,7 +208,7 @@ shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{number}-out-of-sco
 
 ## レビュー所見コメント確認
 
-`[COMPLETE]` ステートの処理で、fork がステップ 6 の PR コメント投稿を完了したか確認する。
+`[COMPLETE]` ステートの処理で、サブエージェントがステップ 6 の PR コメント投稿を完了したか確認する。
 
 ### 確認手順
 
@@ -223,7 +223,7 @@ shirokuma-docs issues comments {PR#}
 レビュー所見コメントが欠落している場合:
 
 1. 警告を表示: `⚠ レビュー所見コメントが未投稿です。フォールバックで簡易コメントを投稿します。`
-2. Fork Signalの要約を簡易コメントとして投稿:
+2. 構造化データの要約を簡易コメントとして投稿:
 
 ```bash
 shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-fallback.md
@@ -237,7 +237,7 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 **Status:** {PASS | FAIL}
 **Critical:** {n} 件 / **Fixable-warning:** {n} 件 / **Out-of-scope:** {n} 件
 
-> このコメントはレビュースキルのステップ 6 が未実行だったため、Fork Signalの要約から自動生成されました。
+> このコメントはレビュースキルのステップ 6 が未実行だったため、構造化データの要約から自動生成されました。
 ```
 
 ## 期待 PR コメントパターン
@@ -249,7 +249,7 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 | NEEDS_FIX → 自動修正 → PASS | 各 iter 1 件 | 1 件（必須） | iter 数 + 1 件 |
 | NEEDS_FIX → 収束不能 | 各 iter 1 件 | 1 件（必須） | iter 数 + 1 件 |
 
-レビュー所見コメントは `reviewing-on-issue` / `reviewing-claude-config` の fork がステップ 6 で投稿する。対応完了コメントはマネージャー（メイン AI、`working-on-issue`）が `[COMPLETE]` ステートで必ず投稿する。
+レビュー所見コメントは `reviewing-on-issue` / `reviewing-claude-config` のサブエージェントがステップ 6 で投稿する。対応完了コメントはマネージャー（メイン AI、`working-on-issue`）が `[COMPLETE]` ステートで必ず投稿する。
 
 ## 対応完了コメント投稿（必須）
 

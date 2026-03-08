@@ -12,8 +12,8 @@ graph LR
 
 | Skill | Role | context | Reason |
 |-------|------|---------|--------|
-| `designing-ui-on-issue` | Workflow management (discovery, evaluation loop) | Non-fork | Requires iterative user interaction via AskUserQuestion |
-| `designing-shadcn-ui` | Design implementation (guidelines, patterns, build verification) | Non-fork | Invoked via Skill delegation |
+| `designing-ui-on-issue` | Workflow management (discovery, evaluation loop) | Non-subagent | Requires iterative user interaction via AskUserQuestion |
+| `designing-shadcn-ui` | Design implementation (guidelines, patterns, build verification) | Non-subagent | Invoked via Skill delegation |
 
 ## Delegation Conditions
 

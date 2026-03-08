@@ -1,15 +1,12 @@
 ---
 name: researching-best-practices
 description: 公式ドキュメントとプロジェクトパターンを調査してから実装する。新機能の開始時、ベストプラクティスが不明な場合、「Xのベストプラクティスを調べて」「Yの実装方法は？」などのリクエスト時に使用。トリガー: "ベストプラクティス調査", "実装方法を調べて", "Drizzleでソフトデリートってどう実装するのがベスト？", "research best practices", "how should I implement".
-context: fork
-agent: general-purpose
-model: opus
 allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, TodoWrite
 ---
 
 # ベストプラクティス調査
 
-公式ドキュメントとプロジェクトパターンを調査し、実装ガイダンスを提供する。`context: fork` で隔離実行。
+公式ドキュメントとプロジェクトパターンを調査し、実装ガイダンスを提供する。Agent ツール（サブエージェント）として隔離実行。
 
 ## コア責務
 
@@ -141,4 +138,4 @@ shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/findings.md
 ## 注意事項
 
 - 調査結果は `coding-nextjs` スキルに渡して実装可能
-- `context: fork` で隔離サブエージェントとして実行（メインコンテキストを汚染しない）
+- Agent ツール（サブエージェント）として隔離実行（メインコンテキストを汚染しない）

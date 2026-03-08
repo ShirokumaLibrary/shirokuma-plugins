@@ -1,12 +1,12 @@
 # Implementation Work Type Reference
 
-Guide for delegating from `working-on-issue` to `coding-on-issue` (fork).
+Guide for delegating from `working-on-issue` to `coding-on-issue` (subagent).
 
 ## Delegation Structure
 
 ```text
 working-on-issue (manager = main AI)
-  → coding-on-issue (fork worker)
+  → coding-on-issue (subagent worker)
       → coding-nextjs (Skill delegation, Next.js specific)
       → direct edit (Markdown, skills, config, etc.)
 ```
@@ -41,4 +41,4 @@ TDD common workflow is **required** for implementation work:
 
 ## Standalone Invocation
 
-Users can also invoke `/coding-nextjs` directly (non-fork, with TodoWrite/AskUserQuestion access). `coding-on-issue` is the standard route from `working-on-issue`, but the existing standalone invocation path is maintained.
+Users can also invoke `/coding-nextjs` directly (non-subagent, with TodoWrite/AskUserQuestion access). `coding-on-issue` is the standard route from `working-on-issue`, but the existing standalone invocation path is maintained.

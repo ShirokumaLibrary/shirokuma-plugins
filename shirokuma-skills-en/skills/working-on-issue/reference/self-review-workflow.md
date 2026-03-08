@@ -25,8 +25,8 @@ Detailed specification of the self-review loop executed within the `working-on-i
     ↓
 [SIMPLIFY] /simplify initial pass (only when code-category files exist)
     ↓  Changes found → commit & push / No changes or failure → skip
-[REVIEW] Launch review (Fork: reviewing-on-issue / reviewing-claude-config)
-    ↓  Note: fork posts PR comment (Step 6) before returning Fork Signal
+[REVIEW] Launch review (Subagent: reviewing-on-issue / reviewing-claude-config)
+    ↓  Note: subagent posts PR comment (Step 6) before returning structured output
 [PARSE] Parse YAML frontmatter + PASS/FAIL determination
     ↓
 [PRESENT] Present self-review result summary to user (using completion report template)
@@ -161,7 +161,7 @@ When fixes are needed, delegate to `Task(general-purpose)`.
 Fix the issues identified in the following self-review results.
 
 ## Review Results
-{Full fork output from reviewing-on-issue / reviewing-claude-config}
+{Full subagent output from reviewing-on-issue / reviewing-claude-config}
 
 ## Fix Targets
 - Critical: {count}
@@ -187,7 +187,7 @@ Report fix summary in this format:
 
 | Item | Details |
 |------|---------|
-| Input | Full fork output (Fork Signal with `### Detail`) from reviewing-on-issue / reviewing-claude-config |
+| Input | Full subagent output (output template with `### Detail`) from reviewing-on-issue / reviewing-claude-config |
 | Output | Fix summary (file count, commit hash, fix list) |
 | Tools | Read, Edit, Bash — Task(general-purpose) has access to all tools |
 | Commit message | `fix: address self-review findings [iter {n}] (#{issue-number})` |
@@ -195,7 +195,7 @@ Report fix summary in this format:
 
 ## Out-of-Scope Follow-up Issue Creation
 
-After the self-review loop completes (PASS, loop stopped, or safety limit reached), if the final iteration's Fork Signal contains `Out-of-scope items`, create follow-up Issues.
+After the self-review loop completes (PASS, loop stopped, or safety limit reached), if the final iteration's subagent output contains `Out-of-scope items`, create follow-up Issues.
 
 **Deduplication**: Only use the out-of-scope list from the final iteration. Results from each iteration are preserved in PR comments so no information is lost.
 
@@ -208,7 +208,7 @@ shirokuma-docs issues create --from-file /tmp/shirokuma-docs/{number}-out-of-sco
 
 ## Review Findings Comment Verification
 
-In the `[COMPLETE]` state processing, verify that the fork completed Step 6 PR comment posting.
+In the `[COMPLETE]` state processing, verify that the subagent completed Step 6 PR comment posting.
 
 ### Verification Procedure
 
@@ -223,7 +223,7 @@ Check the comment list for review findings comments (the review summary posted b
 If review findings comments are missing:
 
 1. Display warning: `⚠ Review findings comment was not posted. Posting fallback summary comment.`
-2. Post a simplified comment from the Fork Signal summary:
+2. Post a simplified comment from the subagent output summary:
 
 ```bash
 shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-fallback.md
@@ -237,7 +237,7 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 **Status:** {PASS | FAIL}
 **Critical:** {n} / **Fixable-warning:** {n} / **Out-of-scope:** {n}
 
-> This comment was auto-generated from the Fork Signal summary because the review skill's Step 6 was not executed.
+> This comment was auto-generated from the subagent output summary because the review skill's Step 6 was not executed.
 ```
 
 ## Expected PR Comment Pattern
@@ -249,7 +249,7 @@ shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-rev
 | NEEDS_FIX → auto-fix → PASS | 1 per iter | 1 (required) | iter count + 1 |
 | NEEDS_FIX → cannot converge | 1 per iter | 1 (required) | iter count + 1 |
 
-Review findings comments are posted by the `reviewing-on-issue` / `reviewing-claude-config` fork in Step 6. The response complete comment is posted by the manager (main AI, `working-on-issue`) in the `[COMPLETE]` state — always required.
+Review findings comments are posted by the `reviewing-on-issue` / `reviewing-claude-config` subagent in Step 6. The response complete comment is posted by the manager (main AI, `working-on-issue`) in the `[COMPLETE]` state — always required.
 
 ## Response Complete Comment (Required)
 

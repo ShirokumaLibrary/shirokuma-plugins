@@ -1,7 +1,7 @@
 # TDD 共通ワークフロー
 
 `working-on-issue` がオーケストレートする TDD（テスト駆動開発）の共通ステップ。
-`coding-on-issue`（fork）の呼び出しを TDD で包んで実行する。
+`coding-on-issue`（subagent）の呼び出しを TDD で包んで実行する。
 
 ## フロー
 

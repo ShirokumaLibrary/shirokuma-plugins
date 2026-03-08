@@ -66,13 +66,13 @@ graph TD
 |--------|-----------|--------------|------|
 | working-on-issue | 対応 | 対応 | 両モードのエントリーポイント |
 | planning-on-issue | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
-| coding-on-issue | 対応 | — | working-on-issue から fork 委任のみ |
+| coding-on-issue | 対応 | — | working-on-issue から subagent 委任のみ |
 | coding-nextjs | 対応 | 対応 | coding-on-issue 経由またはスタンドアロン |
 | designing-ui-on-issue | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
 | designing-shadcn-ui | 対応 | 対応 | designing-ui-on-issue 経由またはスタンドアロン |
 | creating-item | — | 対応 | 常にスタンドアロン対応 |
-| committing-on-issue | 対応 | 対応 | fork（スタンドアロンも fork で動作） |
-| creating-pr-on-issue | 対応 | 対応 | fork（スタンドアロンも fork で動作） |
+| committing-on-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
+| creating-pr-on-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | starting-session | 対応 | — | セッション開始専用（`#N` で Issue バウンド、引数なしでアンバウンド） |
 | ending-session | 対応 | — | セッション終了専用 |
 
@@ -92,11 +92,11 @@ graph TD
 
 | タスクタイプ | 委任先 | メソッド |
 |-------------|--------|----------|
-| コーディング全般 | `coding-on-issue` | Skill (`context: fork`, via `working-on-issue`) |
+| コーディング全般 | `coding-on-issue` | Agent (custom subagent, via `working-on-issue`) |
 | UI デザイン | `designing-ui-on-issue` | Skill（via `working-on-issue`） |
-| リサーチ | `researching-best-practices` | Skill (`context: fork`) |
-| レビュー | `reviewing-on-issue` | Skill (`context: fork`) |
-| Claude 設定 | `reviewing-claude-config` | Skill (`context: fork`) |
+| リサーチ | `researching-best-practices` | Agent (custom subagent) |
+| レビュー | `reviewing-on-issue` | Agent (custom subagent) |
+| Claude 設定 | `reviewing-claude-config` | Agent (custom subagent) |
 | Issue / Discussion 作成 | `creating-item` | Skill |
 | GitHub データ表示 | `showing-github` | Skill |
 | プロジェクトセットアップ | `setting-up-project` | Skill |
@@ -114,15 +114,15 @@ graph TD
 - **AskUserQuestion**: 指示からの逸脱、複数アプローチの選択、エッジケースの判断
 - **TodoWrite**: 3ステップ以上のタスク、マルチ Issue、委任チェーン
 
-## Fork 結果処理
+## Subagent 結果処理
 
-**fork スキル完了 ≠ タスク完了。** fork スキル（`context: fork`）が結果を返した後、メイン AI は:
+**subagent スキル完了 ≠ タスク完了。** カスタムサブエージェント（例: `pr-worker`, `commit-worker`, `review-worker`）が Agent ツール経由で結果を返した後、メイン AI は:
 
-1. Fork Signal（YAML フロントマター）をパース
+1. 出力テンプレート（YAML フロントマター）をパース
 2. TodoWrite の残り `pending` ステップを確認
-3. pending ステップがあれば → 即座に次のステップに進む（停止やサマリー表示をしない）
+3. pending ステップがあれば → **同じレスポンス内で即座に次のステップに進む**（停止・サマリー表示・ユーザーへの確認は禁止）
 
-Fork の結果はチェーンの中間データ。fork 結果で停止するとユーザーが手動で「続けて」と促す必要が生じ、自動ワークフローチェーンが機能しなくなる。
+Agent ツールの復帰はチェーンの中間地点であり、完了シグナルではない。subagent 結果で停止するとユーザーが手動で「続けて」と促す必要が生じ、自動ワークフローチェーンが機能しなくなる。
 
 ## エラー回復
 

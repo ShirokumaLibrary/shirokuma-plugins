@@ -11,7 +11,7 @@
 
 ## 実行コンテキスト
 
-`reviewing-on-issue` は `context: fork` で実行される（サブエージェント）。メインコンテキストを汚さない。
+`reviewing-on-issue` は Agent ツール（サブエージェント）として実行される。メインコンテキストを汚さない。
 
 ## TDD 非適用
 

@@ -6,7 +6,7 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
 
 # Working on Issue (Orchestrator)
 
-> **Chain Autonomous Progression**: Fork skill results are intermediate chain data, not final user-facing output. When TodoWrite has pending steps, immediately parse the YAML frontmatter and proceed to the next step. Stopping after a fork result forces the user to manually type "continue", breaking the autonomous workflow that makes this orchestrator valuable. Log a one-line summary and invoke the next tool in the same response.
+> **Chain Autonomous Progression**: Subagent skill results are intermediate chain data, not final user-facing output. When TodoWrite has pending steps, immediately parse the YAML frontmatter and proceed to the next step. Stopping after a subagent result forces the user to manually type "continue", breaking the autonomous workflow that makes this orchestrator valuable. Log a one-line summary and invoke the next tool in the same response.
 
 Orchestrate the full workflow from planning to implementation, commit, PR, and self-review based on issue type or task description.
 
@@ -20,9 +20,9 @@ Register **all chain steps** in TodoWrite **before starting work**.
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Implement changes | Implementing changes | `coding-on-issue` (fork) / `designing-ui-on-issue` |
-| 2 | Commit and push changes | Committing and pushing | `committing-on-issue` (fork) |
-| 3 | Create pull request | Creating pull request | `creating-pr-on-issue` (fork) |
+| 1 | Implement changes | Implementing changes | `coding-on-issue` (subagent) / `designing-ui-on-issue` |
+| 2 | Commit and push changes | Committing and pushing | `committing-on-issue` (subagent) |
+| 3 | Create pull request | Creating pull request | `creating-pr-on-issue` (subagent) |
 | 4 | Run self-review and apply fixes | Running self-review | Manager direct: SIMPLIFY → REVIEW → COMPLETE |
 | 5 | Post work summary | Posting work summary | Manager direct: `issues comment` |
 | 6 | Update Status to Review | Updating Status to Review | Manager direct: `issues update` |
@@ -31,7 +31,7 @@ Register **all chain steps** in TodoWrite **before starting work**.
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Conduct research | Conducting research | `researching-best-practices` (fork) |
+| 1 | Conduct research | Conducting research | `researching-best-practices` (subagent) |
 | 2 | Save findings to Discussion | Creating Discussion | `shirokuma-docs discussions create` |
 
 Update each step to `in_progress` when starting and `completed` when done.
@@ -117,13 +117,13 @@ For Feature type, Size M+, suggest ADR creation (AskUserQuestion).
 
 | Work Type | Condition | Delegate To | TDD |
 |-----------|-----------|-------------|-----|
-| General Coding | Implementation, bug fix, refactoring, config, Markdown editing | `coding-on-issue` (fork) | Yes (implementation, bug fix, refactoring) |
+| General Coding | Implementation, bug fix, refactoring, config, Markdown editing | `coding-on-issue` (subagent) | Yes (implementation, bug fix, refactoring) |
 | UI Design | Keywords: `design`, `UI`, `memorable`, `impressive` | `designing-ui-on-issue` | No |
-| Research | Keywords: `research`, `investigate` | `researching-best-practices` (fork) | No |
-| Review | Keywords: `review`, `audit` | `reviewing-on-issue` (fork) | No |
+| Research | Keywords: `research`, `investigate` | `researching-best-practices` (subagent) | No |
+| Review | Keywords: `review`, `audit` | `reviewing-on-issue` (subagent) | No |
 | Project Setup | Keywords: `setup project`, `initialize` | `setting-up-project` | No |
 
-**Pre-resolution logic**: Fork workers cannot use `AskUserQuestion`, so the manager (main AI) resolves edge cases before invocation:
+**Pre-resolution logic**: Subagent workers cannot use `AskUserQuestion`, so the manager (main AI) resolves edge cases before invocation:
 
 | Edge Case | Manager's (Main AI) Pre-action |
 |-----------|---------------------|
@@ -163,9 +163,9 @@ After work completes, execute the chain **automatically**. No user confirmation 
 - No confirmation between steps, one-line progress reports
 - On failure: stop chain, report status, return control to user
 
-**Chain completion guarantee**: After each fork skill returns its Fork Signal, the manager (main AI) parses the YAML frontmatter and **immediately proceeds to the next step**. The body's first line is used as a one-line summary and does not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via fork), eliminating the risk of chain interruption.
+**Chain completion guarantee**: After each subagent skill returns its structured output, the manager (main AI) parses the YAML frontmatter and **immediately proceeds to the next step**. The body's first line is used as a one-line summary and does not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via subagent), eliminating the risk of chain interruption.
 
-**Fork Signal parse checkpoint** — On receiving fork output, execute these checks in order:
+**Output parse checkpoint** — On receiving subagent output, execute these checks in order:
 
 1. **Extract YAML frontmatter** (block delimited by `---`)
 2. **action field**: Read `action` → STOP/FIX/REVISE/CONTINUE determines the next behavior
@@ -175,34 +175,34 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. Do not output anything except a one-line summary before the tool call.
 
-**TodoWrite continuation invariant**: After each fork skill completes, check TodoWrite. If any step is still `pending`, you MUST invoke the next tool call in the same response — generating a final text-only response while pending steps remain is a chain-breaking error.
+**TodoWrite continuation invariant**: After each subagent skill completes, check TodoWrite. If any step is still `pending`, you MUST invoke the next tool call in the same response — generating a final text-only response while pending steps remain is a chain-breaking error.
 
-**Chain delegation table (MUST follow)** — After receiving a fork skill result, invoke exactly the skill indicated by the `next` field:
+**Chain delegation table (MUST follow)** — After receiving a subagent skill result, invoke exactly the skill indicated by the `next` field:
 
 | Completed Skill | `next` field | Next Skill to Invoke | Prohibited Action |
 |----------------|-------------|---------------------|------------------|
 | `coding-on-issue` | `committing-on-issue` | `committing-on-issue` | Do NOT re-invoke `coding-on-issue` |
 | `committing-on-issue` | `creating-pr-on-issue` | `creating-pr-on-issue` | Do NOT delegate to `coding-on-issue` |
-| `creating-pr-on-issue` | — | **Start manager-managed steps** (see below) | Do NOT delegate to fork |
+| `creating-pr-on-issue` | — | **Start manager-managed steps** (see below) | Do NOT delegate to subagent |
 
 **Manager-managed steps after `creating-pr-on-issue` (required checklist):**
 
 When `creating-pr-on-issue` returns its result, execute the following steps **within the same chain** sequentially. Each step is registered as `pending` in TodoWrite — do NOT stop while pending steps remain:
 
 1. **SIMPLIFY**: Invoke `/simplify` via Skill tool (code category only, skip on failure) → commit & push if changes
-2. **REVIEW**: Invoke `reviewing-on-issue` / `reviewing-claude-config` via Skill tool → PASS/NEEDS_FIX/FAIL determination
+2. **REVIEW**: Invoke `reviewing-on-issue` / `reviewing-claude-config` via Agent tool (subagent) → PASS/NEEDS_FIX/FAIL determination
 3. **COMPLETE**: Create out-of-scope Issues → Post response complete comment
 4. **Work Summary**: Post work summary as Issue comment
 5. **Status Update**: `shirokuma-docs issues update {number} --field-status "Review"`
 6. **Evolution**: Auto-record signals (Step 6)
 
-**Post-fork-result behavior (pseudocode):**
+**Post-subagent-result behavior (pseudocode):**
 
 ```text
 for each step in [commit, pr, simplify, self_review, work_summary, status_update]:
   // GUARD: TodoWrite has pending steps → this iteration MUST execute (do NOT stop)
-  fork_output = invoke_fork_skill(step)
-  frontmatter, body = parse_yaml_frontmatter(fork_output)
+  subagent_output = invoke_subagent_skill(step)
+  frontmatter, body = parse_yaml_frontmatter(subagent_output)
   action = frontmatter.action                    // CONTINUE | FIX | STOP | REVISE
   if action == "STOP":
     handle_failure(frontmatter, body)             // Chain stop, report to user
@@ -219,7 +219,7 @@ for each step in [commit, pr, simplify, self_review, work_summary, status_update
   // End of chain only when all todos are completed
 ```
 
-**Fork Signal field definitions:**
+**Output template field definitions:**
 
 | Field | Required | Values | Description |
 |-------|----------|--------|-------------|
@@ -238,16 +238,41 @@ The `Summary` field is abolished. Instead, the **body's first line** is treated 
 | SUCCESS | CONTINUE | committing-on-issue, creating-pr-on-issue, coding-on-issue | Proceed to next step |
 | PASS | CONTINUE | reviewing-on-issue (self-review) | Proceed to status update |
 | NEEDS_FIX | FIX | reviewing-on-issue (self-review) | Enter fix loop |
-| FAIL | STOP | All fork skills | Chain stop, report to user |
+| FAIL | STOP | All subagent skills | Chain stop, report to user |
 | NEEDS_REVISION | REVISE | reviewing-on-issue (plan review) | Enter revision loop |
 
-Fork Signals are internal processing data, not user-facing output. Presenting raw fork output exposes technical intermediates that disrupt the user's workflow experience. Output only a one-line summary and immediately proceed to the next tool call.
+Subagent outputs are internal processing data, not user-facing output. Presenting raw subagent output exposes technical intermediates that disrupt the user's workflow experience. Output only a one-line summary and immediately proceed to the next tool call.
+
+#### Subagent Invocation Pattern
+
+The following skills are launched via custom sub-agents (AGENT.md). `/simplify` continues to be launched via Skill tool.
+
+| Skill | Sub-agent name |
+|-------|---------------|
+| `coding-on-issue` | `coding-worker` |
+| `committing-on-issue` | `commit-worker` |
+| `creating-pr-on-issue` | `pr-worker` |
+| `reviewing-on-issue` | `review-worker` |
+| `reviewing-claude-config` | `config-review-worker` |
+| `researching-best-practices` | `research-worker` |
+
+```text
+Agent(
+  description: "{worker-name} #{number}",
+  subagent_type: "{worker-name}",
+  prompt: "{args}"
+)
+```
+
+Each sub-agent has the corresponding skill's full content auto-injected via the `skills` frontmatter field.
+
+> **CRITICAL — Chain continuation after Agent tool returns**: When a custom sub-agent (e.g., `pr-worker`, `commit-worker`) completes and the Agent tool returns, **check TodoWrite for remaining `pending` steps**. If pending steps remain (self-review, work summary, status update, evolution), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. The Agent tool returning is a chain mid-point, not a completion signal.
 
 #### Self-Review Loop (Manager = Main AI Directly Manages)
 
 After PR creation, the manager (main AI) directly manages self-review. See [reference/self-review-workflow.md](reference/self-review-workflow.md) for details.
 
-Self-review should be launched via Skill tool (`reviewing-on-issue` / `reviewing-claude-config`), not Agent (general-purpose). Review skills post PR comments as part of their workflow — launching via other means causes review findings to not be recorded on the PR, losing the audit trail.
+Self-review should be launched via Agent tool (subagent) for `reviewing-on-issue` / `reviewing-claude-config`. Review skills post PR comments as part of their workflow — launching via other means causes review findings to not be recorded on the PR, losing the audit trail.
 
 **State transition overview:**
 
@@ -260,13 +285,13 @@ Self-review should be launched via Skill tool (`reviewing-on-issue` / `reviewing
   └── FAIL → chain stop, [REPORT]
 ```
 
-> **⚠ SIMPLIFY ≠ Self-Review**: SIMPLIFY is a quality-baseline pre-pass, not a substitute for self-review. After SIMPLIFY completes (changes, no changes, or failure), always proceed to [REVIEW] and invoke `reviewing-on-issue` / `reviewing-claude-config` via the Skill tool. Skipping [REVIEW] after SIMPLIFY is prohibited.
+> **⚠ SIMPLIFY ≠ Self-Review**: SIMPLIFY is a quality-baseline pre-pass, not a substitute for self-review. After SIMPLIFY completes (changes, no changes, or failure), always proceed to [REVIEW] and invoke `reviewing-on-issue` / `reviewing-claude-config` via the Agent tool (subagent). Skipping [REVIEW] after SIMPLIFY is prohibited.
 
 | State | Action |
 |-------|--------|
 | SIMPLIFY | Invoke `/simplify` via Skill tool (only when code-category files exist; run once, skip on failure) **← pre-pass, skippable** |
-| REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` as fork **← NOT skippable. Must run after SIMPLIFY.** |
-| PARSE | Parse Fork Signal, PASS/NEEDS_FIX/FAIL determination |
+| REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` via subagent **← NOT skippable. Must run after SIMPLIFY.** |
+| PARSE | Parse subagent output, PASS/NEEDS_FIX/FAIL determination |
 | PRESENT | Present self-review result summary to user |
 | FIX | Delegate fix to `Task(general-purpose)` |
 | CONVERGE | Convergence check (numeric-based, stop after 2 consecutive non-decreases) |
@@ -436,11 +461,11 @@ Sub-issue creation in this flow uses `shirokuma-docs issues create` directly (no
 
 ## Notes
 
-- This skill is the **manager (the main-process AI agent)** — actual work is delegated to fork workers
+- This skill is the **manager (the main-process AI agent)** — actual work is delegated to subagent workers
 - Update issue status before starting
 - Ensure correct feature branch
 - TDD-applicable work types wrap `coding-on-issue` invocation with TDD ([docs/tdd-workflow.md](docs/tdd-workflow.md))
 - Workflow executes sequentially (Commit → PR → Simplify → Self-Review → Status Update). **Merge is NOT included**
 - Self-review is directly managed by the manager (main AI) ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user
-- **Chain autonomous progression**: Fork Signals are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the YAML frontmatter and execute the next step's Skill/Bash tool call. Log a one-line summary and invoke the next tool in the same response
+- **Chain autonomous progression**: Subagent outputs are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the YAML frontmatter and execute the next step's Agent/Bash tool call. Log a one-line summary and invoke the next tool in the same response

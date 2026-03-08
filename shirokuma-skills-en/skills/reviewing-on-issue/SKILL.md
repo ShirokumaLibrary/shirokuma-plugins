@@ -1,9 +1,6 @@
 ---
 name: reviewing-on-issue
 description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, documentation, and plan quality. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "code review".
-context: fork
-agent: general-purpose
-model: opus
 allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---
 
@@ -274,7 +271,7 @@ Review complete. If changes were made based on findings:
 
 ## Orchestration (when invoked as sub-agent)
 
-When this skill runs with `context: fork`, it operates as an isolated sub-agent:
+When this skill runs as an Agent tool (subagent), it operates in an isolated context:
 
 ### Progress Reporting
 
@@ -335,10 +332,10 @@ If analysis is incomplete:
 - **Progressive**: Summary first, details on request
 - **Updateable**: Use `--update` to refresh knowledge
 - **Rules auto-loaded**: Project conventions from `.claude/rules/`
-- **Sub-agent mode**: Runs with `context: fork` for isolated execution
-- **Fork constraint**: TodoWrite / AskUserQuestion are unavailable due to `context: fork`; return results as a report only
-- **Self-review**: When invoked from delegated chain, return structured output (Fork Signal)
-- **Caller's comment-first compliance**: This skill does not update bodies (due to `context: fork`), but when caller skills (`creating-pr-on-issue`, `working-on-issue`) update Issue/PR bodies based on review results, they must follow the comment-first principle in `item-maintenance.md`. See the "Updating Body from Review Results" section in `item-maintenance.md` for specific procedure patterns
+- **Sub-agent mode**: Runs as Agent tool (subagent) for isolated execution
+- **Subagent constraint**: TodoWrite / AskUserQuestion are unavailable in subagent mode; return results as a report only
+- **Self-review**: When invoked from delegated chain, return structured output (output template)
+- **Caller's comment-first compliance**: This skill does not update bodies (as a subagent, it only posts comments), but when caller skills (`creating-pr-on-issue`, `working-on-issue`) update Issue/PR bodies based on review results, they must follow the comment-first principle in `item-maintenance.md`. See the "Updating Body from Review Results" section in `item-maintenance.md` for specific procedure patterns
 
 ## Self-Review Mode
 
@@ -350,9 +347,9 @@ In self-review mode, execute the following steps **in order**:
 
 1. **Execute Steps 1-5 normally** — Role selection, knowledge loading, lint, analysis, report generation
 2. **Step 6: Post PR comment (REQUIRED)** — When a PR number is in context, post the review report as a PR comment. This step is non-optional
-3. **Return Fork Signal** — Return a summary in the format below for the caller's automated decision-making
+3. **Return output template** — Return a summary in the format below for the caller's automated decision-making
 
-### Fork Signal Format (Self-Review)
+### Output Template (Self-Review)
 
 After posting the PR comment in Step 6, return in the following format. Self-review includes a `### Detail` extension block in the body because `working-on-issue` needs detailed information for loop decisions:
 
@@ -435,9 +432,9 @@ shirokuma-docs discussions create \
 
 ## Plan Review Mode
 
-When invoked from `planning-on-issue` with plan role as fork, post the plan review result as an Issue comment and return a Fork Signal.
+When invoked from `planning-on-issue` with plan role via subagent, post the plan review result as an Issue comment and return structured output.
 
-### Fork Signal Format (Plan Review)
+### Output Template (Plan Review)
 
 ```yaml
 ---
@@ -476,9 +473,9 @@ comment_id: {comment-database-id}
 
 ## Normal Review Mode (Non-Self-Review, Non-Plan-Review)
 
-When invoked standalone or as fork, and it is neither a self-review nor a plan review, save the report to GitHub and return a Fork Signal.
+When invoked standalone or as subagent, and it is neither a self-review nor a plan review, save the report to GitHub and return structured output.
 
-### Fork Signal Format (Normal Review)
+### Output Template (Normal Review)
 
 ```yaml
 ---

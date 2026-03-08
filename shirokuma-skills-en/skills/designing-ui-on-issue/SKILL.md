@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUser
 
 Orchestrate design discovery, implementation delegation, and visual evaluation loops. Delegates implementation to `designing-shadcn-ui` and ensures design quality through iterative user interaction.
 
-**Note**: Delegated from `working-on-issue`, but also supports standalone invocation. Non-fork skill (requires iterative user interaction via AskUserQuestion).
+**Note**: Delegated from `working-on-issue`, but also supports standalone invocation. Non-subagent skill (requires iterative user interaction via AskUserQuestion).
 
 ## Workflow
 
@@ -154,7 +154,7 @@ Initial implementation delegates to `designing-shadcn-ui` only, but future deleg
 
 ## Notes
 
-- Non-fork skill (requires iterative user interaction via AskUserQuestion)
+- Non-subagent skill (requires iterative user interaction via AskUserQuestion)
 - Confirm design direction with user before implementation — implementing without alignment risks extensive rework
 - Visual evaluation loop limited to 3 iterations maximum
 - `designing-shadcn-ui` handles build verification (not needed in this skill)

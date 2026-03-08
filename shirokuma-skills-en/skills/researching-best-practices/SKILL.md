@@ -1,9 +1,6 @@
 ---
 name: researching-best-practices
 description: Researches official documentation and project patterns before implementation. Triggers: starting a new feature, unsure about best practices, "research best practices for X", "how should I implement Y".
-context: fork
-agent: general-purpose
-model: opus
 allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, TodoWrite
 ---
 
@@ -141,4 +138,4 @@ shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/findings.md
 ## Notes
 
 - Results can be passed to `coding-nextjs` skill for implementation
-- Use `context: fork` to run as isolated sub-agent without polluting main context
+- Runs as Agent tool (subagent) for isolated execution without polluting main context

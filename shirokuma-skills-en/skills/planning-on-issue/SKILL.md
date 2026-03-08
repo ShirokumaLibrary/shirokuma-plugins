@@ -6,7 +6,7 @@ allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion, TodoWrite
 
 # Planning on Issue
 
-> **Chain Autonomous Progression**: After the plan review fork (Step 5) returns its result, immediately proceed to Steps 6-7 (update status, return to user). Stopping after the review fork forces the user to manually prompt continuation, breaking the planning workflow. Parse the YAML frontmatter `action` field and act without waiting for user input.
+> **Chain Autonomous Progression**: After the plan review subagent (Step 5) returns its result, immediately proceed to Steps 6-7 (update status, return to user). Stopping after the review subagent forces the user to manually prompt continuation, breaking the planning workflow. Parse the YAML frontmatter `action` field and act without waiting for user input.
 
 Analyze issue requirements, create an implementation plan, and persist it to the issue body. After planning, set status to Spec Review and return control to the user. **Does not proceed to implementation.**
 
@@ -167,13 +167,13 @@ shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-b
 
 > Plan section headings and content must comply with the `output-language` rule. Follow `github-writing-style` rule bullet-point guidelines.
 
-### Step 5: Plan Review (Fork Delegation)
+### Step 5: Plan Review (Subagent Delegation)
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `reviewing-on-issue` plan role as fork for a fresh-context review. Since the plan was written to the Issue body in Step 4, the reviewer can retrieve it via `shirokuma-docs show {number}`.
+Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `reviewing-on-issue` plan role via subagent for a fresh-context review. Since the plan was written to the Issue body in Step 4, the reviewer can retrieve it via `shirokuma-docs show {number}`.
 
 #### Skill Availability Check (Fallback)
 
-Before launching the fork, verify that `reviewing-on-issue` is available in the skill list.
+Before launching the subagent, verify that `reviewing-on-issue` is available in the skill list.
 
 | State | Action |
 |-------|--------|
@@ -190,24 +190,24 @@ If all checks pass, proceed to Step 6.
 
 #### Launching the Reviewer
 
-Invoke `reviewing-on-issue` with plan role via the Skill tool. `reviewing-on-issue` will fetch the Issue body itself via `shirokuma-docs show {number}` (which now includes the plan written in Step 4).
+Invoke `reviewing-on-issue` with plan role via the Agent tool (custom subagent `review-worker`). `reviewing-on-issue` will fetch the Issue body itself via `shirokuma-docs show {number}` (which now includes the plan written in Step 4).
 
 ```text
-Skill(reviewing-on-issue, args: "plan #{number}")
+Agent(review-worker, args: "plan #{number}")
 ```
 
-The review result is posted as an Issue comment by `reviewing-on-issue`, and a Fork Signal is returned.
+The review result is posted as an Issue comment by `reviewing-on-issue`, and structured output is returned.
 
-#### Processing Fork Signal
+#### Processing Subagent Output
 
-| Fork Signal Status | Action |
+| Output Status | Action |
 |--------|--------|
 | PASS | Follow "On PASS" below |
 | NEEDS_REVISION | Follow "On Failure" below to fix and re-review |
 
-#### Fork Signal Parse Checkpoint
+#### Output Parse Checkpoint
 
-On receiving fork output, execute these checks in order:
+On receiving subagent output, execute these checks in order:
 
 1. **Extract YAML frontmatter** (block delimited by `---`)
 2. **action field**: Read `action` → CONTINUE (PASS) or REVISE (NEEDS_REVISION)
@@ -216,7 +216,7 @@ On receiving fork output, execute these checks in order:
 5. **action = CONTINUE**: Follow "On PASS" below
 6. **action = REVISE**: Follow "On Failure" below
 
-Fork Signal is internal processing data — output only a one-line summary before proceeding.
+Subagent output is internal processing data — output only a one-line summary before proceeding.
 
 #### On PASS
 
@@ -271,15 +271,15 @@ EOF
 
 When NEEDS_REVISION is returned:
 
-1. Classify issues from Fork Signal `### Detail` into **[Plan]** and **[Issue description]**
+1. Classify issues from subagent output `### Detail` into **[Plan]** and **[Issue description]**
 2. **[Issue description]** issues → Fix the relevant sections in the issue body (overview, background, tasks, etc.)
 3. **[Plan]** issues → Fix the plan section and update the `## Plan` section in the Issue body with the revised content
-4. After fixes, re-run the review via Skill (same `reviewing-on-issue` plan role)
+4. After fixes, re-run the review via Agent tool (same custom subagent `review-worker` plan role)
 5. **Max retries: 2** (initial review + up to 2 fix-and-review cycles)
 6. On 3rd NEEDS_REVISION → Stop the loop, report to user for their judgment
 
 ```
-Plan → Body write → Skill(reviewing-on-issue plan) → NEEDS_REVISION → Fix + Update body → Re-review → PASS → Response comment → Step 5a
+Plan → Body write → Agent(review-worker plan) → NEEDS_REVISION → Fix + Update body → Re-review → PASS → Response comment → Step 5a
                                                                                         ↓ (failed twice)
                                                                                    Report to user
 ```
@@ -413,7 +413,7 @@ Add GitHub writing rule references to each skill...
 | Bash | `shirokuma-docs show/update` |
 | Read/Grep/Glob | Codebase investigation |
 | Task (Explore) | Broad code investigation |
-| Skill (reviewing-on-issue) | Step 5: Fresh-context plan review (fork delegation) |
+| Agent (review-worker) | Step 5: Fresh-context plan review (custom subagent delegation) |
 | AskUserQuestion | Overwrite confirmation, issue number prompt |
 | TodoWrite | Planning step progress tracking |
 
@@ -423,4 +423,4 @@ Add GitHub writing rule references to each skill...
 - Plans are persisted in the issue body — available across sessions
 - `Spec Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
 - Use Explore agent during investigation to minimize context consumption
-- **Chain autonomous progression**: After the review fork (Step 5) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 6-7 based on the YAML frontmatter `action` field
+- **Chain autonomous progression**: After the review subagent (Step 5) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 6-7 based on the YAML frontmatter `action` field

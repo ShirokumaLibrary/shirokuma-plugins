@@ -1,9 +1,6 @@
 ---
 name: reviewing-claude-config
 description: Reviews Claude Code configuration files (skills, rules, agents, output-styles, plugins) for quality, consistency, and Anthropic's best practices. Use PROACTIVELY after creating or updating any .claude/ configuration. Triggers: "config review", "quality check", "review config".
-context: fork
-agent: general-purpose
-model: opus
 allowed-tools: Read, Grep, Glob, WebSearch, WebFetch
 ---
 
@@ -185,7 +182,7 @@ comment_id: {comment-database-id}
 - {file2}: {summary} [critical | warning]
 ```
 
-**Fork Signal (YAML frontmatter + body) must always be output at the end of the report.**
+**Output template (YAML frontmatter + body) must always be output at the end of the report.**
 
 **Status determination:**
 - Error > 0 → FAIL
@@ -218,8 +215,8 @@ When reviewing skills/agents, identify which pattern they follow:
 - Errors must be fixed, warnings are recommended
 - Keep report concise and scannable
 - Reference Anthropic's best practices when suggesting fixes
-- Use `context: fork` to run as isolated sub-agent without polluting main context
-- **Fork constraint**: TodoWrite / AskUserQuestion are unavailable due to `context: fork`; return results as a report only
+- Runs as Agent tool (subagent) for isolated execution without polluting main context
+- **Subagent constraint**: TodoWrite / AskUserQuestion are unavailable in subagent mode; return results as a report only
 
 ## Anti-Patterns
 

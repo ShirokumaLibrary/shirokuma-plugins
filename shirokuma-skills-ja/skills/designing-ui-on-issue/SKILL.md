@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUser
 
 デザインディスカバリーから実装委任、視覚評価ループまでを統括する。`designing-shadcn-ui` に実装を委任し、ユーザーとの対話でデザイン品質を担保する。
 
-**注意**: `working-on-issue` から委任されるが、スタンドアロン起動もサポート。非 fork スキル（AskUserQuestion による反復的ユーザー対話が必要なため）。
+**注意**: `working-on-issue` から委任されるが、スタンドアロン起動もサポート。非サブエージェントスキル（AskUserQuestion による反復的ユーザー対話が必要なため）。
 
 ## ワークフロー
 
@@ -154,7 +154,7 @@ lsof -i :3000 2>/dev/null || echo "dev server not running"
 
 ## 注意事項
 
-- 非 fork スキル（AskUserQuestion による反復的ユーザー対話が必要）
+- 非サブエージェントスキル（AskUserQuestion による反復的ユーザー対話が必要）
 - 実装前にデザイン方向性をユーザーに確認する — 合意なく実装すると大幅な手戻りリスクがある
 - 視覚評価ループは最大 3 イテレーション
 - `designing-shadcn-ui` がビルド検証を実施（このスキルでは不要）

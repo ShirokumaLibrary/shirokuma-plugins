@@ -103,7 +103,7 @@ plugin/specs/{skill-name}/
 | `workflow` | ステータス遷移、ステップ順序 | 「Issue ステータスを In Progress に更新する」 |
 | `convention` | 命名規約、フォーマット | 「ブランチ名が branch-workflow ルールに準拠する」 |
 | `tooling` | ツール使用 | 「TodoWrite でチェーンステップを登録する」 |
-| `output` | 出力形式、成果物 | 「Fork Signal 形式で結果を返す」 |
+| `output` | 出力形式、成果物 | 「出力テンプレート形式で結果を返す」 |
 
 **必須件数**: 3 件以上。assertions は**観測可能な行動**に限定する（Anthropic 指針: "objectively verifiable, not subjective"）。
 

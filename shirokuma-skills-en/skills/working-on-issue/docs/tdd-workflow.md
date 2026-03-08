@@ -1,7 +1,7 @@
 # TDD Common Workflow
 
 Common TDD (Test-Driven Development) steps orchestrated by `working-on-issue`.
-Wraps the `coding-on-issue` (fork) invocation with TDD steps.
+Wraps the `coding-on-issue` (subagent) invocation with TDD steps.
 
 ## Flow
 
