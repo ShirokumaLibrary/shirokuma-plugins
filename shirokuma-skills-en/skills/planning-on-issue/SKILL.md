@@ -153,6 +153,31 @@ For issues where `subIssuesSummary.total > 0`, use the extended template that in
 
 See `epic-workflow` reference for details.
 
+### Step 3.5: Post Thinking Process Comment
+
+Post the decision rationale, alternatives, and constraints derived from the investigation as a **primary record** in a comment. Record "why this approach was chosen" before writing the plan to the body (Step 4).
+
+```bash
+shirokuma-docs issues comment {number} --body-file - <<'EOF'
+## Plan Decision Rationale
+
+### Selected Approach
+{The chosen approach and why it was selected}
+
+### Alternatives Considered
+{Approaches considered but rejected, with reasons. If none: 'No alternatives (single clear approach)'}
+
+### Constraints Discovered
+{Technical constraints or dependencies found during codebase investigation. If none: 'No constraints discovered'}
+EOF
+```
+
+**Template intent**: The comment records "why this approach was chosen". The body's plan section documents "what will be done" in a structured format, so comments and body serve distinct roles.
+
+**On NEEDS_REVISION**: This step runs only once (initial pass). No re-posting during the NEEDS_REVISION loop — include revised rationale in the "Plan Review Response Complete" comment (Step 5 On PASS).
+
+> Comment language and style must comply with the `output-language` rule and `github-writing-style` rule.
+
 ### Step 4: Write Plan to Issue Body
 
 Write the plan section to the Issue body before review. This enables `reviewing-on-issue` to retrieve the plan content via `shirokuma-docs show {number}`.
@@ -242,31 +267,6 @@ shirokuma-docs issues comment {number} --body-file - <<'EOF'
 EOF
 ```
 
-2. Proceed to Step 5a below.
-
-#### 5a: Post Decision Rationale as Comment (PASS only)
-
-Post the planning decision rationale as a **primary record** in a comment. Record the decision process that would only exist in comments, not a summary of the body.
-
-```bash
-shirokuma-docs issues comment {number} --body-file - <<'EOF'
-## Plan Decision Rationale
-
-### Selected Approach
-{The chosen approach and why it was selected}
-
-### Alternatives Considered
-{Approaches considered but rejected, with reasons. If none: 'No alternatives (single clear approach)'}
-
-### Constraints Discovered
-{Technical constraints or dependencies found during codebase investigation. Omit if none}
-EOF
-```
-
-**Template intent**: The comment records "why this approach was chosen". The body's plan section documents "what will be done" in a structured format, so comments and body serve distinct roles.
-
-> Comment language and style must comply with the `output-language` rule and `github-writing-style` rule.
-
 #### On Failure
 
 When NEEDS_REVISION is returned:
@@ -279,9 +279,12 @@ When NEEDS_REVISION is returned:
 6. On 3rd NEEDS_REVISION → Stop the loop, report to user for their judgment
 
 ```
-Plan → Body write → Agent(review-worker plan) → NEEDS_REVISION → Fix + Update body → Re-review → PASS → Response comment → Step 5a
-                                                                                        ↓ (failed twice)
-                                                                                   Report to user
+Thinking process comment → Plan → Body write
+  → Agent(review-worker plan)
+    → NEEDS_REVISION → Fix + Update body → Re-review
+                         ↓ (failed twice)
+                    Report to user
+    → PASS → Response comment
 ```
 
 ### Step 6: Update Status (After Plan Review)

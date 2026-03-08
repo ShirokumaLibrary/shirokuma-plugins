@@ -108,21 +108,65 @@ Args: Update {target file}
 
 Post an analysis summary comment, update the Evolution Issue body, and close the Issue.
 
+#### 7a: Post Comment (Primary Record)
+
+Record the analysis thinking process as a comment. The comment must meet these content requirements:
+
+- **Analysis summary**: Number of detected patterns, category distribution
+- **Apply/skip rationale**: Reasoning for applying each proposal, or judgment rationale for skipping
+- **Impact scope**: Assessment of how changes affect other rules/skills
+
 ```bash
-# Post comment first (comment-first principle)
 shirokuma-docs issues comment {number} --body-file - <<'EOF'
 ## Analysis Complete: {date}
 
+### Analysis Summary
+Analyzed {N} signals. {Category distribution summary}.
+
 ### Applied
-- {target}: {change summary}
+- {target}: {change summary}. {rationale for applying}
 
 ### Skipped
-- {target}: {reason}
+- {target}: {rationale for skipping}
+
+### Impact Scope
+{Impact on other rules/skills. If none: "No impact"}
 EOF
+```
 
-# Update body as aggregated summary
-shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/evolution-summary.md
+#### 7b: Update Body (Structured Summary)
 
+Structure the comment content and consolidate into the body. The body records results only; for impact scope details, refer to the comment history. Update the body following this template:
+
+```markdown
+## Evolution Analysis Summary
+
+### Analysis Results
+- **Analysis date:** {date}
+- **Signals:** {N}
+- **Proposals:** {M}
+- **Applied:** {K}
+
+### Applied Improvements
+| Target | Category | Change Summary |
+|--------|----------|---------------|
+| {name} | {category} | {summary} |
+
+### Skip Reasons
+| Target | Category | Reason |
+|--------|----------|--------|
+| {name} | {category} | {reason} |
+
+> For impact scope details, refer to the comment history.
+```
+
+```bash
+shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-body.md
+```
+
+#### 7c: Close Issue
+
+```bash
 # Close the Evolution Issue (1 analysis cycle = 1 Issue)
 gh issue close {number}
 ```

@@ -8,7 +8,6 @@ For Issues / Discussions / PRs. Supplements the overview in the `project-items` 
 - How to Update
 - File-Based Body Editing
 - Workflow Order (Comment First)
-- Substantive Compliance
 - Updating Body from Review Results
 - Guidelines
 
@@ -59,26 +58,28 @@ Always pass the file name to the CLI (`--body-file /tmp/shirokuma-docs/{number}-
 
 ## Workflow Order (Comment First)
 
+### Why Comment First
+
+The purpose of the comment-first principle is to preserve AI's **thinking process as a primary record**.
+
+- **Judgment error analysis**: Without recorded thinking, it is impossible to retroactively analyze why a wrong decision was made
+- **Evolution loop input source**: Evolution signals in the `rule-evolution` rule are detected from decision rationale and investigation results recorded in comments. The body alone captures "what was done" but loses "why it was done"
+- **Hallucination detection**: By comparing the reasoning process recorded in comments with actual results, detection and correction of AI's incorrect assumptions or reasoning becomes possible
+
+### Order
+
 When updating a body, ALWAYS follow this order:
 
-1. **Post a comment** — Record the changes, findings, or corrections as a comment first
-2. **Consolidate into body** — Integrate the comment content into the relevant body section
-
-This order ensures the comment history preserves "what was changed and why", enabling detection and correction of AI judgment errors or hallucinations.
+1. **Record thinking process as a comment** — Record decision rationale, investigation results, alternatives considered — the "why" — as a primary record
+2. **Consolidate into body** — Structure the comment content and integrate it into the relevant body section
 
 **Prohibited**: Updating the body directly and then adding a comment after the fact (reverse order). Updating the body without any comment.
 
-## Substantive Compliance
+### Comment Content Requirements
 
 Merely following the comment→body order is not enough. Comments must have **independent value as primary records** of the work.
 
 **Heuristic**: If deleting a comment would not lose any information absent from the body, that comment is not substantive.
-
-| Bad (Formal compliance) | Good (Substantive compliance) |
-|------------------------|-------------------------------|
-| "Plan created. See body for details." | "Selected approach A. Also considered B (reason), rejected due to X." |
-| "Updated issue body." | "Investigation found module X is also affected. Added to tasks." |
-| "Reflected review results." | "Review detected N issues: {summary of specific findings}" |
 
 **Content that should be primary records in comments**:
 - Decision rationale and alternatives considered
@@ -87,6 +88,14 @@ Merely following the comment→body order is not enough. Comments must have **in
 - Reasons for requirement changes
 
 **When consolidating into body**: Structure and merge comment content into relevant sections. Comments remain as historical record.
+
+### Anti-Patterns
+
+| Bad (Formal compliance) | Good (Substantive compliance) |
+|------------------------|-------------------------------|
+| "Plan created. See body for details." | "Selected approach A. Also considered B (reason), rejected due to X." |
+| "Updated issue body." | "Investigation found module X is also affected. Added to tasks." |
+| "Reflected review results." | "Review detected N issues: {summary of specific findings}" |
 
 ## Updating Body from Review Results
 

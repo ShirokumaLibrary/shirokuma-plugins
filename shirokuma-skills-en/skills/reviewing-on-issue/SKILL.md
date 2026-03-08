@@ -173,12 +173,14 @@ Route the output based on the review context.
 
 #### PR Review (when PR number is in context)
 
-Post review summary as a PR comment:
+Post review summary as a PR issuecomment (not a review thread comment):
 
 ```bash
 # Write tool でファイル作成後
 shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-summary.md
 ```
+
+> **Note**: `issues comment` posts an issuecomment on the PR. These appear in the `issue_comments` section of `pr comments` output, separate from review thread comments.
 
 Only save a detailed report to Discussions when there are many critical issues (severity: error, 5 or more), and link the Discussion URL in the PR comment.
 

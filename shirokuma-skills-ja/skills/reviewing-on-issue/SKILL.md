@@ -173,12 +173,14 @@ shirokuma-docs lint docs -p . -f terminal
 
 #### PR レビュー（PR 番号がコンテキストにある場合）
 
-PR にレビューサマリーをコメントとして投稿：
+PR にレビューサマリーを issuecomment として投稿（レビュースレッドコメントではなく通常コメント）：
 
 ```bash
 # Write ツールでファイル作成後
 shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-summary.md
 ```
+
+> **注意**: `issues comment` は PR に issuecomment を投稿する。これは `pr comments` 出力の `issue_comments` セクションに表示され、レビュースレッドコメントとは別に管理される。
 
 重大な問題（severity: error）が多数（5件以上）ある場合のみ、詳細レポートを Discussion にも保存し、PR コメントに Discussion URL をリンクする。
 
