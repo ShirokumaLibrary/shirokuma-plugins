@@ -27,22 +27,21 @@ In self-review, the REVIEW → FIX → CONVERGE state machine loop runs internal
 
 See [reference/self-review-mode.md](reference/self-review-mode.md) for details.
 
-#### Required: PR Comment Posting
-
-The following PR comments **MUST be posted** at self-review completion (never skip):
-
-1. **Review findings comment**: Post a PR comment at each iteration following reviewing-on-issue Step 6
-2. **Response complete comment**: Post a response complete comment to the PR in the [COMPLETE] state and capture the `comment_id`
-
-```bash
-shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
-```
-
-After posting, capture the `comment_id` (database_id) from the command output and include it in the `### Response Complete Comment` section of the final output template. A final output without a posted comment is considered **incomplete**.
-
 #### Final Output Template
 
-After self-review completion, return results in this format:
+After self-review completion, return results in this format.
+
+**⛔ Precondition (MUST execute before returning output):**
+
+Before returning this template, verify that these 2 PR comments have been posted. If not yet posted, **post them now** before returning output:
+
+1. **Review findings comment**: Verify a PR comment was posted per reviewing-on-issue Step 6. If missing, post it now
+2. **Response complete comment**: Post to the PR with the command below and capture the `comment_id` (database_id) from output:
+   ```bash
+   shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
+   ```
+
+Do NOT return this template without a captured `comment_id`.
 
 ```yaml
 ---

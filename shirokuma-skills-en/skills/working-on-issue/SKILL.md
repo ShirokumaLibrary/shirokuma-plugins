@@ -283,13 +283,24 @@ Simplified to `/simplify` pre-pass + single review-worker invocation. See [refer
 3. **Parse result**: Read action/status from YAML frontmatter
    - `action: CONTINUE` → proceed to comment_id verification
    - `action: STOP` → chain stop, report to user
-4. **comment_id verification** (when action: CONTINUE):
+4. **comment_id verification (MUST NOT skip)** (when action: CONTINUE):
    - Check the `comment_id` in the `### Response Complete Comment` section
    - `comment_id` present → proceed to post-processing
-   - `comment_id` missing → review-worker skipped PR comment posting. Post the response complete comment directly as fallback:
-     ```bash
-     shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
-     ```
+   - `comment_id` missing → **immediate fallback execution (NEVER skip)**:
+     1. Extract the Self-Review Result from review-worker output and generate a response complete comment:
+        ```bash
+        cat > /tmp/shirokuma-docs/{number}-review-response.md << 'REVIEW_EOF'
+        ## Self-Review Response Complete
+
+        {transcribe Self-Review Result section from review-worker output}
+        REVIEW_EOF
+        ```
+     2. Post as a PR comment:
+        ```bash
+        shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
+        ```
+     3. Capture the `comment_id` from command output
+     4. If the command fails → chain stop, report "Self-review PR comment posting failed" to user
 5. **Post-processing**:
    - `### Recommendations` `[trivial]` items → propose immediate fix (AskUserQuestion)
    - `### Recommendations` `[rule]` items → record as Evolution signal

@@ -27,22 +27,21 @@ references:
 
 詳細は [reference/self-review-mode.md](reference/self-review-mode.md) を参照。
 
-#### 必須: PR コメント投稿
-
-セルフレビュー完了時、以下の PR コメントを**必ず投稿**すること（省略禁止）:
-
-1. **レビュー所見コメント**: 各イテレーションで reviewing-on-issue ステップ 6 に従い PR コメントを投稿
-2. **対応完了コメント**: [COMPLETE] ステートで対応完了コメントを PR に投稿し、`comment_id` を取得
-
-```bash
-shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
-```
-
-投稿後、コマンド出力から `comment_id`（database_id）を取得し、最終出力テンプレートの `### Response Complete Comment` セクションに含める。コメントが投稿されていない最終出力は**不完全**とみなされる。
-
 #### 最終出力テンプレート
 
-セルフレビュー完了後、以下の形式で結果を返す:
+セルフレビュー完了後、以下の形式で結果を返す。
+
+**⛔ 前提条件（出力前に必ず実行）:**
+
+このテンプレートを返す**前に**、以下の 2 つの PR コメントが投稿済みであることを確認する。未投稿の場合は**今すぐ投稿してから**出力する:
+
+1. **レビュー所見コメント**: reviewing-on-issue ステップ 6 に従い PR コメントを投稿済みか確認。未投稿なら投稿する
+2. **対応完了コメント**: 以下のコマンドで PR に投稿し、出力から `comment_id`（database_id）を取得する:
+   ```bash
+   shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
+   ```
+
+`comment_id` が取得できていない状態でこのテンプレートを返してはならない。
 
 ```yaml
 ---

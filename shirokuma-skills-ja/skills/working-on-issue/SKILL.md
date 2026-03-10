@@ -283,13 +283,24 @@ Agent(
 3. **結果パース**: YAML フロントマターから action/status を読み取り
    - `action: CONTINUE` → comment_id 検証へ
    - `action: STOP` → チェーン停止、ユーザーに報告
-4. **comment_id 検証**（action: CONTINUE の場合）:
+4. **comment_id 検証（スキップ不可）**（action: CONTINUE の場合）:
    - `### Response Complete Comment` セクションの `comment_id` を確認
    - `comment_id` あり → 後処理に進む
-   - `comment_id` なし → review-worker が PR コメント投稿を省略した。フォールバックとして対応完了コメントを直接投稿:
-     ```bash
-     shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
-     ```
+   - `comment_id` なし → **即時フォールバック実行（スキップ禁止）**:
+     1. review-worker の出力から Self-Review Result を抽出し、対応完了コメントを生成:
+        ```bash
+        cat > /tmp/shirokuma-docs/{number}-review-response.md << 'REVIEW_EOF'
+        ## セルフレビュー対応完了
+
+        {review-worker 出力の Self-Review Result セクションを転記}
+        REVIEW_EOF
+        ```
+     2. PR コメントとして投稿:
+        ```bash
+        shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
+        ```
+     3. コマンド出力から `comment_id` を取得して記録
+     4. コマンドが失敗した場合 → チェーン停止、ユーザーに「セルフレビュー PR コメント投稿に失敗」と報告
 5. **後処理**:
    - `### Recommendations` の `[trivial]` 項目 → その場で対応を提案（AskUserQuestion）
    - `### Recommendations` の `[rule]` 項目 → Evolution シグナルとして記録
