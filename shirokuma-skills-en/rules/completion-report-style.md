@@ -55,7 +55,7 @@ For detailed bullets vs prose guidelines in GitHub content (Issues, PRs, Discuss
 |----------|------------------|---------|
 | Workflow | Required (strict) | committing-on-issue, creating-pr-on-issue, ending-session |
 | Config Management | Required (strict) | managing-rules, managing-skills, managing-agents |
-| Analysis | Required (with tables) | evolving-rules, planning-on-issue |
+| Analysis | Required (with tables) | evolving-rules, preparing-on-issue |
 | Display / Orchestrator | Not required | showing-github, working-on-issue |
 | Delegator | Deferred to caller | reviewing-on-issue, creating-item |
 

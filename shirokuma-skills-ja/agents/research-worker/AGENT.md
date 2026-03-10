@@ -2,7 +2,7 @@
 name: research-worker
 description: 公式ドキュメントとプロジェクトパターンを調査するサブエージェント。新機能の開始時やベストプラクティスが不明な場合に使用する。
 tools: Read, Grep, Glob, WebSearch, WebFetch, Bash
-model: inherit
+model: sonnet
 skills:
   - researching-best-practices
 ---

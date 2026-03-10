@@ -1,6 +1,6 @@
 ---
 name: reviewing-on-issue
-description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, documentation, and plan quality. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "code review".
+description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, documentation, plan quality, design quality, and research quality. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "design review", "research review", "code review".
 allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---
 
@@ -19,6 +19,8 @@ Comprehensive review workflow with specialized roles for different review types.
 | **nextjs** | Framework, patterns | "Next.js review", "プロジェクト" |
 | **docs** | Markdown structure, links, terminology | "docs review", "ドキュメントレビュー" |
 | **plan** | Requirements coverage, task granularity, risks | "plan review", "計画レビュー" |
+| **design** | Design Brief, Aesthetic Direction, UI implementation | "design review", "設計レビュー" |
+| **research** | Requirement alignment, research quality, implementability | "research review", "リサーチレビュー" |
 
 ## Workflow
 
@@ -41,6 +43,8 @@ Based on user request, select appropriate role:
 | "Next.js", "nextjs" | nextjs | ALL knowledge files |
 | "docs", "ドキュメント" | docs | roles/docs.md |
 | "plan", "計画レビュー" | plan | roles/plan.md |
+| "design", "設計レビュー", "デザイン" | design | criteria/design, roles/design |
+| "research", "リサーチレビュー" | research | roles/research, criteria/research |
 
 #### Auto Role Selection for Self-Review
 
@@ -50,12 +54,12 @@ When invoked from the self-review chain (PR context available), analyze changed 
 |-------------|-----------|------|
 | Code | Contains `.ts/.tsx/.js/.jsx` | `code` |
 | Docs only | `.md` files only (excluding config paths) | `docs` |
-| Config only | Only files under `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/` | Routed to `reviewing-claude-config` by `creating-pr-on-issue` (this skill is not invoked) |
+| Config only | Only files under `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/` | Routed to `reviewing-claude-config` by `review-worker` (this skill is not invoked) |
 | Mixed | Code + docs/config | `code` (config portion reviewed by `reviewing-claude-config` in parallel) |
 
 **Config paths**: `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/`
 
-**Note**: The plan role is excluded from self-review auto-selection. Plans are not code files and cannot be detected via `git diff --name-only`. The plan role is only selected via keyword specification or explicit Spec Review Issue designation.
+**Note**: The plan, design, and research roles are excluded from self-review auto-selection. Plans, design artifacts, and research findings are not code files and cannot be detected via `git diff --name-only`. These roles are only selected via keyword specification or explicit Issue designation.
 
 ### 2. Load Knowledge
 
@@ -81,6 +85,8 @@ Read required knowledge files based on role:
 | testing | lint tests, lint coverage (test-related only) |
 | docs | lint docs (document structure only) |
 | plan | Skip (target is Issue body, not code/document files) |
+| design | Skip (target is Issue body / design artifacts, not code/document files) |
+| research | Skip (target is research findings, not code/document files) |
 
 **code / code+annotation / nextjs roles:**
 
@@ -140,6 +146,24 @@ See project-specific workflow documentation for detailed fix instructions.
 3. Evaluate each item in review checklist (`roles/plan.md`)
 4. Check against anti-patterns
 5. Verify consistency with requirements and deliverables
+
+**Design role:**
+
+1. Fetch Issue body via `shirokuma-docs show {number}`
+2. Extract Design Brief, Aesthetic Direction, and UI implementation results
+3. Evaluate each item in review checklist (`roles/design.md`)
+4. Check against review criteria (`criteria/design.md`)
+5. Check against anti-patterns
+6. Verify requirements alignment and technical feasibility
+
+**Research role:**
+
+1. Fetch research findings (Discussion or Issue comment)
+2. Verify requirement alignment (`criteria/research.md`)
+3. Evaluate research quality (source diversity, version consistency, source attribution)
+4. Verify implementability (specificity, incremental adoption, risk identification)
+5. Assess alignment level using the mismatch decision matrix (`roles/research.md`)
+6. Create adoption proposals for mismatched but useful patterns
 
 ### 5. Generate Report
 
@@ -204,6 +228,8 @@ Report the Discussion URL to the user.
 | PR number specified | PR comment (summary) | Discussion only if 5+ errors |
 | File/directory | Discussion (Reports) | — |
 | Issue number specified (plan role) | Issue comment | — |
+| Issue number specified (design role) | Issue comment | — |
+| Issue number specified (research role) | Issue comment | — |
 
 > See `rules/output-destinations.md` for the full output destination policy.
 
@@ -257,6 +283,14 @@ For token efficiency:
 # Plan review
 "plan review #42"
 "計画レビュー #42"
+
+# Design review
+"design review #42"
+"設計レビュー #42"
+
+# Research review
+"research review #42"
+"リサーチレビュー #42"
 
 # Update knowledge base
 "reviewer --update"
@@ -319,6 +353,28 @@ Step 6/6: Saving report...
   Issue #42 comment
 ```
 
+**Progress reporting example for design role:**
+
+```text
+Step 1/6: Selecting role...
+  Role: design
+  Files to load: CLAUDE.md, .claude/rules/, criteria/design
+
+Step 2/6: Loading knowledge...
+
+Step 3/6: Running lints... Skipped (design role)
+
+Step 4/6: Analyzing design...
+  Issue #42 - Design Brief, Aesthetic Direction analysis
+  Design Brief quality: appropriate, Token definitions: 3 missing
+
+Step 5/6: Generating report...
+  0 Critical, 3 Improvements
+
+Step 6/6: Saving report...
+  Issue #42 comment
+```
+
 ### Error Recovery
 
 If analysis is incomplete:
@@ -341,7 +397,7 @@ If analysis is incomplete:
 
 ## Self-Review Mode
 
-When invoked from `working-on-issue` delegated chain or `creating-pr-on-issue` self-review chain, return structured output that the caller can parse for automated decisions.
+When invoked from `working-on-issue` delegated chain (via `review-worker`), return structured output that the caller can parse for automated decisions.
 
 ### Self-Review Execution Steps
 
@@ -369,13 +425,20 @@ comment_id: {comment-database-id}
 **Critical:** {n}
 **Fixable-warning:** {n}
 **Out-of-scope:** {n}
+**Plan-gap:** {n}
 **Auto-fixable:** {yes | no}
 **Files with issues:**
 - {file1}: {summary} [critical | fixable-warning]
 - {file2}: {summary} [critical | fixable-warning]
 **Out-of-scope items:**
-- {description1}
-- {description2}
+- [plan-gap] {description1}
+- [true-out-of-scope] {description2}
+
+### Recommendations
+- [rule] {pattern name}: {description}
+- [trigger:{condition}] {description}
+- [one-off] {description}
+- [trivial] {description} ({estimated change size})
 ```
 
 Status-specific Action:
@@ -383,7 +446,27 @@ Status-specific Action:
 - **PASS** (action: CONTINUE): critical = 0 and fixable-warning = 0 (out-of-scope only is still PASS)
 - **NEEDS_FIX** (action: FIX): (critical > 0 or fixable-warning > 0) and Auto-fixable = yes
 - **FAIL** (action: STOP): (critical > 0 or fixable-warning > 0) and Auto-fixable = no
-- **Out-of-scope items**: Summary list used as input for follow-up Issue creation
+- **Out-of-scope items**: Summary list used as input for follow-up Issue creation. Tagged with `[plan-gap]` / `[true-out-of-scope]` sub-classification
+
+### Recommendations Classification
+
+| Classification | Example | Action |
+|---------------|---------|--------|
+| `[rule]` | "Use exported types from external libraries when available" | Record as Evolution signal |
+| `[trigger:{condition}]` | "Re-evaluate on major update" | Create follow-up Issue |
+| `[one-off]` | "Refactor this function to abstract the pattern" | Create follow-up Issue |
+| `[trivial]` | "Narrow the type" (2-line change) | Propose immediate fix |
+
+When classification is ambiguous, fall back to `[one-off]`.
+
+### Plan-Gap Criteria
+
+When determining out-of-scope classification, cross-reference with the Issue body's `## Purpose` + `## Summary` sections:
+
+| Condition | Sub-classification |
+|-----------|-------------------|
+| Outside PR scope but within Issue scope | `[plan-gap]` (improvement material for planning-on-issue) |
+| Outside PR scope and outside Issue scope | `[true-out-of-scope]` (create follow-up Issue) |
 
 ### Self-Review 3-Classification Mapping
 
@@ -473,7 +556,66 @@ comment_id: {comment-database-id}
 
 `planning-on-issue` classifies `### Detail` Issues into `[Plan]` and `[Issue description]` and fixes each accordingly.
 
-## Normal Review Mode (Non-Self-Review, Non-Plan-Review)
+## Design Review Mode
+
+When invoked with the design role via subagent, post the design review result as an Issue comment and return structured output.
+
+### Output Template (Design Review)
+
+```yaml
+---
+action: {CONTINUE | REVISE}
+status: {PASS | NEEDS_REVISION}
+ref: "#{issue-number}"
+comment_id: {comment-database-id}
+---
+
+{one-line review result summary}
+```
+
+- **PASS** (action: CONTINUE): No critical issues in the design (improvement suggestions may still be present)
+- **NEEDS_REVISION** (action: REVISE): Missing Design Brief, uncovered requirements, accessibility violations, significant inconsistencies
+
+### NEEDS_REVISION Additional Information
+
+```yaml
+---
+action: REVISE
+status: NEEDS_REVISION
+ref: "#{issue-number}"
+comment_id: {comment-database-id}
+---
+
+{n} issues detected
+
+### Detail
+**Issues:**
+- [{Design Brief | Aesthetic Direction | UI Implementation | Requirements | a11y}] {description of the problem}
+**Suggestions:**
+- {improvement suggestion}
+```
+
+## Research Review Mode
+
+When invoked with the research role via subagent, post the research review result as an Issue comment and return structured output.
+
+### Output Template (Research Review)
+
+```yaml
+---
+action: {CONTINUE | REVISE}
+status: {PASS | NEEDS_REVISION}
+ref: "#{issue-number}"
+comment_id: {comment-database-id}
+---
+
+{One-line review result summary}
+```
+
+- **PASS** (action: CONTINUE): No critical issues in research findings, aligned with requirements
+- **NEEDS_REVISION** (action: REVISE): Insufficient sources, version inconsistencies, critical mismatches with requirements, or adoption proposals present
+
+## Normal Review Mode (Non-Self-Review, Non-Plan-Review, Non-Design-Review)
 
 When invoked standalone or as subagent, and it is neither a self-review nor a plan review, save the report to GitHub and return structured output.
 
@@ -503,10 +645,10 @@ Review reports (PR comments, Discussions) must follow the language specified in 
 
 | Directory | Files |
 |-----------|-------|
-| `criteria/` | [code-quality](criteria/code-quality.md), [coding-conventions](criteria/coding-conventions.md), [security](criteria/security.md), [testing](criteria/testing.md) |
+| `criteria/` | [code-quality](criteria/code-quality.md), [coding-conventions](criteria/coding-conventions.md), [security](criteria/security.md), [testing](criteria/testing.md), [design](criteria/design.md), [research](criteria/research.md) |
 | `patterns/` | [server-actions](patterns/server-actions.md), [server-actions-structure](patterns/server-actions-structure.md), [drizzle-orm](patterns/drizzle-orm.md), [better-auth](patterns/better-auth.md), [e2e-testing](patterns/e2e-testing.md), [tailwind-v4](patterns/tailwind-v4.md), [radix-ui-hydration](patterns/radix-ui-hydration.md), [jsdoc](patterns/jsdoc.md), [nextjs-patterns](patterns/nextjs-patterns.md), [i18n](patterns/i18n.md), [code-quality](patterns/code-quality.md), [account-lockout](patterns/account-lockout.md), [audit-logging](patterns/audit-logging.md), [docs-management](patterns/docs-management.md) |
 | `reference/` | [tech-stack](reference/tech-stack.md) |
-| `roles/` | [code](roles/code.md), [security](roles/security.md), [testing](roles/testing.md), [nextjs](roles/nextjs.md), [docs](roles/docs.md), [plan](roles/plan.md) |
+| `roles/` | [code](roles/code.md), [security](roles/security.md), [testing](roles/testing.md), [nextjs](roles/nextjs.md), [docs](roles/docs.md), [plan](roles/plan.md), [design](roles/design.md), [research](roles/research.md) |
 | `templates/` | [report](templates/report.md) |
 | `docs/setup/` | [auth-setup](docs/setup/auth-setup.md), [database-setup](docs/setup/database-setup.md), [infra-setup](docs/setup/infra-setup.md), [project-init](docs/setup/project-init.md), [styling-setup](docs/setup/styling-setup.md) |
 | `docs/workflows/` | [annotation-consistency](docs/workflows/annotation-consistency.md), [shirokuma-docs-verification](docs/workflows/shirokuma-docs-verification.md) |

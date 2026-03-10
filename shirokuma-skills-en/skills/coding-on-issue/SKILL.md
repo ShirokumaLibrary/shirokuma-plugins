@@ -1,7 +1,7 @@
 ---
 name: coding-on-issue
 description: Handles generic coding tasks by delegating to framework-specific skills or performing direct edits based on work type. Automatically delegated from working-on-issue. Not intended for direct invocation.
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, WebSearch, WebFetch
 ---
 
 # Generic Coding
@@ -18,6 +18,18 @@ The following context is passed as arguments from `working-on-issue`:
 - Work type classification result
 
 No need to re-fetch the issue.
+
+## Skill Discovery (Run Before Dispatch)
+
+In addition to fixed dispatch table entries, dynamically detect project-specific skills:
+
+```bash
+shirokuma-docs skills routing coding
+```
+
+Refer to the `description` of each entry in the output `routes` array and route to the skill that best matches the issue requirements.
+Entries with `source: "discovered"` / `source: "config"` are project-specific skills.
+If a fixed table skill is optimal, it takes precedence regardless of discovery results.
 
 ## Dispatch
 
@@ -63,7 +75,7 @@ Skill delegate to `coding-nextjs`. Pass plan section and issue context.
 - As an Agent tool (subagent), `TodoWrite` / `AskUserQuestion` are not available
 - Progress management is handled by the manager (main AI, `working-on-issue`)
 - TDD workflow is managed by `working-on-issue` wrapping `coding-on-issue` calls with TDD steps (`coding-on-issue` focuses solely on implementation)
-- UI design tasks (new UI pages, visual redesigns, design system token changes) are handled by `designing-ui-on-issue` → `designing-shadcn-ui`. See `working-on-issue/docs/designing-reference.md` for responsibility boundaries
+- UI design tasks (new UI pages, visual redesigns, design system token changes) are handled by `designing-on-issue` → `designing-shadcn-ui`, not by this skill
 - **Commit, push, and PR creation are outside the scope of this skill**. This skill is responsible for code changes only — `committing-on-issue` handles commits and `creating-pr-on-issue` handles PR creation in the subsequent chain. Do not directly execute `git commit` / `git push` / `gh pr create` / `shirokuma-docs pr create`
 
 ## Output Template

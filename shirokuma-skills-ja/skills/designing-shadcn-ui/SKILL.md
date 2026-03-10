@@ -20,7 +20,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 
 ### 1. Design Brief 確認
 
-`designing-ui-on-issue` から委任された場合、Design Brief と Aesthetic Direction が渡される。そのまま使用する。
+`designing-on-issue` から委任された場合、Design Brief と Aesthetic Direction が渡される。そのまま使用する。
 
 スタンドアロンで起動された場合、Design Brief はスキップ可。ただし、美学方向性が不明な場合は最低限の方向性確認を推奨する。
 
@@ -77,14 +77,14 @@ pnpm --filter {app-name} build
 
 ## 次のステップ
 
-`designing-ui-on-issue` 経由で呼ばれた場合、制御は自動的にオーケストレーターに戻る。
+`designing-on-issue` 経由で呼ばれた場合、制御は自動的にオーケストレーターに戻る。
 
 スタンドアロンで起動された場合:
 
 ```
 実装完了。次のステップ:
 → `/committing-on-issue` で変更をコミット
-→ フルワークフローが必要な場合は `/designing-ui-on-issue` を使用
+→ フルワークフローが必要な場合は `/designing-on-issue` を使用
 ```
 
 ## 注意事項

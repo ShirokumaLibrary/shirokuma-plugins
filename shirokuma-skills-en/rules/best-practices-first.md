@@ -5,23 +5,49 @@
 ## Preferred Entry Point
 
 When the user provides a task with an issue number or work description → delegate to `working-on-issue`.
-`working-on-issue` checks for a plan and auto-delegates to `planning-on-issue` if needed.
+`working-on-issue` checks for a plan and auto-delegates to `preparing-on-issue` if needed.
 
 Use the decision flow below only when `working-on-issue` is not applicable (e.g., exploration, architecture, simple questions).
 
 ## Development Lifecycle
+
+### Three-Phase Model
+
+The development workflow consists of three phases, each managed by an independent orchestrator.
+
+```mermaid
+graph LR
+    PREP["preparing-on-issue<br/>(decide what to do)"]
+    DESIGN["designing-on-issue<br/>(detail how to do it)"]
+    WORK["working-on-issue<br/>(build it)"]
+
+    PREP -->|"design needed"| DESIGN
+    PREP -->|"no design needed"| WORK
+    DESIGN --> WORK
+```
+
+| Phase | Orchestrator | Responsibility | Delegates to |
+|-------|-------------|----------------|-------------|
+| Preparing | `preparing-on-issue` | Planning + plan review | `planning-worker` → `planning-on-issue` |
+| Designing | `designing-on-issue` | Design routing + design review | `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` etc. |
+| Working | `working-on-issue` | Implementation, commit, PR, self-review | `coding-worker`, `commit-worker`, `pr-worker`, `review-worker` |
+
+### Conversation Flow
 
 Each phase typically runs in a separate Claude Code conversation. Context flows between conversations via Issue body (plan) and Issue comments (work summaries).
 
 ```mermaid
 graph TD
     C1["Conversation 1: Issue creation<br/>/creating-item (standalone)"]
-    C2["Conversation 2: Planning<br/>/planning-on-issue #N (standalone)"]
+    C2["Conversation 2: Planning<br/>/preparing-on-issue #N (standalone)"]
+    C2D["Conversation 2.5: Design (optional)<br/>/designing-on-issue #N (standalone)"]
     C3["Conversation 3: Implementation<br/>Small: /working-on-issue #N (standalone)<br/>Large: /starting-session #N"]
     C4["Conversation 4: Continuation (large only)<br/>/starting-session #N → context restore"]
 
     C1 -->|"Backlog → user decision"| C2
-    C2 -->|"Spec Review → user approval"| C3
+    C2 -->|"design needed"| C2D
+    C2 -->|"no design needed (Spec Review → user approval)"| C3
+    C2D -->|"Spec Review → user approval"| C3
     C3 -->|"context overflow"| C4
     C3 -->|"completed"| Done["PR → Review → Done"]
     C4 --> Done
@@ -33,7 +59,7 @@ Small tasks may complete planning + implementation in a single conversation.
 
 ```mermaid
 graph TD
-    E1["Conversation 1: Epic planning<br/>/planning-on-issue #N"]
+    E1["Conversation 1: Epic planning<br/>/preparing-on-issue #N"]
     E2["Conversation 2: Epic kickoff<br/>/working-on-issue #N<br/>(auto-creates sub-issues + integration branch)"]
     E3["Conversation 3+: Sub-issue work<br/>/working-on-issue #sub (standalone)<br/>or /starting-session #sub"]
 
@@ -65,11 +91,13 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 | Skill | Session | Standalone | Notes |
 |-------|---------|------------|-------|
 | working-on-issue | Yes | Yes | Entry point for both modes |
-| planning-on-issue | Yes | Yes | Via working-on-issue or standalone |
+| preparing-on-issue | Yes | Yes | Via working-on-issue or standalone |
+| planning-on-issue | Yes | — | Subagent via planning-worker (from preparing-on-issue) |
 | coding-on-issue | Yes | — | Subagent delegation from working-on-issue only |
 | coding-nextjs | Yes | Yes | Via coding-on-issue or standalone |
-| designing-ui-on-issue | Yes | Yes | Via working-on-issue or standalone |
-| designing-shadcn-ui | Yes | Yes | Via designing-ui-on-issue or standalone |
+| designing-on-issue | — | Yes | Currently standalone (invoked from preparing-on-issue completion report) |
+| designing-shadcn-ui | Yes | Yes | Via designing-on-issue or standalone |
+| designing-nextjs | Yes | Yes | Via designing-on-issue or standalone |
 | creating-item | — | Yes | Always standalone-capable |
 | committing-on-issue | Yes | Yes | Subagent (standalone also runs as subagent) |
 | creating-pr-on-issue | Yes | Yes | Subagent (via chain or standalone) |
@@ -93,7 +121,7 @@ For substantial standalone work without `working-on-issue`:
 | Task Type | Route To | Method |
 |-----------|----------|--------|
 | General Coding | `coding-on-issue` | Agent (custom subagent, via `working-on-issue`) |
-| UI Design | `designing-ui-on-issue` | Skill (via `working-on-issue`) |
+| UI Design | `designing-on-issue` | Skill (currently standalone; invoked when recommended by `preparing-on-issue` completion report) |
 | Research | `researching-best-practices` | Agent (custom subagent) |
 | Review | `reviewing-on-issue` | Agent (custom subagent) |
 | Claude Config | `reviewing-claude-config` | Agent (custom subagent) |

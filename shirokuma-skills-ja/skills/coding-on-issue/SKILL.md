@@ -1,7 +1,7 @@
 ---
 name: coding-on-issue
 description: 汎用的なコーディングタスクを処理し、作業タイプに応じてフレームワーク固有スキルに委任するか直接編集を行います。working-on-issue から自動的に委任されるため、直接起動は不要。
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, WebSearch, WebFetch
 ---
 
 # 汎用コーディング
@@ -18,6 +18,18 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
 - 作業タイプ分類結果
 
 Issue の再取得は不要。
+
+## スキル発見（ディスパッチ前に実行）
+
+ディスパッチテーブルの固定エントリに加え、プロジェクト固有スキルを動的に検出する:
+
+```bash
+shirokuma-docs skills routing coding
+```
+
+出力の `routes` 配列の各エントリの `description` を参照し、Issue の要件に最も適合するスキルにルーティングする。
+`source: "discovered"` / `source: "config"` のエントリはプロジェクト固有スキルである。
+固定テーブルのスキルが最適な場合は、発見結果に関わらず固定テーブルを優先してよい。
 
 ## ディスパッチ
 
@@ -63,7 +75,7 @@ Issue の再取得は不要。
 - Agent ツール（サブエージェント）のため `TodoWrite` / `AskUserQuestion` は使用不可
 - 進捗管理はマネージャー（メイン AI、`working-on-issue`）が担当
 - TDD ワークフローは `working-on-issue` が `coding-on-issue` の呼び出しを TDD で包む形で管理（`coding-on-issue` 自体は実装のみに集中）
-- UI デザインタスク（新規 UI ページ、ビジュアルリデザイン、デザインシステムトークン変更）は `designing-ui-on-issue` → `designing-shadcn-ui` が担当。責務境界の詳細は `working-on-issue/docs/designing-reference.md` を参照
+- UI デザインタスク（新規 UI ページ、ビジュアルリデザイン、デザインシステムトークン変更）は `designing-on-issue` → `designing-shadcn-ui` が担当し、本スキルの責務外
 - **コミット・プッシュ・PR 作成は本スキルの責務外**。コード変更のみを担当し、コミットは `committing-on-issue`、PR 作成は `creating-pr-on-issue` が後続チェーンで担当する。`git commit` / `git push` / `gh pr create` / `shirokuma-docs pr create` を直接実行しないこと
 
 ## 出力テンプレート

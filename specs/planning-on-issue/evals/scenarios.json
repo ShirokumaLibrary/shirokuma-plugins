@@ -84,7 +84,7 @@
       },
       "assertions": [
         {
-          "text": "Issue ステータスを Planning に遷移する",
+          "text": "Issue ステータスを Preparing に遷移する",
           "category": "workflow"
         },
         {

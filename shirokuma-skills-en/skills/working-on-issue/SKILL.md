@@ -16,14 +16,14 @@ Orchestrate the full workflow from planning to implementation, commit, PR, and s
 
 Register **all chain steps** in TodoWrite **before starting work**.
 
-**Implementation / Design / Bug Fix / Refactoring / Chore:**
+**Implementation / Bug Fix / Refactoring / Chore:**
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Implement changes | Implementing changes | `coding-on-issue` (subagent) / `designing-ui-on-issue` |
+| 1 | Implement changes | Implementing changes | `coding-on-issue` (subagent) |
 | 2 | Commit and push changes | Committing and pushing | `committing-on-issue` (subagent) |
 | 3 | Create pull request | Creating pull request | `creating-pr-on-issue` (subagent) |
-| 4 | Run self-review and apply fixes | Running self-review | Manager direct: SIMPLIFY → REVIEW → COMPLETE |
+| 4 | Run self-review and apply fixes | Running self-review | Manager managed: SIMPLIFY → review-worker self-review → post-processing |
 | 5 | Post work summary | Posting work summary | Manager direct: `issues comment` |
 | 6 | Update Status to Review | Updating Status to Review | Manager direct: `issues update` |
 
@@ -61,15 +61,15 @@ Check if issue body contains `## Plan` section (detected by `^## Plan` line pref
 
 | Plan state | Action |
 |-----------|--------|
-| No plan | → Delegate to `planning-on-issue` |
+| No plan | → Delegate to `preparing-on-issue` |
 | Plan exists | → Pass `## Plan` section as context to implementation skill |
 
-#### Transition from Planning Status
+#### Transition from Preparing Status
 
 | Plan state | Action |
 |-----------|--------|
-| Planning + no plan | → Delegate to `planning-on-issue` |
-| Planning + plan exists | → Transition to Spec Review, ask user approval |
+| Preparing + no plan | → Delegate to `preparing-on-issue` |
+| Preparing + plan exists | → Transition to Spec Review, ask user approval |
 
 **Text description only**: Classify using dispatch condition table (Step 4) keywords.
 
@@ -118,7 +118,6 @@ For Feature type, Size M+, suggest ADR creation (AskUserQuestion).
 | Work Type | Condition | Delegate To | TDD |
 |-----------|-----------|-------------|-----|
 | General Coding | Implementation, bug fix, refactoring, config, Markdown editing | `coding-on-issue` (subagent) | Yes (implementation, bug fix, refactoring) |
-| UI Design | Keywords: `design`, `UI`, `memorable`, `impressive` | `designing-ui-on-issue` | No |
 | Research | Keywords: `research`, `investigate` | `researching-best-practices` (subagent) | No |
 | Review | Keywords: `review`, `audit` | `reviewing-on-issue` (subagent) | No |
 | Project Setup | Keywords: `setup project`, `initialize` | `setting-up-project` | No |
@@ -146,7 +145,6 @@ See [docs/tdd-workflow.md](docs/tdd-workflow.md) for details.
 | Work Type | Reference |
 |-----------|-----------|
 | Implementation | [docs/coding-reference.md](docs/coding-reference.md) |
-| Design | [docs/designing-reference.md](docs/designing-reference.md) |
 | Review | [docs/reviewing-reference.md](docs/reviewing-reference.md) |
 | Research | [docs/researching-reference.md](docs/researching-reference.md) |
 
@@ -156,7 +154,7 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 | Work Type | Chain |
 |-----------|-------|
-| General Coding / Design | Work → Commit → PR → Simplify → Self-Review → Work Summary → Status Update |
+| General Coding | Work → Commit → PR → Simplify → Self-Review → Work Summary → Status Update |
 | Research | Research → Discussion |
 
 - **Merge is NOT part of the chain**
@@ -190,8 +188,8 @@ If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. 
 When `creating-pr-on-issue` returns its result, execute the following steps **within the same chain** sequentially. Each step is registered as `pending` in TodoWrite — do NOT stop while pending steps remain:
 
 1. **SIMPLIFY**: Invoke `/simplify` via Skill tool (code category only, skip on failure) → commit & push if changes
-2. **REVIEW**: Invoke `reviewing-on-issue` / `reviewing-claude-config` via Agent tool (subagent) → PASS/NEEDS_FIX/FAIL determination
-3. **COMPLETE**: Create out-of-scope Issues → Post response complete comment
+2. **SELF-REVIEW**: Invoke review-worker in self-review mode with a single Agent call → action: CONTINUE/STOP determination
+3. **Post-processing**: Recommendations handling, Plan-gap Evolution signal recording
 4. **Work Summary**: Post work summary as Issue comment
 5. **Status Update**: `shirokuma-docs issues update {number} --field-status "Review"`
 6. **Evolution**: Auto-record signals (Step 6)
@@ -199,18 +197,16 @@ When `creating-pr-on-issue` returns its result, execute the following steps **wi
 **Post-subagent-result behavior (pseudocode):**
 
 ```text
-for each step in [commit, pr, simplify, self_review, work_summary, status_update]:
+for each step in [commit, pr, simplify, self_review, post_processing, work_summary, status_update]:
   // GUARD: TodoWrite has pending steps → this iteration MUST execute (do NOT stop)
   subagent_output = invoke_subagent_skill(step)
   frontmatter, body = parse_yaml_frontmatter(subagent_output)
-  action = frontmatter.action                    // CONTINUE | FIX | STOP | REVISE
+  action = frontmatter.action                    // CONTINUE | STOP | REVISE
   if action == "STOP":
     handle_failure(frontmatter, body)             // Chain stop, report to user
     break
-  if action == "FIX":
-    enter_fix_loop(frontmatter, body)             // Self-review fix loop
-    // After fix loop, continue chain
   // action == "CONTINUE" → proceed immediately
+  // NOTE: FIX loop is completed inside review-worker; manager only handles CONTINUE/STOP
   summary = body.split("\n")[0]                    // Body first line as summary
   log_one_line_summary(summary)
   update_todo(step, "completed")
@@ -223,7 +219,7 @@ for each step in [commit, pr, simplify, self_review, work_summary, status_update
 
 | Field | Required | Values | Description |
 |-------|----------|--------|-------------|
-| `action` | Yes | `CONTINUE` / `FIX` / `STOP` / `REVISE` | Behavioral directive for orchestrator (first field) |
+| `action` | Yes | `CONTINUE` / `STOP` / `REVISE` | Behavioral directive for orchestrator (first field) |
 | `next` | Conditional | skill name | Skill to invoke when `action: CONTINUE` |
 | `status` | Yes | `SUCCESS` / `PASS` / `NEEDS_FIX` / `FAIL` / `NEEDS_REVISION` | Result state |
 | `ref` | Conditional | GitHub reference | Human-readable reference when GitHub write occurred |
@@ -236,8 +232,8 @@ The `Summary` field is abolished. Instead, the **body's first line** is treated 
 | Status | Action | Used By | Chain Behavior |
 |--------|--------|---------|----------------|
 | SUCCESS | CONTINUE | committing-on-issue, creating-pr-on-issue, coding-on-issue | Proceed to next step |
-| PASS | CONTINUE | reviewing-on-issue (self-review) | Proceed to status update |
-| NEEDS_FIX | FIX | reviewing-on-issue (self-review) | Enter fix loop |
+| PASS | CONTINUE | review-worker (self-review mode) | Proceed to post-processing |
+| NEEDS_FIX_RESOLVED | CONTINUE | review-worker (self-review mode) | Proceed to post-processing (internally fixed) |
 | FAIL | STOP | All subagent skills | Chain stop, report to user |
 | NEEDS_REVISION | REVISE | reviewing-on-issue (plan review) | Enter revision loop |
 
@@ -249,6 +245,7 @@ The following skills are launched via custom sub-agents (AGENT.md). `/simplify` 
 
 | Skill | Sub-agent name |
 |-------|---------------|
+| `planning-on-issue` | `planning-worker` |
 | `coding-on-issue` | `coding-worker` |
 | `committing-on-issue` | `commit-worker` |
 | `creating-pr-on-issue` | `pr-worker` |
@@ -268,39 +265,31 @@ Each sub-agent has the corresponding skill's full content auto-injected via the 
 
 > **CRITICAL — Chain continuation after Agent tool returns**: When a custom sub-agent (e.g., `pr-worker`, `commit-worker`) completes and the Agent tool returns, **check TodoWrite for remaining `pending` steps**. If pending steps remain (self-review, work summary, status update, evolution), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. The Agent tool returning is a chain mid-point, not a completion signal.
 
-#### Self-Review Loop (Manager = Main AI Directly Manages)
+#### Self-Review (review-worker self-review mode)
 
-After PR creation, the manager (main AI) directly manages self-review. See [reference/self-review-workflow.md](reference/self-review-workflow.md) for details.
+Simplified to `/simplify` pre-pass + single review-worker invocation. See [reference/self-review-workflow.md](reference/self-review-workflow.md) for details.
 
-Self-review should be launched via Agent tool (subagent) for `reviewing-on-issue` / `reviewing-claude-config`. Review skills post PR comments as part of their workflow — launching via other means causes review findings to not be recorded on the PR, losing the audit trail.
+**Procedure:**
 
-**State transition overview:**
+1. **SIMPLIFY**: Invoke `/simplify` via Skill tool (only when code-category files exist; run once, skip on failure) → commit & push if changes
+2. **SELF-REVIEW**: Invoke review-worker in self-review mode with a single Agent call:
+   ```text
+   Agent(
+     description: "review-worker self-review #{number}",
+     subagent_type: "review-worker",
+     prompt: "self-review #{number}"
+   )
+   ```
+3. **Parse result**: Read action/status from YAML frontmatter
+   - `action: CONTINUE` → proceed to post-processing
+   - `action: STOP` → chain stop, report to user
+4. **Post-processing** (when action: CONTINUE):
+   - `### Recommendations` `[trivial]` items → propose immediate fix (AskUserQuestion)
+   - `### Recommendations` `[rule]` items → record as Evolution signal
+   - `### Recommendations` `[trigger:*]` / `[one-off]` items → propose follow-up Issue creation
+   - Plan-gap count > 0 → record as Evolution signal for `planning-on-issue` improvement
 
-```text
-[SIMPLIFY] /simplify initial pass → commit & push (if changes) [pre-pass, skippable]
-    ↓ Regardless of SIMPLIFY outcome (changes/no changes/failure), always proceed to [REVIEW]
-[REVIEW] Launch review → [PARSE] Parse result → [PRESENT] Present result → Decision [NOT skippable]
-  ├── PASS → [COMPLETE]
-  ├── NEEDS_FIX → [FIX] Task fix → [CONVERGE] Convergence check → [REVIEW]
-  └── FAIL → chain stop, [REPORT]
-```
-
-> **⚠ SIMPLIFY ≠ Self-Review**: SIMPLIFY is a quality-baseline pre-pass, not a substitute for self-review. After SIMPLIFY completes (changes, no changes, or failure), always proceed to [REVIEW] and invoke `reviewing-on-issue` / `reviewing-claude-config` via the Agent tool (subagent). Skipping [REVIEW] after SIMPLIFY is prohibited.
-
-| State | Action |
-|-------|--------|
-| SIMPLIFY | Invoke `/simplify` via Skill tool (only when code-category files exist; run once, skip on failure) **← pre-pass, skippable** |
-| REVIEW | Launch `reviewing-on-issue` / `reviewing-claude-config` via subagent **← NOT skippable. Must run after SIMPLIFY.** |
-| PARSE | Parse subagent output, PASS/NEEDS_FIX/FAIL determination |
-| PRESENT | Present self-review result summary to user |
-| FIX | Delegate fix to `Task(general-purpose)` |
-| CONVERGE | Convergence check (numeric-based, stop after 2 consecutive non-decreases) |
-| REPORT | Report remaining issues to user |
-| COMPLETE | Create out-of-scope Issues → Post response complete comment → **Subsequent steps**: Post Work Summary → Status → Review update → Evolution signal recording |
-
-**Subsequent steps after COMPLETE are managed as pending in TodoWrite. Even after reaching COMPLETE, immediately proceed to the next step as long as pending steps remain.**
-
-**Safety limit**: 5 iterations (2 critical + 2 warning + 1 buffer). On reaching limit, convert remaining fixable-warnings to follow-up Issues.
+> **⚠ SIMPLIFY ≠ Self-Review**: SIMPLIFY is a quality-baseline pre-pass. After SIMPLIFY completes, always invoke review-worker's self-review mode.
 
 **Batch mode self-review**: Run once for the entire batch PR. After completion, update all batch Issue statuses to Review.
 
@@ -348,30 +337,11 @@ shirokuma-docs issues update {number} --field-status "Review"
 
 ### Step 6: Evolution Signal Auto-Recording
 
-After successful chain completion (skip on chain failure), auto-record Evolution signals detected during the session following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule.
+After successful chain completion (skip on chain failure), auto-record Evolution signals detected during the session following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule. This includes environment checks (lint metrics), as `working-on-issue` is a target skill for environment checks per the `rule-evolution` rule.
 
-#### 6a: Introspection Checks
-
-Self-review the session using the detection checklist (see `rule-evolution` rule).
-
-#### 6b: Environment Checks (Lint Metrics)
-
-Regardless of introspection check results, fetch lint metrics once:
-
-```bash
-shirokuma-docs lint tests -p . --format json 2>/dev/null
-```
-
-| Condition | Action |
-|-----------|--------|
-| `summary.errorCount > 0` | Record as Evolution signal + propose follow-up Issue creation |
-| `summary.warningCount > 0` | Report count (signal type: lint trend) |
-| Command failure | Skip (environment checks are best-effort) |
-
-#### 6c: Signal Recording
-
-- Introspection or environment checks detected signals → Post comment to Evolution Issue → Display 1-line recording confirmation
-- No signals → Check for accumulated signals → Display reminder (fallback)
+1. Self-review the session using the detection checklist (see `rule-evolution` rule)
+2. Signals detected → Post comment to Evolution Issue → Display 1-line recording confirmation
+3. No signals → Check for accumulated signals → Display reminder (fallback)
 
 Do not register in TodoWrite (non-blocking processing, not a work step).
 
@@ -406,7 +376,7 @@ When an epic issue is directly specified (detected by `subIssuesSummary.total > 
 
 ### Pre-condition: Plan with Sub-Issue Structure
 
-The epic must have a `## Plan` with a `### Sub-Issue Structure` section. If no plan exists, delegate to `planning-on-issue` first (standard flow).
+The epic must have a `## Plan` with a `### Sub-Issue Structure` section. If no plan exists, delegate to `preparing-on-issue` first (standard flow).
 
 ### Epic Workflow
 
@@ -425,15 +395,20 @@ The epic must have a `## Plan` with a `### Sub-Issue Structure` section. If no p
    Body: Minimal stub referencing the parent plan (`See #{epic-number} for full plan`).
    After creation, update the epic's `### Sub-Issue Structure` table with actual issue numbers.
 
-3. **Propose execution order**: Based on the `### Execution Order` section or dependency column, present the recommended order via AskUserQuestion:
+3. **Present execution order**: Based on the `### Execution Order` section or dependency column, display the recommended order and end. Do NOT propose immediate work start — each sub-issue should be worked on in a separate conversation per the epic pattern in `best-practices-first`:
    ```
-   Sub-issues created. Recommended execution order:
+   Epic setup complete.
+
+   **Integration branch:** `epic/{number}-{slug}`
+   **Sub-issues created:** #{sub1}, #{sub2}, #{sub3}
+
+   Recommended execution order:
    1. #{sub1} - {title} (no dependencies)
    2. #{sub2} - {title} (depends on #{sub1})
-   Start with #{sub1}?
-   ```
+   3. #{sub3} - {title} (depends on #{sub2})
 
-4. **Start first sub-issue**: After user confirmation, set epic → In Progress, then recursively invoke `working-on-issue #{first-sub-issue}`. The sub-issue flow auto-detects the integration branch via `parentIssue`.
+   Start each sub-issue in a new conversation with `/working-on-issue #{sub}`.
+   ```
 
 ### Responsibility Note
 
@@ -466,6 +441,6 @@ Sub-issue creation in this flow uses `shirokuma-docs issues create` directly (no
 - Ensure correct feature branch
 - TDD-applicable work types wrap `coding-on-issue` invocation with TDD ([docs/tdd-workflow.md](docs/tdd-workflow.md))
 - Workflow executes sequentially (Commit → PR → Simplify → Self-Review → Status Update). **Merge is NOT included**
-- Self-review is directly managed by the manager (main AI) ([reference/self-review-workflow.md](reference/self-review-workflow.md))
+- Self-review is delegated to review-worker's self-review mode ([reference/self-review-workflow.md](reference/self-review-workflow.md))
 - Chain execution stops on error and returns control to user
 - **Chain autonomous progression**: Subagent outputs are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the YAML frontmatter and execute the next step's Agent/Bash tool call. Log a one-line summary and invoke the next tool in the same response

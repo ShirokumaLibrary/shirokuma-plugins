@@ -46,7 +46,7 @@ Accumulate signals as comments in Evolution Issues.
 | Preventive | Pattern recognized during signal recording | Include proposal in comment |
 | Periodic | User explicitly invokes `evolving-rules` | Analyze all accumulated signals |
 | Session start | `starting-session` detects accumulated signals | Recommend `evolving-rules` invocation (no auto-execution) |
-| Skill completion | `working-on-issue`, `planning-on-issue`, `creating-item` complete | Auto-record via detection checklist. Display reminder as fallback when no signals detected |
+| Skill completion | `working-on-issue`, `preparing-on-issue`, `creating-item` complete | Auto-record via detection checklist. Display reminder as fallback when no signals detected |
 
 ## Responsibility Boundaries
 
@@ -80,7 +80,7 @@ Open → Accumulate signals → Analyze (evolving-rules) → Close → New Issue
 
 ## Auto-Recording Procedure at Skill Completion
 
-At the completion of major skills (`working-on-issue`, `planning-on-issue`, `creating-item`), auto-record Evolution signals detected during the session using the following procedure. Each skill references this section to perform auto-recording.
+At the completion of major skills (`working-on-issue`, `preparing-on-issue`, `creating-item`), auto-record Evolution signals detected during the session using the following procedure. Each skill references this section to perform auto-recording.
 
 ### Signal Detection Checklist
 
@@ -97,7 +97,7 @@ Self-check the following at skill completion. When in doubt, do not record (avoi
 
 #### Environment Checks (`working-on-issue` only)
 
-At the completion of skills involving code changes, verify the project's objective state. `planning-on-issue` / `creating-item` do not involve code changes and are excluded.
+At the completion of skills involving code changes, verify the project's objective state. `preparing-on-issue` / `creating-item` do not involve code changes and are excluded.
 
 | Check Item | Signal Type | Detection Condition | Do NOT Record |
 |-----------|------------|-------------------|---------------|
@@ -175,7 +175,7 @@ Signals can be recorded even without a session (standalone skill invocations, di
 | Use Case | Signal Type | Recording Method |
 |----------|------------|-----------------|
 | Standalone `/working-on-issue` | Rule friction, redo instruction | Recording template + reminder. Include Issue number in **Context** |
-| Standalone `/planning-on-issue` | Rule friction, skill improvement | Recording template + reminder. Include rule/skill name in **Target** |
+| Standalone `/preparing-on-issue` | Rule friction, skill improvement | Recording template + reminder. Include rule/skill name in **Target** |
 | Standalone `/creating-item` | Skill improvement | Recording template + reminder. Include improvement idea in **Proposal** |
 | Direct file editing & commit | Rule friction | See recording template. Include rule name in **Target** |
 | Review-only short sessions | Review pattern | Reports accumulation (existing). Include pattern improvement in **Proposal** |

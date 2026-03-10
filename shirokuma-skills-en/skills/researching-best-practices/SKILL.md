@@ -135,7 +135,21 @@ shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/findings.md
 - [ ] All recommendations have source attribution
 - [ ] Compared findings against existing project patterns
 
+## Review Gate
+
+When invoked via `working-on-issue` chain, research results are reviewed by `review-worker` (Opus) using the **research role** before being finalized. This ensures research quality through a different model perspective.
+
+The research role reviews the following aspects (see `reviewing-on-issue`'s `roles/research.md` and `criteria/research.md` for details):
+- **Requirement alignment**: Whether recommended patterns are compatible with the project's tech-stack, existing patterns, and dependencies
+- **Research quality**: Source diversity, version consistency, source attribution, currency
+- **Implementability**: Specificity, incremental adoption paths, risk identification
+
+When mismatched but useful best practices are detected, adoption proposals are created.
+
+The orchestrator (`working-on-issue`) is responsible for invoking the review gate after this skill completes. This skill itself does not invoke the review.
+
 ## Notes
 
 - Results can be passed to `coding-nextjs` skill for implementation
 - Runs as Agent tool (subagent) for isolated execution without polluting main context
+- Research results are reviewed by `review-worker` (Opus) when invoked through the workflow chain

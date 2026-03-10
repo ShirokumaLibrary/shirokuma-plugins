@@ -9,7 +9,7 @@
 ```mermaid
 graph LR
   subgraph planning-on-issue
-    A[Planning 設定] --> B[深さ判定] --> C[計画策定] --> D[Issue 本文更新] --> E[Spec Review]
+    A[Preparing 設定] --> B[深さ判定] --> C[計画策定] --> D[Issue 本文更新] --> E[Spec Review]
   end
   E --> F[ユーザーに返す]
   F -.-> G[working-on-issue]

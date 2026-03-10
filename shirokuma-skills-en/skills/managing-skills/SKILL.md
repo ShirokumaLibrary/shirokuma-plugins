@@ -329,6 +329,7 @@ When run standalone, suggest next steps (review, testing methods).
 - [updating-skills.md](updating-skills.md) - Update workflows
 - [reference-workflows.md](reference-workflows.md) - Workflow patterns
 - [reference-output-patterns.md](reference-output-patterns.md) - Output templates
+- [reference-orchestrator.md](reference-orchestrator.md) - Orchestrator and project-specific specialist skill templates (`designing-*` / `coding-*`)
 
 ## Notes
 

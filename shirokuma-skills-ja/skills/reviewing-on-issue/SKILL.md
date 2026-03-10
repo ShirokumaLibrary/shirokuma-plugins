@@ -1,6 +1,6 @@
 ---
 name: reviewing-on-issue
-description: 専門ロール別の包括的レビューワークフローを提供し、コード品質・セキュリティ・テストパターン・ドキュメント品質・計画品質をチェックします。トリガー: 「レビューして」「review」「セキュリティチェック」「security audit」「テストレビュー」「ドキュメントレビュー」「計画レビュー」「コードレビュー」。
+description: 専門ロール別の包括的レビューワークフローを提供し、コード品質・セキュリティ・テストパターン・ドキュメント品質・計画品質・設計品質・リサーチ品質をチェックします。トリガー: 「レビューして」「review」「セキュリティチェック」「security audit」「テストレビュー」「ドキュメントレビュー」「計画レビュー」「設計レビュー」「リサーチレビュー」「コードレビュー」。
 allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---
 
@@ -19,6 +19,8 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 | **nextjs** | フレームワーク、パターン | "Next.js review", "プロジェクト" |
 | **docs** | Markdown 構造、リンク、用語 | "docs review", "ドキュメントレビュー" |
 | **plan** | 要件カバレッジ、タスク粒度、リスク | "plan review", "計画レビュー" |
+| **design** | Design Brief、Aesthetic Direction、UI 実装 | "design review", "設計レビュー" |
+| **research** | 要件合致性、調査品質、実装可能性 | "research review", "リサーチレビュー" |
 
 ## ワークフロー
 
@@ -41,6 +43,8 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 | "Next.js", "nextjs" | nextjs | 全ナレッジファイル |
 | "docs", "ドキュメント" | docs | roles/docs.md |
 | "plan", "計画レビュー" | plan | roles/plan.md |
+| "design", "設計レビュー", "デザイン" | design | criteria/design, roles/design |
+| "research", "リサーチレビュー" | research | roles/research, criteria/research |
 
 #### セルフレビュー時のロール自動選択
 
@@ -50,12 +54,12 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 |---------|---------|--------|
 | コード | `.ts/.tsx/.js/.jsx` を含む | `code` |
 | ドキュメントのみ | `.md` ファイルのみ（設定パス配下を除く） | `docs` |
-| 設定のみ | `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/` 配下のみ | `creating-pr-on-issue` が `reviewing-claude-config` にルーティング（本スキルは呼ばれない） |
+| 設定のみ | `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/` 配下のみ | `review-worker` が `reviewing-claude-config` にルーティング（本スキルは呼ばれない） |
 | 混在 | コード + ドキュメント/設定 | `code`（設定部分は `reviewing-claude-config` が並行レビュー） |
 
 **設定パス**: `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/`
 
-**注意**: plan ロールはセルフレビュー自動選択の対象外。計画はコードファイルではないため `git diff --name-only` では検出できない。plan ロールはキーワード指定または Spec Review Issue の明示指定でのみ選択される。
+**注意**: plan ロール、design ロール、research ロールはセルフレビュー自動選択の対象外。計画・設計・調査成果物はコードファイルではないため `git diff --name-only` では検出できない。これらのロールはキーワード指定または Issue の明示指定でのみ選択される。
 
 ### 2. ナレッジ読み込み
 
@@ -81,6 +85,8 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 | testing | lint tests, lint coverage（テスト関連のみ） |
 | docs | lint docs（ドキュメント構造のみ） |
 | plan | スキップ（対象が Issue 本文であり、コード/ドキュメントファイルではないため） |
+| design | スキップ（対象が Issue 本文 / 設計成果物であり、コード/ドキュメントファイルではないため） |
+| research | スキップ（対象が調査結果であり、コード/ドキュメントファイルではないため） |
 
 **code / code+annotation / nextjs ロール:**
 
@@ -140,6 +146,24 @@ shirokuma-docs lint docs -p . -f terminal
 3. レビューチェックリスト（`roles/plan.md`）の各項目を評価
 4. アンチパターンとの照合
 5. 要件・成果物との整合性を検証
+
+**design ロール:**
+
+1. `shirokuma-docs show {number}` で Issue 本文を取得
+2. Design Brief、Aesthetic Direction、UI 実装結果を抽出
+3. レビューチェックリスト（`roles/design.md`）の各項目を評価
+4. レビュー基準（`criteria/design.md`）と照合
+5. アンチパターンとの照合
+6. 要件との整合性・技術的実現可能性を検証
+
+**research ロール:**
+
+1. 調査結果（Discussion または Issue コメント）を取得
+2. 要件合致性を検証（`criteria/research.md`）
+3. 調査品質を評価（ソース多様性、バージョン整合性、ソース帰属）
+4. 実装可能性を検証（具体性、段階的導入、リスク識別）
+5. 不合致判定マトリクス（`roles/research.md`）に基づき合致度を評価
+6. 不合致だが有用なパターンがあれば取り込み提案を作成
 
 ### 5. レポート生成
 
@@ -204,6 +228,8 @@ Discussion URL をユーザーに報告。
 | PR 番号指定 | PR コメント（サマリー） | error 5件以上のみ Discussion |
 | ファイル/ディレクトリ | Discussion (Reports) | — |
 | Issue 番号指定（plan ロール） | Issue コメント | — |
+| Issue 番号指定（design ロール） | Issue コメント | — |
+| Issue 番号指定（research ロール） | Issue コメント | — |
 
 > 出力先ポリシーの全体像は `rules/output-destinations.md` を参照。
 
@@ -257,6 +283,14 @@ knowledge-manager が Web 検索で以下を最新化する：
 # 計画レビュー
 "plan review #42"
 "計画レビュー #42"
+
+# 設計レビュー
+"design review #42"
+"設計レビュー #42"
+
+# リサーチレビュー
+"research review #42"
+"リサーチレビュー #42"
 
 # ナレッジベース更新
 "reviewer --update"
@@ -319,6 +353,28 @@ knowledge-manager が Web 検索で以下を最新化する：
   Issue #42 コメント
 ```
 
+**design ロール時の進捗報告例:**
+
+```text
+ステップ 1/6: ロール選択中...
+  ロール: design
+  読み込みファイル: CLAUDE.md, .claude/rules/, criteria/design
+
+ステップ 2/6: ナレッジ読み込み中...
+
+ステップ 3/6: Lint 実行... スキップ（design ロール）
+
+ステップ 4/6: 設計分析中...
+  Issue #42 - Design Brief, Aesthetic Direction 分析
+  Design Brief 品質: 適切、トークン定義: 3件不足
+
+ステップ 5/6: レポート生成中...
+  0 件重大、3 件改善提案
+
+ステップ 6/6: レポート保存中...
+  Issue #42 コメント
+```
+
 ### エラー回復
 
 分析が不完全な場合：
@@ -341,7 +397,7 @@ knowledge-manager が Web 検索で以下を最新化する：
 
 ## セルフレビューモード
 
-`working-on-issue` の委任チェーンまたは `creating-pr-on-issue` のセルフレビューチェーンから起動された場合、呼び出し元が自動判定できるよう構造化された出力を返す。
+`working-on-issue` の委任チェーン（`review-worker` 経由）から起動された場合、呼び出し元が自動判定できるよう構造化された出力を返す。
 
 ### セルフレビュー実行手順
 
@@ -369,13 +425,20 @@ comment_id: {comment-database-id}
 **Critical:** {n}
 **Fixable-warning:** {n}
 **Out-of-scope:** {n}
+**Plan-gap:** {n}
 **Auto-fixable:** {yes | no}
 **Files with issues:**
 - {file1}: {summary} [critical | fixable-warning]
 - {file2}: {summary} [critical | fixable-warning]
 **Out-of-scope items:**
-- {description1}
-- {description2}
+- [plan-gap] {description1}
+- [true-out-of-scope] {description2}
+
+### Recommendations
+- [rule] {パターン名}: {説明}
+- [trigger:{condition}] {説明}
+- [one-off] {説明}
+- [trivial] {説明} ({変更量の目安})
 ```
 
 ステータス別 Action:
@@ -383,7 +446,27 @@ comment_id: {comment-database-id}
 - **PASS** (action: CONTINUE): critical = 0 かつ fixable-warning = 0（out-of-scope のみでも PASS）
 - **NEEDS_FIX** (action: FIX): (critical > 0 or fixable-warning > 0) かつ Auto-fixable = yes
 - **FAIL** (action: STOP): (critical > 0 or fixable-warning > 0) かつ Auto-fixable = no
-- **Out-of-scope items**: フォローアップ Issue 作成の入力となる概要リスト
+- **Out-of-scope items**: フォローアップ Issue 作成の入力となる概要リスト。`[plan-gap]` / `[true-out-of-scope]` サブ分類タグ付き
+
+### Recommendations 分類定義
+
+| 分類 | 例 | アクション |
+|------|-----|----------|
+| `[rule]` | 「外部ライブラリの型をエクスポートしていれば使う」 | Evolution シグナルとして記録 |
+| `[trigger:{condition}]` | 「メジャーアップデート時に再検討」 | フォローアップ Issue 作成 |
+| `[one-off]` | 「この関数をリファクタして抽象化する」 | フォローアップ Issue 作成 |
+| `[trivial]` | 「型を絞る」（2行変更） | その場で対応を提案 |
+
+判断に迷う場合は `[one-off]` にフォールバックする。
+
+### plan-gap 判定基準
+
+out-of-scope 判定時に Issue 本文の `## 目的` + `## 概要` セクションと照合し、サブ分類を決定する:
+
+| 条件 | サブ分類 |
+|------|---------|
+| PR スコープ外だが Issue スコープ内 | `[plan-gap]`（planning-on-issue の改善材料） |
+| PR スコープ外かつ Issue スコープ外 | `[true-out-of-scope]`（フォローアップ Issue 作成） |
 
 ### セルフレビュー 3 分類マッピング
 
@@ -473,7 +556,66 @@ comment_id: {comment-database-id}
 
 `planning-on-issue` は `### Detail` の `Issues` を `[計画]` と `[Issue記述]` に分類し、それぞれを修正する。
 
-## 通常レビューモード（非セルフレビュー、非計画レビュー）
+## 設計レビューモード
+
+design ロールでサブエージェントとして起動された場合、設計レビュー結果を Issue コメントに投稿し、構造化データを返す。
+
+### 出力テンプレート（設計レビュー）
+
+```yaml
+---
+action: {CONTINUE | REVISE}
+status: {PASS | NEEDS_REVISION}
+ref: "#{issue-number}"
+comment_id: {comment-database-id}
+---
+
+{レビュー結果の1行要約}
+```
+
+- **PASS** (action: CONTINUE): 設計に重大な問題がない（改善提案がある場合も PASS）
+- **NEEDS_REVISION** (action: REVISE): Design Brief 不在、要件未カバー、アクセシビリティ違反、重大な不整合
+
+### NEEDS_REVISION 時の追加情報
+
+```yaml
+---
+action: REVISE
+status: NEEDS_REVISION
+ref: "#{issue-number}"
+comment_id: {comment-database-id}
+---
+
+{n} 件の問題を検出
+
+### Detail
+**Issues:**
+- [{Design Brief | Aesthetic Direction | UI実装 | 要件整合 | a11y}] {問題点の説明}
+**Suggestions:**
+- {改善提案}
+```
+
+## リサーチレビューモード
+
+research ロールでサブエージェントとして起動された場合、リサーチレビュー結果を Issue コメントに投稿し、構造化データを返す。
+
+### 出力テンプレート（リサーチレビュー）
+
+```yaml
+---
+action: {CONTINUE | REVISE}
+status: {PASS | NEEDS_REVISION}
+ref: "#{issue-number}"
+comment_id: {comment-database-id}
+---
+
+{レビュー結果の1行要約}
+```
+
+- **PASS** (action: CONTINUE): 調査結果に重大な問題がなく、要件と合致
+- **NEEDS_REVISION** (action: REVISE): ソース不足、バージョン不整合、要件との重大な不合致、または取り込み提案がある場合
+
+## 通常レビューモード（非セルフレビュー、非計画レビュー、非設計レビュー）
 
 スタンドアロンまたはサブエージェントとして起動され、セルフレビューでも計画レビューでもない場合は、レポートを GitHub に保存し構造化データを返す。
 
@@ -503,10 +645,10 @@ comment_id: {comment-database-id}
 
 | ディレクトリ | ファイル |
 |-------------|---------|
-| `criteria/` | [code-quality](criteria/code-quality.md), [coding-conventions](criteria/coding-conventions.md), [security](criteria/security.md), [testing](criteria/testing.md) |
+| `criteria/` | [code-quality](criteria/code-quality.md), [coding-conventions](criteria/coding-conventions.md), [security](criteria/security.md), [testing](criteria/testing.md), [design](criteria/design.md), [research](criteria/research.md) |
 | `patterns/` | [server-actions](patterns/server-actions.md), [server-actions-structure](patterns/server-actions-structure.md), [drizzle-orm](patterns/drizzle-orm.md), [better-auth](patterns/better-auth.md), [e2e-testing](patterns/e2e-testing.md), [tailwind-v4](patterns/tailwind-v4.md), [radix-ui-hydration](patterns/radix-ui-hydration.md), [jsdoc](patterns/jsdoc.md), [nextjs-patterns](patterns/nextjs-patterns.md), [i18n](patterns/i18n.md), [code-quality](patterns/code-quality.md), [account-lockout](patterns/account-lockout.md), [audit-logging](patterns/audit-logging.md), [docs-management](patterns/docs-management.md) |
 | `reference/` | [tech-stack](reference/tech-stack.md) |
-| `roles/` | [code](roles/code.md), [security](roles/security.md), [testing](roles/testing.md), [nextjs](roles/nextjs.md), [docs](roles/docs.md), [plan](roles/plan.md) |
+| `roles/` | [code](roles/code.md), [security](roles/security.md), [testing](roles/testing.md), [nextjs](roles/nextjs.md), [docs](roles/docs.md), [plan](roles/plan.md), [design](roles/design.md), [research](roles/research.md) |
 | `templates/` | [report](templates/report.md) |
 | `docs/setup/` | [auth-setup](docs/setup/auth-setup.md), [database-setup](docs/setup/database-setup.md), [infra-setup](docs/setup/infra-setup.md), [project-init](docs/setup/project-init.md), [styling-setup](docs/setup/styling-setup.md) |
 | `docs/workflows/` | [annotation-consistency](docs/workflows/annotation-consistency.md), [shirokuma-docs-verification](docs/workflows/shirokuma-docs-verification.md) |

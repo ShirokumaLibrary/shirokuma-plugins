@@ -8,7 +8,7 @@
 **Date**: YYYY-MM-DD HH:MM
 **Reviewer**: Claude (reviewer agent)
 **Target**: [file/directory path]
-**Role**: [code|security|testing|nextjs|plan]
+**Role**: [code|security|testing|nextjs|plan|design]
 ```
 
 ## Sections

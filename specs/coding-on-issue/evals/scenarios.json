@@ -28,7 +28,7 @@
       "type": "trigger",
       "prompt": "UI デザインして",
       "expected": "should_not_trigger",
-      "rationale": "UI デザインは designing-ui-on-issue → designing-shadcn-ui の責務"
+      "rationale": "UI デザインは designing-on-issue → designing-shadcn-ui の責務"
     },
     {
       "id": "trigger-05",

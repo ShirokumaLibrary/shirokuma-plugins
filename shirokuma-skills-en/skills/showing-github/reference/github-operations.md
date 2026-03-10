@@ -181,7 +181,7 @@ Use `<<'EOF'` as heredoc delimiter (single quotes prevent variable expansion). W
 
 ```mermaid
 graph LR
-  Icebox --> Backlog --> Planning --> SpecReview[Spec Review] --> InProgress[In Progress]
+  Icebox --> Backlog --> Preparing --> Designing --> SpecReview[Spec Review] --> InProgress[In Progress]
   InProgress --> Review --> Testing --> Done --> Released
   InProgress <--> Pending["Pending (blocked)"]
 ```
@@ -190,7 +190,8 @@ graph LR
 |--------|-------------|
 | Icebox | Low priority, not yet planned |
 | Backlog | Planned for future work |
-| Planning | Plan being created |
+| Preparing | Plan being created |
+| Designing | Design being created |
 | Spec Review | Requirements being reviewed |
 | In Progress | Currently working on |
 | Pending | Blocked (document reason) |

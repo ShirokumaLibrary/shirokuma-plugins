@@ -225,7 +225,7 @@ shirokuma-docs session end \
 
 | 優先度 | 条件 | アクション |
 |--------|------|----------|
-| 0 | ステータスが Planning または Spec Review | ステータス更新しない（pre-work ステータス、計画途中） |
+| 0 | ステータスが Preparing、Designing、または Spec Review | ステータス更新しない（pre-work ステータス、計画・設計途中） |
 | 1 | Issue に関連するマージ済み PR がある | `--done` |
 | 2 | Issue に関連するオープン PR がある | `--review` |
 | 3 | PR 不要で作業完了 | `--done` |

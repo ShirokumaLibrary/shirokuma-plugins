@@ -8,7 +8,7 @@
 **日付**: YYYY-MM-DD HH:MM
 **レビュアー**: Claude (reviewer agent)
 **対象**: [ファイル/ディレクトリパス]
-**ロール**: [code|security|testing|nextjs|plan]
+**ロール**: [code|security|testing|nextjs|plan|design]
 ```
 
 ## セクション

@@ -1,0 +1,157 @@
+{
+  "skill_name": "designing-drizzle",
+  "version": "0.3.0-alpha.15",
+  "scenarios": [
+    {
+      "id": "trigger-01",
+      "type": "trigger",
+      "prompt": "データモデル設計して",
+      "expected": "should_trigger",
+      "rationale": "日本語の基本的なデータモデル設計トリガー"
+    },
+    {
+      "id": "trigger-02",
+      "type": "trigger",
+      "prompt": "テーブル設計して #42",
+      "expected": "should_trigger",
+      "rationale": "テーブル設計キーワード + Issue 番号"
+    },
+    {
+      "id": "trigger-03",
+      "type": "trigger",
+      "prompt": "スキーマ設計して",
+      "expected": "should_trigger",
+      "rationale": "スキーマ設計キーワード"
+    },
+    {
+      "id": "trigger-04",
+      "type": "trigger",
+      "prompt": "DB 設計して",
+      "expected": "should_trigger",
+      "rationale": "DB 設計キーワード"
+    },
+    {
+      "id": "trigger-05",
+      "type": "trigger",
+      "prompt": "マイグレーション設計して",
+      "expected": "should_trigger",
+      "rationale": "マイグレーション設計キーワード"
+    },
+    {
+      "id": "trigger-06",
+      "type": "trigger",
+      "prompt": "#42 やって",
+      "expected": "should_not_trigger",
+      "rationale": "作業実行は working-on-issue の責務"
+    },
+    {
+      "id": "trigger-07",
+      "type": "trigger",
+      "prompt": "UI デザインして",
+      "expected": "should_not_trigger",
+      "rationale": "UI デザインは designing-shadcn-ui の責務"
+    },
+    {
+      "id": "trigger-08",
+      "type": "trigger",
+      "prompt": "コンポーネント設計して",
+      "expected": "should_not_trigger",
+      "rationale": "コンポーネント設計は designing-nextjs の責務"
+    },
+    {
+      "id": "trigger-09",
+      "type": "trigger",
+      "prompt": "レビューして",
+      "expected": "should_not_trigger",
+      "rationale": "レビューは reviewing-on-issue の責務"
+    },
+    {
+      "id": "trigger-10",
+      "type": "trigger",
+      "prompt": "計画して #42",
+      "expected": "should_not_trigger",
+      "rationale": "計画は planning-on-issue の責務"
+    },
+    {
+      "id": "quality-01",
+      "type": "quality",
+      "prompt": "#42（新規ユーザー管理テーブル追加）のデータモデルを設計して",
+      "context": {
+        "issue_type": "Feature",
+        "has_plan": true,
+        "plan_contains": "users テーブル、roles テーブル、user_roles 中間テーブル"
+      },
+      "assertions": [
+        {
+          "text": "プロジェクトの CLAUDE.md と tech-stack.md を確認してスタック情報を把握する",
+          "category": "workflow"
+        },
+        {
+          "text": "エンティティ一覧テーブルを含むデータモデル設計を出力する",
+          "category": "output"
+        },
+        {
+          "text": "各テーブルの Drizzle スキーマ定義（型、制約、デフォルト値）を含める",
+          "category": "output"
+        },
+        {
+          "text": "リレーション定義と結合戦略を含める",
+          "category": "output"
+        }
+      ]
+    },
+    {
+      "id": "quality-02",
+      "type": "quality",
+      "prompt": "#42（注文履歴のソフトデリート対応）のスキーマ設計をして",
+      "context": {
+        "issue_type": "Feature",
+        "has_plan": true,
+        "existing_schema": "orders テーブルが既存",
+        "plan_contains": "ソフトデリート、deletedAt カラム追加"
+      },
+      "assertions": [
+        {
+          "text": "ソフトデリートパターン（deletedAt カラム）を設計に含める",
+          "category": "output"
+        },
+        {
+          "text": "マイグレーション戦略（既存データへの影響）を含める",
+          "category": "output"
+        },
+        {
+          "text": "主要決定事項テーブルに選択の根拠を記載する",
+          "category": "convention"
+        }
+      ]
+    },
+    {
+      "id": "quality-03",
+      "type": "quality",
+      "prompt": "#42（商品カタログの多言語対応）のDB設計をして",
+      "context": {
+        "issue_type": "Feature",
+        "has_plan": true,
+        "plan_contains": "products テーブルに多言語対応、i18n、翻訳テーブル"
+      },
+      "assertions": [
+        {
+          "text": "インデックス戦略をクエリパターンに基づいて設計する",
+          "category": "output"
+        },
+        {
+          "text": "レビューチェックリストの項目を満たしているか確認する",
+          "category": "workflow"
+        },
+        {
+          "text": "既存スキーマパターンとの整合性を確認する",
+          "category": "convention"
+        },
+        {
+          "text": "designing-on-issue 経由の場合は制御をオーケストレーターに返す旨を案内する",
+          "category": "tooling"
+        }
+      ]
+    }
+  ]
+}

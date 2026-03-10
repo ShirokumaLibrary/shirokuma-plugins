@@ -328,6 +328,7 @@ SKILL.md → サポートファイル（それ以上のチェーンなし）
 - [updating-skills.md](updating-skills.md) - 更新ワークフロー
 - [reference-workflows.md](reference-workflows.md) - ワークフローパターン
 - [reference-output-patterns.md](reference-output-patterns.md) - 出力テンプレート
+- [reference-orchestrator.md](reference-orchestrator.md) - オーケストレーター・プロジェクト固有専門スキルテンプレート（`designing-*` / `coding-*`）
 
 ## 注意事項
 

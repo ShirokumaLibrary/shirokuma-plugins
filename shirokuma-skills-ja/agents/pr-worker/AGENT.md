@@ -2,7 +2,7 @@
 name: pr-worker
 description: 現在のブランチから develop（またはサブ Issue の integration ブランチ）をターゲットに GitHub プルリクエストを作成するサブエージェント。
 tools: Bash, Read, Grep, Glob
-model: inherit
+model: sonnet
 skills:
   - creating-pr-on-issue
 ---

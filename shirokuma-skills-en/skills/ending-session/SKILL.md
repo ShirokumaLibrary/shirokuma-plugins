@@ -223,7 +223,7 @@ Example: `2026-02-19 - Plugin feature` → `2026-02-19 [alice] - Plugin feature`
 
 | Priority | Condition | Action |
 |----------|-----------|--------|
-| 0 | Status is Planning or Spec Review | Do not update status (pre-work status, planning in progress) |
+| 0 | Status is Preparing, Designing, or Spec Review | Do not update status (pre-work status, planning/designing in progress) |
 | 1 | Issue has a merged PR | `--done` |
 | 2 | Issue has an open PR | `--review` |
 | 3 | Work complete, no PR needed | `--done` |

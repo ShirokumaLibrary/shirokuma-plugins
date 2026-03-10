@@ -5,23 +5,49 @@
 ## 推奨エントリーポイント
 
 ユーザーが Issue 番号や作業内容を提供した場合 → `working-on-issue` に委任。
-`working-on-issue` が計画の有無を確認し、未計画なら `planning-on-issue` に自動委任する。
+`working-on-issue` が計画の有無を確認し、未計画なら `preparing-on-issue` に自動委任する。
 
 以下の判断フローは `working-on-issue` が適用できない場合のみ使用。
 
 ## 開発ライフサイクル
+
+### 3フェーズモデル
+
+開発ワークフローは 3 つのフェーズで構成される。各フェーズは独立したオーケストレーターが管理する。
+
+```mermaid
+graph LR
+    PREP["preparing-on-issue<br/>（何をやるか決める）"]
+    DESIGN["designing-on-issue<br/>（どうやるか詳細化）"]
+    WORK["working-on-issue<br/>（作る）"]
+
+    PREP -->|"設計が必要"| DESIGN
+    PREP -->|"設計不要"| WORK
+    DESIGN --> WORK
+```
+
+| フェーズ | オーケストレーター | 責務 | 実作業の委任先 |
+|---------|-----------------|------|-------------|
+| Preparing | `preparing-on-issue` | 計画策定・計画レビュー | `planning-worker` → `planning-on-issue` |
+| Designing | `designing-on-issue` | 設計ルーティング・設計レビュー | `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` 等 |
+| Working | `working-on-issue` | 実装・コミット・PR・セルフレビュー | `coding-worker`, `commit-worker`, `pr-worker`, `review-worker` |
+
+### 会話フロー
 
 各フェーズは通常、別の Claude Code 会話で実行される。会話間のコンテキスト引き継ぎは Issue 本文（計画）と Issue コメント（作業サマリー）が担う。
 
 ```mermaid
 graph TD
     C1["会話 1: Issue 作成<br/>/creating-item（スタンドアロン）"]
-    C2["会話 2: 計画策定<br/>/planning-on-issue #N（スタンドアロン）"]
+    C2["会話 2: 計画策定<br/>/preparing-on-issue #N（スタンドアロン）"]
+    C2D["会話 2.5: 設計（任意）<br/>/designing-on-issue #N（スタンドアロン）"]
     C3["会話 3: 製造<br/>小規模: /working-on-issue #N（スタンドアロン）<br/>大規模: /starting-session #N"]
     C4["会話 4: 製造の続き（大規模のみ）<br/>/starting-session #N → コンテキスト復元"]
 
     C1 -->|"Backlog → ユーザー判断"| C2
-    C2 -->|"Spec Review → ユーザー承認"| C3
+    C2 -->|"設計が必要"| C2D
+    C2 -->|"設計不要（Spec Review → ユーザー承認）"| C3
+    C2D -->|"Spec Review → ユーザー承認"| C3
     C3 -->|"コンテキスト溢れ"| C4
     C3 -->|"完結"| Done["PR → Review → Done"]
     C4 --> Done
@@ -33,7 +59,7 @@ graph TD
 
 ```mermaid
 graph TD
-    E1["会話 1: エピック計画<br/>/planning-on-issue #N"]
+    E1["会話 1: エピック計画<br/>/preparing-on-issue #N"]
     E2["会話 2: エピック開始<br/>/working-on-issue #N<br/>（サブ Issue + integration ブランチを自動作成）"]
     E3["会話 3+: サブ Issue 作業<br/>/working-on-issue #sub（スタンドアロン）<br/>or /starting-session #sub"]
 
@@ -65,11 +91,13 @@ graph TD
 | スキル | セッション | スタンドアロン | 備考 |
 |--------|-----------|--------------|------|
 | working-on-issue | 対応 | 対応 | 両モードのエントリーポイント |
-| planning-on-issue | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
+| preparing-on-issue | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
+| planning-on-issue | 対応 | — | planning-worker 経由のサブエージェント（preparing-on-issue から） |
 | coding-on-issue | 対応 | — | working-on-issue から subagent 委任のみ |
 | coding-nextjs | 対応 | 対応 | coding-on-issue 経由またはスタンドアロン |
-| designing-ui-on-issue | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
-| designing-shadcn-ui | 対応 | 対応 | designing-ui-on-issue 経由またはスタンドアロン |
+| designing-on-issue | — | 対応 | 現時点ではスタンドアロン起動（preparing-on-issue の完了レポートから起動） |
+| designing-shadcn-ui | 対応 | 対応 | designing-on-issue 経由またはスタンドアロン |
+| designing-nextjs | 対応 | 対応 | designing-on-issue 経由またはスタンドアロン |
 | creating-item | — | 対応 | 常にスタンドアロン対応 |
 | committing-on-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | creating-pr-on-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
@@ -93,7 +121,7 @@ graph TD
 | タスクタイプ | 委任先 | メソッド |
 |-------------|--------|----------|
 | コーディング全般 | `coding-on-issue` | Agent (custom subagent, via `working-on-issue`) |
-| UI デザイン | `designing-ui-on-issue` | Skill（via `working-on-issue`） |
+| UI デザイン | `designing-on-issue` | Skill（現時点ではスタンドアロン。`preparing-on-issue` の完了レポートで推奨時に起動） |
 | リサーチ | `researching-best-practices` | Agent (custom subagent) |
 | レビュー | `reviewing-on-issue` | Agent (custom subagent) |
 | Claude 設定 | `reviewing-claude-config` | Agent (custom subagent) |

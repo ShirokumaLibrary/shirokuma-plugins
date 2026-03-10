@@ -15,7 +15,7 @@ Every project item MUST have:
 
 ```mermaid
 graph LR
-  Icebox --> Backlog --> Planning --> SpecReview[Spec Review]
+  Icebox --> Backlog --> Preparing --> Designing --> SpecReview[Spec Review]
   SpecReview --> InProgress[In Progress] --> Review --> Testing --> Done --> Released
   InProgress <--> Pending
   Review <--> Pending
@@ -27,7 +27,8 @@ graph LR
 |--------|-------------|
 | Icebox | Low priority, shelved. May be promoted to Backlog later |
 | Backlog | Planned work. Requirements may still need refinement |
-| Planning | Plan is being created by `planning-on-issue` (pre-work status) |
+| Preparing | Plan is being created by `preparing-on-issue` (pre-work status) |
+| Designing | Design is being created by `designing-on-issue` (pre-work status) |
 | Spec Review | Gate for requirements review before work begins |
 | In Progress | Currently working on |
 | Pending | Blocked (document reason) |
@@ -88,8 +89,8 @@ AI MUST update issue status at these points:
 
 | Trigger | Action | Owner | Command |
 |---------|--------|-------|---------|
-| Planning started | → Planning + assign | `planning-on-issue` | `issues update {n} --field-status "Planning" --add-assignee @me` |
-| Plan created | → Spec Review | `planning-on-issue` | `issues update {n} --field-status "Spec Review"` |
+| Preparing started | → Preparing + assign | `preparing-on-issue` | `issues update {n} --field-status "Preparing" --add-assignee @me` |
+| Plan created | → Spec Review | `preparing-on-issue` | `issues update {n} --field-status "Spec Review"` |
 | User approves plan, starts work | → In Progress + branch | `working-on-issue` | `issues update {n} --field-status "In Progress"` |
 | Self-review complete | → Review | `creating-pr-on-issue` | `issues update {n} --field-status "Review"` (Status MUST remain In Progress **during** self-review. Transition to Review only after self-review completes) |
 | PR merged | → Done | `committing-on-issue` (via `pr merge`) | Automatic |
@@ -98,21 +99,30 @@ AI MUST update issue status at these points:
 | Cancelled | → Not Planned | `issues cancel` | `issues cancel {n}` |
 | Session end | → Review or Done | `ending-session` (safety net) | `session end --review/--done {n}` |
 
-### Planning Usage
+### Preparing Usage
 
-The `planning-on-issue` skill transitions from Backlog → Planning when starting plan creation.
+The `preparing-on-issue` orchestrator transitions from Backlog → Preparing when starting plan creation.
 
 - **Purpose**: Visibility that planning is in progress; records planning start timestamp
-- **Entry**: `planning-on-issue` sets this status after fetching the issue
-- **Exit**: Plan complete → Spec Review (set by `planning-on-issue`)
+- **Entry**: `preparing-on-issue` sets this status before delegating to `planning-worker`
+- **Exit**: Plan complete → Designing (if design needed) or Spec Review (set by `preparing-on-issue` after plan review)
 - **Pre-work status**: Not included in `WORK_STARTED_STATUSES` (same treatment as Spec Review)
+
+### Designing Usage
+
+The `designing-on-issue` orchestrator handles design work between Preparing and Spec Review.
+
+- **Purpose**: Visibility that design work is in progress
+- **Entry**: `preparing-on-issue` sets this status when design phase is needed (Step 5a assessment)
+- **Exit**: Design complete → Spec Review
+- **Pre-work status**: Not included in `WORK_STARTED_STATUSES` (same treatment as Preparing)
 
 ### Spec Review Usage
 
-The `planning-on-issue` skill writes a plan to the issue body and transitions Planning → Spec Review.
+The `preparing-on-issue` orchestrator transitions Preparing → Spec Review after `planning-worker` completes the plan and the plan review passes.
 
 - **Purpose**: User approval gate before implementation
-- **Entry**: `planning-on-issue` appends `## Plan` section and sets this status
+- **Entry**: `preparing-on-issue` sets this status after plan review passes (`planning-on-issue` writes the plan via `planning-worker`)
 - **Exit**: User approves → `working-on-issue` starts implementation → In Progress
 - **Applies to**: All issues (plan depth scales with content: lightweight/standard/detailed)
 

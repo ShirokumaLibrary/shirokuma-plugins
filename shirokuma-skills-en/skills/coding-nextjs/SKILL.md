@@ -10,6 +10,8 @@ Framework-compliant implementation using Next.js-specific templates and patterns
 
 > **TDD Management**: Test design, creation, and execution are orchestrated by `working-on-issue`. This skill focuses on **implementation only**.
 
+> **Architecture Design**: Architecture decisions (routing design, component hierarchy, Server Actions vs API Routes, middleware design) are the responsibility of `designing-nextjs`. This skill implements based on those decisions.
+
 ## Before Starting
 
 1. Rules in `.claude/rules/` are auto-loaded based on file paths

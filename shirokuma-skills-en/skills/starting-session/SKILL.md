@@ -112,7 +112,8 @@ Route to the appropriate skill based on the issue's status.
 | Issue Status | Delegate To | Reason |
 |-------------|-------------|--------|
 | Backlog | `planning-on-issue` | Needs planning |
-| Planning | `planning-on-issue` | Planning in progress |
+| Preparing | `preparing-on-issue` | Preparing in progress |
+| Designing | `designing-on-issue` | Designing in progress |
 | Spec Review | `working-on-issue` | Implicit approval, start implementation |
 | In Progress | `working-on-issue` | Resume work |
 | Review / Pending | `working-on-issue` | Continue work |

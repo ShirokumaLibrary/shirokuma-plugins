@@ -20,7 +20,7 @@ Create memorable, production-grade interfaces that avoid generic "AI slop" aesth
 
 ### 1. Design Brief Check
 
-When delegated from `designing-ui-on-issue`, Design Brief and Aesthetic Direction are provided. Use them as-is.
+When delegated from `designing-on-issue`, Design Brief and Aesthetic Direction are provided. Use them as-is.
 
 When invoked standalone, Design Brief can be skipped. However, if aesthetic direction is unclear, minimal direction confirmation is recommended.
 
@@ -77,14 +77,14 @@ pnpm --filter {app-name} build
 
 ## Next Steps
 
-When invoked via `designing-ui-on-issue`, control returns automatically to the orchestrator.
+When invoked via `designing-on-issue`, control returns automatically to the orchestrator.
 
 When invoked standalone:
 
 ```
 Implementation complete. Next steps:
 → `/committing-on-issue` to stage and commit your changes
-→ Use `/designing-ui-on-issue` for the full workflow
+→ Use `/designing-on-issue` for the full workflow
 ```
 
 ## Notes

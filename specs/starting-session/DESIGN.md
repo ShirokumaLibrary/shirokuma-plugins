@@ -21,7 +21,7 @@
 
 | Issue ステータス | 委任先 |
 |-----------------|--------|
-| Backlog / Planning | `planning-on-issue` |
+| Backlog / Preparing | `planning-on-issue` |
 | その他 | `working-on-issue` |
 
 ### 付加機能

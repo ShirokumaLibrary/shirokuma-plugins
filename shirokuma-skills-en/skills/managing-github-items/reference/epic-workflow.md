@@ -89,7 +89,7 @@ gh api repos/{owner}/{repo}/pulls/{pr-number} --method PATCH -f base="correct-br
 
 | Event | Epic Action |
 |-------|-------------|
-| Planning complete | Epic → Spec Review (standard flow) |
+| Preparing complete | Epic → Spec Review (standard flow) |
 | First sub-issue becomes In Progress | Epic → In Progress |
 | Sub-issue PR merged | Epic remains In Progress (check `subIssuesSummary` but do not transition) |
 | Final PR: integration → develop merged | Epic → Done |

@@ -1,14 +1,12 @@
 ---
 name: planning-on-issue
-description: Creates an implementation plan for an issue and persists it to the issue body for user approval. Triggers: "plan", "plan #42", "design approach", "create plan".
-allowed-tools: Bash, Read, Grep, Glob, Task, AskUserQuestion, TodoWrite
+description: "Sub-agent skill for issue planning. Delegated from preparing-on-issue via planning-worker, performs codebase investigation, plan creation, and issue body updates. Not intended for direct invocation."
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
 ---
 
 # Planning on Issue
 
-> **Chain Autonomous Progression**: After the plan review subagent (Step 5) returns its result, immediately proceed to Steps 6-7 (update status, return to user). Stopping after the review subagent forces the user to manually prompt continuation, breaking the planning workflow. Parse the YAML frontmatter `action` field and act without waiting for user input.
-
-Analyze issue requirements, create an implementation plan, and persist it to the issue body. After planning, set status to Spec Review and return control to the user. **Does not proceed to implementation.**
+Analyze issue requirements, create an implementation plan, and persist it to the issue body. This skill performs the actual planning work as a subagent — orchestration (status management, review delegation, user interaction) is handled by `preparing-on-issue`.
 
 ## Plan Depth Levels
 
@@ -43,17 +41,6 @@ shirokuma-docs show {number}
 
 Review title, body, type, priority, size, labels, and comments.
 
-### Step 1b: Set Status to Planning + Assign
-
-If the issue status is Backlog, transition to Planning to record the planning start. Also auto-assign the user.
-
-```bash
-shirokuma-docs issues update {number} --field-status "Planning"
-shirokuma-docs issues update {number} --add-assignee @me
-```
-
-Skip status update if already Planning or Spec Review. Assignee is idempotent, so always execute.
-
 ### Step 2: Codebase Investigation
 
 Investigate code related to the issue requirements.
@@ -62,96 +49,11 @@ Investigate code related to the issue requirements.
 2. **Dependencies**: Identify modules and tests affected by changes
 3. **Patterns**: Check for similar implementations in the codebase
 
-Use Task (Explore agent) for broad investigation to minimize context consumption.
-
 ### Step 3: Create Plan
 
 Assess the plan depth level from issue content and investigation results, then create a plan matching that level.
 
-#### Lightweight Plan
-
-```markdown
-## Plan
-
-### Approach
-{1-2 line description of the approach}
-```
-
-#### Standard Plan
-
-> When tasks have dependencies, include a diagram following the Mermaid guidelines in the `github-writing-style` rule.
-
-```markdown
-## Plan
-
-### Approach
-{Selected approach and rationale}
-
-### Target Files
-- `path/to/file.ts` - {Summary of changes}
-
-### Task Breakdown
-- [ ] Task 1
-- [ ] Task 2
-```
-
-#### Detailed Plan
-
-> Follow the Mermaid guidelines in the `github-writing-style` rule to include diagrams for task dependencies, state transitions, or component interactions.
-
-```markdown
-## Plan
-
-### Approach
-{Multi-option comparison and selection rationale}
-
-### Target Files
-- `path/to/file.ts` - {Summary of changes}
-
-### Task Breakdown
-- [ ] Task 1
-- [ ] Task 2
-
-### Risks / Concerns
-- {Breaking changes, performance, security, etc.}
-```
-
-#### Epic Plan (Issues with Sub-Issues)
-
-For issues where `subIssuesSummary.total > 0`, use the extended template that includes sub-issue structure and integration branch.
-
-> Follow the Mermaid guidelines in the `github-writing-style` rule to visualize sub-issue dependencies and execution order.
-
-```markdown
-## Plan
-
-### Approach
-{Overall strategy}
-
-### Integration Branch
-`epic/{number}-{slug}`
-
-### Sub-Issue Structure
-
-| # | Issue | Description | Dependencies | Size |
-|---|-------|-------------|--------------|------|
-| 1 | #{sub1} | {summary} | — | S |
-| 2 | #{sub2} | {summary} | #{sub1} | M |
-
-### Execution Order
-{Recommended order based on dependencies}
-
-### Task Breakdown
-- [ ] Create integration branch
-- [ ] #{sub1}: {task summary}
-- [ ] #{sub2}: {task summary}
-- [ ] Final PR: integration → develop
-
-### Risks / Concerns
-- {Dependency risks between sub-issues}
-```
-
-See `epic-workflow` reference for details.
+Plan templates for each level (Lightweight/Standard/Detailed/Epic) are in [reference/plan-templates.md](reference/plan-templates.md).
 
 ### Step 3.5: Post Thinking Process Comment
 
@@ -174,13 +76,11 @@ EOF
 
 **Template intent**: The comment records "why this approach was chosen". The body's plan section documents "what will be done" in a structured format, so comments and body serve distinct roles.
 
-**On NEEDS_REVISION**: This step runs only once (initial pass). No re-posting during the NEEDS_REVISION loop — include revised rationale in the "Plan Review Response Complete" comment (Step 5 On PASS).
-
 > Comment language and style must comply with the `output-language` rule and `github-writing-style` rule.
 
 ### Step 4: Write Plan to Issue Body
 
-Write the plan section to the Issue body before review. This enables `reviewing-on-issue` to retrieve the plan content via `shirokuma-docs show {number}`.
+Write the plan section to the Issue body. This enables `reviewing-on-issue` to retrieve the plan content via `shirokuma-docs show {number}`.
 
 Append a `## Plan` section to the existing issue body. Use the template from the depth level determined in Step 3.
 
@@ -192,177 +92,43 @@ shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-b
 
 > Plan section headings and content must comply with the `output-language` rule. Follow `github-writing-style` rule bullet-point guidelines.
 
-### Step 5: Plan Review (Subagent Delegation)
+## Constraints
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `reviewing-on-issue` plan role via subagent for a fresh-context review. Since the plan was written to the Issue body in Step 4, the reviewer can retrieve it via `shirokuma-docs show {number}`.
+- As an Agent tool (subagent), `TodoWrite` / `AskUserQuestion` are not available
+- Progress management and user interaction are handled by the orchestrator (`preparing-on-issue`)
+- Plan review is handled by `preparing-on-issue` — this skill only creates the plan
+- **Does not update status** — status transitions (Preparing, Designing, Spec Review) are managed by `preparing-on-issue`
 
-#### Skill Availability Check (Fallback)
+## Output Template
 
-Before launching the subagent, verify that `reviewing-on-issue` is available in the skill list.
+After work completes, return the following structured data to the caller. The plan is written to the issue body as the deliverable.
 
-| State | Action |
-|-------|--------|
-| Skill available | Proceed to "Launching the Reviewer" below |
-| Skill unavailable | Use "Fallback (self-check)" instead |
+```yaml
+---
+action: CONTINUE
+status: SUCCESS
+---
 
-**Fallback (self-check)**: When `reviewing-on-issue` is unavailable, verify plan quality using this checklist:
-- [ ] Does the plan address all requirements in the Issue?
-- [ ] Are there any missing tasks?
-- [ ] Is the deliverable (definition of done) clearly defined?
-- [ ] Are risks/concerns identified (for complex Issues)?
+Plan created ({level} level). {one-line plan summary}
 
-If all checks pass, proceed to Step 6.
-
-#### Launching the Reviewer
-
-Invoke `reviewing-on-issue` with plan role via the Agent tool (custom subagent `review-worker`). `reviewing-on-issue` will fetch the Issue body itself via `shirokuma-docs show {number}` (which now includes the plan written in Step 4).
-
-```text
-Agent(review-worker, args: "plan #{number}")
-```
-
-The review result is posted as an Issue comment by `reviewing-on-issue`, and structured output is returned.
-
-#### Processing Subagent Output
-
-| Output Status | Action |
-|--------|--------|
-| PASS | Follow "On PASS" below |
-| NEEDS_REVISION | Follow "On Failure" below to fix and re-review |
-
-#### Output Parse Checkpoint
-
-On receiving subagent output, execute these checks in order:
-
-1. **Extract YAML frontmatter** (block delimited by `---`)
-2. **action field**: Read `action` → CONTINUE (PASS) or REVISE (NEEDS_REVISION)
-3. **status field**: Read `status` → log for record
-4. **Body first line**: Extract the first line after frontmatter → one-line summary
-5. **action = CONTINUE**: Follow "On PASS" below
-6. **action = REVISE**: Follow "On Failure" below
-
-Subagent output is internal processing data — output only a one-line summary before proceeding.
-
-#### On PASS
-
-1. Post a **plan review response comment** (evidence that the review passed):
-
-```bash
-shirokuma-docs issues comment {number} --body-file - <<'EOF'
-## Plan Review Response Complete
-
-**Review result:** PASS
-**Fixes:** None (plan approved as-is)
-EOF
-```
-
-If PASS was reached after NEEDS_REVISION cycles:
-
-```bash
-shirokuma-docs issues comment {number} --body-file - <<'EOF'
-## Plan Review Response Complete
-
-**Review result:** PASS (after {n} revision(s))
-**Fixes:** {summary of changes made}
-EOF
-```
-
-#### On Failure
-
-When NEEDS_REVISION is returned:
-
-1. Classify issues from subagent output `### Detail` into **[Plan]** and **[Issue description]**
-2. **[Issue description]** issues → Fix the relevant sections in the issue body (overview, background, tasks, etc.)
-3. **[Plan]** issues → Fix the plan section and update the `## Plan` section in the Issue body with the revised content
-4. After fixes, re-run the review via Agent tool (same custom subagent `review-worker` plan role)
-5. **Max retries: 2** (initial review + up to 2 fix-and-review cycles)
-6. On 3rd NEEDS_REVISION → Stop the loop, report to user for their judgment
-
-```
-Thinking process comment → Plan → Body write
-  → Agent(review-worker plan)
-    → NEEDS_REVISION → Fix + Update body → Re-review
-                         ↓ (failed twice)
-                    Report to user
-    → PASS → Response comment
-```
-
-### Step 6: Update Status (After Plan Review)
-
-```bash
-shirokuma-docs issues update {number} --field-status "Spec Review"
-```
-
-### Step 7: Return to User
-
-Display a plan summary and request approval. The plan is a contract with the user — proceeding without approval risks wasted work on a misaligned approach.
-
-Show a summary matching the plan depth level:
-
-#### For Lightweight Plans
-
-```markdown
-## Plan Complete: #{number} {title}
-
-**Status:** Spec Review (awaiting approval)
-**Level:** Lightweight
-
-### Plan Summary
-- **Approach:** {one-line summary}
-
-If approved, run `/working-on-issue #{number}` to start implementation.
-```
-
-#### For Standard/Detailed Plans
-
-```markdown
-## Plan Complete: #{number} {title}
-
-**Status:** Spec Review (awaiting approval)
-**Level:** {Standard | Detailed}
-
-### Plan Summary
-- **Approach:** {one-line summary}
+### Plan Details
+- **Level:** {Lightweight | Standard | Detailed | Epic}
 - **Target files:** {N} files
 - **Tasks:** {N} steps
-
-Review the plan. If approved, run `/working-on-issue #{number}` to start implementation.
-If changes are needed, provide feedback.
 ```
 
-#### For Epic Plans (Sub-Issue Structure)
+On failure:
 
-When the plan includes a sub-issue structure (`### Sub-Issue Structure` section), display an epic-specific completion report with next steps guidance:
+```yaml
+---
+action: STOP
+status: FAIL
+---
 
-```markdown
-## Plan Complete: #{number} {title}
-
-**Status:** Spec Review (awaiting approval)
-**Level:** Detailed (Epic)
-
-### Plan Summary
-- **Approach:** {one-line summary}
-- **Sub-issues:** {N} issues
-- **Integration branch:** `epic/{number}-{slug}`
-
-### Next Steps
-1. Run `/working-on-issue #{number}` — this will automatically:
-   - Create all sub-issues from the plan
-   - Create the integration branch
-   - Propose execution order based on dependencies
-   - Start work on the first sub-issue
-
-Review the plan. If approved, run `/working-on-issue #{number}` to begin.
-If changes are needed, provide feedback.
+{error description}
 ```
 
-#### Evolution Signal Auto-Recording
-
-At the end of the plan completion report, auto-record Evolution signals detected during the session following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule.
-
-1. Self-review the session using the detection checklist (see `rule-evolution` rule)
-2. Signals detected → Post comment to Evolution Issue → Display 1-line recording confirmation
-3. No signals → Check for accumulated signals → Display reminder (fallback)
+**Note**: `next` field is omitted (orchestrator determines next action). `ref` field is omitted (issue body update is the deliverable, not a separate GitHub write).
 
 ## GitHub Writing Rules
 
@@ -386,18 +152,13 @@ Add GitHub writing rule references to each skill...
 
 | Format | Example | Behavior |
 |--------|---------|----------|
-| Issue number | `#42` | Fetch issue and start planning |
-| No argument | — | Ask for issue number via AskUserQuestion |
+| Issue number | `#42` | Fetch issue and create plan |
 
 ## Edge Cases
 
 | Situation | Action |
 |-----------|--------|
-| `## Plan` section already exists | Ask whether to overwrite (AskUserQuestion) |
-| Issue is Done/Released | Show warning |
 | Issue body is empty | Create body with plan section only |
-| Status is already Planning | Continue planning, skip status update |
-| Status is already Spec Review | Update plan, keep status |
 | Epic issue (has sub-issues) | Use epic plan template with integration branch and sub-issue structure |
 
 ## Rule References
@@ -409,21 +170,8 @@ Add GitHub writing rule references to each skill...
 | `output-language` | Output language for issue comments and body |
 | `github-writing-style` | Bullet-point vs prose guidelines |
 
-## Tool Usage
-
-| Tool | When |
-|------|------|
-| Bash | `shirokuma-docs show/update` |
-| Read/Grep/Glob | Codebase investigation |
-| Task (Explore) | Broad code investigation |
-| Agent (review-worker) | Step 5: Fresh-context plan review (custom subagent delegation) |
-| AskUserQuestion | Overwrite confirmation, issue number prompt |
-| TodoWrite | Planning step progress tracking |
-
 ## Notes
 
 - **Does not implement** — planning only. Implementation is `working-on-issue`'s responsibility
 - Plans are persisted in the issue body — available across sessions
-- `Spec Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
-- Use Explore agent during investigation to minimize context consumption
-- **Chain autonomous progression**: After the review subagent (Step 5) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 6-7 based on the YAML frontmatter `action` field
+- This skill runs as a subagent via `planning-worker` — orchestration is handled by `preparing-on-issue`
