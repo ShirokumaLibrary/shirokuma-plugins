@@ -81,7 +81,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 | ロール | 実行する lint コマンド |
 |--------|----------------------|
 | code, code+annotation, nextjs | `lint all`（全種一括）を推奨。個別実行も可: lint tests, lint coverage, lint code, lint structure, lint annotations |
-| security | lint code, lint structure（セキュリティ関連のみ） |
+| security | lint security, lint code, lint structure（セキュリティ関連のみ） |
 | testing | lint tests, lint coverage（テスト関連のみ） |
 | docs | lint docs（ドキュメント構造のみ） |
 | plan | スキップ（対象が Issue 本文であり、コード/ドキュメントファイルではないため） |

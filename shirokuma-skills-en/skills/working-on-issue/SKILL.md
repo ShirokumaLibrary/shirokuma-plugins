@@ -281,9 +281,16 @@ Simplified to `/simplify` pre-pass + single review-worker invocation. See [refer
    )
    ```
 3. **Parse result**: Read action/status from YAML frontmatter
-   - `action: CONTINUE` → proceed to post-processing
+   - `action: CONTINUE` → proceed to comment_id verification
    - `action: STOP` → chain stop, report to user
-4. **Post-processing** (when action: CONTINUE):
+4. **comment_id verification** (when action: CONTINUE):
+   - Check the `comment_id` in the `### Response Complete Comment` section
+   - `comment_id` present → proceed to post-processing
+   - `comment_id` missing → review-worker skipped PR comment posting. Post the response complete comment directly as fallback:
+     ```bash
+     shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
+     ```
+5. **Post-processing**:
    - `### Recommendations` `[trivial]` items → propose immediate fix (AskUserQuestion)
    - `### Recommendations` `[rule]` items → record as Evolution signal
    - `### Recommendations` `[trigger:*]` / `[one-off]` items → propose follow-up Issue creation

@@ -81,7 +81,7 @@ Read required knowledge files based on role:
 | Role | Lint Commands |
 |------|--------------|
 | code, code+annotation, nextjs | `lint all` (all types at once) recommended. Individual: lint tests, lint coverage, lint code, lint structure, lint annotations |
-| security | lint code, lint structure (security-related only) |
+| security | lint security, lint code, lint structure (security-related only) |
 | testing | lint tests, lint coverage (test-related only) |
 | docs | lint docs (document structure only) |
 | plan | Skip (target is Issue body, not code/document files) |
