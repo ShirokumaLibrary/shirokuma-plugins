@@ -51,6 +51,8 @@ graph TD
     C3 -->|"context overflow"| C4
     C3 -->|"completed"| Done["PR → Review → Done"]
     C4 --> Done
+    Done -->|"review feedback"| C5["Conversation 5: Review response<br/>/reviewing-on-pr #PR (standalone)"]
+    C5 --> Done
 ```
 
 Small tasks may complete planning + implementation in a single conversation.
@@ -101,6 +103,7 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 | creating-item | — | Yes | Always standalone-capable |
 | committing-on-issue | Yes | Yes | Subagent (standalone also runs as subagent) |
 | creating-pr-on-issue | Yes | Yes | Subagent (via chain or standalone) |
+| reviewing-on-pr | — | Yes | PR review response (new conversation entry point) |
 | starting-session | Yes | — | Session start only (`#N` for issue-bound, no arg for unbound) |
 | ending-session | Yes | — | Session end only |
 
@@ -131,6 +134,7 @@ For substantial standalone work without `working-on-issue`:
 | Exploration | `Explore` | Task (Built-in) |
 | Architecture | `Plan` | Task (Built-in) |
 | Rule/Skill evolution | `evolving-rules` | Skill |
+| PR review response | `reviewing-on-pr` | Skill |
 | None match | Propose new skill | — |
 
 ## Direct Handling OK

@@ -47,6 +47,24 @@ Accumulate signals as comments in Evolution Issues.
 | Periodic | User explicitly invokes `evolving-rules` | Analyze all accumulated signals |
 | Session start | `starting-session` detects accumulated signals | Recommend `evolving-rules` invocation (no auto-execution) |
 | Skill completion | `working-on-issue`, `preparing-on-issue`, `creating-item` complete | Auto-record via detection checklist. Display reminder as fallback when no signals detected |
+| Eval failure | `skill eval` or `skill optimize` shows failures | Record eval result pattern as evolution signal. Propose description improvement via `evolving-rules` |
+
+## Eval Data Reference
+
+When `evolving-rules` analyzes skills, eval data provides quantitative signals:
+
+```bash
+# Check saved eval results
+ls .shirokuma/evals/{skill-name}/
+
+# Read latest eval result
+cat .shirokuma/evals/{skill-name}/eval_*.json | tail -1
+```
+
+Eval failure signals to record:
+- Trigger rate < 50% for should_trigger queries → description too narrow
+- Trigger rate > 50% for should_not_trigger queries → description too broad
+- Consistent failures for specific query patterns → missing description keywords
 
 ## Responsibility Boundaries
 

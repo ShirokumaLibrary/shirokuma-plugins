@@ -80,7 +80,7 @@ description: Helps with documents  # 曖昧すぎる
 | scripts/ | ユーティリティスクリプト（chmod +x） |
 | templates/ | ボイラープレート |
 
-[architecture.md](architecture.md) に段階的開示の詳細あり。
+[docs/architecture.md](docs/architecture.md) に段階的開示の詳細あり。
 
 ### ステップ 6: ツール設定
 
@@ -157,15 +157,7 @@ Bash ツールで `run_in_background: true` を指定して `pnpm test`
 
 ### ステップ 7: ファイル作成
 
-**方法 A: init スクリプト（推奨）**
-
-```bash
-./scripts/init_skill.py my-skill --path .claude/skills
-```
-
-テンプレート付きの完全なスキル構造を作成。
-
-**方法 B: 手動**
+**方法 A: 手動**
 
 ```bash
 mkdir -p .claude/skills/skill-name
@@ -182,10 +174,10 @@ EOF
 
 ### ステップ 8: 検証
 
-**検証スクリプト:**
+**CLI で検証:**
 
 ```bash
-./scripts/quick_validate.py .claude/skills/skill-name
+shirokuma-docs skill validate .claude/skills/skill-name
 ```
 
 **手動チェックリスト:**
@@ -214,7 +206,7 @@ EOF
 4. 複数モデル（Haiku, Sonnet, Opus）でテスト
 5. 観察に基づきイテレーション
 
-[best-practices-testing.md](best-practices-testing.md) に eval シナリオ形式とテスト戦略あり。
+[docs/best-practices-testing.md](docs/best-practices-testing.md) に eval シナリオ形式とテスト戦略あり。
 
 ## ワークフロー: スキル更新
 
@@ -250,7 +242,7 @@ ls .claude/skills/skill-name/
 - 複数モデルでテスト
 - フィードバック収集
 
-[updating-skills.md](updating-skills.md) に詳細なワークフローあり。
+[docs/updating-skills.md](docs/updating-skills.md) に詳細なワークフローあり。
 
 ## 主要原則
 
@@ -300,35 +292,72 @@ SKILL.md → サポートファイル（それ以上のチェーンなし）
 
 スタンドアロン実行時は次のステップ（レビュー、テスト方法）を提案する。
 
-## スクリプト
+## CLI コマンド（shirokuma-docs skill）
 
-| スクリプト | 用途 |
-|-----------|------|
-| `scripts/init_skill.py` | テンプレートから新規スキル作成 |
-| `scripts/quick_validate.py` | スキル構造の検証 |
-| `scripts/package_skill.py` | 配布用パッケージ |
+`shirokuma-docs skill` コマンドがすべてのスキル管理操作を提供する:
+
+| コマンド | 用途 |
+|---------|------|
+| `skill validate <path>` | SKILL.md 構造の検証 |
+| `skill package <path>` | .skill ファイルとしてパッケージ化 |
+| `skill eval <path>` | トリガー eval セットの実行 |
+| `skill optimize <path>` | eval ループによる説明の最適化 |
+| `skill benchmark <dir>` | benchmark ランの集計 |
 
 ```bash
-# 新規スキル初期化
-./scripts/init_skill.py my-skill --path .claude/skills
-
 # 既存スキル検証
-./scripts/quick_validate.py .claude/skills/my-skill
+shirokuma-docs skill validate .claude/skills/my-skill
 
 # 配布用パッケージ
-./scripts/package_skill.py .claude/skills/my-skill ./dist
+shirokuma-docs skill package .claude/skills/my-skill --output ./dist
+
+# トリガー eval 実行
+shirokuma-docs skill eval .claude/skills/my-skill --eval-set evals/scenarios.json
+
+# 説明の最適化（eval セット必須）
+shirokuma-docs skill optimize .claude/skills/my-skill --eval-set evals/scenarios.json --model claude-opus-4-5
+
+# benchmark 結果の集計
+shirokuma-docs skill benchmark .shirokuma/evals/my-skill/benchmarks/2026-01-15/
 ```
+
+## Eval ワークフロー統合
+
+eval システムは、スキルの説明が適切なクエリでトリガーされるかを検証する。
+
+### eval セット形式
+
+スキルディレクトリに `evals/scenarios.json` を作成:
+
+```json
+[
+  { "query": "プロジェクトに新しいスキルを作成して", "should_trigger": true },
+  { "query": "今日の天気は？", "should_trigger": false }
+]
+```
+
+### 最適化ループ
+
+`skill optimize` は自動ループを実行する:
+1. 現在の説明をトレインセットで評価
+2. Claude が改善された説明を提案
+3. すべてのトレインクエリが通過するか最大イテレーションに達するまで繰り返す
+4. テストセットスコアが最高の説明を返す
+
+結果は自動的に `.shirokuma/evals/{skill-name}/` に保存される。
+
+`compatibility` フィールド仕様と完全なフロントマタースキーマは [reference/reference.md](reference/reference.md) を参照。
 
 ## 関連リソース
 
-- [reference.md](reference.md) - 完全な仕様、フロントマターフィールド
-- [best-practices.md](best-practices.md) - 高度なパターン、テスト
+- [reference/reference.md](reference/reference.md) - 完全な仕様、フロントマターフィールド
+- [docs/best-practices.md](docs/best-practices.md) - 高度なパターン、テスト
 - [examples.md](examples.md) - 具体的なユースケース
-- [architecture.md](architecture.md) - 段階的開示
-- [updating-skills.md](updating-skills.md) - 更新ワークフロー
-- [reference-workflows.md](reference-workflows.md) - ワークフローパターン
-- [reference-output-patterns.md](reference-output-patterns.md) - 出力テンプレート
-- [reference-orchestrator.md](reference-orchestrator.md) - オーケストレーター・プロジェクト固有専門スキルテンプレート（`designing-*` / `coding-*`）
+- [docs/architecture.md](docs/architecture.md) - 段階的開示
+- [docs/updating-skills.md](docs/updating-skills.md) - 更新ワークフロー
+- [reference/workflows.md](reference/workflows.md) - ワークフローパターン
+- [reference/output-patterns.md](reference/output-patterns.md) - 出力テンプレート
+- [reference/orchestrator.md](reference/orchestrator.md) - オーケストレーター・プロジェクト固有専門スキルテンプレート（`designing-*` / `coding-*`）
 
 ## 注意事項
 

@@ -5,6 +5,8 @@ Behavioral specification when review-worker is launched with the `self-review #{
 ## State Transitions
 
 ```text
+[INIT] Retrieve PR number (search via `gh pr view` from current branch)
+    ↓
 [REVIEW] Execute reviewing-on-issue / reviewing-claude-config (Agent tool unavailable → execute skill steps directly)
     ↓  Post PR comment before returning structured data
 [PARSE] Parse YAML frontmatter + PASS/NEEDS_FIX/FAIL determination
@@ -23,6 +25,31 @@ Behavioral specification when review-worker is launched with the `self-review #{
 
 [COMPLETE] Create out-of-scope Issues → Classify recommendations → Plan-gap determination → Post response complete comment → Return final output
 ```
+
+## PR Number Retrieval
+
+Before starting the [REVIEW] phase, retrieve the PR number associated with the Issue. Required for PR comment posting (reviewing-on-issue Step 6) and response complete comment posting.
+
+### Retrieval Procedure
+
+```bash
+# Search for PR from current branch
+gh pr view --json number -q .number
+```
+
+`gh pr view` returns the PR corresponding to the current branch.
+
+### When PR Number Cannot Be Retrieved
+
+If `gh pr view` fails (e.g., PR not yet created):
+
+1. Display warning: `⚠ PR not found. Skipping PR comment posting.`
+2. Skip PR comment posting but continue the review itself
+3. In [COMPLETE], post the response complete comment to the Issue instead of the PR
+
+### Context Retention
+
+The retrieved PR number is referenced as `{PR#}` in all subsequent steps. When executing reviewing-on-issue Step 6, use this PR number as the comment posting target.
 
 ## File Category Detection
 

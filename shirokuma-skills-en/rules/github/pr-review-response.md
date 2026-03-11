@@ -1,5 +1,7 @@
 # PR Review Response
 
+> The procedures in this rule are automated as the `reviewing-on-pr` skill. Invoke with `/reviewing-on-pr #{PR-number}`.
+
 ## When Review Comments Are Received
 
 1. Fetch all review threads: `shirokuma-docs pr comments <PR#>`

@@ -1,5 +1,7 @@
 # PR レビューレスポンス
 
+> このルールの手順は `reviewing-on-pr` スキルとして自動化されています。`/reviewing-on-pr #{PR番号}` で起動できます。
+
 ## レビューコメント受領時
 
 1. すべてのレビュースレッドを取得: `shirokuma-docs pr comments <PR#>`

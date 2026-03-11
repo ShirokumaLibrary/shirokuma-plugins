@@ -51,6 +51,8 @@ graph TD
     C3 -->|"コンテキスト溢れ"| C4
     C3 -->|"完結"| Done["PR → Review → Done"]
     C4 --> Done
+    Done -->|"レビュー指摘時"| C5["会話 5: レビュー対応<br/>/reviewing-on-pr #PR（スタンドアロン）"]
+    C5 --> Done
 ```
 
 小規模タスクは 1 会話で計画+製造を完結することもある。
@@ -101,6 +103,7 @@ graph TD
 | creating-item | — | 対応 | 常にスタンドアロン対応 |
 | committing-on-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | creating-pr-on-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
+| reviewing-on-pr | — | 対応 | PR レビュー対応（新会話のエントリーポイント） |
 | starting-session | 対応 | — | セッション開始専用（`#N` で Issue バウンド、引数なしでアンバウンド） |
 | ending-session | 対応 | — | セッション終了専用 |
 
@@ -131,6 +134,7 @@ graph TD
 | 探索 | `Explore` | Task (ビルトイン) |
 | アーキテクチャ | `Plan` | Task (ビルトイン) |
 | ルール・スキル進化 | `evolving-rules` | Skill |
+| PR レビュー対応 | `reviewing-on-pr` | Skill |
 | 該当なし | 新しいスキルを提案 | — |
 
 ## 直接対応OK

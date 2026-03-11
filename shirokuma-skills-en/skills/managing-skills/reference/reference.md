@@ -10,7 +10,7 @@
 6. [Tool Restrictions](#tool-restrictions)
 7. [Supporting Files](#supporting-files)
 
-For platform-specific and integration topics, see [reference-platform.md](reference-platform.md):
+For platform-specific and integration topics, see [platform.md](platform.md):
 - Platform-Specific Considerations (Claude Code, API, Agent SDK)
 - API Integration
 - Agent SDK Configuration
@@ -103,6 +103,30 @@ description: Extract text and tables from PDF files, fill forms, merge PDF docum
 Perfect: Multiple capabilities, specific file type, multiple triggers in quotes, third person
 
 ### Optional Fields
+
+#### compatibility
+
+- Type: string
+- Max length: 500 characters
+- Purpose: Describe platform, model, or version constraints
+
+##### When to use
+
+Use `compatibility` to document known limitations or requirements:
+
+```yaml
+---
+name: my-skill
+description: ...
+compatibility: "Requires Claude 3.5 Sonnet or later. Does not work with Haiku models."
+---
+```
+
+##### Validation rules
+
+- Must be a string (not a list or object)
+- Maximum 500 characters
+- Validated by `shirokuma-docs skill validate`
 
 #### allowed-tools
 

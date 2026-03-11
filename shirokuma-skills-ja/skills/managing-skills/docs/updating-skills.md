@@ -651,8 +651,8 @@ Consider versioning:
 
 - [Official Best Practices](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices)
 - [managing-skills/best-practices.md](best-practices.md) - Creation best practices
-- [managing-skills/examples.md](examples.md) - Example skills
-- [managing-skills/reference.md](reference.md) - Technical reference
+- [managing-skills/examples.md](../examples.md) - Example skills
+- [managing-skills/reference.md](../reference/reference.md) - Technical reference
 
 ## Summary
 

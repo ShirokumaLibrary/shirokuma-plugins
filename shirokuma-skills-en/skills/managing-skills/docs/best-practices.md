@@ -330,5 +330,5 @@ For complex scenarios, see [advanced-validation.md](advanced-validation.md):
 
 - [Writing Effective Instructions](best-practices-writing.md)
 - [Testing and Evaluation](best-practices-testing.md)
-- [Reference Guide](reference.md)
-- [Examples](examples.md)
+- [Reference Guide](../reference/reference.md)
+- [Examples](../examples.md)

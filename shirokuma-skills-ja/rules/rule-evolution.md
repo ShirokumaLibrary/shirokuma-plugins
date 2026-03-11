@@ -47,6 +47,24 @@ Evolution Issue にシグナルをコメントとして蓄積する。
 | 定期的 | ユーザーが `evolving-rules` を明示的に起動 | 蓄積シグナル全体を分析 |
 | セッション開始時 | `starting-session` がシグナル蓄積を検出 | `evolving-rules` の起動を推奨（自動実行しない） |
 | スキル完了時 | `working-on-issue`、`preparing-on-issue`、`creating-item` の完了時 | 検出チェックリストで自動記録。シグナル未検出時はリマインド表示（フォールバック） |
+| eval 失敗時 | `skill eval` または `skill optimize` で失敗が発生 | eval 結果パターンを Evolution シグナルとして記録。`evolving-rules` で説明改善を提案 |
+
+## eval データ参照
+
+`evolving-rules` がスキルを分析する際、eval データが定量的シグナルを提供する:
+
+```bash
+# 保存済み eval 結果を確認
+ls .shirokuma/evals/{skill-name}/
+
+# 最新の eval 結果を読み込む
+cat .shirokuma/evals/{skill-name}/eval_*.json | tail -1
+```
+
+記録すべき eval 失敗シグナル:
+- should_trigger クエリのトリガー率 < 50% → 説明が狭すぎる
+- should_not_trigger クエリのトリガー率 > 50% → 説明が広すぎる
+- 特定のクエリパターンで一貫して失敗 → 説明にキーワードが不足
 
 ## 責務境界
 

@@ -81,7 +81,7 @@ See [reference.md](reference.md#description-field) for rich format with examples
 | scripts/ | Utility scripts (chmod +x) |
 | templates/ | Reusable boilerplate |
 
-See [architecture.md](architecture.md) for progressive disclosure details.
+See [docs/architecture.md](docs/architecture.md) for progressive disclosure details.
 
 ### Step 6: Tool Configuration
 
@@ -158,15 +158,7 @@ Bash tool with `run_in_background: true` for `pnpm test`
 
 ### Step 7: Create Files
 
-**Option A: Use init script (recommended)**
-
-```bash
-./scripts/init_skill.py my-skill --path .claude/skills
-```
-
-Creates complete skill structure with templates.
-
-**Option B: Manual creation**
+**Option A: Manual creation**
 
 ```bash
 mkdir -p .claude/skills/skill-name
@@ -183,10 +175,10 @@ EOF
 
 ### Step 8: Validate
 
-**Run validation script:**
+**Run validation via CLI:**
 
 ```bash
-./scripts/quick_validate.py .claude/skills/skill-name
+shirokuma-docs skill validate .claude/skills/skill-name
 ```
 
 **Manual checklist:**
@@ -215,7 +207,7 @@ Run `reviewing-claude-config` skill to validate:
 4. Test across models (Haiku, Sonnet, Opus)
 5. Iterate based on observations
 
-See [best-practices-testing.md](best-practices-testing.md) for eval scenario format and testing strategies.
+See [docs/best-practices-testing.md](docs/best-practices-testing.md) for eval scenario format and testing strategies.
 
 ## Workflow: Updating Skills
 
@@ -251,7 +243,7 @@ Run `reviewing-claude-config` skill to validate changes.
 - Test across models
 - Get team feedback
 
-See [updating-skills.md](updating-skills.md) for detailed workflow.
+See [docs/updating-skills.md](docs/updating-skills.md) for detailed workflow.
 
 ## Key Principles
 
@@ -301,35 +293,72 @@ One term per concept throughout.
 
 When run standalone, suggest next steps (review, testing methods).
 
-## Scripts
+## CLI Commands (shirokuma-docs skill)
 
-| Script | Purpose |
-|--------|---------|
-| `scripts/init_skill.py` | Create new skill from template |
-| `scripts/quick_validate.py` | Validate skill structure |
-| `scripts/package_skill.py` | Package skill for distribution |
+The `shirokuma-docs skill` command provides all skill management operations:
+
+| Command | Purpose |
+|---------|---------|
+| `skill validate <path>` | Validate SKILL.md structure |
+| `skill package <path>` | Package skill as .skill file |
+| `skill eval <path>` | Run trigger eval set |
+| `skill optimize <path>` | Optimize description via eval loop |
+| `skill benchmark <dir>` | Aggregate benchmark run results |
 
 ```bash
-# Initialize new skill
-./scripts/init_skill.py my-skill --path .claude/skills
-
 # Validate existing skill
-./scripts/quick_validate.py .claude/skills/my-skill
+shirokuma-docs skill validate .claude/skills/my-skill
 
 # Package for distribution
-./scripts/package_skill.py .claude/skills/my-skill ./dist
+shirokuma-docs skill package .claude/skills/my-skill --output ./dist
+
+# Run trigger eval
+shirokuma-docs skill eval .claude/skills/my-skill --eval-set evals/scenarios.json
+
+# Optimize description (requires eval set)
+shirokuma-docs skill optimize .claude/skills/my-skill --eval-set evals/scenarios.json --model claude-opus-4-5
+
+# Aggregate benchmark results
+shirokuma-docs skill benchmark .shirokuma/evals/my-skill/benchmarks/2026-01-15/
 ```
+
+## Eval Workflow Integration
+
+The eval system tests whether a skill's description causes Claude to trigger the skill for relevant queries.
+
+### Eval Set Format
+
+Create `evals/scenarios.json` in the skill directory:
+
+```json
+[
+  { "query": "create a new skill for my project", "should_trigger": true },
+  { "query": "what is the weather today", "should_trigger": false }
+]
+```
+
+### Optimization Loop
+
+`skill optimize` runs an automated loop:
+1. Evaluates current description against train set
+2. Uses Claude to propose improved description
+3. Repeats until all train queries pass or max iterations reached
+4. Returns the best description by test set score
+
+Results are saved to `.shirokuma/evals/{skill-name}/` automatically.
+
+See [reference/reference.md](reference/reference.md) for `compatibility` field specification and complete frontmatter schema.
 
 ## Related Resources
 
-- [reference.md](reference.md) - Complete specs, frontmatter fields
-- [best-practices.md](best-practices.md) - Advanced patterns, testing
+- [reference/reference.md](reference/reference.md) - Complete specs, frontmatter fields
+- [docs/best-practices.md](docs/best-practices.md) - Advanced patterns, testing
 - [examples.md](examples.md) - Concrete use cases
-- [architecture.md](architecture.md) - Progressive disclosure
-- [updating-skills.md](updating-skills.md) - Update workflows
-- [reference-workflows.md](reference-workflows.md) - Workflow patterns
-- [reference-output-patterns.md](reference-output-patterns.md) - Output templates
-- [reference-orchestrator.md](reference-orchestrator.md) - Orchestrator and project-specific specialist skill templates (`designing-*` / `coding-*`)
+- [docs/architecture.md](docs/architecture.md) - Progressive disclosure
+- [docs/updating-skills.md](docs/updating-skills.md) - Update workflows
+- [reference/workflows.md](reference/workflows.md) - Workflow patterns
+- [reference/output-patterns.md](reference/output-patterns.md) - Output templates
+- [reference/orchestrator.md](reference/orchestrator.md) - Orchestrator and project-specific specialist skill templates (`designing-*` / `coding-*`)
 
 ## Notes
 
