@@ -1,19 +1,19 @@
 ---
 name: reviewing-on-pr
-description: Takes a PR number, batch-fetches unresolved review threads, classifies them (code fix / question / disagreement), fixes code, commits, replies, and resolves threads in an automated chain. Triggers: "review response", "PR review", "/reviewing-on-pr #123".
-allowed-tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, AskUserQuestion
+description: Takes a PR number, performs code review execution and processes unresolved review threads in an automated chain. Triggers: "review response", "PR review", "code review PR", "/reviewing-on-pr #123".
+allowed-tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, AskUserQuestion, Agent
 ---
 
 # PR Review Response
 
-Takes a PR number and processes unresolved review threads through an automated chain: batch-fetch, classify, fix, commit, reply, and resolve.
+Takes a PR number and performs code review execution (via `review-worker`) and processes unresolved review threads through an automated chain: classify, fix, commit, reply, and resolve.
 
 ## Responsibility Boundary
 
 | Skill | Responsibility |
 |-------|---------------|
-| `reviewing-on-issue` | Self-review (review your own code). Invoked via `review-worker` |
-| `reviewing-on-pr` (this skill) | PR review response (address reviewer feedback). Entry point for a new conversation |
+| `reviewing-on-issue` | Review execution engine (shared by self-review and PR review). Invoked via `review-worker` |
+| `reviewing-on-pr` (this skill) | PR review orchestrator (review execution + thread response). Entry point for a new conversation |
 
 ## Arguments
 
@@ -24,12 +24,19 @@ Takes a PR number and processes unresolved review threads through an automated c
 
 ## Workflow
 
-### Step 1: Context Restoration
+### Step 1: Context Restoration (Required — Must Run First)
 
-1. Fetch PR information:
+> **This step must always run first.** Cannot be skipped.
+
+1. Fetch PR information and record `review_count` and `linked_issues` (used for branching in Step 2):
    ```bash
    shirokuma-docs pr show {PR#}
    ```
+   Fields to extract:
+   - `review_count`: Number of submitted reviews (0 = triggers new review mode)
+   - `linked_issues`: Related Issue numbers (used for context restoration)
+   - `base_ref_name`: Base branch (used to fetch diff)
+
 2. If a related Issue exists, reference its plan for context:
    ```bash
    shirokuma-docs show {issue-number}
@@ -40,13 +47,40 @@ Takes a PR number and processes unresolved review threads through an automated c
    git diff origin/{base-branch}...HEAD
    ```
 
-### Step 2: Batch-Fetch Unresolved Threads
+### Step 2: Review State Assessment and Branching
+
+First check the `review_count` obtained in Step 1:
+
+**If `review_count: 0` → proceed to new review mode (Step 2a)**
+
+**If `review_count > 0` → fetch unresolved threads and branch**:
 
 ```bash
 shirokuma-docs pr comments {PR#}
 ```
 
-If 0 unresolved threads → display completion report and exit.
+- 0 unresolved threads → display completion report and propose re-review ("Would you like to run a re-review with `review-worker`?" via AskUserQuestion). If user accepts, transition to Step 2a
+- Unresolved threads exist → proceed to existing flow (Step 3 onwards)
+
+### Step 2a: Review Execution Mode (when `review_count: 0`)
+
+When no review has been submitted yet, invoke `review-worker` via the Agent tool to perform a code review.
+
+1. Invoke `review-worker` via Agent tool to perform a code review on the PR diff:
+   ```text
+   Agent(
+     description: "review-worker PR #{PR#}",
+     subagent_type: "review-worker",
+     prompt: "Perform a code review for PR #{PR#}. Role: code"
+   )
+   ```
+2. `review-worker` posts the review results as a PR comment
+3. After review execution, check for unresolved threads:
+   ```bash
+   shirokuma-docs pr comments {PR#}
+   ```
+   - Unresolved threads exist → proceed to existing flow (Step 3 onwards)
+   - No unresolved threads → display completion report and exit (see Step 6)
 
 ### Step 3: Thread Classification
 
@@ -64,33 +98,24 @@ Classify each unresolved thread into one of 4 types:
 Register all thread processing steps in TodoWrite based on classification:
 
 ```
-1. [Code fix] Thread: {summary} — fix, commit, reply, resolve
+1. [Code fix] Thread: {summary} — fix, commit & push, reply, resolve
 2. [Question] Thread: {summary} — reply, resolve
 3. [Disagreement] Thread: {summary} — reply only
-4. Push changes
-5. Display completion report
+4. Display completion report
 ```
 
 ### Step 5: Sequential Thread Processing
 
 #### Code Fix Threads
 
-Process code fix threads together. Fix → individual commit, then batch push, reply, and resolve after all fixes.
+Process code fix threads together. Fix → commit & push per fix → reply, resolve.
 
 1. **Fix**: Modify code based on review feedback
-2. **Commit**: Commit per fix (reference Issue number)
+2. **Commit & Push**: Stage, commit, and push per fix in one command (Issue number via `--issue`)
    ```bash
-   git add {modified-files}
-   git commit -m "$(cat <<'EOF'
-   fix: {description of fix} (#{issue-number})
-   EOF
-   )"
+   shirokuma-docs git commit-push -m "fix: {description of fix}" --files {modified-files} --issue {issue-number}
    ```
-3. **Push**: Push once after all code fix commits
-   ```bash
-   git push
-   ```
-4. **Reply**: Reply to each thread referencing the commit
+3. **Reply**: Reply to each thread referencing the commit (use numeric `database_id` from `pr comments` output for `--reply-to`)
    ```bash
    shirokuma-docs pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
    Fixed in {commit-hash}.
@@ -98,7 +123,7 @@ Process code fix threads together. Fix → individual commit, then batch push, r
    {description of the fix}
    EOF
    ```
-5. **Resolve**: Resolve the thread
+4. **Resolve**: Resolve the thread (use `PRRT_`-prefixed ID from `pr comments` output for `--thread-id`)
    ```bash
    shirokuma-docs pr resolve {PR#} --thread-id {PRRT_id}
    ```
@@ -142,17 +167,18 @@ Process code fix threads together. Fix → individual commit, then batch push, r
 
 1. **Process all threads before reporting back** — Do not ask the user between threads
 2. **Reply and Resolve are paired** — Every reply should be followed by a resolve (except disagreements)
-3. **Use correct IDs** — `--reply-to` takes numeric `database_id`, `--thread-id` takes GraphQL `PRRT_` ID
-4. **Commit per fix** — Do not mix fixes for different threads in one commit
-5. **Push once** — Push once after all code fix commits
-6. **Do not resolve disagreements** — Let the reviewer decide
-7. **Restore context first** — Review Issue plan and PR diff before addressing threads
+3. **Use correct IDs** — `--reply-to` takes numeric `database_id` from `pr comments` output, `--thread-id` takes `PRRT_`-prefixed ID from `pr comments` output
+4. **Commit per fix** — Do not mix fixes for different threads in one commit (call `git commit-push` once per fix)
+5. **Do not resolve disagreements** — Let the reviewer decide
+6. **Restore context first** — Step 1 must always run first; obtain `review_count` before branching
+7. **Review execution via `review-worker`** — Step 2a invokes `review-worker` via Agent tool; do not write reviews directly
 
 ## Edge Cases
 
 | Situation | Action |
 |-----------|--------|
-| 0 unresolved threads | Display completion report and exit |
+| `review_count: 0` | Execute code review via `review-worker` in review execution mode (Step 2a) |
+| 0 unresolved threads (`review_count > 0`) | Display completion report and propose re-review |
 | Thread already resolved | Skip |
 | Outdated comment (code changed) | Reply if feedback is still valid, reference the relevant commit |
 | Reviewer requests re-review | Reply but leave thread open |
@@ -163,6 +189,7 @@ Process code fix threads together. Fix → individual commit, then batch push, r
 
 | Tool | When |
 |------|------|
+| Agent | Code review execution via `review-worker` (Step 2a) |
 | Bash | `shirokuma-docs pr comments`, `pr reply`, `pr resolve`, git operations |
 | Read | Code review, plan reference |
 | Edit | Code fixes |

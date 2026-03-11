@@ -30,7 +30,7 @@ graph LR
 |---------|-----------------|------|-------------|
 | Preparing | `preparing-on-issue` | 計画策定・計画レビュー | `planning-worker` → `planning-on-issue` |
 | Designing | `designing-on-issue` | 設計ルーティング・設計レビュー | `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` 等 |
-| Working | `working-on-issue` | 実装・コミット・PR・セルフレビュー | `coding-worker`, `commit-worker`, `pr-worker`, `review-worker` |
+| Working | `working-on-issue` | 実装・コミット・PR | `coding-worker`, `commit-worker`, `pr-worker` |
 
 ### 会話フロー
 

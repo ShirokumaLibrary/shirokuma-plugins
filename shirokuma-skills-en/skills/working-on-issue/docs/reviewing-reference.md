@@ -31,6 +31,6 @@ Review work type does NOT execute the commit → PR chain (completes with report
 reviewing-on-issue → Report posted → Complete
 ```
 
-## Self-Review
+## Post-PR Review
 
-When auto-executed as part of `working-on-issue` Step 5, it runs as `creating-pr-on-issue` Step 6.
+When code review is needed after PR creation, use `/reviewing-on-pr`.

@@ -117,7 +117,6 @@ PR 作成自体が GitHub への書き込み（成果物）であるため、追
 ```yaml
 ---
 action: CONTINUE
-next: reviewing-on-issue
 status: SUCCESS
 ref: "PR #{pr-number}"
 ---
@@ -146,7 +145,6 @@ status: FAIL
 ```yaml
 ---
 action: CONTINUE
-next: reviewing-on-issue
 status: SUCCESS
 ref: "PR #{existing-pr-number}"
 ---
@@ -228,7 +226,7 @@ docs: update CLAUDE.md command table     ← 日本語設定では不正
 
 ```text
 PR を作成しました。次のステップ:
-→ セルフレビューが必要な場合は `/reviewing-on-issue` を実行
+→ レビュー対応が必要な場合は `/reviewing-on-pr #{PR番号}` を実行
 → `/ending-session` で引き継ぎを保存し Issue ステータスを更新
 ```
 

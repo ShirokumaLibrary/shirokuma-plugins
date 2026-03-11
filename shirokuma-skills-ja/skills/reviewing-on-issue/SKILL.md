@@ -46,20 +46,6 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 | "design", "設計レビュー", "デザイン" | design | criteria/design, roles/design |
 | "research", "リサーチレビュー" | research | roles/research, criteria/research |
 
-#### セルフレビュー時のロール自動選択
-
-セルフレビューチェーンからの呼び出し時（PR コンテキストあり）、`git diff --name-only` で変更ファイルを分析しロールを自動選択する：
-
-| 変更種別 | 判定条件 | ロール |
-|---------|---------|--------|
-| コード | `.ts/.tsx/.js/.jsx` を含む | `code` |
-| ドキュメントのみ | `.md` ファイルのみ（設定パス配下を除く） | `docs` |
-| 設定のみ | `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/` 配下のみ | `review-worker` が `reviewing-claude-config` にルーティング（本スキルは呼ばれない） |
-| 混在 | コード + ドキュメント/設定 | `code`（設定部分は `reviewing-claude-config` が並行レビュー） |
-
-**設定パス**: `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/`
-
-**注意**: plan ロール、design ロール、research ロールはセルフレビュー自動選択の対象外。計画・設計・調査成果物はコードファイルではないため `git diff --name-only` では検出できない。これらのロールはキーワード指定または Issue の明示指定でのみ選択される。
 
 ### 2. ナレッジ読み込み
 
@@ -392,128 +378,7 @@ knowledge-manager が Web 検索で以下を最新化する：
 - **ルール自動読み込み**: `.claude/rules/` からプロジェクト規約
 - **サブエージェントモード**: Agent ツール（サブエージェント）として隔離実行
 - **サブエージェント制約**: サブエージェントモードのため TodoWrite / AskUserQuestion は使用不可。結果はレポートとして返す
-- **セルフレビュー**: 委任チェーンから起動時は構造化出力（出力テンプレート）を返す
 - **呼び出し元のコメントファースト遵守**: このスキルはサブエージェントのためコメント投稿のみを行い本文更新は行わないが、呼び出し元スキル（`creating-pr-on-issue`, `working-on-issue`）がレビュー結果に基づいて Issue/PR 本文を更新する場合は、`item-maintenance.md` のコメントファースト原則に従うこと。具体的な手順パターンは `item-maintenance.md` の「レビュー結果からの本文更新」セクションを参照
-
-## セルフレビューモード
-
-`working-on-issue` の委任チェーン（`review-worker` 経由）から起動された場合、呼び出し元が自動判定できるよう構造化された出力を返す。
-
-### セルフレビュー実行手順
-
-セルフレビューモードでは以下の手順を**順序通り**に実行する:
-
-1. **ステップ 1-5 を通常通り実行** — ロール選択、ナレッジ読み込み、Lint、分析、レポート生成
-2. **ステップ 6: PR コメント投稿（必須）** — PR 番号がコンテキストにある場合、レビューレポートを PR コメントとして投稿する。このステップは省略不可
-3. **構造化データを返却** — 呼び出し元の自動判定用に、以下の形式でサマリーを返す
-
-### 出力テンプレート（セルフレビュー）
-
-ステップ 6 で PR コメントを投稿した後、以下の形式で返す。セルフレビューでは `working-on-issue` のループ判定に詳細情報が必要なため、本文に `### Detail` 拡張ブロックを含める:
-
-```yaml
----
-action: {CONTINUE | FIX | STOP}
-status: {PASS | NEEDS_FIX | FAIL}
-ref: "PR #{pr-number} comment"
-comment_id: {comment-database-id}
----
-
-{critical} critical, {fixable-warning} fixable-warning detected
-
-### Detail
-**Critical:** {n}
-**Fixable-warning:** {n}
-**Out-of-scope:** {n}
-**Plan-gap:** {n}
-**Auto-fixable:** {yes | no}
-**Files with issues:**
-- {file1}: {summary} [critical | fixable-warning]
-- {file2}: {summary} [critical | fixable-warning]
-**Out-of-scope items:**
-- [plan-gap] {description1}
-- [true-out-of-scope] {description2}
-
-### Recommendations
-- [rule] {パターン名}: {説明}
-- [trigger:{condition}] {説明}
-- [one-off] {説明}
-- [trivial] {説明} ({変更量の目安})
-```
-
-ステータス別 Action:
-
-- **PASS** (action: CONTINUE): critical = 0 かつ fixable-warning = 0（out-of-scope のみでも PASS）
-- **NEEDS_FIX** (action: FIX): (critical > 0 or fixable-warning > 0) かつ Auto-fixable = yes
-- **FAIL** (action: STOP): (critical > 0 or fixable-warning > 0) かつ Auto-fixable = no
-- **Out-of-scope items**: フォローアップ Issue 作成の入力となる概要リスト。`[plan-gap]` / `[true-out-of-scope]` サブ分類タグ付き
-
-### Recommendations 分類定義
-
-| 分類 | 例 | アクション |
-|------|-----|----------|
-| `[rule]` | 「外部ライブラリの型をエクスポートしていれば使う」 | Evolution シグナルとして記録 |
-| `[trigger:{condition}]` | 「メジャーアップデート時に再検討」 | フォローアップ Issue 作成 |
-| `[one-off]` | 「この関数をリファクタして抽象化する」 | フォローアップ Issue 作成 |
-| `[trivial]` | 「型を絞る」（2行変更） | その場で対応を提案 |
-
-判断に迷う場合は `[one-off]` にフォールバックする。
-
-### plan-gap 判定基準
-
-out-of-scope 判定時に Issue 本文の `## 目的` + `## 概要` セクションと照合し、サブ分類を決定する:
-
-| 条件 | サブ分類 |
-|------|---------|
-| PR スコープ外だが Issue スコープ内 | `[plan-gap]`（planning-on-issue の改善材料） |
-| PR スコープ外かつ Issue スコープ外 | `[true-out-of-scope]`（フォローアップ Issue 作成） |
-
-### セルフレビュー 3 分類マッピング
-
-レポートテンプレートの表示用 4 段階（Critical/High/Medium/Low）は人間向けレビューレポートとして維持し、セルフレビューの構造化出力にのみ 3 分類を導入する**二層構造**。
-
-#### レポート深刻度 → セルフレビュー分類
-
-| レポート深刻度 | スコープ判定 | マッピング先 |
-|--------------|------------|-------------|
-| Critical / High | 不問（常に修正対象） | → critical |
-| Medium / Low | PR 変更ファイル内 | → fixable-warning |
-| Medium / Low | PR スコープ外 | → out-of-scope |
-
-Critical/High はスコープ外であっても `critical` に分類する。重大な問題は発見した時点で修正すべきであり、スコープ外への先送りは品質リスクが高いため。
-
-#### fixable-warning vs out-of-scope の判定基準
-
-| 条件 | 分類 |
-|------|------|
-| 当該 PR で変更したファイル内の修正（新規追加ファイルを含む） | fixable-warning |
-| 当該 PR で変更したファイルに依存する未変更ファイルの修正 | out-of-scope |
-| PR スコープ外の新規ファイル作成が必要 | out-of-scope |
-| 設計パターンの変更が必要 | out-of-scope |
-
-### フィードバック蓄積
-
-セルフレビューで検出された指摘パターンを蓄積し、スキル・ルールの改善材料にする。
-
-**記録タイミング**: セルフレビューループの各イテレーションで指摘を記録。
-
-**蓄積先**: Discussion (Reports) に `[Self-Review Feedback]` プレフィックスで保存。
-
-```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Self-Review Feedback] {branch}: iteration {n}" \
-  --body-file /tmp/shirokuma-docs/{number}-feedback.md
-```
-
-**ルール化提案**: 頻出パターン（3回以上）が検出された場合、レポート末尾に追記：
-
-```markdown
-## ルール化候補
-- **パターン**: {description}
-- **検出回数**: {n}
-- **提案**: {rule-file} に追加を検討
-```
 
 ## 計画レビューモード
 
@@ -615,9 +480,9 @@ comment_id: {comment-database-id}
 - **PASS** (action: CONTINUE): 調査結果に重大な問題がなく、要件と合致
 - **NEEDS_REVISION** (action: REVISE): ソース不足、バージョン不整合、要件との重大な不合致、または取り込み提案がある場合
 
-## 通常レビューモード（非セルフレビュー、非計画レビュー、非設計レビュー）
+## 通常レビューモード（非計画レビュー、非設計レビュー）
 
-スタンドアロンまたはサブエージェントとして起動され、セルフレビューでも計画レビューでもない場合は、レポートを GitHub に保存し構造化データを返す。
+スタンドアロンまたはサブエージェントとして起動され、計画レビューでも設計レビューでもない場合は、レポートを GitHub に保存し構造化データを返す。
 
 ### 出力テンプレート（通常レビュー）
 

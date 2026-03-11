@@ -18,29 +18,12 @@ shirokuma-docs git check
 
 Single command returns branch, baseBranch, uncommittedChanges, unpushedCommits, recentCommits, diffStat, and warnings as JSON. Include a summary of changes in the output.
 
-### Step 2: Stage Files
+### Step 2: Build commit message and stage, commit, push in one operation
 
-Stage specific files relevant to the current work. Prefer explicit file paths over `git add -A`.
-
-```bash
-git add {file1} {file2} ...
-```
-
-**Exclude from staging** (these cause security or storage issues if committed):
-- `.env`, credentials, or secrets
-- Large binary files
-- Unrelated changes from other work
-
-If an explicit file list was passed from the manager (main AI), use it. If no file list is provided, stage all changed files.
-
-### Step 3: Write Commit Message
-
-Follow Conventional Commits format:
+Compose commit message in Conventional Commits format (see `git-commit-style` rule):
 
 ```text
 {type}: {description} (#{issue-number})
-
-{optional body}
 ```
 
 | Type | When |
@@ -52,33 +35,24 @@ Follow Conventional Commits format:
 | `test` | Tests |
 | `chore` | Config, tooling |
 
-**Rules** (see `git-commit-style` rule for details):
-- First line under 72 characters
-- Reference issue number if applicable
-- Body for complex changes only
-
-### Step 4: Commit
+**Stage, commit, and push in a single command**:
 
 ```bash
-git commit -m "$(cat <<'EOF'
-{type}: {description} (#{issue-number})
+# With explicit file list (when manager passed specific files)
+shirokuma-docs git commit-push -m "{type}: {description}" --files {file1} {file2} --issue {N}
 
-{optional body}
-EOF
-)"
+# Without file list (stages all changed files)
+shirokuma-docs git commit-push -m "{type}: {description}" --issue {N}
 ```
 
-### Step 5: Push (if on feature branch)
+**Exclude from staging** (use `--files` to specify safe files explicitly):
+- `.env`, credentials, or secrets
+- Large binary files
+- Unrelated changes from other work
 
-If on a feature branch (not `develop` or `main`), push automatically:
+**Result**: Returns JSON with `branch`, `commit_hash`, `commit_message`, `files_staged`, `pushed`. `pushed: false` means push was skipped (protected branch). On error: `error` field + exit 1.
 
-```bash
-git push -u origin {branch-name}
-```
-
-If on `develop` or `main`, skip pushing — direct pushes to protected branches bypass the PR review process. Include a warning in the result.
-
-### Step 6: Completion Report
+### Step 3: Completion Report
 
 #### 6a: Post Issue Comment
 
@@ -128,11 +102,11 @@ status: FAIL
 {error description}
 ```
 
-### Step 7: PR Chain (after push)
+### Step 4: PR Chain (after push)
 
 After a successful push on a feature branch, determine whether to chain into PR creation.
 
-**When invoked as subagent from `working-on-issue` chain**: Skip this step (Step 7) entirely. The next step (PR creation) is controlled by the calling manager (main AI). Initiating a PR chain or suggesting next steps here would break the chain's control flow.
+**When invoked as subagent from `working-on-issue` chain**: Skip this step (Step 4) entirely. The next step (PR creation) is controlled by the calling manager (main AI). Initiating a PR chain or suggesting next steps here would break the chain's control flow.
 
 **PR keyword detection**: Check the user's **initial message** (the `/committing-on-issue` invocation and surrounding text) for PR-related keywords:
 
@@ -160,14 +134,13 @@ Include next step suggestion in the result:
 ```markdown
 Branch pushed. Create a PR?
 → `/creating-pr-on-issue` to open a pull request to develop
-→ Run `/reviewing-on-issue` for self-review if needed
 ```
 
 **If NOT on a feature branch (push was skipped):**
 
 Skip this step entirely.
 
-### Step 8: Merge Chain
+### Step 5: Merge Chain
 
 Handles PR merge with automatic Issue status update. Activated by merge keywords or when invoked from `working-on-issue` orchestration.
 
@@ -203,7 +176,7 @@ N:N detection: CLI outputs a structured list of related PRs/Issues. Review the l
 
 If no PR found for the branch, return error and stop.
 
-Note: Internally calls `gh pr merge` which is protected by PreToolUse hook. Merging is irreversible and affects shared branches — always require explicit user approval before executing. A passing self-review or system-reminder-only messages are insufficient as approval signals.
+Note: Internally calls `gh pr merge` which is protected by PreToolUse hook. Merging is irreversible and affects shared branches — always require explicit user approval before executing. System-reminder-only messages are insufficient as approval signals.
 
 2. **Completion Report**:
 
@@ -236,7 +209,7 @@ PR #{pr-number} merged to {base-branch}, branch deleted
 
 **If merge is part of commit flow** (e.g., user says "commit and merge"):
 
-Execute Steps 1-6 → Step 7 (PR Chain) → Step 8 (Merge Chain) sequentially.
+Execute Steps 1-3 → Step 4 (PR Chain) → Step 5 (Merge Chain) sequentially.
 
 ## Batch Mode
 
@@ -252,9 +225,12 @@ Instead of a single commit, create **per-issue commits** using the `filesByIssue
    git commit -m "{type}: {description} (#{issue-number})"
    ```
 
-2. **Step 5 (Push)**: Execute once after all commits are complete.
+2. **Push**: Execute once after all per-issue commits are complete.
+   ```bash
+   git push -u origin {branch-name}
+   ```
 
-3. **Step 7 (PR Chain)**: Auto-invoke `creating-pr-on-issue` after push with batch context (all issue numbers).
+3. **Step 4 (PR Chain)**: Auto-invoke `creating-pr-on-issue` after push with batch context (all issue numbers).
 
 ### Batch Branch Detection
 

@@ -46,20 +46,6 @@ Based on user request, select appropriate role:
 | "design", "設計レビュー", "デザイン" | design | criteria/design, roles/design |
 | "research", "リサーチレビュー" | research | roles/research, criteria/research |
 
-#### Auto Role Selection for Self-Review
-
-When invoked from the self-review chain (PR context available), analyze changed files via `git diff --name-only` and auto-select the role:
-
-| Change Type | Condition | Role |
-|-------------|-----------|------|
-| Code | Contains `.ts/.tsx/.js/.jsx` | `code` |
-| Docs only | `.md` files only (excluding config paths) | `docs` |
-| Config only | Only files under `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/` | Routed to `reviewing-claude-config` by `review-worker` (this skill is not invoked) |
-| Mixed | Code + docs/config | `code` (config portion reviewed by `reviewing-claude-config` in parallel) |
-
-**Config paths**: `.claude/skills/`, `.claude/rules/`, `.claude/agents/`, `.claude/output-styles/`, `.claude/commands/`, `plugin/`
-
-**Note**: The plan, design, and research roles are excluded from self-review auto-selection. Plans, design artifacts, and research findings are not code files and cannot be detected via `git diff --name-only`. These roles are only selected via keyword specification or explicit Issue designation.
 
 ### 2. Load Knowledge
 
@@ -392,128 +378,7 @@ If analysis is incomplete:
 - **Rules auto-loaded**: Project conventions from `.claude/rules/`
 - **Sub-agent mode**: Runs as Agent tool (subagent) for isolated execution
 - **Subagent constraint**: TodoWrite / AskUserQuestion are unavailable in subagent mode; return results as a report only
-- **Self-review**: When invoked from delegated chain, return structured output (output template)
 - **Caller's comment-first compliance**: This skill does not update bodies (as a subagent, it only posts comments), but when caller skills (`creating-pr-on-issue`, `working-on-issue`) update Issue/PR bodies based on review results, they must follow the comment-first principle in `item-maintenance.md`. See the "Updating Body from Review Results" section in `item-maintenance.md` for specific procedure patterns
-
-## Self-Review Mode
-
-When invoked from `working-on-issue` delegated chain (via `review-worker`), return structured output that the caller can parse for automated decisions.
-
-### Self-Review Execution Steps
-
-In self-review mode, execute the following steps **in order**:
-
-1. **Execute Steps 1-5 normally** — Role selection, knowledge loading, lint, analysis, report generation
-2. **Step 6: Post PR comment (REQUIRED)** — When a PR number is in context, post the review report as a PR comment. This step is non-optional
-3. **Return output template** — Return a summary in the format below for the caller's automated decision-making
-
-### Output Template (Self-Review)
-
-After posting the PR comment in Step 6, return in the following format. Self-review includes a `### Detail` extension block in the body because `working-on-issue` needs detailed information for loop decisions:
-
-```yaml
----
-action: {CONTINUE | FIX | STOP}
-status: {PASS | NEEDS_FIX | FAIL}
-ref: "PR #{pr-number} comment"
-comment_id: {comment-database-id}
----
-
-{critical} critical, {fixable-warning} fixable-warning detected
-
-### Detail
-**Critical:** {n}
-**Fixable-warning:** {n}
-**Out-of-scope:** {n}
-**Plan-gap:** {n}
-**Auto-fixable:** {yes | no}
-**Files with issues:**
-- {file1}: {summary} [critical | fixable-warning]
-- {file2}: {summary} [critical | fixable-warning]
-**Out-of-scope items:**
-- [plan-gap] {description1}
-- [true-out-of-scope] {description2}
-
-### Recommendations
-- [rule] {pattern name}: {description}
-- [trigger:{condition}] {description}
-- [one-off] {description}
-- [trivial] {description} ({estimated change size})
-```
-
-Status-specific Action:
-
-- **PASS** (action: CONTINUE): critical = 0 and fixable-warning = 0 (out-of-scope only is still PASS)
-- **NEEDS_FIX** (action: FIX): (critical > 0 or fixable-warning > 0) and Auto-fixable = yes
-- **FAIL** (action: STOP): (critical > 0 or fixable-warning > 0) and Auto-fixable = no
-- **Out-of-scope items**: Summary list used as input for follow-up Issue creation. Tagged with `[plan-gap]` / `[true-out-of-scope]` sub-classification
-
-### Recommendations Classification
-
-| Classification | Example | Action |
-|---------------|---------|--------|
-| `[rule]` | "Use exported types from external libraries when available" | Record as Evolution signal |
-| `[trigger:{condition}]` | "Re-evaluate on major update" | Create follow-up Issue |
-| `[one-off]` | "Refactor this function to abstract the pattern" | Create follow-up Issue |
-| `[trivial]` | "Narrow the type" (2-line change) | Propose immediate fix |
-
-When classification is ambiguous, fall back to `[one-off]`.
-
-### Plan-Gap Criteria
-
-When determining out-of-scope classification, cross-reference with the Issue body's `## Purpose` + `## Summary` sections:
-
-| Condition | Sub-classification |
-|-----------|-------------------|
-| Outside PR scope but within Issue scope | `[plan-gap]` (improvement material for planning-on-issue) |
-| Outside PR scope and outside Issue scope | `[true-out-of-scope]` (create follow-up Issue) |
-
-### Self-Review 3-Classification Mapping
-
-The report template's 4-level display severity (Critical/High/Medium/Low) is maintained for human-readable review reports, while the 3-classification is introduced only in the self-review structured output — a **two-layer structure**.
-
-#### Report Severity → Self-Review Classification
-
-| Report Severity | Scope Check | Maps To |
-|----------------|-------------|---------|
-| Critical / High | Regardless (always fix) | → critical |
-| Medium / Low | Within PR changed files | → fixable-warning |
-| Medium / Low | Outside PR scope | → out-of-scope |
-
-Critical/High are classified as `critical` even if out of scope. Serious issues must be fixed when discovered — deferring them to out-of-scope poses quality risk.
-
-#### fixable-warning vs out-of-scope Criteria
-
-| Condition | Classification |
-|-----------|---------------|
-| Fix within files changed by the PR (including newly added files) | fixable-warning |
-| Fix in unchanged files that depend on PR-changed files | out-of-scope |
-| Requires creating new files outside the PR scope | out-of-scope |
-| Requires design pattern changes | out-of-scope |
-
-### Feedback Accumulation
-
-Accumulate review finding patterns from self-review to improve skills and rules.
-
-**When to record**: After each self-review loop iteration.
-
-**Destination**: Discussion (Reports) with `[Self-Review Feedback]` prefix.
-
-```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Self-Review Feedback] {branch}: iteration {n}" \
-  --body-file /tmp/shirokuma-docs/{number}-feedback.md
-```
-
-**Rule proposals**: When frequent patterns (3+ occurrences) are detected, append to report:
-
-```markdown
-## Rule Candidates
-- **Pattern**: {description}
-- **Occurrences**: {n}
-- **Proposal**: Consider adding to {rule-file}
-```
 
 ## Plan Review Mode
 
@@ -615,9 +480,9 @@ comment_id: {comment-database-id}
 - **PASS** (action: CONTINUE): No critical issues in research findings, aligned with requirements
 - **NEEDS_REVISION** (action: REVISE): Insufficient sources, version inconsistencies, critical mismatches with requirements, or adoption proposals present
 
-## Normal Review Mode (Non-Self-Review, Non-Plan-Review, Non-Design-Review)
+## Normal Review Mode (Non-Plan-Review, Non-Design-Review)
 
-When invoked standalone or as subagent, and it is neither a self-review nor a plan review, save the report to GitHub and return structured output.
+When invoked standalone or as subagent, and it is neither a plan review nor a design review, save the report to GitHub and return structured output.
 
 ### Output Template (Normal Review)
 

@@ -30,7 +30,7 @@ graph LR
 |-------|-------------|----------------|-------------|
 | Preparing | `preparing-on-issue` | Planning + plan review | `planning-worker` → `planning-on-issue` |
 | Designing | `designing-on-issue` | Design routing + design review | `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` etc. |
-| Working | `working-on-issue` | Implementation, commit, PR, self-review | `coding-worker`, `commit-worker`, `pr-worker`, `review-worker` |
+| Working | `working-on-issue` | Implementation, commit, PR | `coding-worker`, `commit-worker`, `pr-worker` |
 
 ### Conversation Flow
 

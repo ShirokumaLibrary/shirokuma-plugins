@@ -35,7 +35,6 @@ All conditions must be met for batch processing:
 
 - Single PR for the entire batch
 - PR body includes an **issue-by-issue change summary** (auto-generated from commits)
-- Self-review covers all changes in the batch
 
 ## Branch Naming
 

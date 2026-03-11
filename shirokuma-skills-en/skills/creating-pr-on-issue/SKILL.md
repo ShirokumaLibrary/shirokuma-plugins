@@ -148,7 +148,6 @@ PR creation itself is a GitHub write (the deliverable), so no additional GitHub 
 ```yaml
 ---
 action: CONTINUE
-next: reviewing-on-issue
 status: SUCCESS
 ref: "PR #{pr-number}"
 ---
@@ -177,7 +176,6 @@ When existing PR detected:
 ```yaml
 ---
 action: CONTINUE
-next: reviewing-on-issue
 status: SUCCESS
 ref: "PR #{existing-pr-number}"
 ---
@@ -230,7 +228,7 @@ If invoked with an issue number (e.g., `/creating-pr-on-issue 39`):
 
 PR titles and bodies must be in English. Conventional commit prefixes (`feat:`, `fix:`, etc.) are always in English.
 
-Review reports output by `reviewing-on-issue` during self-review must also follow the `output-language` rule.
+Review reports output by `reviewing-on-issue` must also follow the `output-language` rule.
 
 ## Edge Cases
 
@@ -254,7 +252,7 @@ Only when invoked standalone:
 
 ```text
 PR created. Next steps:
-→ Run `/reviewing-on-issue` for self-review if needed
+→ Run `/reviewing-on-pr #{pr-number}` to respond to reviewer feedback
 → `/ending-session` to save handover and update issue statuses
 ```
 

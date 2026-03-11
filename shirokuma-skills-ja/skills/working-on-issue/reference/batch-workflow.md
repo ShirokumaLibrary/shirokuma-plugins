@@ -23,8 +23,7 @@
 ...
 [K] 全変更をコミット・プッシュする / コミット・プッシュ中
 [K+1] プルリクエストを作成する / プルリクエストを作成中
-[K+2] セルフレビューを実行する / セルフレビュー実行中
-[K+3] 全 Issue の Status を Review に更新する / Status を更新中
+[K+2] 全 Issue の Status を Review に更新する / Status を更新中
 ```
 
 ## バッチワークフロー
@@ -53,7 +52,6 @@
    - バッチコンテキスト付きで `committing-on-issue` (subagent) にチェーン
    - `committing-on-issue` が Issue ごとのスコープ付きコミットを処理
    - 続いて `creating-pr-on-issue` (subagent) にチェーンしバッチ PR を作成
-   - セルフレビューループ（バッチ PR 全体で 1 回）
    - 全 Issue の Status を Review に更新
 
 ## バッチコンテキスト

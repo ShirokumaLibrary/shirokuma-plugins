@@ -8,7 +8,7 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
 
 > **Chain Autonomous Progression**: Subagent skill results are intermediate chain data, not final user-facing output. When TodoWrite has pending steps, immediately parse the YAML frontmatter and proceed to the next step. Stopping after a subagent result forces the user to manually type "continue", breaking the autonomous workflow that makes this orchestrator valuable. Log a one-line summary and invoke the next tool in the same response.
 
-Orchestrate the full workflow from planning to implementation, commit, PR, and self-review based on issue type or task description.
+Orchestrate the full workflow from planning to implementation, commit, and PR based on issue type or task description.
 
 **Note**: For session setup, use `starting-session`. This skill works both within a session and standalone (without `starting-session`). It is the primary entry point for working on a specific task in either mode.
 
@@ -23,9 +23,8 @@ Register **all chain steps** in TodoWrite **before starting work**.
 | 1 | Implement changes | Implementing changes | `coding-on-issue` (subagent) |
 | 2 | Commit and push changes | Committing and pushing | `committing-on-issue` (subagent) |
 | 3 | Create pull request | Creating pull request | `creating-pr-on-issue` (subagent) |
-| 4 | Run self-review and apply fixes | Running self-review | Manager managed: SIMPLIFY → review-worker self-review → post-processing |
-| 5 | Post work summary | Posting work summary | Manager direct: `issues comment` |
-| 6 | Update Status to Review | Updating Status to Review | Manager direct: `issues update` |
+| 4 | Post work summary | Posting work summary | Manager direct: `issues comment` |
+| 5 | Update Status to Review | Updating Status to Review | Manager direct: `issues update` |
 
 **Research:**
 
@@ -154,7 +153,7 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 | Work Type | Chain |
 |-----------|-------|
-| General Coding | Work → Commit → PR → Simplify → Self-Review → Work Summary → Status Update |
+| General Coding | Work → Commit → PR → Work Summary → Status Update |
 | Research | Research → Discussion |
 
 - **Merge is NOT part of the chain**
@@ -187,17 +186,14 @@ If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. 
 
 When `creating-pr-on-issue` returns its result, execute the following steps **within the same chain** sequentially. Each step is registered as `pending` in TodoWrite — do NOT stop while pending steps remain:
 
-1. **SIMPLIFY**: Invoke `/simplify` via Skill tool (code category only, skip on failure) → commit & push if changes
-2. **SELF-REVIEW**: Invoke review-worker in self-review mode with a single Agent call → action: CONTINUE/STOP determination
-3. **Post-processing**: Recommendations handling, Plan-gap Evolution signal recording
-4. **Work Summary**: Post work summary as Issue comment
-5. **Status Update**: `shirokuma-docs issues update {number} --field-status "Review"`
-6. **Evolution**: Auto-record signals (Step 6)
+1. **Work Summary**: Post work summary as Issue comment
+2. **Status Update**: `shirokuma-docs issues update {number} --field-status "Review"`
+3. **Evolution**: Auto-record signals (Step 6)
 
 **Post-subagent-result behavior (pseudocode):**
 
 ```text
-for each step in [commit, pr, simplify, self_review, post_processing, work_summary, status_update]:
+for each step in [commit, pr, work_summary, status_update]:
   // GUARD: TodoWrite has pending steps → this iteration MUST execute (do NOT stop)
   subagent_output = invoke_subagent_skill(step)
   frontmatter, body = parse_yaml_frontmatter(subagent_output)
@@ -206,7 +202,6 @@ for each step in [commit, pr, simplify, self_review, post_processing, work_summa
     handle_failure(frontmatter, body)             // Chain stop, report to user
     break
   // action == "CONTINUE" → proceed immediately
-  // NOTE: FIX loop is completed inside review-worker; manager only handles CONTINUE/STOP
   summary = body.split("\n")[0]                    // Body first line as summary
   log_one_line_summary(summary)
   update_todo(step, "completed")
@@ -232,8 +227,6 @@ The `Summary` field is abolished. Instead, the **body's first line** is treated 
 | Status | Action | Used By | Chain Behavior |
 |--------|--------|---------|----------------|
 | SUCCESS | CONTINUE | committing-on-issue, creating-pr-on-issue, coding-on-issue | Proceed to next step |
-| PASS | CONTINUE | review-worker (self-review mode) | Proceed to post-processing |
-| NEEDS_FIX_RESOLVED | CONTINUE | review-worker (self-review mode) | Proceed to post-processing (internally fixed) |
 | FAIL | STOP | All subagent skills | Chain stop, report to user |
 | NEEDS_REVISION | REVISE | reviewing-on-issue (plan review) | Enter revision loop |
 
@@ -263,57 +256,11 @@ Agent(
 
 Each sub-agent has the corresponding skill's full content auto-injected via the `skills` frontmatter field.
 
-> **CRITICAL — Chain continuation after Agent tool returns**: When a custom sub-agent (e.g., `pr-worker`, `commit-worker`) completes and the Agent tool returns, **check TodoWrite for remaining `pending` steps**. If pending steps remain (self-review, work summary, status update, evolution), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. The Agent tool returning is a chain mid-point, not a completion signal.
-
-#### Self-Review (review-worker self-review mode)
-
-Simplified to `/simplify` pre-pass + single review-worker invocation. See [reference/self-review-workflow.md](reference/self-review-workflow.md) for details.
-
-**Procedure:**
-
-1. **SIMPLIFY**: Invoke `/simplify` via Skill tool (only when code-category files exist; run once, skip on failure) → commit & push if changes
-2. **SELF-REVIEW**: Invoke review-worker in self-review mode with a single Agent call:
-   ```text
-   Agent(
-     description: "review-worker self-review #{number}",
-     subagent_type: "review-worker",
-     prompt: "self-review #{number}"
-   )
-   ```
-3. **Parse result**: Read action/status from YAML frontmatter
-   - `action: CONTINUE` → proceed to comment_id verification
-   - `action: STOP` → chain stop, report to user
-4. **comment_id verification (MUST NOT skip)** (when action: CONTINUE):
-   - Check the `comment_id` in the `### Response Complete Comment` section
-   - `comment_id` present → proceed to post-processing
-   - `comment_id` missing → **immediate fallback execution (NEVER skip)**:
-     1. Extract the Self-Review Result from review-worker output and generate a response complete comment:
-        ```bash
-        cat > /tmp/shirokuma-docs/{number}-review-response.md << 'REVIEW_EOF'
-        ## Self-Review Response Complete
-
-        {transcribe Self-Review Result section from review-worker output}
-        REVIEW_EOF
-        ```
-     2. Post as a PR comment:
-        ```bash
-        shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/{number}-review-response.md
-        ```
-     3. Capture the `comment_id` from command output
-     4. If the command fails → chain stop, report "Self-review PR comment posting failed" to user
-5. **Post-processing**:
-   - `### Recommendations` `[trivial]` items → propose immediate fix (AskUserQuestion)
-   - `### Recommendations` `[rule]` items → record as Evolution signal
-   - `### Recommendations` `[trigger:*]` / `[one-off]` items → propose follow-up Issue creation
-   - Plan-gap count > 0 → record as Evolution signal for `planning-on-issue` improvement
-
-> **⚠ SIMPLIFY ≠ Self-Review**: SIMPLIFY is a quality-baseline pre-pass. After SIMPLIFY completes, always invoke review-worker's self-review mode.
-
-**Batch mode self-review**: Run once for the entire batch PR. After completion, update all batch Issue statuses to Review.
+> **CRITICAL — Chain continuation after Agent tool returns**: When a custom sub-agent (e.g., `pr-worker`, `commit-worker`) completes and the Agent tool returns, **check TodoWrite for remaining `pending` steps**. If pending steps remain (work summary, status update, evolution), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. The Agent tool returning is a chain mid-point, not a completion signal.
 
 #### Work Summary (Issue Comment)
 
-After self-review completion, post a technical work summary to the Issue as a comment. This is the primary context record that `starting-session #N` will restore in future sessions.
+After PR creation, post a technical work summary to the Issue as a comment. This is the primary context record that `starting-session #N` will restore in future sessions.
 
 The work summary focuses on **technical work details** — what was changed, which files were modified, and technical decisions made. Session-level context (cross-cutting decisions, blockers, next steps) is handled separately by `ending-session`.
 
@@ -345,7 +292,7 @@ Skip this step if no issue number is associated with the work.
 
 #### Status Update (End of Chain)
 
-After self-review completion, update Status to Review for issues with a number:
+After work summary is posted, update Status to Review for issues with a number:
 
 ```bash
 shirokuma-docs issues update {number} --field-status "Review"
@@ -458,7 +405,6 @@ Sub-issue creation in this flow uses `shirokuma-docs issues create` directly (no
 - Update issue status before starting
 - Ensure correct feature branch
 - TDD-applicable work types wrap `coding-on-issue` invocation with TDD ([docs/tdd-workflow.md](docs/tdd-workflow.md))
-- Workflow executes sequentially (Commit → PR → Simplify → Self-Review → Status Update). **Merge is NOT included**
-- Self-review is delegated to review-worker's self-review mode ([reference/self-review-workflow.md](reference/self-review-workflow.md))
+- Workflow executes sequentially (Commit → PR → Work Summary → Status Update). **Merge is NOT included**
 - Chain execution stops on error and returns control to user
 - **Chain autonomous progression**: Subagent outputs are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the YAML frontmatter and execute the next step's Agent/Bash tool call. Log a one-line summary and invoke the next tool in the same response

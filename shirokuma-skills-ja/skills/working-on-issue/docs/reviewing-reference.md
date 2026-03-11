@@ -31,6 +31,6 @@
 reviewing-on-issue → レポート投稿 → 完了
 ```
 
-## セルフレビュー
+## PR 後のレビュー
 
-`working-on-issue` のステップ 5 でセルフレビューとして自動実行される場合は、`creating-pr-on-issue` のステップ 6 として組み込まれる。
+PR 作成後にコードレビューを行う場合は `/reviewing-on-pr` を使用する。

@@ -23,8 +23,7 @@ If any issue fails eligibility, inform user and suggest individual processing.
 ...
 [K] Commit and push all changes / Committing and pushing
 [K+1] Create pull request / Creating pull request
-[K+2] Run self-review / Running self-review
-[K+3] Update Status to Review for all Issues / Updating Status
+[K+2] Update Status to Review for all Issues / Updating Status
 ```
 
 ## Batch Workflow
@@ -53,7 +52,6 @@ If any issue fails eligibility, inform user and suggest individual processing.
    - Chain to `committing-on-issue` (subagent) with batch context
    - `committing-on-issue` handles per-issue scoped commits
    - Then chain to `creating-pr-on-issue` (subagent) for a single batch PR
-   - Self-review loop (once for entire batch PR)
    - Update all Issue statuses to Review
 
 ## Batch Context
