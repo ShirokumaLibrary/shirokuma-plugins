@@ -242,7 +242,6 @@ The following skills are launched via custom sub-agents (AGENT.md). `/simplify` 
 | `coding-on-issue` | `coding-worker` |
 | `committing-on-issue` | `commit-worker` |
 | `creating-pr-on-issue` | `pr-worker` |
-| `reviewing-on-issue` | `review-worker` |
 | `reviewing-claude-config` | `config-review-worker` |
 | `researching-best-practices` | `research-worker` |
 

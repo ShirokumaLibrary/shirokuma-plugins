@@ -242,7 +242,6 @@ for each step in [commit, pr, work_summary, status_update]:
 | `coding-on-issue` | `coding-worker` |
 | `committing-on-issue` | `commit-worker` |
 | `creating-pr-on-issue` | `pr-worker` |
-| `reviewing-on-issue` | `review-worker` |
 | `reviewing-claude-config` | `config-review-worker` |
 | `researching-best-practices` | `research-worker` |
 

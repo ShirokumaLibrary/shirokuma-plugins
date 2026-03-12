@@ -12,7 +12,7 @@ Takes a PR number and performs code review execution (via `review-worker`) and p
 
 | Skill | Responsibility |
 |-------|---------------|
-| `reviewing-on-issue` | Review execution engine (shared by self-review and PR review). Invoked via `review-worker` |
+| `reviewing-on-issue` | Code review execution engine. Invoked via `review-worker` |
 | `reviewing-on-pr` (this skill) | PR review orchestrator (review execution + thread response). Entry point for a new conversation |
 
 ## Arguments
@@ -71,7 +71,7 @@ When no review has been submitted yet, invoke `review-worker` via the Agent tool
    Agent(
      description: "review-worker PR #{PR#}",
      subagent_type: "review-worker",
-     prompt: "Perform a code review for PR #{PR#}. Role: code"
+     prompt: "Perform a code review for PR #{PR#}."
    )
    ```
 2. `review-worker` posts the review results as a PR comment
@@ -79,8 +79,23 @@ When no review has been submitted yet, invoke `review-worker` via the Agent tool
    ```bash
    shirokuma-docs pr comments {PR#}
    ```
-   - Unresolved threads exist → proceed to existing flow (Step 3 onwards)
+   - Unresolved threads exist → proceed to Step 2b (review result confirmation)
    - No unresolved threads → display completion report and exit (see Step 6)
+
+### Step 2b: Review Result Confirmation (User Control Point)
+
+> **Scope:** This step applies only after Step 2a (new review execution, `review_count: 0`). When processing existing threads with `review_count > 0`, the user is already aware of the review content, so UCP is not required.
+
+After `review-worker` completes in Step 2a and unresolved threads exist, present the review results to the user and confirm the response approach.
+
+1. Display a summary of review results (number of issues, breakdown by type) to the user
+2. Confirm via `AskUserQuestion`:
+   - "Please review the results. Would you like to start addressing them?"
+   - Options: "Start addressing" / "No fixes needed (complete as-is)" / "Address selected threads only"
+3. Branch based on user response:
+   - **Start addressing** → proceed to thread response flow (Step 3 onwards)
+   - **No fixes needed** → display completion report and exit (Step 6)
+   - **Selected threads only** → display numbered thread list and confirm which threads to address via `AskUserQuestion`, then process selected threads only (Step 3 onwards)
 
 ### Step 3: Thread Classification
 
@@ -184,6 +199,8 @@ Process code fix threads together. Fix → commit & push per fix → reply, reso
 | Reviewer requests re-review | Reply but leave thread open |
 | PR has no related Issue | Skip Issue reference in context restoration |
 | Code fix affects other threads | Check impact and address together |
+| User decides no fixes needed (UCP) | Display completion report and exit. Skip thread resolution |
+| User selects partial addressing (UCP) | Process only specified threads, leave the rest unresolved |
 
 ## Tool Usage
 

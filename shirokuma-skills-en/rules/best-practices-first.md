@@ -156,6 +156,16 @@ Simple questions, minor config edits, fine-tuning skill results, confirmation di
 
 The Agent tool returning is a chain mid-point, not a completion signal. Stopping after a subagent result forces the user to manually type "continue" — this breaks the autonomous workflow chain.
 
+### UCP (User Control Point) Exception
+
+The following cases are **exceptions** to the automatic progression rule above, where user confirmation (`AskUserQuestion`) is inserted after a subagent result:
+
+| Skill | UCP Position | Reason |
+|-------|-------------|--------|
+| `reviewing-on-pr` | After `review-worker` completes (before thread resolution starts) | Fix approach requires user confirmation before proceeding |
+
+A UCP is a chain "pause", not a chain "break". Once the user approves, automatic progression resumes.
+
 ## Error Recovery
 
 When failure occurs, analyze root cause and **always propose system improvements** (changes to config files).

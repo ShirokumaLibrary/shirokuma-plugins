@@ -1,6 +1,6 @@
 ---
 name: reviewing-on-issue
-description: 専門ロール別の包括的レビューワークフローを提供し、コード品質・セキュリティ・テストパターン・ドキュメント品質・計画品質・設計品質・リサーチ品質をチェックします。トリガー: 「レビューして」「review」「セキュリティチェック」「security audit」「テストレビュー」「ドキュメントレビュー」「計画レビュー」「設計レビュー」「リサーチレビュー」「コードレビュー」。
+description: 専門ロール別の包括的レビューワークフローを提供し、コード品質・セキュリティ・テストパターン・ドキュメント品質・計画品質・設計品質・リサーチ品質をチェックします。トリガー: 「レビューして」「review」「セキュリティチェック」「security audit」「テストレビュー」「ドキュメントレビュー」「計画レビュー」「設計レビュー」「リサーチレビュー」「コードレビュー」「設定レビュー」「config review」。
 allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---
 
@@ -13,6 +13,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 | ロール | 焦点 | トリガー |
 |--------|------|----------|
 | **code** | 品質、パターン、スタイル | "review", "コードレビュー" |
+| **config** | 設定ファイル品質、ベストプラクティス準拠 | `code` ロールから自動検出、または "config review", "設定レビュー" |
 | **code+annotation** | JSDoc アノテーション | "annotation review", "アノテーションレビュー" |
 | **security** | OWASP、CVE、認証 | "security review", "セキュリティ" |
 | **testing** | TDD、カバレッジ、モック | "test review", "テストレビュー" |
@@ -37,6 +38,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 | キーワード | ロール | 読み込むファイル |
 |------------|--------|-----------------|
 | "review", "レビュー" | code | criteria/code-quality, criteria/coding-conventions, patterns/server-actions, patterns/drizzle-orm, patterns/jsdoc |
+| "config review", "設定レビュー" | config | `reviewing-claude-config/SKILL.md` の検証ルール |
 | "annotation", "アノテーション" | code+annotation | roles/code.md |
 | "security", "セキュリティ" | security | criteria/security, patterns/better-auth |
 | "test", "テスト" | testing | criteria/testing, patterns/e2e-testing |
@@ -46,6 +48,30 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 | "design", "設計レビュー", "デザイン" | design | criteria/design, roles/design |
 | "research", "リサーチレビュー" | research | roles/research, criteria/research |
 
+#### `config` ロール自動検出（`code` ロール選択時）
+
+ロールが `code` に決定された場合、変更ファイルを分析してレビュー戦略を自動判定する：
+
+```bash
+git diff --name-only origin/{base-branch}...HEAD 2>/dev/null || git diff --name-only HEAD~1 HEAD
+```
+
+取得したファイルリストを以下の設定ファイルパターンと照合する：
+
+| パターン | 対象 |
+|---------|------|
+| `plugin/**/*.md` | スキルファイル（SKILL.md）、ルールファイル（rules/*.md）、エージェントファイル（AGENT.md） |
+| `plugin/**/*.json` | plugin.json 等の設定 |
+| `.claude/**/*.md` | プロジェクトローカルのルール・スキル |
+| `.claude/**/*.json` | プロジェクトローカルの設定 |
+| `.claude/**/*.yaml` | プロジェクトローカルの YAML 設定 |
+
+| 判定結果 | アクション |
+|---------|----------|
+| 全ファイルが設定ファイルパターンに一致 | `config` ロールに切り替え |
+| 一部または全ファイルが不一致 | `code` ロールを維持 |
+| 変更ファイルが取得できない | `code` ロールにフォールバック |
+| `config` と明示的に指定された場合 | 変更ファイル分析をスキップし `config` で実行 |
 
 ### 2. ナレッジ読み込み
 
@@ -70,6 +96,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 | security | lint security, lint code, lint structure（セキュリティ関連のみ） |
 | testing | lint tests, lint coverage（テスト関連のみ） |
 | docs | lint docs（ドキュメント構造のみ） |
+| config | スキップ（設定ファイルは `reviewing-claude-config` の検証ロジックで分析するため） |
 | plan | スキップ（対象が Issue 本文であり、コード/ドキュメントファイルではないため） |
 | design | スキップ（対象が Issue 本文 / 設計成果物であり、コード/ドキュメントファイルではないため） |
 | research | スキップ（対象が調査結果であり、コード/ドキュメントファイルではないため） |
@@ -124,6 +151,19 @@ shirokuma-docs lint docs -p . -f terminal
 3. 既知の問題と照合
 4. shirokuma-docs lint 結果と相互参照
 5. 違反と改善点を特定
+
+**config ロール:**
+
+`reviewing-claude-config/SKILL.md` の検証ロジックを参照し、変更された設定ファイルに対して以下をチェック：
+
+1. 一時的マーカーの検出（`TODO:`, `FIXME:`, `WIP`, `TBD`, `DRAFT`, `PLACEHOLDER`, `XXX:`, `**NEW**`）
+2. 内部リンク切れの確認（参照先ファイルの存在確認）
+3. 必須フロントマターフィールドの存在確認（スキル: `name`, `description`、エージェント: `name`, `description`）
+4. `description` にトリガーキーワードが含まれているか
+5. ファイルの行数チェック（SKILL.md で 500行超は Warning）
+6. `plugin.json` バージョンの整合性（`package.json` との照合）
+7. 手動日付スタンプの検出
+8. ASCIIアート図の検出
 
 **plan ロール:**
 
@@ -317,6 +357,29 @@ knowledge-manager が Web 検索で以下を最新化する：
   GitHub Discussions (Reports)
 ```
 
+**config ロール時の進捗報告例:**
+
+```text
+ステップ 1/6: ロール選択中...
+  ロール: code → config（変更ファイル分析により自動切り替え）
+  変更ファイル: plugin/shirokuma-skills-ja/skills/reviewing-on-issue/SKILL.md 等 2 件
+  読み込みファイル: reviewing-claude-config/SKILL.md
+
+ステップ 2/6: ナレッジ読み込み中...
+
+ステップ 3/6: Lint 実行... スキップ（config ロール）
+
+ステップ 4/6: 設定ファイル分析中...
+  SKILL.md - 一時的マーカー 0 件、リンク切れ 0 件
+  plugin.json - バージョン整合性 OK
+
+ステップ 5/6: レポート生成中...
+  0 件重大、1 件警告
+
+ステップ 6/6: レポート保存中...
+  PR #{number} コメント
+```
+
 **plan ロール時の進捗報告例:**
 
 ```text
@@ -368,6 +431,20 @@ knowledge-manager が Web 検索で以下を最新化する：
 2. 追加パターンを読み込む
 3. 未分析箇所を再分析
 4. レポートを更新
+
+## マルチロール実行モード
+
+`review-worker` が複数ロールを順次実行する場合、このスキルはロールごとに繰り返し実行される。
+
+### 動作の違い
+
+| 項目 | 通常（単一ロール） | マルチロール |
+|------|-------------------|------------|
+| ロール選択 | ユーザーリクエストから判定 | `review-worker` が指定したロールを使用 |
+| レポート保存 | PR/Issue コメントとして投稿 | PR/Issue コメントとして投稿（変更なし） |
+| 出力テンプレート | 通常レビューモードの出力テンプレート | 同じ（変更なし） |
+
+マルチロール時の最終判断は `review-worker` が統合して行う。各ロール実行のレポートは個別に投稿される。
 
 ## 注意事項
 

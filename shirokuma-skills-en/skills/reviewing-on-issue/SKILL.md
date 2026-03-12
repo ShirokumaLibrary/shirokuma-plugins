@@ -1,6 +1,6 @@
 ---
 name: reviewing-on-issue
-description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, documentation, plan quality, design quality, and research quality. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "design review", "research review", "code review".
+description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, documentation, plan quality, design quality, and research quality. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "design review", "research review", "code review", "config review".
 allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---
 
@@ -13,6 +13,7 @@ Comprehensive review workflow with specialized roles for different review types.
 | Role | Focus | Trigger |
 |------|-------|---------|
 | **code** | Quality, patterns, style | "review", "コードレビュー" |
+| **config** | Config file quality, best practices compliance | Auto-detected from `code` role, or "config review", "設定レビュー" |
 | **code+annotation** | JSDoc annotations | "annotation review", "アノテーションレビュー" |
 | **security** | OWASP, CVEs, auth | "security review", "セキュリティ" |
 | **testing** | TDD, coverage, mocks | "test review", "テストレビュー" |
@@ -37,6 +38,7 @@ Based on user request, select appropriate role:
 | Keyword | Role | Files to Load |
 |---------|------|---------------|
 | "review", "レビュー" | code | criteria/code-quality, criteria/coding-conventions, patterns/server-actions, patterns/drizzle-orm, patterns/jsdoc |
+| "config review", "設定レビュー" | config | `reviewing-claude-config/SKILL.md` validation rules |
 | "annotation", "アノテーション" | code+annotation | roles/code.md |
 | "security", "セキュリティ" | security | criteria/security, patterns/better-auth |
 | "test", "テスト" | testing | criteria/testing, patterns/e2e-testing |
@@ -46,6 +48,30 @@ Based on user request, select appropriate role:
 | "design", "設計レビュー", "デザイン" | design | criteria/design, roles/design |
 | "research", "リサーチレビュー" | research | roles/research, criteria/research |
 
+#### `config` Role Auto-Detection (when `code` role is selected)
+
+When the role resolves to `code`, analyze changed files to auto-determine the review strategy:
+
+```bash
+git diff --name-only origin/{base-branch}...HEAD 2>/dev/null || git diff --name-only HEAD~1 HEAD
+```
+
+Match the file list against the following config file patterns:
+
+| Pattern | Target |
+|---------|--------|
+| `plugin/**/*.md` | Skill files (SKILL.md), rule files (rules/*.md), agent files (AGENT.md) |
+| `plugin/**/*.json` | plugin.json and other config |
+| `.claude/**/*.md` | Project-local rules and skills |
+| `.claude/**/*.json` | Project-local config |
+| `.claude/**/*.yaml` | Project-local YAML config |
+
+| Result | Action |
+|--------|--------|
+| All files match config file patterns | Switch to `config` role |
+| Some or all files do not match | Keep `code` role |
+| Cannot retrieve changed files | Fall back to `code` role |
+| `config` explicitly specified | Skip file analysis, use `config` role |
 
 ### 2. Load Knowledge
 
@@ -70,6 +96,7 @@ Read required knowledge files based on role:
 | security | lint security, lint code, lint structure (security-related only) |
 | testing | lint tests, lint coverage (test-related only) |
 | docs | lint docs (document structure only) |
+| config | Skip (config files are analyzed using `reviewing-claude-config` validation logic) |
 | plan | Skip (target is Issue body, not code/document files) |
 | design | Skip (target is Issue body / design artifacts, not code/document files) |
 | research | Skip (target is research findings, not code/document files) |
@@ -124,6 +151,19 @@ See project-specific workflow documentation for detailed fix instructions.
 3. Check against known issues
 4. Cross-reference with shirokuma-docs lint results
 5. Identify violations and improvements
+
+**Config role:**
+
+Reference the validation logic in `reviewing-claude-config/SKILL.md` and check the changed config files for:
+
+1. Temporary markers (`TODO:`, `FIXME:`, `WIP`, `TBD`, `DRAFT`, `PLACEHOLDER`, `XXX:`, `**NEW**`)
+2. Broken internal links (verify referenced files exist)
+3. Required frontmatter fields (skills: `name`, `description`; agents: `name`, `description`)
+4. Trigger keywords present in `description`
+5. File length check (SKILL.md over 500 lines is Warning)
+6. `plugin.json` version consistency (match against `package.json`)
+7. Manual date stamps
+8. ASCII art diagrams
 
 **Plan role:**
 
@@ -317,6 +357,29 @@ Step 6/6: Saving report...
   GitHub Discussions (Reports)
 ```
 
+**Progress reporting example for config role:**
+
+```text
+Step 1/6: Selecting role...
+  Role: code → config (auto-switched by changed file analysis)
+  Changed files: plugin/shirokuma-skills-ja/skills/reviewing-on-issue/SKILL.md etc. 2 files
+  Files to load: reviewing-claude-config/SKILL.md
+
+Step 2/6: Loading knowledge...
+
+Step 3/6: Running lints... Skipped (config role)
+
+Step 4/6: Analyzing config files...
+  SKILL.md - 0 temporary markers, 0 broken links
+  plugin.json - version consistency OK
+
+Step 5/6: Generating report...
+  0 Critical, 1 Warning
+
+Step 6/6: Saving report...
+  PR #{number} comment
+```
+
 **Progress reporting example for plan role:**
 
 ```text
@@ -368,6 +431,20 @@ If analysis is incomplete:
 2. Load additional patterns
 3. Re-analyze missed areas
 4. Update report
+
+## Multi-Role Execution Mode
+
+When `review-worker` executes multiple roles sequentially, this skill is invoked repeatedly for each role.
+
+### Behavioral Differences
+
+| Aspect | Normal (Single Role) | Multi-Role |
+|--------|---------------------|------------|
+| Role Selection | Determined from user request | Uses the role specified by `review-worker` |
+| Report Save | Posted as PR/Issue comment | Posted as PR/Issue comment (no change) |
+| Output Template | Normal review mode output template | Same (no change) |
+
+The final judgment in multi-role mode is aggregated by `review-worker`. Each role's report is posted individually.
 
 ## Notes
 
