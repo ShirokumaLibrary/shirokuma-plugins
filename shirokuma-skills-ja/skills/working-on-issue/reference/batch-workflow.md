@@ -51,7 +51,7 @@
 4. **ループ後チェーン**: 全 Issue 実装完了後:
    - バッチコンテキスト付きで `commit-issue` (subagent) にチェーン
    - `commit-issue` が Issue ごとのスコープ付きコミットを処理
-   - 続いて `create-pr-issue` (subagent) にチェーンしバッチ PR を作成
+   - 続いて `open-pr-issue` (subagent) にチェーンしバッチ PR を作成
    - 全 Issue の Status を Review に更新
 
 ## バッチコンテキスト

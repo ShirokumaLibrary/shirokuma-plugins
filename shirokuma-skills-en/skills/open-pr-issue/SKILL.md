@@ -1,5 +1,5 @@
 ---
-name: create-pr-issue
+name: open-pr-issue
 description: Creates a GitHub pull request from the current branch targeting develop (or integration branch for sub-issues). Triggers: "create pull request", "create PR", "open PR", "submit PR".
 allowed-tools: Bash, Read, Grep, Glob
 ---
@@ -220,7 +220,7 @@ Closes #{N3}
 
 ## Arguments
 
-If invoked with an issue number (e.g., `/create-pr-issue 39`):
+If invoked with an issue number (e.g., `/open-pr-issue 39`):
 - Include `Closes #39` in the PR body
 - Derive PR title from the issue context
 

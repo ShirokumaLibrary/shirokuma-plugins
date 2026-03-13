@@ -95,7 +95,7 @@ git push -u origin {branch-name}
 
 #### 3c. PR 作成
 
-`create-pr-issue` スキルのワークフローに従い、`develop` ターゲットで PR を作成（`branch-workflow` ルール参照）:
+`open-pr-issue` スキルのワークフローに従い、`develop` ターゲットで PR を作成（`branch-workflow` ルール参照）:
 
 ```bash
 shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
@@ -233,7 +233,7 @@ shirokuma-docs session end \
 
 判定に必要な情報は `session preflight` 出力の `issues[].hasMergedPr` フラグと `prs` 配列で確認する。`hasMergedPr` が `true` の Issue は `--done`、オープン PR がある Issue は `--review` とする。追加の `shirokuma-docs show` 呼び出しは不要。
 
-**冪等性**: `create-pr-issue` が PR 作成後に既に Review に更新済みの場合、`--review` は no-op。`commit-issue` のマージチェーンが Done に更新済みの場合、`--done` は no-op。`ending-session` はセーフティネットとして機能し、スキルが更新し損ねた Status を補完する。
+**冪等性**: `open-pr-issue` が PR 作成後に既に Review に更新済みの場合、`--review` は no-op。`commit-issue` のマージチェーンが Done に更新済みの場合、`--done` は no-op。`ending-session` はセーフティネットとして機能し、スキルが更新し損ねた Status を補完する。
 
 **出力**:
 ```json

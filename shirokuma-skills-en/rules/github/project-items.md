@@ -89,7 +89,7 @@ AI MUST update issue status at these points:
 | Preparing started | → Preparing + assign | `preparing-on-issue` | `issues update {n} --field-status "Preparing" --add-assignee @me` |
 | Plan created | → Spec Review | `preparing-on-issue` | `issues update {n} --field-status "Spec Review"` |
 | User approves plan, starts work | → In Progress + branch | `working-on-issue` | `issues update {n} --field-status "In Progress"` |
-| PR creation complete | → Review | `create-pr-issue` | `issues update {n} --field-status "Review"` |
+| PR creation complete | → Review | `open-pr-issue` | `issues update {n} --field-status "Review"` |
 | PR merged | → Done | `commit-issue` (via `pr merge`) | Automatic |
 | Blocked by dependency | → Pending | Manual | `issues update {n} --field-status "Pending"` + comment |
 | Complete (no PR needed) | → Done | `ending-session` | `session end --done {n}` |

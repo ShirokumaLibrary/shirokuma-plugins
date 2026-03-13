@@ -78,7 +78,7 @@ Return the following structured data to the caller:
 ```yaml
 ---
 action: CONTINUE
-next: create-pr-issue
+next: open-pr-issue
 status: SUCCESS
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
@@ -125,7 +125,7 @@ If a PR already exists for this branch, include the existing URL in the result a
 
 **If PR keywords detected AND no existing PR:**
 
-Auto-invoke the `create-pr-issue` skill via the Skill tool. Pass the current branch and related issue number as context.
+Auto-invoke the `open-pr-issue` skill via the Skill tool. Pass the current branch and related issue number as context.
 
 **If no PR keywords AND no existing PR:**
 
@@ -133,7 +133,7 @@ Include next step suggestion in the result:
 
 ```markdown
 Branch pushed. Create a PR?
-→ `/create-pr-issue` to open a pull request to develop
+→ `/open-pr-issue` to open a pull request to develop
 ```
 
 **If NOT on a feature branch (push was skipped):**
@@ -230,7 +230,7 @@ Instead of a single commit, create **per-issue commits** using the `filesByIssue
    git push -u origin {branch-name}
    ```
 
-3. **Step 4 (PR Chain)**: Auto-invoke `create-pr-issue` after push with batch context (all issue numbers).
+3. **Step 4 (PR Chain)**: Auto-invoke `open-pr-issue` after push with batch context (all issue numbers).
 
 ### Batch Branch Detection
 

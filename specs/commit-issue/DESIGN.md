@@ -9,7 +9,7 @@
 | チェーン | トリガーキーワード | フロー |
 |---------|-------------------|--------|
 | Commit only | "コミットして" | Stage → Commit → Push |
-| Commit + PR | "コミットして PR 作って" | Stage → Commit → Push → `create-pr-issue` |
+| Commit + PR | "コミットして PR 作って" | Stage → Commit → Push → `open-pr-issue` |
 | Merge | "マージして" | `pr merge` → Status Done → Branch delete |
 
 ### 設計上の制約

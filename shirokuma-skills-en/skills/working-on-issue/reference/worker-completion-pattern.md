@@ -87,7 +87,7 @@ Would you like to proceed?
 
 | Status | Action | Used By | Chain Behavior |
 |--------|--------|---------|----------------|
-| SUCCESS | CONTINUE | commit-issue, create-pr-issue, code-issue | Proceed to next step |
+| SUCCESS | CONTINUE | commit-issue, open-pr-issue, code-issue | Proceed to next step |
 | PASS | CONTINUE | review-issue | Proceed to next step (Suggestions presented via UCP) |
 | NEEDS_FIX | FIX | code-issue | Test fix loop (TDD cycle) |
 | FAIL | STOP | All subagent skills | Chain stop, report to user |

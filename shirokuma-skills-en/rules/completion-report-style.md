@@ -53,7 +53,7 @@ For detailed bullets vs prose guidelines in GitHub content (Issues, PRs, Discuss
 
 | Category | Template Required | Examples |
 |----------|------------------|---------|
-| Workflow | Required (strict) | commit-issue, create-pr-issue, ending-session |
+| Workflow | Required (strict) | commit-issue, open-pr-issue, ending-session |
 | Config Management | Required (strict) | managing-rules, managing-skills, managing-agents |
 | Analysis | Required (with tables) | evolving-rules, preparing-on-issue |
 | Display / Orchestrator | Not required | showing-github, working-on-issue |

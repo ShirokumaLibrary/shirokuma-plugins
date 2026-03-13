@@ -87,7 +87,7 @@ worker が #{ref} に投稿したコメントを確認してください。
 
 | Status | Action | 使用スキル | チェーン動作 |
 |--------|--------|-----------|------------|
-| SUCCESS | CONTINUE | commit-issue, create-pr-issue, code-issue | 次のステップへ進む |
+| SUCCESS | CONTINUE | commit-issue, open-pr-issue, code-issue | 次のステップへ進む |
 | PASS | CONTINUE | review-issue | 次のステップへ進む（Suggestions は UCP で提示） |
 | NEEDS_FIX | FIX | code-issue | テスト修正ループ（TDD サイクル） |
 | FAIL | STOP | 全サブエージェントスキル | チェーン停止、ユーザーに報告 |

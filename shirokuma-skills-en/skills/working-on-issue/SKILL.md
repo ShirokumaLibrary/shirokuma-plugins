@@ -22,7 +22,7 @@ Register **all chain steps** in TodoWrite **before starting work**.
 |---|---------|------------|-------|
 | 1 | Implement changes | Implementing changes | `code-issue` (subagent) |
 | 2 | Commit and push changes | Committing and pushing | `commit-issue` (subagent) |
-| 3 | Create pull request | Creating pull request | `create-pr-issue` (subagent) |
+| 3 | Create pull request | Creating pull request | `open-pr-issue` (subagent) |
 | 4 | Post work summary | Posting work summary | Manager direct: `issues comment` |
 | 5 | Update Status to Review | Updating Status to Review | Manager direct: `issues update` |
 
@@ -47,7 +47,7 @@ When `shirokuma-docs show {number}` output contains a `parentIssue` field, the i
 
 1. Reference the parent issue's `## Plan` section to understand overall context
 2. Set base branch to the parent's integration branch instead of `develop` (Step 3)
-3. `create-pr-issue` will self-detect the sub-issue via the `parentIssue` field, so explicit context passing is not required (if passed, it is used as supplementary; otherwise, self-detection is the fallback)
+3. `open-pr-issue` will self-detect the sub-issue via the `parentIssue` field, so explicit context passing is not required (if passed, it is used as supplementary; otherwise, self-detection is the fallback)
 
 ```bash
 # Check parent issue
@@ -183,12 +183,12 @@ If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. 
 | Completed Skill | `next` field | Next Skill to Invoke | Prohibited Action |
 |----------------|-------------|---------------------|------------------|
 | `code-issue` | `commit-issue` | `commit-issue` | Do NOT re-invoke `code-issue` |
-| `commit-issue` | `create-pr-issue` | `create-pr-issue` | Do NOT delegate to `code-issue` |
-| `create-pr-issue` | — | **Start manager-managed steps** (see below) | Do NOT delegate to subagent |
+| `commit-issue` | `open-pr-issue` | `open-pr-issue` | Do NOT delegate to `code-issue` |
+| `open-pr-issue` | — | **Start manager-managed steps** (see below) | Do NOT delegate to subagent |
 
-**Manager-managed steps after `create-pr-issue` (required checklist):**
+**Manager-managed steps after `open-pr-issue` (required checklist):**
 
-When `create-pr-issue` returns its result, execute the following steps **within the same chain** sequentially. Each step is registered as `pending` in TodoWrite — do NOT stop while pending steps remain:
+When `open-pr-issue` returns its result, execute the following steps **within the same chain** sequentially. Each step is registered as `pending` in TodoWrite — do NOT stop while pending steps remain:
 
 1. **Work Summary**: Post work summary as Issue comment
 2. **Status Update**: `shirokuma-docs issues update {number} --field-status "Review"`
@@ -233,7 +233,7 @@ The `Summary` field is abolished. Instead, the **body's first line** is treated 
 
 | Status | Action | Used By | Chain Behavior |
 |--------|--------|---------|----------------|
-| SUCCESS | CONTINUE | commit-issue, create-pr-issue, code-issue | Proceed to next step |
+| SUCCESS | CONTINUE | commit-issue, open-pr-issue, code-issue | Proceed to next step |
 | FAIL | STOP | All subagent skills | Chain stop, report to user |
 | NEEDS_REVISION | REVISE | review-issue (plan review) | Enter revision loop |
 
@@ -248,7 +248,7 @@ The following skills are launched via custom sub-agents (AGENT.md). `/simplify` 
 | `plan-issue` | `planning-worker` |
 | `code-issue` | `coding-worker` |
 | `commit-issue` | `commit-worker` |
-| `create-pr-issue` | `pr-worker` |
+| `open-pr-issue` | `pr-worker` |
 | `reviewing-claude-config` | `config-review-worker` |
 | `researching-best-practices` | `research-worker` |
 
@@ -260,7 +260,7 @@ Agent(
 )
 ```
 
-**The `pr-worker` prompt MUST include the issue number.** `create-pr-issue` includes `Closes #{issue-number}` in the PR body when launched with an issue number, linking the PR to the issue. If the issue number is omitted, `Closes` is skipped and the PR will not be linked to the issue.
+**The `pr-worker` prompt MUST include the issue number.** `open-pr-issue` includes `Closes #{issue-number}` in the PR body when launched with an issue number, linking the PR to the issue. If the issue number is omitted, `Closes` is skipped and the PR will not be linked to the issue.
 
 Each sub-agent has the corresponding skill's full content auto-injected via the `skills` frontmatter field.
 
@@ -310,7 +310,7 @@ shirokuma-docs issues update {number} --field-status "Review"
 
 #### Next Steps Suggestion (End of Chain)
 
-After Status update, present next action candidates to the user. Extract the PR number from `create-pr-issue`'s `ref` field to provide specific guidance. If `ref` is unavailable (e.g., PR not created), omit the `/reviewing-on-pr` line.
+After Status update, present next action candidates to the user. Extract the PR number from `open-pr-issue`'s `ref` field to provide specific guidance. If `ref` is unavailable (e.g., PR not created), omit the `/reviewing-on-pr` line.
 
 ```
 ## Next Steps

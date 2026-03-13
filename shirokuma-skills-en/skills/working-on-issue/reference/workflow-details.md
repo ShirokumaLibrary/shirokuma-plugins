@@ -72,7 +72,7 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 | designing-nextjs | Yes | Yes | Via designing-on-issue or standalone |
 | creating-item | — | Yes | Always standalone-capable |
 | commit-issue | Yes | Yes | Subagent (standalone also runs as subagent) |
-| create-pr-issue | Yes | Yes | Subagent (via chain or standalone) |
+| open-pr-issue | Yes | Yes | Subagent (via chain or standalone) |
 | reviewing-on-pr | — | Yes | PR review response (new conversation entry point) |
 | starting-session | Yes | — | Session start only (`#N` for issue-bound, no arg for unbound) |
 | ending-session | Yes | — | Session end only |

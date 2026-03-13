@@ -48,6 +48,21 @@ For conversation flow, epic pattern, and session vs standalone details, see `wor
 | PR review response | `reviewing-on-pr` | Skill |
 | None match | Propose new skill | — |
 
+## Task Scope Understanding (Pre-Execution Check)
+
+Before delegating to a skill, accurately understand the issue requirements. Friction pattern detected by Insights: skipping requirements and starting implementation, leading to rework cycles.
+
+**Pre-execution checklist:**
+1. Read the issue's `## Summary` and `## Deliverable` to understand "what to achieve"
+2. If `## Plan` exists, review the task breakdown and target files
+3. If `## Considerations` exists, review constraints and decision criteria
+4. If anything is unclear, confirm with AskUserQuestion before delegating
+
+**Anti-patterns:**
+- Starting implementation after reading only the issue title
+- Executing only some tasks from the plan and ignoring the rest
+- Taking the default approach without reviewing considerations
+
 ## Direct Handling OK
 
 Simple questions, minor config edits, fine-tuning skill results, confirmation dialogues.

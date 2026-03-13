@@ -4,7 +4,7 @@ description: 現在のブランチから develop（またはサブ Issue の int
 tools: Bash, Read, Grep, Glob
 model: sonnet
 skills:
-  - create-pr-issue
+  - open-pr-issue
 ---
 
 # プルリクエスト作成（サブエージェント）

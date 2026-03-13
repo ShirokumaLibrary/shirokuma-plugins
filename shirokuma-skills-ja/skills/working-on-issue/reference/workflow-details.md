@@ -72,7 +72,7 @@ graph TD
 | designing-nextjs | 対応 | 対応 | designing-on-issue 経由またはスタンドアロン |
 | creating-item | — | 対応 | 常にスタンドアロン対応 |
 | commit-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
-| create-pr-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
+| open-pr-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | reviewing-on-pr | — | 対応 | PR レビュー対応（新会話のエントリーポイント） |
 | starting-session | 対応 | — | セッション開始専用（`#N` で Issue バウンド、引数なしでアンバウンド） |
 | ending-session | 対応 | — | セッション終了専用 |

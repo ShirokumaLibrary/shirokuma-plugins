@@ -455,7 +455,7 @@ The final judgment in multi-role mode is aggregated by `review-worker`. Each rol
 - **Rules auto-loaded**: Project conventions from `.claude/rules/`
 - **Sub-agent mode**: Runs as Agent tool (subagent) for isolated execution
 - **Subagent constraint**: TodoWrite / AskUserQuestion are unavailable in subagent mode; return results as a report only
-- **Caller's comment-first compliance**: This skill does not update bodies (as a subagent, it only posts comments), but when caller skills (`create-pr-issue`, `working-on-issue`) update Issue/PR bodies based on review results, they must follow the comment-first principle in `item-maintenance.md`. See the "Updating Body from Review Results" section in `item-maintenance.md` for specific procedure patterns
+- **Caller's comment-first compliance**: This skill does not update bodies (as a subagent, it only posts comments), but when caller skills (`open-pr-issue`, `working-on-issue`) update Issue/PR bodies based on review results, they must follow the comment-first principle in `item-maintenance.md`. See the "Updating Body from Review Results" section in `item-maintenance.md` for specific procedure patterns
 
 ## Plan Review Mode
 

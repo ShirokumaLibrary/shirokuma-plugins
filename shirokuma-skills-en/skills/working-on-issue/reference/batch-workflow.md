@@ -51,7 +51,7 @@ If any issue fails eligibility, inform user and suggest individual processing.
 4. **Post-loop chain**: After all issues are implemented:
    - Chain to `commit-issue` (subagent) with batch context
    - `commit-issue` handles per-issue scoped commits
-   - Then chain to `create-pr-issue` (subagent) for a single batch PR
+   - Then chain to `open-pr-issue` (subagent) for a single batch PR
    - Update all Issue statuses to Review
 
 ## Batch Context
