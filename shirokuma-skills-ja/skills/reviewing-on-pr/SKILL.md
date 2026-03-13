@@ -1,7 +1,7 @@
 ---
 name: reviewing-on-pr
 description: PR番号を受け取り、コードレビュー実行および未解決レビュースレッドの対応を自動チェーンで処理します。トリガー: 「レビュー対応」「PR対応」「PRレビュー」「review response」「/reviewing-on-pr #123」。
-allowed-tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, AskUserQuestion, Agent
+allowed-tools: Bash, Read, Grep, Glob, TodoWrite, AskUserQuestion, Agent
 ---
 
 # PR レビュー対応
@@ -123,13 +123,27 @@ shirokuma-docs pr comments {PR#}
 
 #### コード修正スレッド
 
-コード修正スレッドをまとめて処理する。修正 → コミット・プッシュ → 返信・解決の順に進める。
+コード修正スレッドをまとめて処理する。修正は `coding-worker` に委任し、コミットは `commit-worker` に委任する。
 
-1. **修正**: レビュー指摘に基づきコードを修正
-2. **コミット・プッシュ**: 修正ごとに1コマンドでステージ・コミット・プッシュ（Issue 番号は `--issue` で付与）
-   ```bash
-   shirokuma-docs git commit-push -m "fix: {修正内容の説明}" --files {修正ファイル} --issue {issue-number}
+1. **修正**: `coding-worker` に修正対象スレッドの情報（ファイルパス、指摘内容）をまとめて渡し、一括修正を委任:
+   ```text
+   Agent(
+     description: "coding-worker PR #{PR#} review fixes",
+     subagent_type: "coding-worker",
+     prompt: "PR #{PR#} のレビュー指摘に対応してください。\n\n{各スレッドの修正指示}"
+   )
    ```
+   `coding-worker` 完了後、`working-on-issue/reference/worker-completion-pattern.md` の統一パターンに従い出力をパースする。
+
+2. **コミット・プッシュ**: `commit-worker` に全修正のコミット・プッシュを委任:
+   ```text
+   Agent(
+     description: "commit-worker PR #{PR#} review fixes",
+     subagent_type: "commit-worker",
+     prompt: "レビュー修正をコミット・プッシュしてください。Issue #{issue-number}"
+   )
+   ```
+
 3. **返信**: 各スレッドにコミット参照で返信（`--reply-to` には `pr comments` 出力の数値 `database_id` を使用）
    ```bash
    shirokuma-docs pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
@@ -187,6 +201,7 @@ shirokuma-docs pr comments {PR#}
 5. **意見相違は解決しない** — レビュアーに判断を委ねる
 6. **コンテキスト復元を先に** — ステップ 1 は必ず最初に実行し、`review_count` を取得してから分岐する
 7. **レビュー実行は `review-worker` 経由** — ステップ 2a では `review-worker` を Agent ツールで呼び出し、直接レビューを書かない
+8. **コード修正は worker 委任** — ステップ 5 のコード修正は `coding-worker` / `commit-worker` に委任し、オーケストレーターは直接コード修正しない
 
 ## エッジケース
 
@@ -206,8 +221,13 @@ shirokuma-docs pr comments {PR#}
 
 | ツール | タイミング |
 |--------|-----------|
-| Agent | `review-worker` によるコードレビュー実行（ステップ 2a） |
+| Agent | `review-worker` によるコードレビュー実行（ステップ 2a）、`coding-worker` / `commit-worker` によるコード修正・コミット（ステップ 5） |
 | Bash | `shirokuma-docs pr comments`, `pr reply`, `pr resolve`, git 操作 |
 | Read | コード確認、計画参照 |
-| Edit | コード修正 |
 | TodoWrite | スレッド処理の進捗管理 |
+
+## リファレンス
+
+| リファレンス | 用途 |
+|------------|------|
+| `working-on-issue/reference/worker-completion-pattern.md` | Worker 完了後の統一パターン、UCP チェック |

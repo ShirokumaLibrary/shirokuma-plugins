@@ -24,12 +24,11 @@ Parse the prompt from the caller and determine which roles to execute.
 | Condition | Selected Role(s) |
 |-----------|-----------------|
 | Caller explicitly specifies role(s) | Specified role(s) (can be multiple) |
-| No role specified + config files only | `config` |
 | No role specified + security-related files (auth, middleware, etc.) | `code` + `security` |
 | No role specified + significant test file changes | `code` + `testing` |
 | No role specified + none of the above | `code` (default) |
 
-**Auto-detection**: When no role is specified, analyze changed files to determine roles.
+**Auto-detection**: When no role is specified, analyze changed files to determine roles. The `config` role switch is handled by `reviewing-on-issue` (when `code` role is selected and all changed files match config file patterns, it auto-switches to `config`).
 
 ```bash
 git diff --name-only origin/{base-branch}...HEAD 2>/dev/null || git diff --name-only HEAD~1 HEAD

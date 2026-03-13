@@ -9,14 +9,14 @@ Quality review of the plan section (`## Plan` / `## 計画`) in Issue body:
 - Risk analysis (breaking changes, performance impact oversight)
 - Issue description sufficiency (plan understandable from Issue body alone)
 
-## Distinction from `planning-on-issue`
+## Distinction from `plan-issue`
 
-| Aspect | `planning-on-issue` built-in review | `reviewing-on-issue` plan role |
+| Aspect | `plan-issue` built-in review | `reviewing-on-issue` plan role |
 |--------|-------------------------------------|-------------------------------|
 | Timing | Immediate check right after planning | User-initiated at any time |
 | Data retrieval | Issue body embedded in Task agent | Fetched via `shirokuma-docs show` by Issue number |
 | Purpose | Initial quality gate for plan | Independent second opinion |
-| Invocation | Auto-executed at `planning-on-issue` step 4 | `/reviewing-on-issue plan #N` or Spec Review Issue |
+| Invocation | Auto-executed at `plan-issue` step 4 | `/reviewing-on-issue plan #N` or Spec Review Issue |
 
 ## Required Knowledge
 

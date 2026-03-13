@@ -4,7 +4,7 @@ description: "Sub-agent for issue planning. Delegated from preparing-on-issue, p
 tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
 model: sonnet
 skills:
-  - planning-on-issue
+  - plan-issue
 ---
 
 # Issue Planning (Sub-agent)

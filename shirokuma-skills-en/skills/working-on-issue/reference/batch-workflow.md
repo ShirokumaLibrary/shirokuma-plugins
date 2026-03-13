@@ -43,15 +43,15 @@ If any issue fails eligibility, inform user and suggest individual processing.
 
 3. **Issue loop**: For each issue:
    - Fetch issue details: `shirokuma-docs show {number}`
-   - Execute implementation (delegate to `coding-on-issue` subagent)
+   - Execute implementation (delegate to `code-issue` subagent)
    - Quality checkpoint: verify changed files + run related tests
    - Track `filesByIssue` mapping for scoped commits
    - **Do NOT chain** Commit → PR during the loop
 
 4. **Post-loop chain**: After all issues are implemented:
-   - Chain to `committing-on-issue` (subagent) with batch context
-   - `committing-on-issue` handles per-issue scoped commits
-   - Then chain to `creating-pr-on-issue` (subagent) for a single batch PR
+   - Chain to `commit-issue` (subagent) with batch context
+   - `commit-issue` handles per-issue scoped commits
+   - Then chain to `create-pr-issue` (subagent) for a single batch PR
    - Update all Issue statuses to Review
 
 ## Batch Context

@@ -109,7 +109,7 @@ Detect existing settings at each step:
 ```
 Setup complete. Next steps:
 → `/working-on-issue` to start your first Issue
-→ `/planning-on-issue` to create a plan
+→ `/plan-issue` to create a plan
 ```
 
 ## Notes

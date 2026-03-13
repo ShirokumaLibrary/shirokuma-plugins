@@ -96,7 +96,7 @@ Always use `{placeholder}` in SKILL.md explanatory text.
 | Placement | When | Examples |
 |-----------|------|---------|
 | `## Completion Report` standalone section | Workflow has 5+ steps | managing-rules, evolving-rules |
-| Step subsection | Workflow has 4 or fewer steps | committing-on-issue |
+| Step subsection | Workflow has 4 or fewer steps | commit-issue |
 
 Define templates in ` ```markdown ` fenced code blocks.
 

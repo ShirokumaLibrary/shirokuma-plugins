@@ -43,15 +43,15 @@
 
 3. **Issue ループ**: 各 Issue に対して:
    - Issue 詳細取得: `shirokuma-docs show {number}`
-   - 実装実行（`coding-on-issue` にサブエージェント委任）
+   - 実装実行（`code-issue` にサブエージェント委任）
    - 品質チェックポイント: 変更ファイル確認 + 関連テスト実行
    - `filesByIssue` マッピングを記録（スコープ付きコミット用）
    - **ループ中は Commit → PR チェーンを発火しない**
 
 4. **ループ後チェーン**: 全 Issue 実装完了後:
-   - バッチコンテキスト付きで `committing-on-issue` (subagent) にチェーン
-   - `committing-on-issue` が Issue ごとのスコープ付きコミットを処理
-   - 続いて `creating-pr-on-issue` (subagent) にチェーンしバッチ PR を作成
+   - バッチコンテキスト付きで `commit-issue` (subagent) にチェーン
+   - `commit-issue` が Issue ごとのスコープ付きコミットを処理
+   - 続いて `create-pr-issue` (subagent) にチェーンしバッチ PR を作成
    - 全 Issue の Status を Review に更新
 
 ## バッチコンテキスト

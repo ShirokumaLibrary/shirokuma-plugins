@@ -42,7 +42,7 @@
       "type": "trigger",
       "prompt": "#42 の計画して",
       "expected": "should_not_trigger",
-      "rationale": "計画策定は planning-on-issue の責務"
+      "rationale": "計画策定は plan-issue の責務"
     },
     {
       "id": "trigger-07",

@@ -1,4 +1,4 @@
-# creating-pr-on-issue 設計メモ
+# create-pr-issue 設計メモ
 
 スキル管理用メタデータ。実行時には読み込まれない。
 

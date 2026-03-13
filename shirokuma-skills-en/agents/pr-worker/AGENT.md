@@ -4,7 +4,7 @@ description: Sub-agent for creating GitHub pull requests from the current branch
 tools: Bash, Read, Grep, Glob
 model: sonnet
 skills:
-  - creating-pr-on-issue
+  - create-pr-issue
 ---
 
 # Pull Request Creation (Sub-agent)

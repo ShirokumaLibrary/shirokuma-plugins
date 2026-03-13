@@ -1,4 +1,4 @@
-# committing-on-issue 設計メモ
+# commit-issue 設計メモ
 
 スキル管理用メタデータ。実行時には読み込まれない。
 
@@ -9,7 +9,7 @@
 | チェーン | トリガーキーワード | フロー |
 |---------|-------------------|--------|
 | Commit only | "コミットして" | Stage → Commit → Push |
-| Commit + PR | "コミットして PR 作って" | Stage → Commit → Push → `creating-pr-on-issue` |
+| Commit + PR | "コミットして PR 作って" | Stage → Commit → Push → `create-pr-issue` |
 | Merge | "マージして" | `pr merge` → Status Done → Branch delete |
 
 ### 設計上の制約

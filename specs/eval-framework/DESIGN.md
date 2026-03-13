@@ -148,8 +148,8 @@ trigger eval は PASS/FAIL の二値。quality eval は assertion ごとに PASS
 `scenarios.json` の作成が必須:
 
 - `working-on-issue`
-- `planning-on-issue`
-- `coding-on-issue`
+- `plan-issue`
+- `code-issue`
 
 ### 推奨（新規スキル）
 

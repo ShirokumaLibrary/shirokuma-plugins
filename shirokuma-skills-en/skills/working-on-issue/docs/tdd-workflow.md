@@ -1,12 +1,12 @@
 # TDD Common Workflow
 
 Common TDD (Test-Driven Development) steps orchestrated by `working-on-issue`.
-Wraps the `coding-on-issue` (subagent) invocation with TDD steps.
+Wraps the `code-issue` (subagent) invocation with TDD steps.
 
 ## Flow
 
 ```text
-Test Design → Test Creation → Test Gate → [coding-on-issue] → Test Run → Verification
+Test Design → Test Creation → Test Gate → [code-issue] → Test Run → Verification
 ```
 
 ## Step 1: Test Design

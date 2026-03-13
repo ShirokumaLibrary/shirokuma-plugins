@@ -130,7 +130,7 @@ pnpm dev:{app}                   # 開発
 
 ```
 Implementation complete. Next step:
-→ `/committing-on-issue` to stage and commit your changes
+→ `/commit-issue` to stage and commit your changes
 ```
 
 ## 注意事項

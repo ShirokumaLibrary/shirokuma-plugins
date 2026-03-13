@@ -1,5 +1,5 @@
 ---
-name: committing-on-issue
+name: commit-issue
 description: Stages, commits, and pushes changes with optional PR creation chain. Also handles PR merge with automatic Issue status update. Triggers: "commit", "push", "commit changes", "push changes", "commit and create PR", "merge PR", "merge this PR".
 allowed-tools: Bash, Read, Grep, Glob
 ---
@@ -78,7 +78,7 @@ Return the following structured data to the caller:
 ```yaml
 ---
 action: CONTINUE
-next: creating-pr-on-issue
+next: create-pr-issue
 status: SUCCESS
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
@@ -108,7 +108,7 @@ After a successful push on a feature branch, determine whether to chain into PR 
 
 **When invoked as subagent from `working-on-issue` chain**: Skip this step (Step 4) entirely. The next step (PR creation) is controlled by the calling manager (main AI). Initiating a PR chain or suggesting next steps here would break the chain's control flow.
 
-**PR keyword detection**: Check the user's **initial message** (the `/committing-on-issue` invocation and surrounding text) for PR-related keywords:
+**PR keyword detection**: Check the user's **initial message** (the `/commit-issue` invocation and surrounding text) for PR-related keywords:
 
 | Language | Keywords |
 |----------|----------|
@@ -125,7 +125,7 @@ If a PR already exists for this branch, include the existing URL in the result a
 
 **If PR keywords detected AND no existing PR:**
 
-Auto-invoke the `creating-pr-on-issue` skill via the Skill tool. Pass the current branch and related issue number as context.
+Auto-invoke the `create-pr-issue` skill via the Skill tool. Pass the current branch and related issue number as context.
 
 **If no PR keywords AND no existing PR:**
 
@@ -133,7 +133,7 @@ Include next step suggestion in the result:
 
 ```markdown
 Branch pushed. Create a PR?
-→ `/creating-pr-on-issue` to open a pull request to develop
+→ `/create-pr-issue` to open a pull request to develop
 ```
 
 **If NOT on a feature branch (push was skipped):**
@@ -230,7 +230,7 @@ Instead of a single commit, create **per-issue commits** using the `filesByIssue
    git push -u origin {branch-name}
    ```
 
-3. **Step 4 (PR Chain)**: Auto-invoke `creating-pr-on-issue` after push with batch context (all issue numbers).
+3. **Step 4 (PR Chain)**: Auto-invoke `create-pr-issue` after push with batch context (all issue numbers).
 
 ### Batch Branch Detection
 
@@ -242,7 +242,7 @@ If detected, treat as batch mode even without explicit batch context.
 
 ## Arguments
 
-If invoked with a message argument (e.g., `/committing-on-issue fix typo in config`):
+If invoked with a message argument (e.g., `/commit-issue fix typo in config`):
 - Use the provided text as the commit message basis
 - Still review changes before committing
 - PR-related keywords in the argument trigger the PR chain

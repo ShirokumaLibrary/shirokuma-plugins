@@ -187,7 +187,7 @@ For typo fixes, single-line changes, and other XS-sized issues:
 - Purpose section can be a single sentence (e.g., "Users can read documentation correctly. There is a typo.")
 - Background section is optional
 
-> **Background section**: Plan review (`planning-on-issue` Step 4) evaluates plans from the issue body alone. Missing background, constraints, or dependencies will cause the reviewer to return NEEDS_REVISION. For lightweight issues (typo fixes, etc.), a single line suffices.
+> **Background section**: Plan review (`plan-issue` Step 4) evaluates plans from the issue body alone. Missing background, constraints, or dependencies will cause the reviewer to return NEEDS_REVISION. For lightweight issues (typo fixes, etc.), a single line suffices.
 
 ## Step 3: Set Fields
 

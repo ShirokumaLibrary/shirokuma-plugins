@@ -111,10 +111,11 @@ Route to the appropriate skill based on the issue's status.
 
 | Issue Status | Delegate To | Reason |
 |-------------|-------------|--------|
-| Backlog | `planning-on-issue` | Needs planning |
+| Backlog | `plan-issue` | Needs planning |
 | Preparing | `preparing-on-issue` | Preparing in progress |
 | Designing | `designing-on-issue` | Designing in progress |
 | Spec Review | `working-on-issue` | Implicit approval, start implementation |
+| Ready | `working-on-issue` | Ready to start, begin implementation |
 | In Progress | `working-on-issue` | Resume work |
 | Review / Pending | `working-on-issue` | Continue work |
 | (Other / No status) | `working-on-issue` | Default |
@@ -127,7 +128,7 @@ Args: #{number}
 ```
 
 `working-on-issue` handles status update, branch creation, plan check, skill selection, execution, and post-work flow.
-`planning-on-issue` handles plan creation and status transitions.
+`plan-issue` handles plan creation and status transitions.
 Status updates and branch creation are `working-on-issue`'s responsibility — duplicating them in `starting-session` causes race conditions and double updates.
 
 ## When Other Selected
@@ -139,7 +140,7 @@ Routing for selections outside the issue list, such as handover remaining tasks 
 1. AskUserQuestion: "Do you have a corresponding issue number? If not, we'll create a new one."
    - Options: "Enter issue number", "No issue - create new"
 2. Issue number provided → Join status-based routing (same as "If Item Selected" above)
-3. No issue → Create issue via `managing-github-items` skill → Route created issue to `planning-on-issue`
+3. No issue → Create issue via `managing-github-items` skill → Route created issue to `plan-issue`
 
 ```
 Other selected
@@ -147,7 +148,7 @@ Other selected
 ├── Issue number provided → Status-based routing
 └── No issue
     ├── Create issue via managing-github-items
-    └── Route created issue to planning-on-issue
+    └── Route created issue to plan-issue
 ```
 
 **For handover remaining tasks**: Pass the handover's Next Steps content as context to `managing-github-items` for the issue body.
@@ -247,5 +248,5 @@ If signals are accumulated, show a single line after the Active Issues section:
 - Parse handover body for Summary and Next Steps sections
 - Show items in priority order within each status
 - Done/Released items are automatically excluded by `session start`
-- After item selection, delegate to `working-on-issue` or `planning-on-issue` based on status-based routing (status updates and branch creation are handled by the delegated skill)
+- After item selection, delegate to `working-on-issue` or `plan-issue` based on status-based routing (status updates and branch creation are handled by the delegated skill)
 - Use `shirokuma-docs session start` instead of raw `gh` commands — the CLI aggregates handover, issues, and PRs in one call, saving context window

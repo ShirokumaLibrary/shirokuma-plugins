@@ -28,7 +28,7 @@ graph LR
 
 | Phase | Orchestrator | Responsibility | Delegates to |
 |-------|-------------|----------------|-------------|
-| Preparing | `preparing-on-issue` | Planning + plan review | `planning-worker` → `planning-on-issue` |
+| Preparing | `preparing-on-issue` | Planning + plan review | `planning-worker` → `plan-issue` |
 | Designing | `designing-on-issue` | Design routing + design review | `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` etc. |
 | Working | `working-on-issue` | Implementation, commit, PR | `coding-worker`, `commit-worker`, `pr-worker` |
 
@@ -94,15 +94,15 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 |-------|---------|------------|-------|
 | working-on-issue | Yes | Yes | Entry point for both modes |
 | preparing-on-issue | Yes | Yes | Via working-on-issue or standalone |
-| planning-on-issue | Yes | — | Subagent via planning-worker (from preparing-on-issue) |
-| coding-on-issue | Yes | — | Subagent delegation from working-on-issue only |
-| coding-nextjs | Yes | Yes | Via coding-on-issue or standalone |
+| plan-issue | Yes | — | Subagent via planning-worker (from preparing-on-issue) |
+| code-issue | Yes | — | Subagent delegation from working-on-issue only |
+| coding-nextjs | Yes | Yes | Via code-issue or standalone |
 | designing-on-issue | — | Yes | Currently standalone (invoked from preparing-on-issue completion report) |
 | designing-shadcn-ui | Yes | Yes | Via designing-on-issue or standalone |
 | designing-nextjs | Yes | Yes | Via designing-on-issue or standalone |
 | creating-item | — | Yes | Always standalone-capable |
-| committing-on-issue | Yes | Yes | Subagent (standalone also runs as subagent) |
-| creating-pr-on-issue | Yes | Yes | Subagent (via chain or standalone) |
+| commit-issue | Yes | Yes | Subagent (standalone also runs as subagent) |
+| create-pr-issue | Yes | Yes | Subagent (via chain or standalone) |
 | reviewing-on-pr | — | Yes | PR review response (new conversation entry point) |
 | starting-session | Yes | — | Session start only (`#N` for issue-bound, no arg for unbound) |
 | ending-session | Yes | — | Session end only |
@@ -123,7 +123,7 @@ For substantial standalone work without `working-on-issue`:
 
 | Task Type | Route To | Method |
 |-----------|----------|--------|
-| General Coding | `coding-on-issue` | Agent (custom subagent, via `working-on-issue`) |
+| General Coding | `code-issue` | Agent (custom subagent, via `working-on-issue`) |
 | UI Design | `designing-on-issue` | Skill (currently standalone; invoked when recommended by `preparing-on-issue` completion report) |
 | Research | `researching-best-practices` | Agent (custom subagent) |
 | Review | `reviewing-on-issue` | Agent (custom subagent) |

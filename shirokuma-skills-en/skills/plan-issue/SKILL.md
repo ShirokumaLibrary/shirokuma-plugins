@@ -1,5 +1,5 @@
 ---
-name: planning-on-issue
+name: plan-issue
 description: "Sub-agent skill for issue planning. Delegated from preparing-on-issue via planning-worker, performs codebase investigation, plan creation, and issue body updates. Not intended for direct invocation."
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
 ---

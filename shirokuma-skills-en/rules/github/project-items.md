@@ -16,7 +16,7 @@ Every project item MUST have:
 ```mermaid
 graph LR
   Icebox --> Backlog --> Preparing --> Designing --> SpecReview[Spec Review]
-  SpecReview --> InProgress[In Progress] --> Review --> Testing --> Done --> Released
+  SpecReview --> Ready --> InProgress[In Progress] --> Review --> Testing --> Done --> Released
   InProgress <--> Pending
   Review <--> Pending
   Backlog <--> Pending
@@ -30,6 +30,7 @@ graph LR
 | Preparing | Plan is being created by `preparing-on-issue` (pre-work status) |
 | Designing | Design is being created by `designing-on-issue` (pre-work status) |
 | Spec Review | Gate for requirements review before work begins |
+| Ready | Ready to start. Plan approved, awaiting implementation |
 | In Progress | Currently working on |
 | Pending | Blocked (document reason) |
 | Review | Code review |
@@ -92,8 +93,8 @@ AI MUST update issue status at these points:
 | Preparing started | → Preparing + assign | `preparing-on-issue` | `issues update {n} --field-status "Preparing" --add-assignee @me` |
 | Plan created | → Spec Review | `preparing-on-issue` | `issues update {n} --field-status "Spec Review"` |
 | User approves plan, starts work | → In Progress + branch | `working-on-issue` | `issues update {n} --field-status "In Progress"` |
-| PR creation complete | → Review | `creating-pr-on-issue` | `issues update {n} --field-status "Review"` |
-| PR merged | → Done | `committing-on-issue` (via `pr merge`) | Automatic |
+| PR creation complete | → Review | `create-pr-issue` | `issues update {n} --field-status "Review"` |
+| PR merged | → Done | `commit-issue` (via `pr merge`) | Automatic |
 | Blocked by dependency | → Pending | Manual | `issues update {n} --field-status "Pending"` + comment |
 | Complete (no PR needed) | → Done | `ending-session` | `session end --done {n}` |
 | Cancelled | → Not Planned | `issues cancel` | `issues cancel {n}` |
@@ -122,9 +123,18 @@ The `designing-on-issue` orchestrator handles design work between Preparing and 
 The `preparing-on-issue` orchestrator transitions Preparing → Spec Review after `planning-worker` completes the plan and the plan review passes.
 
 - **Purpose**: User approval gate before implementation
-- **Entry**: `preparing-on-issue` sets this status after plan review passes (`planning-on-issue` writes the plan via `planning-worker`)
+- **Entry**: `preparing-on-issue` sets this status after plan review passes (`plan-issue` writes the plan via `planning-worker`)
 - **Exit**: User approves → `working-on-issue` starts implementation → In Progress
 - **Applies to**: All issues (plan depth scales with content: lightweight/standard/detailed)
+
+### Ready Usage
+
+The `Ready` status indicates that the plan has been approved and the issue is available for implementation.
+
+- **Purpose**: Visibility that the issue is ready to start, plan approved
+- **Entry**: User approves plan in Spec Review, or manual setting
+- **Exit**: `working-on-issue` starts implementation → In Progress
+- **Pre-work status**: Not included in `WORK_STARTED_STATUSES`
 
 ### Epic Status Management
 
@@ -143,7 +153,7 @@ Epic Done is determined by the final integration branch merge, not by individual
 
 1. **One In Progress at a time** - Move previous item out before starting new one (exception: batch mode allows multiple simultaneous In Progress per `batch-workflow` rule; epic issue and sub-issues can be simultaneously In Progress due to parent-child relationship)
 2. **Branch per issue** - Create a feature branch when starting work (see `branch-workflow` rule; exception: batch mode shares one branch per `batch-workflow` rule; epics use integration branch + sub-issue branches per `epic-workflow` reference)
-3. **Event-driven**: Status changes happen immediately when events occur (`creating-pr-on-issue` sets Review after PR creation, `pr merge` sets Done)
+3. **Event-driven**: Status changes happen immediately when events occur (`create-pr-issue` sets Review after PR creation, `pr merge` sets Done)
 4. **Session end safety net** - `ending-session` catches any missed status updates
 5. **Pending requires reason** - Add a comment explaining the blocker
 6. **Idempotency** - If status is already correct, skip the update (no error)

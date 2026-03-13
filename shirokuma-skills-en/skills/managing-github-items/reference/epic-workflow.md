@@ -141,7 +141,7 @@ In epic structures, PRs and issues can form many-to-many relationships. `pr merg
 
 ## Epic Plan Template
 
-Extended template used by `planning-on-issue` when `subIssuesSummary.total > 0` is detected:
+Extended template used by `plan-issue` when `subIssuesSummary.total > 0` is detected:
 
 ```markdown
 ## Plan
@@ -174,7 +174,7 @@ Extended template used by `planning-on-issue` when `subIssuesSummary.total > 0` 
 
 ## Post-Plan Approval Entry Point
 
-After `planning-on-issue` creates an epic plan (with `### Sub-Issue Structure`) and the user approves it, the entry point is:
+After `plan-issue` creates an epic plan (with `### Sub-Issue Structure`) and the user approves it, the entry point is:
 
 ```
 /working-on-issue #{epic-number}

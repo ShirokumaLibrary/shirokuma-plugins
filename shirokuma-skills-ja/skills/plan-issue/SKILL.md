@@ -1,5 +1,5 @@
 ---
-name: planning-on-issue
+name: plan-issue
 description: "Issue計画のサブエージェントスキル。preparing-on-issueからplanning-worker経由で委任され、コードベース調査、計画作成、Issue本文更新を実行する。直接起動は想定しない。"
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
 ---

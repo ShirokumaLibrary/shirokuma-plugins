@@ -40,14 +40,16 @@ Skill: managing-github-items
 Args: create-item --title "{Title}" --issue-type "{Type}" --labels "{area:label}" --priority "{Priority}" --size "{Size}"
 ```
 
-### Step 3: Chain Decision
+### Step 3: Return to User
 
-After creation, confirm next action via AskUserQuestion:
+After creation, display next action guidance:
 
-| Option | Action |
-|--------|--------|
-| Start planning | Delegate to `planning-on-issue` with `#{number}` |
-| Keep in Backlog | End (status remains Backlog) |
+```markdown
+Item created: #{number}
+→ `/preparing-on-issue #{number}` to start planning
+→ `/working-on-issue #{number}` to start implementation directly
+→ Or keep in Backlog
+```
 
 See [reference/chain-rules.md](reference/chain-rules.md) for chain decision details.
 
@@ -60,23 +62,18 @@ See [reference/chain-rules.md](reference/chain-rules.md) for chain decision deta
 
 ## Next Steps
 
-When invoked standalone (not via `working-on-issue` chain):
-
 ```
 Item created: #{number}
-→ `/planning-on-issue #{number}` to start planning
+→ `/preparing-on-issue #{number}` to start planning
+→ `/working-on-issue #{number}` to start implementation directly
 → Or keep in Backlog
 ```
 
 ## Evolution Signal Auto-Recording
 
-At the end of the item creation completion report, auto-record Evolution signals detected during the session following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule.
+At the end of the item creation completion report, auto-record Evolution signals following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule.
 
-**Skip condition:** If the created item's Issue Type is Evolution, skip the entire signal recording. The Evolution Issue itself is a skill/rule improvement proposal, so there is no need to duplicate the same content in another Evolution Issue.
-
-1. Self-review the session using the detection checklist (see `rule-evolution` rule)
-2. Signals detected → Post comment to Evolution Issue → Display 1-line recording confirmation
-3. No signals → Check for accumulated signals → Display reminder (fallback)
+**Skip condition:** If the created item's Issue Type is Evolution, skip the entire signal recording (the Evolution Issue itself is an improvement proposal, avoiding duplicate recording).
 
 ## GitHub Writing Rules
 

@@ -1,7 +1,7 @@
 ---
 name: designing-on-issue
 description: 設計タイプに応じて適切な設計スキルにルーティングし、ディスカバリー・視覚評価ループを管理するオーケストレーター。UI 設計は designing-shadcn-ui に、アーキテクチャ設計は designing-nextjs に、データモデル設計は designing-drizzle に委任します。トリガー: 「デザイン」「UI」「印象的」「design」「設計」。
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TodoWrite, Skill
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TodoWrite, Skill, Agent
 ---
 
 # デザインワークフロー（オーケストレーター）
@@ -114,6 +114,10 @@ shirokuma-docs skills routing designing
 - 技術的制約（DB エンジン、既存スキーマ）
 - 計画セクション（存在する場合）
 
+### Phase 3b: Worker 完了後の UCP チェック
+
+設計スキル / review-worker が構造化データを返した場合、`working-on-issue/reference/worker-completion-pattern.md` の統一パターンに従い UCP チェックを実行する。`suggestions_count > 0` の場合、worker が Issue コメントに投稿した Suggestions をユーザーに提示する。
+
 ### Phase 4: 視覚評価ループ
 
 実装完了後、ユーザーによる視覚評価を実施する。
@@ -166,7 +170,7 @@ shirokuma-docs issues update {number} --field-status "Spec Review"
 ```
 デザイン完了。次のステップ:
 → `/working-on-issue #{number}` で実装を開始
-→ 変更のみコミットする場合は `/committing-on-issue` を使用
+→ 変更のみコミットする場合は `/commit-issue` を使用
 ```
 
 ## 拡張性

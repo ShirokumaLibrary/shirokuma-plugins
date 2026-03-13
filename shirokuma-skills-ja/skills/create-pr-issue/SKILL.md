@@ -1,5 +1,5 @@
 ---
-name: creating-pr-on-issue
+name: create-pr-issue
 description: 現在のブランチから develop（またはサブIssueの integration ブランチ）をターゲットに GitHub プルリクエストを作成します。トリガー: 「PR作成」「プルリクエスト作成」「create pull request」「PRを開く」。
 allowed-tools: Bash, Read, Grep, Glob
 ---
@@ -189,7 +189,7 @@ Closes #{N3}
 
 ## 引数
 
-Issue 番号付きで起動された場合（例: `/creating-pr-on-issue 39`）：
+Issue 番号付きで起動された場合（例: `/create-pr-issue 39`）：
 - PR 本文に `Closes #39` を含める
 - Issue のコンテキストから PR タイトルを生成
 

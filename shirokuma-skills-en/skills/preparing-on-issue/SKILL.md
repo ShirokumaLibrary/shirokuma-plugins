@@ -44,7 +44,7 @@ Check if issue body contains `## Plan` section (detected by `^## Plan` line pref
 
 ### Step 3: Delegate to Planning Worker
 
-Invoke `planning-on-issue` via the Agent tool (custom subagent `planning-worker`).
+Invoke `plan-issue` via the Agent tool (custom subagent `planning-worker`).
 
 ```text
 Agent(planning-worker, args: "#{number}")
@@ -111,9 +111,10 @@ On receiving subagent output, execute these checks in order:
 1. **Extract YAML frontmatter** (block delimited by `---`)
 2. **action field**: Read `action` → CONTINUE (PASS) or REVISE (NEEDS_REVISION)
 3. **status field**: Read `status` → log for record
-4. **Body first line**: Extract the first line after frontmatter → one-line summary
-5. **action = CONTINUE**: Follow "On PASS" below
-6. **action = REVISE**: Follow "On Failure" below
+4. **UCP check**: If `ucp_required` or `suggestions_count > 0` → present to user via AskUserQuestion (see `working-on-issue/reference/worker-completion-pattern.md` for details)
+5. **Body first line**: Extract the first line after frontmatter → one-line summary
+6. **action = CONTINUE with no UCP**: Follow "On PASS" below
+7. **action = REVISE**: Follow "On Failure" below
 
 Subagent output is internal processing data — output only a one-line summary before proceeding.
 
@@ -277,11 +278,7 @@ If changes are needed, provide feedback.
 
 #### Evolution Signal Auto-Recording
 
-At the end of the plan completion report, auto-record Evolution signals detected during the session following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule.
-
-1. Self-review the session using the detection checklist (see `rule-evolution` rule)
-2. Signals detected → Post comment to Evolution Issue → Display 1-line recording confirmation
-3. No signals → Check for accumulated signals → Display reminder (fallback)
+At the end of the plan completion report, auto-record Evolution signals following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule.
 
 ## Arguments
 
@@ -308,6 +305,7 @@ At the end of the plan completion report, auto-record Evolution signals detected
 | `project-items` | Preparing/Designing/Spec Review status workflow |
 | `output-language` | Output language for issue comments and body |
 | `github-writing-style` | Bullet-point vs prose guidelines |
+| `working-on-issue/reference/worker-completion-pattern.md` | Worker completion unified pattern, UCP check |
 
 ## Tool Usage
 

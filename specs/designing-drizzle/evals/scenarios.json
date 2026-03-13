@@ -70,7 +70,7 @@
       "type": "trigger",
       "prompt": "計画して #42",
       "expected": "should_not_trigger",
-      "rationale": "計画は planning-on-issue の責務"
+      "rationale": "計画は plan-issue の責務"
     },
     {
       "id": "quality-01",

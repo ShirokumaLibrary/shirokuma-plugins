@@ -1,7 +1,7 @@
 ---
 name: designing-on-issue
 description: Routes to the appropriate design skill based on design type, managing discovery and visual evaluation loops. UI design delegates to designing-shadcn-ui; architecture design delegates to designing-nextjs; data model design delegates to designing-drizzle. Triggers: "design", "UI", "memorable", "impressive", "architecture".
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TodoWrite, Skill
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TodoWrite, Skill, Agent
 ---
 
 # Design Workflow (Orchestrator)
@@ -114,6 +114,10 @@ Invoke `designing-drizzle` via `Skill` tool. Pass the following context:
 - Technical constraints (DB engine, existing schema)
 - Plan section (if available)
 
+### Phase 3b: UCP Check After Worker Completion
+
+When design skills / review-worker return structured output, execute UCP check following the unified pattern in `working-on-issue/reference/worker-completion-pattern.md`. When `suggestions_count > 0`, present the Suggestions posted by the worker to the Issue comment to the user.
+
 ### Phase 4: Visual Evaluation Loop
 
 After implementation completes, conduct visual evaluation with user.
@@ -166,7 +170,7 @@ shirokuma-docs issues update {number} --field-status "Spec Review"
 ```
 Design complete. Next steps:
 → `/working-on-issue #{number}` to start implementation
-→ Use `/committing-on-issue` to commit changes only
+→ Use `/commit-issue` to commit changes only
 ```
 
 ## Extensibility

@@ -83,7 +83,7 @@ When invoked standalone:
 
 ```
 Implementation complete. Next steps:
-→ `/committing-on-issue` to stage and commit your changes
+→ `/commit-issue` to stage and commit your changes
 → Use `/designing-on-issue` for the full workflow
 ```
 

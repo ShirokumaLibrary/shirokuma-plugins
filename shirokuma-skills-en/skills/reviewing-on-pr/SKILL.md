@@ -1,7 +1,7 @@
 ---
 name: reviewing-on-pr
 description: Takes a PR number, performs code review execution and processes unresolved review threads in an automated chain. Triggers: "review response", "PR review", "code review PR", "/reviewing-on-pr #123".
-allowed-tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, AskUserQuestion, Agent
+allowed-tools: Bash, Read, Grep, Glob, TodoWrite, AskUserQuestion, Agent
 ---
 
 # PR Review Response
@@ -123,13 +123,27 @@ Register all thread processing steps in TodoWrite based on classification:
 
 #### Code Fix Threads
 
-Process code fix threads together. Fix → commit & push per fix → reply, resolve.
+Process code fix threads together. Delegate fixes to `coding-worker` and commits to `commit-worker`.
 
-1. **Fix**: Modify code based on review feedback
-2. **Commit & Push**: Stage, commit, and push per fix in one command (Issue number via `--issue`)
-   ```bash
-   shirokuma-docs git commit-push -m "fix: {description of fix}" --files {modified-files} --issue {issue-number}
+1. **Fix**: Delegate to `coding-worker` with the thread information (file paths, review feedback) for all threads at once:
+   ```text
+   Agent(
+     description: "coding-worker PR #{PR#} review fixes",
+     subagent_type: "coding-worker",
+     prompt: "Address the review feedback for PR #{PR#}.\n\n{fix instructions for each thread}"
+   )
    ```
+   After `coding-worker` completes, parse its output following the unified pattern in `working-on-issue/reference/worker-completion-pattern.md`.
+
+2. **Commit & Push**: Delegate all fix commits and pushes to `commit-worker`:
+   ```text
+   Agent(
+     description: "commit-worker PR #{PR#} review fixes",
+     subagent_type: "commit-worker",
+     prompt: "Commit and push the review fixes. Issue #{issue-number}"
+   )
+   ```
+
 3. **Reply**: Reply to each thread referencing the commit (use numeric `database_id` from `pr comments` output for `--reply-to`)
    ```bash
    shirokuma-docs pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
@@ -187,6 +201,7 @@ Process code fix threads together. Fix → commit & push per fix → reply, reso
 5. **Do not resolve disagreements** — Let the reviewer decide
 6. **Restore context first** — Step 1 must always run first; obtain `review_count` before branching
 7. **Review execution via `review-worker`** — Step 2a invokes `review-worker` via Agent tool; do not write reviews directly
+8. **Code fixes via worker delegation** — Step 5 code fixes are delegated to `coding-worker` / `commit-worker`; the orchestrator does not modify code directly
 
 ## Edge Cases
 
@@ -206,8 +221,13 @@ Process code fix threads together. Fix → commit & push per fix → reply, reso
 
 | Tool | When |
 |------|------|
-| Agent | Code review execution via `review-worker` (Step 2a) |
+| Agent | Code review execution via `review-worker` (Step 2a), code fixes and commits via `coding-worker` / `commit-worker` (Step 5) |
 | Bash | `shirokuma-docs pr comments`, `pr reply`, `pr resolve`, git operations |
 | Read | Code review, plan reference |
-| Edit | Code fixes |
 | TodoWrite | Track thread processing progress |
+
+## References
+
+| Reference | Usage |
+|-----------|-------|
+| `working-on-issue/reference/worker-completion-pattern.md` | Worker completion unified pattern, UCP check |

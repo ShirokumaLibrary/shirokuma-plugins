@@ -40,14 +40,16 @@ Skill: managing-github-items
 Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area:ラベル}" --priority "{Priority}" --size "{Size}"
 ```
 
-### ステップ 3: チェーン判定
+### ステップ 3: ユーザーに返す
 
-作成完了後、AskUserQuestion で次のアクションを確認:
+作成完了後、次のアクションの案内を表示する:
 
-| 選択肢 | アクション |
-|--------|----------|
-| 計画を立てる | `planning-on-issue` に `#{number}` で委任 |
-| Backlog に置く | 終了（ステータスは Backlog のまま） |
+```markdown
+アイテム作成完了: #{number}
+→ `/preparing-on-issue #{number}` で計画から開始
+→ `/working-on-issue #{number}` で直接実装を開始
+→ またはそのまま Backlog に配置
+```
 
 チェーン判定の詳細は [reference/chain-rules.md](reference/chain-rules.md) 参照。
 
@@ -60,23 +62,18 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 
 ## 次のステップ
 
-`working-on-issue` チェーンではなくスタンドアロンで起動された場合:
-
 ```
 アイテム作成完了: #{number}
-→ `/planning-on-issue #{number}` で計画から開始
+→ `/preparing-on-issue #{number}` で計画から開始
+→ `/working-on-issue #{number}` で直接実装を開始
 → またはそのまま Backlog に配置
 ```
 
 ## Evolution シグナル自動記録
 
-アイテム作成完了レポートの末尾で、`rule-evolution` ルールの「スキル完了時の自動記録手順」に従い、セッション中に発生した Evolution シグナルを自動記録する。
+アイテム作成完了レポートの末尾で、`rule-evolution` ルールの「スキル完了時の自動記録手順」に従い Evolution シグナルを自動記録する。
 
-**スキップ条件:** 作成したアイテムの Issue Type が Evolution の場合、シグナル記録全体をスキップする。Evolution Issue 自体がスキル・ルール改善の提案であり、同内容を別の Evolution Issue に重複記録する必要がないため。
-
-1. 検出チェックリスト（`rule-evolution` ルール参照）でセッション中の作業を振り返る
-2. シグナルあり → Evolution Issue にコメント投稿 → 記録完了を 1 行表示
-3. シグナルなし → 既存シグナルの蓄積確認 → リマインド表示（フォールバック）
+**スキップ条件:** 作成したアイテムの Issue Type が Evolution の場合、シグナル記録全体をスキップする（Evolution Issue 自体が改善提案であり、重複記録を防止するため）。
 
 ## GitHub 書き込みルール
 

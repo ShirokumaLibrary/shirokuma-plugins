@@ -4,7 +4,7 @@ description: Sub-agent for general coding tasks. Delegated from working-on-issue
 tools: Read, Write, Edit, Bash, Grep, Glob, Skill, WebSearch, WebFetch
 model: sonnet
 skills:
-  - coding-on-issue
+  - code-issue
 ---
 
 # General Coding (Sub-agent)

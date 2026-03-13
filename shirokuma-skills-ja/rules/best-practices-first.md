@@ -28,7 +28,7 @@ graph LR
 
 | フェーズ | オーケストレーター | 責務 | 実作業の委任先 |
 |---------|-----------------|------|-------------|
-| Preparing | `preparing-on-issue` | 計画策定・計画レビュー | `planning-worker` → `planning-on-issue` |
+| Preparing | `preparing-on-issue` | 計画策定・計画レビュー | `planning-worker` → `plan-issue` |
 | Designing | `designing-on-issue` | 設計ルーティング・設計レビュー | `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` 等 |
 | Working | `working-on-issue` | 実装・コミット・PR | `coding-worker`, `commit-worker`, `pr-worker` |
 
@@ -94,15 +94,15 @@ graph TD
 |--------|-----------|--------------|------|
 | working-on-issue | 対応 | 対応 | 両モードのエントリーポイント |
 | preparing-on-issue | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
-| planning-on-issue | 対応 | — | planning-worker 経由のサブエージェント（preparing-on-issue から） |
-| coding-on-issue | 対応 | — | working-on-issue から subagent 委任のみ |
-| coding-nextjs | 対応 | 対応 | coding-on-issue 経由またはスタンドアロン |
+| plan-issue | 対応 | — | planning-worker 経由のサブエージェント（preparing-on-issue から） |
+| code-issue | 対応 | — | working-on-issue から subagent 委任のみ |
+| coding-nextjs | 対応 | 対応 | code-issue 経由またはスタンドアロン |
 | designing-on-issue | — | 対応 | 現時点ではスタンドアロン起動（preparing-on-issue の完了レポートから起動） |
 | designing-shadcn-ui | 対応 | 対応 | designing-on-issue 経由またはスタンドアロン |
 | designing-nextjs | 対応 | 対応 | designing-on-issue 経由またはスタンドアロン |
 | creating-item | — | 対応 | 常にスタンドアロン対応 |
-| committing-on-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
-| creating-pr-on-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
+| commit-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
+| create-pr-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | reviewing-on-pr | — | 対応 | PR レビュー対応（新会話のエントリーポイント） |
 | starting-session | 対応 | — | セッション開始専用（`#N` で Issue バウンド、引数なしでアンバウンド） |
 | ending-session | 対応 | — | セッション終了専用 |
@@ -123,7 +123,7 @@ graph TD
 
 | タスクタイプ | 委任先 | メソッド |
 |-------------|--------|----------|
-| コーディング全般 | `coding-on-issue` | Agent (custom subagent, via `working-on-issue`) |
+| コーディング全般 | `code-issue` | Agent (custom subagent, via `working-on-issue`) |
 | UI デザイン | `designing-on-issue` | Skill（現時点ではスタンドアロン。`preparing-on-issue` の完了レポートで推奨時に起動） |
 | リサーチ | `researching-best-practices` | Agent (custom subagent) |
 | レビュー | `reviewing-on-issue` | Agent (custom subagent) |

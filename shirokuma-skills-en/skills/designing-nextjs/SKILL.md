@@ -116,7 +116,7 @@ When invoked standalone:
 
 ```
 Architecture design complete. Next steps:
--> /committing-on-issue to stage and commit your changes
+-> /commit-issue to stage and commit your changes
 -> Use /designing-on-issue for the full design workflow
 ```
 

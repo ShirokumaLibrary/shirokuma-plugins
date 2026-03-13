@@ -6,9 +6,9 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 
 # Drizzle Data Model Design
 
-Design Drizzle ORM data models with informed pattern selection. Focuses on design decisions and trade-off analysis; implementation is delegated to `coding-on-issue`.
+Design Drizzle ORM data models with informed pattern selection. Focuses on design decisions and trade-off analysis; implementation is delegated to `code-issue`.
 
-> **Data model design is this skill's responsibility.** `coding-on-issue` handles implementation based on the schema decisions made here.
+> **Data model design is this skill's responsibility.** `code-issue` handles implementation based on the schema decisions made here.
 
 ## Workflow
 
@@ -119,13 +119,13 @@ When invoked standalone:
 
 ```
 Data model design complete. Next steps:
--> /committing-on-issue to stage and commit your changes
+-> /commit-issue to stage and commit your changes
 -> Use /designing-on-issue for the full design workflow
 ```
 
 ## Notes
 
-- **Design decisions are this skill's priority** -- implementation details are `coding-on-issue`'s responsibility
+- **Design decisions are this skill's priority** -- implementation details are `code-issue`'s responsibility
 - **Build verification is not needed** -- this skill produces design documents, not runnable code
 - When Design Brief is provided, design based on it. When standalone, gather requirements from the issue before designing
 - Always check DB engine-specific constraints (PostgreSQL array types, SQLite ALTER TABLE limitations, etc.)

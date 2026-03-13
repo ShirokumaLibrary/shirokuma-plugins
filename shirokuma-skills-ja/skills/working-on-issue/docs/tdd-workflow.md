@@ -1,12 +1,12 @@
 # TDD 共通ワークフロー
 
 `working-on-issue` がオーケストレートする TDD（テスト駆動開発）の共通ステップ。
-`coding-on-issue`（subagent）の呼び出しを TDD で包んで実行する。
+`code-issue`（subagent）の呼び出しを TDD で包んで実行する。
 
 ## フロー
 
 ```text
-テスト設計 → テスト作成 → テスト確認（ゲート）→ [coding-on-issue] → テスト実行 → 検証
+テスト設計 → テスト作成 → テスト確認（ゲート）→ [code-issue] → テスト実行 → 検証
 ```
 
 ## ステップ 1: テスト設計

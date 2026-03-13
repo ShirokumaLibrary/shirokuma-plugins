@@ -4,7 +4,7 @@ description: Sub-agent for staging, committing, and pushing changes. Operates as
 tools: Bash, Read, Grep, Glob
 model: sonnet
 skills:
-  - committing-on-issue
+  - commit-issue
 ---
 
 # Commit (Sub-agent)

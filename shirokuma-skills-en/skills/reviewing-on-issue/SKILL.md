@@ -328,7 +328,7 @@ When invoked standalone (not via `working-on-issue`), suggest the next workflow 
 
 ```
 Review complete. If changes were made based on findings:
-→ `/committing-on-issue` to stage and commit your changes
+→ `/commit-issue` to stage and commit your changes
 ```
 
 ## Orchestration (when invoked as sub-agent)
@@ -455,11 +455,11 @@ The final judgment in multi-role mode is aggregated by `review-worker`. Each rol
 - **Rules auto-loaded**: Project conventions from `.claude/rules/`
 - **Sub-agent mode**: Runs as Agent tool (subagent) for isolated execution
 - **Subagent constraint**: TodoWrite / AskUserQuestion are unavailable in subagent mode; return results as a report only
-- **Caller's comment-first compliance**: This skill does not update bodies (as a subagent, it only posts comments), but when caller skills (`creating-pr-on-issue`, `working-on-issue`) update Issue/PR bodies based on review results, they must follow the comment-first principle in `item-maintenance.md`. See the "Updating Body from Review Results" section in `item-maintenance.md` for specific procedure patterns
+- **Caller's comment-first compliance**: This skill does not update bodies (as a subagent, it only posts comments), but when caller skills (`create-pr-issue`, `working-on-issue`) update Issue/PR bodies based on review results, they must follow the comment-first principle in `item-maintenance.md`. See the "Updating Body from Review Results" section in `item-maintenance.md` for specific procedure patterns
 
 ## Plan Review Mode
 
-When invoked from `planning-on-issue` with plan role via subagent, post the plan review result as an Issue comment and return structured output.
+When invoked from `plan-issue` with plan role via subagent, post the plan review result as an Issue comment and return structured output.
 
 ### Output Template (Plan Review)
 
@@ -469,6 +469,9 @@ action: {CONTINUE | REVISE}
 status: {PASS | NEEDS_REVISION}
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {one-line review result summary}
@@ -485,6 +488,9 @@ action: REVISE
 status: NEEDS_REVISION
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {n} issues detected
@@ -496,7 +502,7 @@ comment_id: {comment-database-id}
 - {improvement suggestion}
 ```
 
-`planning-on-issue` classifies `### Detail` Issues into `[Plan]` and `[Issue description]` and fixes each accordingly.
+`plan-issue` classifies `### Detail` Issues into `[Plan]` and `[Issue description]` and fixes each accordingly.
 
 ## Design Review Mode
 
@@ -510,6 +516,9 @@ action: {CONTINUE | REVISE}
 status: {PASS | NEEDS_REVISION}
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {one-line review result summary}
@@ -526,6 +535,9 @@ action: REVISE
 status: NEEDS_REVISION
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {n} issues detected
@@ -549,6 +561,9 @@ action: {CONTINUE | REVISE}
 status: {PASS | NEEDS_REVISION}
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {One-line review result summary}
@@ -569,6 +584,9 @@ action: {CONTINUE | STOP}
 status: {PASS | FAIL}
 ref: "{output destination reference (PR #{number} comment / Discussion #{number})}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {one-line issue count summary}

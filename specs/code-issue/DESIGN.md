@@ -1,4 +1,4 @@
-# coding-on-issue 設計メモ
+# code-issue 設計メモ
 
 スキル管理用メタデータ。実行時には読み込まれない。
 
@@ -7,7 +7,7 @@
 `working-on-issue` から委任される汎用コーディングワーカー。作業タイプに応じてフレームワーク固有スキル（`coding-nextjs`）に再委任するか、直接編集を行う。
 
 ```
-working-on-issue → coding-on-issue → coding-nextjs（Next.js 関連）
+working-on-issue → code-issue → coding-nextjs（Next.js 関連）
                                     → 直接編集（Markdown, plugin/, config 等）
 ```
 

@@ -9,7 +9,7 @@ shirokuma-skills プラグインには 2 つの拡張可能なオーケストレ
 | オーケストレーター | 発見対象 | 命名規約 |
 |------------------|---------|---------|
 | `designing-on-issue` | `designing-*` スキル | `designing-{domain}` |
-| `coding-on-issue` | `coding-*` スキル | `coding-{domain}` |
+| `code-issue` | `coding-*` スキル | `coding-{domain}` |
 
 これらのオーケストレーターはハイブリッド発見メカニズム（`shirokuma-docs skills routing {prefix}`）を使用して、ビルトインスキルとプロジェクト固有スキルの両方を実行時に検出する。命名規約に従ったスキルを作成するだけで自動的に発見可能になる。
 
@@ -137,7 +137,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 スタンドアロンで起動された場合:
 \`\`\`
 {Domain} 完了。次のステップ:
--> /committing-on-issue で変更をコミット
+-> /commit-issue で変更をコミット
 -> フルワークフローが必要な場合は /working-on-issue を使用
 \`\`\`
 

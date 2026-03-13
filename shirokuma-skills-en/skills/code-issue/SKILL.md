@@ -1,5 +1,5 @@
 ---
-name: coding-on-issue
+name: code-issue
 description: Handles generic coding tasks by delegating to framework-specific skills or performing direct edits based on work type. Automatically delegated from working-on-issue. Not intended for direct invocation.
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, WebSearch, WebFetch
 ---
@@ -74,18 +74,18 @@ Skill delegate to `coding-nextjs`. Pass plan section and issue context.
 
 - As an Agent tool (subagent), `TodoWrite` / `AskUserQuestion` are not available
 - Progress management is handled by the manager (main AI, `working-on-issue`)
-- TDD workflow is managed by `working-on-issue` wrapping `coding-on-issue` calls with TDD steps (`coding-on-issue` focuses solely on implementation)
+- TDD workflow is managed by `working-on-issue` wrapping `code-issue` calls with TDD steps (`code-issue` focuses solely on implementation)
 - UI design tasks (new UI pages, visual redesigns, design system token changes) are handled by `designing-on-issue` → `designing-shadcn-ui`, not by this skill
-- **Commit, push, and PR creation are outside the scope of this skill**. This skill is responsible for code changes only — `committing-on-issue` handles commits and `creating-pr-on-issue` handles PR creation in the subsequent chain. Do not directly execute `git commit` / `git push` / `gh pr create` / `shirokuma-docs pr create`
+- **Commit, push, and PR creation are outside the scope of this skill**. This skill is responsible for code changes only — `commit-issue` handles commits and `create-pr-issue` handles PR creation in the subsequent chain. Do not directly execute `git commit` / `git push` / `gh pr create` / `shirokuma-docs pr create`
 
 ## Output Template
 
-After work completes, return the following structured data to the caller. Code changes are the deliverable, so no GitHub write is performed (GitHub writes are handled by subsequent `committing-on-issue` / `creating-pr-on-issue`).
+After work completes, return the following structured data to the caller. Code changes are the deliverable, so no GitHub write is performed (GitHub writes are handled by subsequent `commit-issue` / `create-pr-issue`).
 
 ```yaml
 ---
 action: CONTINUE
-next: committing-on-issue
+next: commit-issue
 status: SUCCESS
 ---
 

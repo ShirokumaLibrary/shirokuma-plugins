@@ -107,7 +107,7 @@ shirokuma-docs session check --setup
 ```
 セットアップ完了。次のステップ:
 → `/working-on-issue` で最初の Issue に着手
-→ `/planning-on-issue` で計画策定
+→ `/plan-issue` で計画策定
 ```
 
 ## 注意事項

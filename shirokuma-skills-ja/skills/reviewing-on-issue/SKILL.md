@@ -328,7 +328,7 @@ knowledge-manager が Web 検索で以下を最新化する：
 
 ```
 レビュー完了。発見に基づいて変更を行った場合：
-→ `/committing-on-issue` で変更をステージしてコミット
+→ `/commit-issue` で変更をステージしてコミット
 ```
 
 ## オーケストレーション（サブエージェントとして起動時）
@@ -455,11 +455,11 @@ knowledge-manager が Web 検索で以下を最新化する：
 - **ルール自動読み込み**: `.claude/rules/` からプロジェクト規約
 - **サブエージェントモード**: Agent ツール（サブエージェント）として隔離実行
 - **サブエージェント制約**: サブエージェントモードのため TodoWrite / AskUserQuestion は使用不可。結果はレポートとして返す
-- **呼び出し元のコメントファースト遵守**: このスキルはサブエージェントのためコメント投稿のみを行い本文更新は行わないが、呼び出し元スキル（`creating-pr-on-issue`, `working-on-issue`）がレビュー結果に基づいて Issue/PR 本文を更新する場合は、`item-maintenance.md` のコメントファースト原則に従うこと。具体的な手順パターンは `item-maintenance.md` の「レビュー結果からの本文更新」セクションを参照
+- **呼び出し元のコメントファースト遵守**: このスキルはサブエージェントのためコメント投稿のみを行い本文更新は行わないが、呼び出し元スキル（`create-pr-issue`, `working-on-issue`）がレビュー結果に基づいて Issue/PR 本文を更新する場合は、`item-maintenance.md` のコメントファースト原則に従うこと。具体的な手順パターンは `item-maintenance.md` の「レビュー結果からの本文更新」セクションを参照
 
 ## 計画レビューモード
 
-`planning-on-issue` から plan ロールでサブエージェントとして起動された場合、計画レビュー結果を Issue コメントに投稿し、構造化データを返す。
+`plan-issue` から plan ロールでサブエージェントとして起動された場合、計画レビュー結果を Issue コメントに投稿し、構造化データを返す。
 
 ### 出力テンプレート（計画レビュー）
 
@@ -469,6 +469,9 @@ action: {CONTINUE | REVISE}
 status: {PASS | NEEDS_REVISION}
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {レビュー結果の1行要約}
@@ -485,6 +488,9 @@ action: REVISE
 status: NEEDS_REVISION
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {n} 件の問題を検出
@@ -496,7 +502,7 @@ comment_id: {comment-database-id}
 - {改善提案}
 ```
 
-`planning-on-issue` は `### Detail` の `Issues` を `[計画]` と `[Issue記述]` に分類し、それぞれを修正する。
+`plan-issue` は `### Detail` の `Issues` を `[計画]` と `[Issue記述]` に分類し、それぞれを修正する。
 
 ## 設計レビューモード
 
@@ -510,6 +516,9 @@ action: {CONTINUE | REVISE}
 status: {PASS | NEEDS_REVISION}
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {レビュー結果の1行要約}
@@ -526,6 +535,9 @@ action: REVISE
 status: NEEDS_REVISION
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {n} 件の問題を検出
@@ -549,6 +561,9 @@ action: {CONTINUE | REVISE}
 status: {PASS | NEEDS_REVISION}
 ref: "#{issue-number}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {レビュー結果の1行要約}
@@ -569,6 +584,9 @@ action: {CONTINUE | STOP}
 status: {PASS | FAIL}
 ref: "{出力先の参照（PR #{number} comment / Discussion #{number}）}"
 comment_id: {comment-database-id}
+suggestions_count: {number}
+followup_candidates:
+  - "{candidate}"
 ---
 
 {問題件数の1行要約}

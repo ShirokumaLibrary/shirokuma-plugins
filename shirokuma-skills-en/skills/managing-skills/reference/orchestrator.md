@@ -9,7 +9,7 @@ The shirokuma-skills plugin includes two extensible orchestrators:
 | Orchestrator | Discovers | Naming Convention |
 |-------------|-----------|-------------------|
 | `designing-on-issue` | `designing-*` skills | `designing-{domain}` |
-| `coding-on-issue` | `coding-*` skills | `coding-{domain}` |
+| `code-issue` | `coding-*` skills | `coding-{domain}` |
 
 These orchestrators use a hybrid discovery mechanism (`shirokuma-docs skills routing {prefix}`) to find both built-in and project-specific skills at runtime. Creating a skill that follows the naming convention automatically makes it discoverable.
 
@@ -137,7 +137,7 @@ When delegated from orchestrator, control returns automatically.
 When standalone:
 \`\`\`
 {Domain} complete. Next steps:
--> /committing-on-issue to commit changes
+-> /commit-issue to commit changes
 -> /working-on-issue for the full workflow
 \`\`\`
 

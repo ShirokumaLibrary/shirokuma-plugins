@@ -85,7 +85,7 @@ git status --short
 ```
 
 If uncommitted changes exist, use AskUserQuestion to confirm whether to commit them before proceeding.
-Follow the `committing-on-issue` skill workflow: stage specific files, write a conventional commit message, and commit.
+Follow the `commit-issue` skill workflow: stage specific files, write a conventional commit message, and commit.
 
 #### 3b. Push Branch
 
@@ -95,7 +95,7 @@ git push -u origin {branch-name}
 
 #### 3c. Create PR
 
-Follow the `creating-pr-on-issue` skill workflow. Create a PR targeting `develop` (see `branch-workflow` rule):
+Follow the `create-pr-issue` skill workflow. Create a PR targeting `develop` (see `branch-workflow` rule):
 
 ```bash
 shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
@@ -231,7 +231,7 @@ Example: `2026-02-19 - Plugin feature` → `2026-02-19 [alice] - Plugin feature`
 
 Use the `issues[].hasMergedPr` flag and `prs` array from `session preflight` output to determine the action. Issues with `hasMergedPr: true` use `--done`; issues with an open PR use `--review`. No additional `shirokuma-docs show` call is needed.
 
-**Idempotency**: If `creating-pr-on-issue` already set Review after PR creation, `--review` is a no-op. If `committing-on-issue` merge chain already set Done, `--done` is a no-op. `ending-session` acts as a safety net, catching any status updates that other skills missed.
+**Idempotency**: If `create-pr-issue` already set Review after PR creation, `--review` is a no-op. If `commit-issue` merge chain already set Done, `--done` is a no-op. `ending-session` acts as a safety net, catching any status updates that other skills missed.
 
 **Output:**
 ```json

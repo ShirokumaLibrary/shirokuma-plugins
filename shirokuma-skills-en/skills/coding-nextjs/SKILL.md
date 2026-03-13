@@ -119,7 +119,7 @@ When invoked standalone (not via `working-on-issue` chain):
 
 ```
 Implementation complete. Next step:
-→ `/committing-on-issue` to stage and commit your changes
+→ `/commit-issue` to stage and commit your changes
 ```
 
 ## Notes

@@ -44,7 +44,7 @@ Issue 本文に `## 計画` セクション（`^## 計画` で前方一致検出
 
 ### ステップ 3: Planning Worker に委任
 
-Agent ツール（カスタムサブエージェント `planning-worker`）で `planning-on-issue` を起動する。
+Agent ツール（カスタムサブエージェント `planning-worker`）で `plan-issue` を起動する。
 
 ```text
 Agent(planning-worker, args: "#{number}")
@@ -111,9 +111,10 @@ Agent(review-worker, args: "plan #{number}")
 1. **YAML フロントマターを抽出**（`---` で囲まれたブロック）
 2. **action フィールド**: `action` を読み取り → CONTINUE（PASS）または REVISE（NEEDS_REVISION）
 3. **status フィールド**: `status` を読み取り → ログ記録用
-4. **本文の 1 行目**: フロントマター後の本文から 1 行目を抽出 → 1 行サマリー
-5. **action = CONTINUE**: 「PASS 時の動作」へ進む
-6. **action = REVISE**: 「不合格時の動作」に従う
+4. **UCP チェック**: `ucp_required` または `suggestions_count > 0` の場合 → AskUserQuestion でユーザーに提示（詳細は `working-on-issue/reference/worker-completion-pattern.md` 参照）
+5. **本文の 1 行目**: フロントマター後の本文から 1 行目を抽出 → 1 行サマリー
+6. **action = CONTINUE かつ UCP なし**: 「PASS 時の動作」へ進む
+7. **action = REVISE**: 「不合格時の動作」に従う
 
 構造化データは内部処理データ — 1 行サマリーのみ出力して次に進む。
 
@@ -277,11 +278,7 @@ shirokuma-docs issues update {number} --field-status "Designing"
 
 #### Evolution シグナル自動記録
 
-計画完了レポートの末尾で、`rule-evolution` ルールの「スキル完了時の自動記録手順」に従い、セッション中に発生した Evolution シグナルを自動記録する。
-
-1. 検出チェックリスト（`rule-evolution` ルール参照）でセッション中の作業を振り返る
-2. シグナルあり → Evolution Issue にコメント投稿 → 記録完了を 1 行表示
-3. シグナルなし → 既存シグナルの蓄積確認 → リマインド表示（フォールバック）
+計画完了レポートの末尾で、`rule-evolution` ルールの「スキル完了時の自動記録手順」に従い Evolution シグナルを自動記録する。
 
 ## 引数
 
@@ -308,6 +305,7 @@ shirokuma-docs issues update {number} --field-status "Designing"
 | `project-items` | Preparing/Designing/Spec Review ステータスの運用 |
 | `output-language` | Issue コメント・本文の出力言語 |
 | `github-writing-style` | 箇条書き vs 散文のガイドライン |
+| `working-on-issue/reference/worker-completion-pattern.md` | Worker 完了後の統一パターン、UCP チェック |
 
 ## ツール使用
 

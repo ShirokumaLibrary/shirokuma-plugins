@@ -83,7 +83,7 @@ pnpm --filter {app-name} build
 
 ```
 実装完了。次のステップ:
-→ `/committing-on-issue` で変更をコミット
+→ `/commit-issue` で変更をコミット
 → フルワークフローが必要な場合は `/designing-on-issue` を使用
 ```
 

@@ -117,7 +117,7 @@ When `reviewing-on-issue` posts review results as PR comments or Issue comments,
 ### Notes
 
 - `reviewing-on-issue` runs as an Agent tool (subagent), so it only posts comments and does not update bodies
-- Body updates are the responsibility of caller skills (`creating-pr-on-issue`, `working-on-issue`)
+- Body updates are the responsibility of caller skills (`create-pr-issue`, `working-on-issue`)
 - **PASS case**: The review comment itself serves as the primary record, so no additional comment is needed (the review comment = the "comment" in comment-first)
 
 ## Guidelines

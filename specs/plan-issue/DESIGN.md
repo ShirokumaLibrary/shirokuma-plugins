@@ -1,4 +1,4 @@
-# planning-on-issue 設計メモ
+# plan-issue 設計メモ
 
 スキル管理用メタデータ。実行時には読み込まれない。
 
@@ -8,7 +8,7 @@
 
 ```mermaid
 graph LR
-  subgraph planning-on-issue
+  subgraph plan-issue
     A[Preparing 設定] --> B[深さ判定] --> C[計画策定] --> D[Issue 本文更新] --> E[Spec Review]
   end
   E --> F[ユーザーに返す]

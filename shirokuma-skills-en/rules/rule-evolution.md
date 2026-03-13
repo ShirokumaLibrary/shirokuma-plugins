@@ -46,7 +46,7 @@ Accumulate signals as comments in Evolution Issues.
 | Preventive | Pattern recognized during signal recording | Include proposal in comment |
 | Periodic | User explicitly invokes `evolving-rules` | Analyze all accumulated signals |
 | Session start | `starting-session` detects accumulated signals | Recommend `evolving-rules` invocation (no auto-execution) |
-| Skill completion | `working-on-issue`, `preparing-on-issue`, `creating-item` complete | Auto-record via detection checklist. Display reminder as fallback when no signals detected |
+| Skill completion | `working-on-issue`, `preparing-on-issue`, `creating-item`, `designing-on-issue`, `reviewing-on-pr` complete | Auto-record via detection checklist. Display reminder as fallback when no signals detected |
 | Eval failure | `skill eval` or `skill optimize` shows failures | Record eval result pattern as evolution signal. Propose description improvement via `evolving-rules` |
 
 ## Eval Data Reference
@@ -98,7 +98,7 @@ Open → Accumulate signals → Analyze (evolving-rules) → Close → New Issue
 
 ## Auto-Recording Procedure at Skill Completion
 
-At the completion of major skills (`working-on-issue`, `preparing-on-issue`, `creating-item`), auto-record Evolution signals detected during the session using the following procedure. Each skill references this section to perform auto-recording.
+At the completion of major skills (`working-on-issue`, `preparing-on-issue`, `creating-item`, `designing-on-issue`, `reviewing-on-pr`), auto-record Evolution signals detected during the session using the following procedure. Each skill references this section to perform auto-recording.
 
 ### Signal Detection Checklist
 
@@ -113,9 +113,9 @@ Self-check the following at skill completion. When in doubt, do not record (avoi
 | Did unexpected obstacles or workarounds occur? | Missing pattern | Fallback execution due to unsupported CLI option | Taking time to understand unfamiliar file structure (normal exploration) |
 | Did the same pattern of issue repeat during the session? | Review pattern | Same type of self-review finding appeared 2+ times | Sequential fixes of different types (not repetition) |
 
-#### Environment Checks (`working-on-issue` only)
+#### Environment Checks (`working-on-issue`, `reviewing-on-pr` only)
 
-At the completion of skills involving code changes, verify the project's objective state. `preparing-on-issue` / `creating-item` do not involve code changes and are excluded.
+At the completion of skills involving code changes, verify the project's objective state. `preparing-on-issue` / `creating-item` / `designing-on-issue` do not involve code changes and are excluded.
 
 | Check Item | Signal Type | Detection Condition | Do NOT Record |
 |-----------|------------|-------------------|---------------|

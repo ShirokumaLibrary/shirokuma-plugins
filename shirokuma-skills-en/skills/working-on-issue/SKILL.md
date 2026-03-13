@@ -20,9 +20,9 @@ Register **all chain steps** in TodoWrite **before starting work**.
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Implement changes | Implementing changes | `coding-on-issue` (subagent) |
-| 2 | Commit and push changes | Committing and pushing | `committing-on-issue` (subagent) |
-| 3 | Create pull request | Creating pull request | `creating-pr-on-issue` (subagent) |
+| 1 | Implement changes | Implementing changes | `code-issue` (subagent) |
+| 2 | Commit and push changes | Committing and pushing | `commit-issue` (subagent) |
+| 3 | Create pull request | Creating pull request | `create-pr-issue` (subagent) |
 | 4 | Post work summary | Posting work summary | Manager direct: `issues comment` |
 | 5 | Update Status to Review | Updating Status to Review | Manager direct: `issues update` |
 
@@ -47,7 +47,7 @@ When `shirokuma-docs show {number}` output contains a `parentIssue` field, the i
 
 1. Reference the parent issue's `## Plan` section to understand overall context
 2. Set base branch to the parent's integration branch instead of `develop` (Step 3)
-3. `creating-pr-on-issue` will self-detect the sub-issue via the `parentIssue` field, so explicit context passing is not required (if passed, it is used as supplementary; otherwise, self-detection is the fallback)
+3. `create-pr-issue` will self-detect the sub-issue via the `parentIssue` field, so explicit context passing is not required (if passed, it is used as supplementary; otherwise, self-detection is the fallback)
 
 ```bash
 # Check parent issue
@@ -84,7 +84,7 @@ Text description → creating-item → Issue number → Join Step 1
 
 If issue is not already In Progress: `shirokuma-docs issues update {number} --field-status "In Progress"`
 
-**Spec Review implicit approval**: Invoking `/working-on-issue` is implicit plan approval. Transition to In Progress without confirmation.
+**Spec Review / Ready implicit approval**: Invoking `/working-on-issue` from Spec Review or Ready is implicit plan approval. Transition to In Progress without confirmation.
 
 ### Step 3: Ensure Feature Branch
 
@@ -116,7 +116,7 @@ For Feature type, Size M+, suggest ADR creation (AskUserQuestion).
 
 | Work Type | Condition | Delegate To | TDD |
 |-----------|-----------|-------------|-----|
-| General Coding | Implementation, bug fix, refactoring, config, Markdown editing | `coding-on-issue` (subagent) | Yes (implementation, bug fix, refactoring) |
+| General Coding | Implementation, bug fix, refactoring, config, Markdown editing | `code-issue` (subagent) | Yes (implementation, bug fix, refactoring) |
 | Research | Keywords: `research`, `investigate` | `researching-best-practices` (subagent) | No |
 | Review | Keywords: `review`, `audit` | `reviewing-on-issue` (subagent) | No |
 | Project Setup | Keywords: `setup project`, `initialize` | `setting-up-project` | No |
@@ -127,14 +127,14 @@ For Feature type, Size M+, suggest ADR creation (AskUserQuestion).
 |-----------|---------------------|
 | Staging target files unclear | Check `git status` and pass file list as argument |
 | Multiple branch matches | Check branch list and pass correct branch as argument |
-| Uncommitted changes present | Invoke `committing-on-issue` first |
+| Uncommitted changes present | Invoke `commit-issue` first |
 
 #### TDD Workflow (when TDD applies)
 
-For TDD-applicable work types, wrap the `coding-on-issue` invocation with TDD:
+For TDD-applicable work types, wrap the `code-issue` invocation with TDD:
 
 ```text
-Test Design → Test Creation → Test Gate → [coding-on-issue] → Test Run → Verification
+Test Design → Test Creation → Test Gate → [code-issue] → Test Run → Verification
 ```
 
 See [docs/tdd-workflow.md](docs/tdd-workflow.md) for details.
@@ -167,8 +167,9 @@ After work completes, execute the chain **automatically**. No user confirmation 
 1. **Extract YAML frontmatter** (block delimited by `---`)
 2. **action field**: Read `action` → STOP/FIX/REVISE/CONTINUE determines the next behavior
 3. **status field**: Read `status` → log for record
-4. **Body first line**: Extract the first line of the body after the frontmatter → use as `log_one_line_summary()`
-5. **action = CONTINUE**: Immediately invoke the skill specified in the `next` field
+4. **UCP check**: If `ucp_required` or `suggestions_count > 0` → present to user via AskUserQuestion (see [reference/worker-completion-pattern.md](reference/worker-completion-pattern.md) for details)
+5. **Body first line**: Extract the first line of the body after the frontmatter → use as `log_one_line_summary()`
+6. **action = CONTINUE with no UCP**: Immediately invoke the skill specified in the `next` field
 
 If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. Do not output anything except a one-line summary before the tool call.
 
@@ -178,13 +179,13 @@ If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. 
 
 | Completed Skill | `next` field | Next Skill to Invoke | Prohibited Action |
 |----------------|-------------|---------------------|------------------|
-| `coding-on-issue` | `committing-on-issue` | `committing-on-issue` | Do NOT re-invoke `coding-on-issue` |
-| `committing-on-issue` | `creating-pr-on-issue` | `creating-pr-on-issue` | Do NOT delegate to `coding-on-issue` |
-| `creating-pr-on-issue` | — | **Start manager-managed steps** (see below) | Do NOT delegate to subagent |
+| `code-issue` | `commit-issue` | `commit-issue` | Do NOT re-invoke `code-issue` |
+| `commit-issue` | `create-pr-issue` | `create-pr-issue` | Do NOT delegate to `code-issue` |
+| `create-pr-issue` | — | **Start manager-managed steps** (see below) | Do NOT delegate to subagent |
 
-**Manager-managed steps after `creating-pr-on-issue` (required checklist):**
+**Manager-managed steps after `create-pr-issue` (required checklist):**
 
-When `creating-pr-on-issue` returns its result, execute the following steps **within the same chain** sequentially. Each step is registered as `pending` in TodoWrite — do NOT stop while pending steps remain:
+When `create-pr-issue` returns its result, execute the following steps **within the same chain** sequentially. Each step is registered as `pending` in TodoWrite — do NOT stop while pending steps remain:
 
 1. **Work Summary**: Post work summary as Issue comment
 2. **Status Update**: `shirokuma-docs issues update {number} --field-status "Review"`
@@ -219,6 +220,9 @@ for each step in [commit, pr, work_summary, status_update]:
 | `status` | Yes | `SUCCESS` / `PASS` / `NEEDS_FIX` / `FAIL` / `NEEDS_REVISION` | Result state |
 | `ref` | Conditional | GitHub reference | Human-readable reference when GitHub write occurred |
 | `comment_id` | Conditional | numeric (database_id) | Only when a comment was posted. For reply-to / edit |
+| `ucp_required` | No | boolean | Set to `true` when the worker requires user judgment |
+| `suggestions_count` | No | number | Number of improvement suggestions |
+| `followup_candidates` | No | string[] | Follow-up Issue candidates |
 
 The `Summary` field is abolished. Instead, the **body's first line** is treated as the summary.
 
@@ -226,7 +230,7 @@ The `Summary` field is abolished. Instead, the **body's first line** is treated 
 
 | Status | Action | Used By | Chain Behavior |
 |--------|--------|---------|----------------|
-| SUCCESS | CONTINUE | committing-on-issue, creating-pr-on-issue, coding-on-issue | Proceed to next step |
+| SUCCESS | CONTINUE | commit-issue, create-pr-issue, code-issue | Proceed to next step |
 | FAIL | STOP | All subagent skills | Chain stop, report to user |
 | NEEDS_REVISION | REVISE | reviewing-on-issue (plan review) | Enter revision loop |
 
@@ -238,10 +242,10 @@ The following skills are launched via custom sub-agents (AGENT.md). `/simplify` 
 
 | Skill | Sub-agent name |
 |-------|---------------|
-| `planning-on-issue` | `planning-worker` |
-| `coding-on-issue` | `coding-worker` |
-| `committing-on-issue` | `commit-worker` |
-| `creating-pr-on-issue` | `pr-worker` |
+| `plan-issue` | `planning-worker` |
+| `code-issue` | `coding-worker` |
+| `commit-issue` | `commit-worker` |
+| `create-pr-issue` | `pr-worker` |
 | `reviewing-claude-config` | `config-review-worker` |
 | `researching-best-practices` | `research-worker` |
 
@@ -249,9 +253,11 @@ The following skills are launched via custom sub-agents (AGENT.md). `/simplify` 
 Agent(
   description: "{worker-name} #{number}",
   subagent_type: "{worker-name}",
-  prompt: "{args}"
+  prompt: "#{issue-number}"
 )
 ```
+
+**The `pr-worker` prompt MUST include the issue number.** `create-pr-issue` includes `Closes #{issue-number}` in the PR body when launched with an issue number, linking the PR to the issue. If the issue number is omitted, `Closes` is skipped and the PR will not be linked to the issue.
 
 Each sub-agent has the corresponding skill's full content auto-injected via the `skills` frontmatter field.
 
@@ -301,13 +307,7 @@ shirokuma-docs issues update {number} --field-status "Review"
 
 ### Step 6: Evolution Signal Auto-Recording
 
-After successful chain completion (skip on chain failure), auto-record Evolution signals detected during the session following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule. This includes environment checks (lint metrics), as `working-on-issue` is a target skill for environment checks per the `rule-evolution` rule.
-
-1. Self-review the session using the detection checklist (see `rule-evolution` rule)
-2. Signals detected → Post comment to Evolution Issue → Display 1-line recording confirmation
-3. No signals → Check for accumulated signals → Display reminder (fallback)
-
-Do not register in TodoWrite (non-blocking processing, not a work step).
+After successful chain completion (skip on chain failure), auto-record Evolution signals following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule. Do not register in TodoWrite (non-blocking processing).
 
 ## Batch Mode
 
@@ -389,6 +389,7 @@ Sub-issue creation in this flow uses `shirokuma-docs issues create` directly (no
 | `git-commit-style` | Commit message format |
 | `output-language` | GitHub output language convention |
 | `github-writing-style` | Bullet-point vs prose guidelines |
+| `worker-completion-pattern` reference | Worker completion unified pattern, extended schema |
 
 ## Tool Usage
 
@@ -403,7 +404,7 @@ Sub-issue creation in this flow uses `shirokuma-docs issues create` directly (no
 - This skill is the **manager (the main-process AI agent)** — actual work is delegated to subagent workers
 - Update issue status before starting
 - Ensure correct feature branch
-- TDD-applicable work types wrap `coding-on-issue` invocation with TDD ([docs/tdd-workflow.md](docs/tdd-workflow.md))
+- TDD-applicable work types wrap `code-issue` invocation with TDD ([docs/tdd-workflow.md](docs/tdd-workflow.md))
 - Workflow executes sequentially (Commit → PR → Work Summary → Status Update). **Merge is NOT included**
 - Chain execution stops on error and returns control to user
 - **Chain autonomous progression**: Subagent outputs are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the YAML frontmatter and execute the next step's Agent/Bash tool call. Log a one-line summary and invoke the next tool in the same response
