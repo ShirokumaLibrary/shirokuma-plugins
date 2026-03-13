@@ -1,5 +1,5 @@
 ---
-name: reviewing-on-issue
+name: review-issue
 description: 専門ロール別の包括的レビューワークフローを提供し、コード品質・セキュリティ・テストパターン・ドキュメント品質・計画品質・設計品質・リサーチ品質をチェックします。トリガー: 「レビューして」「review」「セキュリティチェック」「security audit」「テストレビュー」「ドキュメントレビュー」「計画レビュー」「設計レビュー」「リサーチレビュー」「コードレビュー」「設定レビュー」「config review」。
 allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---
@@ -362,7 +362,7 @@ knowledge-manager が Web 検索で以下を最新化する：
 ```text
 ステップ 1/6: ロール選択中...
   ロール: code → config（変更ファイル分析により自動切り替え）
-  変更ファイル: plugin/shirokuma-skills-ja/skills/reviewing-on-issue/SKILL.md 等 2 件
+  変更ファイル: plugin/shirokuma-skills-ja/skills/review-issue/SKILL.md 等 2 件
   読み込みファイル: reviewing-claude-config/SKILL.md
 
 ステップ 2/6: ナレッジ読み込み中...

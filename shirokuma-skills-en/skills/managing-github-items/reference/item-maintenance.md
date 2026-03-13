@@ -99,11 +99,11 @@ Merely following the comment→body order is not enough. Comments must have **in
 
 ## Updating Body from Review Results
 
-When `reviewing-on-issue` posts review results as PR comments or Issue comments, and a caller skill needs to update the body accordingly.
+When `review-issue` posts review results as PR comments or Issue comments, and a caller skill needs to update the body accordingly.
 
 ### Procedure
 
-1. **Confirm review comment is already posted** — `reviewing-on-issue` Step 6 has completed comment posting
+1. **Confirm review comment is already posted** — `review-issue` Step 6 has completed comment posting
 2. **Consolidate into relevant body sections** — Update task lists or add new sections based on review results
 
 ### Examples
@@ -116,7 +116,7 @@ When `reviewing-on-issue` posts review results as PR comments or Issue comments,
 
 ### Notes
 
-- `reviewing-on-issue` runs as an Agent tool (subagent), so it only posts comments and does not update bodies
+- `review-issue` runs as an Agent tool (subagent), so it only posts comments and does not update bodies
 - Body updates are the responsibility of caller skills (`create-pr-issue`, `working-on-issue`)
 - **PASS case**: The review comment itself serves as the primary record, so no additional comment is needed (the review comment = the "comment" in comment-first)
 

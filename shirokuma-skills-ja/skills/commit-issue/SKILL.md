@@ -118,7 +118,7 @@ status: FAIL
 **PR 提案前の事前チェック**:
 
 ```bash
-gh pr list --head {branch-name} --json number,url --jq '.[0]'
+shirokuma-docs pr list --head {branch-name} --format json
 ```
 
 このブランチに既に PR がある場合、既存 URL を結果に含めてスキップ。

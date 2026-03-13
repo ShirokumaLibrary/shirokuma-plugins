@@ -21,7 +21,7 @@ allowed-tools: Bash, Read, Glob
 
 ### ワークフロー
 
-1. リポジトリ情報取得: `gh repo view --json nameWithOwner -q '.nameWithOwner'`
+1. リポジトリ情報取得: `shirokuma-docs repo info --format json`（`nameWithOwner` フィールドを参照）
 2. 並列実行:
    - `shirokuma-docs issues list`（ステータス別アイテム + `total_issues` でオープン Issue 数を導出）
    - `shirokuma-docs pr list`（オープン PR 一覧 + 行数から PR 数を導出）
@@ -134,9 +134,7 @@ GitHub Issue リストをフィルタリング付きで表示。
 ### ワークフロー
 
 ```bash
-gh issue list --state open \
-  --json number,title,state,labels,assignees,createdAt,updatedAt \
-  --limit 20
+shirokuma-docs issues list --format json
 ```
 
 ### 表示フォーマット

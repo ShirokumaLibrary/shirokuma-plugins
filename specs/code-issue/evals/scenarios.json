@@ -35,7 +35,7 @@
       "type": "trigger",
       "prompt": "#42 レビューして",
       "expected": "should_not_trigger",
-      "rationale": "レビューは reviewing-on-issue の責務"
+      "rationale": "レビューは review-issue の責務"
     },
     {
       "id": "quality-01",

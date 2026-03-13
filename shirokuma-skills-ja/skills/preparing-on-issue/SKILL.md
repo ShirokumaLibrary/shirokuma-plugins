@@ -68,18 +68,18 @@ Planning Worker の出力から YAML フロントマターをパースする:
 
 ### ステップ 4: 計画レビュー（サブエージェント委任）
 
-計画策定と同じエージェントがレビューしても盲点に気づけない。`reviewing-on-issue` の plan ロールにサブエージェント委任し、まっさらなコンテキストでレビューを実行する。Planning Worker が Issue 本文に計画を書き込み済みのため、reviewer は `shirokuma-docs show {number}` で計画内容を取得できる。
+計画策定と同じエージェントがレビューしても盲点に気づけない。`review-issue` の plan ロールにサブエージェント委任し、まっさらなコンテキストでレビューを実行する。Planning Worker が Issue 本文に計画を書き込み済みのため、reviewer は `shirokuma-docs show {number}` で計画内容を取得できる。
 
 #### スキル利用可能チェック（フォールバック）
 
-サブエージェント起動前に `reviewing-on-issue` スキルがスキルリストに存在するか確認する。
+サブエージェント起動前に `review-issue` スキルがスキルリストに存在するか確認する。
 
 | 状態 | アクション |
 |------|----------|
 | スキルが利用可能 | 下記「レビュアーの起動」へ進む |
 | スキルが利用不可 | 下記「フォールバック（自己チェック）」で代替する |
 
-**フォールバック（自己チェック）**: `reviewing-on-issue` が利用できない場合、以下のチェックリストで計画品質を自己確認する:
+**フォールバック（自己チェック）**: `review-issue` が利用できない場合、以下のチェックリストで計画品質を自己確認する:
 - [ ] 計画は Issue の全要件に対応しているか？
 - [ ] タスク漏れはないか？
 - [ ] 成果物（Deliverable）の定義は明確か？
@@ -89,13 +89,13 @@ Planning Worker の出力から YAML フロントマターをパースする:
 
 #### レビュアーの起動
 
-Agent ツール（カスタムサブエージェント `review-worker`）で `reviewing-on-issue` を plan ロールで起動する。`reviewing-on-issue` が自身で `shirokuma-docs show {number}` を実行して Issue 本文を取得する。
+Agent ツール（カスタムサブエージェント `review-worker`）で `review-issue` を plan ロールで起動する。`review-issue` が自身で `shirokuma-docs show {number}` を実行して Issue 本文を取得する。
 
 ```text
 Agent(review-worker, args: "plan #{number}")
 ```
 
-レビュー結果は `reviewing-on-issue` が Issue コメントとして投稿し、構造化データを返却する。
+レビュー結果は `review-issue` が Issue コメントとして投稿し、構造化データを返却する。
 
 #### レビュー出力の処理
 

@@ -58,10 +58,13 @@ shirokuma-docs show {parent-number}
 
 Issue 本文に `## 計画` セクション（`^## 計画` で前方一致検出）があるか確認する。
 
-| 計画状態 | アクション |
-|---------|----------|
-| 計画なし | → `preparing-on-issue` に委任して計画を策定 |
-| 計画あり | → 計画を `## 計画` セクションからコンテキストとして実装スキルに渡す |
+| 計画状態 | 条件 | アクション |
+|---------|------|----------|
+| 計画なし | Size XS/S（明確な要件） | → 計画をスキップして直接 `code-issue` に進む |
+| 計画なし | Size M 以上または要件に曖昧さあり | → `preparing-on-issue` に委任して計画を策定 |
+| 計画あり | — | → 計画を `## 計画` セクションからコンテキストとして実装スキルに渡す |
+
+**XS/S 直接実装パスの判定:** Issue の Size フィールドが XS または S であり、かつタイトルと本文から変更内容が明確に読み取れる場合（パターン置換、型修正、リネーム等の機械的変換）に適用する。Size が未設定、要件に曖昧さがある、または判断が難しい場合は `preparing-on-issue` に委任する。正規の判定基準は `creating-item/reference/chain-rules.md`「要件明確性の判定」セクションを参照。
 
 #### Preparing ステータスからの遷移
 
@@ -118,7 +121,7 @@ Feature タイプでサイズ M 以上の場合、ADR 作成を提案（AskUserQ
 |-----------|---------|------------|---------|
 | コーディング全般 | 実装、修正、リファクタ、設定、Markdown 編集 | `code-issue` (subagent) | はい（実装・修正・リファクタ） |
 | 調査 | キーワード: `research`, `調査` | `researching-best-practices` (subagent) | いいえ |
-| レビュー | キーワード: `review`, `レビュー` | `reviewing-on-issue` (subagent) | いいえ |
+| レビュー | キーワード: `review`, `レビュー` | `review-issue` (subagent) | いいえ |
 | セットアップ | キーワード: `初期設定`, `セットアップ`, `setup project` | `setting-up-project` | いいえ |
 
 **事前解決ロジック**: サブエージェントワーカーは `AskUserQuestion` を使用できないため、マネージャー（メイン AI）が起動前にエッジケースを解決する:
@@ -232,7 +235,7 @@ for each step in [commit, pr, work_summary, status_update]:
 |--------|--------|-----------|------------|
 | SUCCESS | CONTINUE | commit-issue, create-pr-issue, code-issue | 次のステップへ進む |
 | FAIL | STOP | 全サブエージェントスキル | チェーン停止、ユーザーに報告 |
-| NEEDS_REVISION | REVISE | reviewing-on-issue（計画レビュー） | 修正ループ |
+| NEEDS_REVISION | REVISE | review-issue（計画レビュー） | 修正ループ |
 
 構造化データは内部処理データであり、そのままユーザーに提示すると技術的な中間出力が目に触れ、ワークフローの信頼感を損なう。本文 1 行目のみサマリーとして出力して次のツール呼び出しへ進む。
 
@@ -304,6 +307,16 @@ shirokuma-docs issues update {number} --field-status "Review"
 ```
 
 **Status フォールバック検証**: チェーン完了後、`shirokuma-docs show {number}` で Status を確認。In Progress のまま → `shirokuma-docs issues update {number} --field-status "Review"` で直接更新（冪等: 既に Review なら再更新は無害）。
+
+#### 次のステップ提案（チェーン末尾）
+
+Status 更新後、ユーザーに次のアクション候補を提示する。`create-pr-issue` の `ref` フィールドから PR 番号を取得して具体的に案内する。`ref` が取得できない場合（PR 未作成等）は `/reviewing-on-pr` の行を省略する。
+
+```
+## 次のステップ
+
+- `/reviewing-on-pr #{pr-number}` — PR のセルフレビューを実行
+```
 
 ### ステップ 6: Evolution シグナル自動記録
 

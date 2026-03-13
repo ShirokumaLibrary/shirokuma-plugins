@@ -53,6 +53,7 @@ claude plugin install shirokuma-skills-ja@shirokuma-library --scope project
 - **古いキャッシュバージョンの削除**: `keepCount = 3` で最新3バージョンを保持し、古いディレクトリを削除
 - **semver ソート**: バージョンディレクトリを semver 順で解決（辞書順ではなく数値比較）
 - **marketplace ソース確認**: `Source: Directory`（ローカル参照）を検出した場合、`Source: GitHub`（fresh clone）に自動再登録
+- **`local/` ディレクトリ除外**: `local/` ディレクトリはローカルインストール用（`plugin install-local` で使用）であり、semver バージョンではないためバージョンソート・クリーンアップの対象外
 
 ## ユーザーへのガイダンスが必要な場合
 

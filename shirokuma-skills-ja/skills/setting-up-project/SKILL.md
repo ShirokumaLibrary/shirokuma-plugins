@@ -18,7 +18,7 @@ TodoWrite で進捗管理（5ステップ）。
 
 ```bash
 git remote -v
-gh repo view --json name,owner 2>/dev/null
+shirokuma-docs repo info --format json 2>/dev/null
 ```
 
 | 状態 | アクション |

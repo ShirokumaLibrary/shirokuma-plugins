@@ -11,11 +11,11 @@ Quality review of design artifacts (Design Brief, Aesthetic Direction, UI implem
 
 ## Distinction from `designing-on-issue`
 
-| Aspect | `designing-on-issue` built-in check | `reviewing-on-issue` design role |
+| Aspect | `designing-on-issue` built-in check | `review-issue` design role |
 |--------|--------------------------------------|----------------------------------|
 | Timing | Iterative checks during design phase | Gate review after design completion |
 | Purpose | Confirm design direction | Independent second opinion |
-| Invocation | Within `designing-on-issue` loop | `/reviewing-on-issue design #N` |
+| Invocation | Within `designing-on-issue` loop | `/review-issue design #N` |
 
 ## Required Knowledge
 

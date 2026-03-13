@@ -68,18 +68,18 @@ Parse the YAML frontmatter from the planning worker's output:
 
 ### Step 4: Plan Review (Subagent Delegation)
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `reviewing-on-issue` plan role via subagent for a fresh-context review. Since the plan was written to the Issue body by the planning worker, the reviewer can retrieve it via `shirokuma-docs show {number}`.
+Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `review-issue` plan role via subagent for a fresh-context review. Since the plan was written to the Issue body by the planning worker, the reviewer can retrieve it via `shirokuma-docs show {number}`.
 
 #### Skill Availability Check (Fallback)
 
-Before launching the subagent, verify that `reviewing-on-issue` is available in the skill list.
+Before launching the subagent, verify that `review-issue` is available in the skill list.
 
 | State | Action |
 |-------|--------|
 | Skill available | Proceed to "Launching the Reviewer" below |
 | Skill unavailable | Use "Fallback (self-check)" instead |
 
-**Fallback (self-check)**: When `reviewing-on-issue` is unavailable, verify plan quality using this checklist:
+**Fallback (self-check)**: When `review-issue` is unavailable, verify plan quality using this checklist:
 - [ ] Does the plan address all requirements in the Issue?
 - [ ] Are there any missing tasks?
 - [ ] Is the deliverable (definition of done) clearly defined?
@@ -89,13 +89,13 @@ If all checks pass, proceed to Step 5.
 
 #### Launching the Reviewer
 
-Invoke `reviewing-on-issue` with plan role via the Agent tool (custom subagent `review-worker`). `reviewing-on-issue` will fetch the Issue body itself via `shirokuma-docs show {number}`.
+Invoke `review-issue` with plan role via the Agent tool (custom subagent `review-worker`). `review-issue` will fetch the Issue body itself via `shirokuma-docs show {number}`.
 
 ```text
 Agent(review-worker, args: "plan #{number}")
 ```
 
-The review result is posted as an Issue comment by `reviewing-on-issue`, and structured output is returned.
+The review result is posted as an Issue comment by `review-issue`, and structured output is returned.
 
 #### Processing Review Output
 

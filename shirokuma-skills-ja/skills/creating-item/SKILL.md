@@ -42,11 +42,22 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 
 ### ステップ 3: ユーザーに返す
 
-作成完了後、次のアクションの案内を表示する:
+作成完了後、[reference/chain-rules.md](reference/chain-rules.md) の判定ロジックに基づくデフォルト推奨を表示する:
+
+**Size XS/S かつ要件明確な場合（デフォルト推奨: すぐに着手する）:**
 
 ```markdown
 アイテム作成完了: #{number}
+→ `/working-on-issue #{number}` で直接実装を開始（推奨）
 → `/preparing-on-issue #{number}` で計画から開始
+→ またはそのまま Backlog に配置
+```
+
+**Size M 以上または要件に曖昧さがある場合（デフォルト推奨: 計画を立てる）:**
+
+```markdown
+アイテム作成完了: #{number}
+→ `/preparing-on-issue #{number}` で計画から開始（推奨）
 → `/working-on-issue #{number}` で直接実装を開始
 → またはそのまま Backlog に配置
 ```
@@ -62,12 +73,7 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 
 ## 次のステップ
 
-```
-アイテム作成完了: #{number}
-→ `/preparing-on-issue #{number}` で計画から開始
-→ `/working-on-issue #{number}` で直接実装を開始
-→ またはそのまま Backlog に配置
-```
+chain-rules.md の判定に基づき、Size XS/S かつ要件明確な場合は `/working-on-issue` を推奨、Size M 以上は `/preparing-on-issue` を推奨する。詳細はステップ 3 参照。
 
 ## Evolution シグナル自動記録
 

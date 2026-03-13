@@ -58,10 +58,13 @@ shirokuma-docs show {parent-number}
 
 Check if issue body contains `## Plan` section (detected by `^## Plan` line prefix).
 
-| Plan state | Action |
-|-----------|--------|
-| No plan | → Delegate to `preparing-on-issue` |
-| Plan exists | → Pass `## Plan` section as context to implementation skill |
+| Plan State | Condition | Action |
+|-----------|-----------|--------|
+| No plan | Size XS/S (clear requirements) | → Skip planning, proceed directly to `code-issue` |
+| No plan | Size M+ or ambiguous requirements | → Delegate to `preparing-on-issue` |
+| Plan exists | — | → Pass `## Plan` section as context to implementation skill |
+
+**XS/S direct implementation path criteria:** Apply when the Issue Size field is XS or S, and the title and body clearly indicate what needs to be changed (mechanical transformation such as pattern replacement, type fix, rename). If Size is unset, requirements are ambiguous, or the judgment is uncertain, delegate to `preparing-on-issue`. See `creating-item/reference/chain-rules.md` "Requirements Clarity Criteria" for the canonical definition.
 
 #### Transition from Preparing Status
 
@@ -118,7 +121,7 @@ For Feature type, Size M+, suggest ADR creation (AskUserQuestion).
 |-----------|-----------|-------------|-----|
 | General Coding | Implementation, bug fix, refactoring, config, Markdown editing | `code-issue` (subagent) | Yes (implementation, bug fix, refactoring) |
 | Research | Keywords: `research`, `investigate` | `researching-best-practices` (subagent) | No |
-| Review | Keywords: `review`, `audit` | `reviewing-on-issue` (subagent) | No |
+| Review | Keywords: `review`, `audit` | `review-issue` (subagent) | No |
 | Project Setup | Keywords: `setup project`, `initialize` | `setting-up-project` | No |
 
 **Pre-resolution logic**: Subagent workers cannot use `AskUserQuestion`, so the manager (main AI) resolves edge cases before invocation:
@@ -232,7 +235,7 @@ The `Summary` field is abolished. Instead, the **body's first line** is treated 
 |--------|--------|---------|----------------|
 | SUCCESS | CONTINUE | commit-issue, create-pr-issue, code-issue | Proceed to next step |
 | FAIL | STOP | All subagent skills | Chain stop, report to user |
-| NEEDS_REVISION | REVISE | reviewing-on-issue (plan review) | Enter revision loop |
+| NEEDS_REVISION | REVISE | review-issue (plan review) | Enter revision loop |
 
 Subagent outputs are internal processing data, not user-facing output. Presenting raw subagent output exposes technical intermediates that disrupt the user's workflow experience. Output only a one-line summary and immediately proceed to the next tool call.
 
@@ -304,6 +307,16 @@ shirokuma-docs issues update {number} --field-status "Review"
 ```
 
 **Status fallback verification**: After chain completion, check Status via `shirokuma-docs show {number}`. If still In Progress → directly update with `shirokuma-docs issues update {number} --field-status "Review"` (idempotent: re-updating to Review when already Review is harmless).
+
+#### Next Steps Suggestion (End of Chain)
+
+After Status update, present next action candidates to the user. Extract the PR number from `create-pr-issue`'s `ref` field to provide specific guidance. If `ref` is unavailable (e.g., PR not created), omit the `/reviewing-on-pr` line.
+
+```
+## Next Steps
+
+- `/reviewing-on-pr #{pr-number}` — Run self-review on the PR
+```
 
 ### Step 6: Evolution Signal Auto-Recording
 

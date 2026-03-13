@@ -175,7 +175,7 @@ shirokuma-docs session start --team
 | `--all` | Fetches handovers from all members (no filter) |
 | `--team` | Groups handovers and issues by member for team overview |
 
-**Default behavior**: Uses `gh api user` to get the current GitHub username and filters handovers to that user only.
+**Default behavior**: `shirokuma-docs session start` internally retrieves the current GitHub username and filters handovers to that user only.
 
 ## Error Handling
 

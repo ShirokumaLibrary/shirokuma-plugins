@@ -1,4 +1,4 @@
-# reviewing-on-issue 設計メモ
+# review-issue 設計メモ
 
 スキル管理用メタデータ。実行時には読み込まれない。
 
@@ -12,7 +12,7 @@
 ## アーキテクチャ
 
 ```
-reviewing-on-issue/
+review-issue/
 ├── SKILL.md        - コアワークフロー（実行時に読み込み）
 ├── criteria/       - 品質基準（code-quality, security, testing）
 ├── patterns/       - 汎用パターン（drizzle-orm, better-auth, server-actions 等）
@@ -21,7 +21,7 @@ reviewing-on-issue/
 └── docs/           - セットアップガイド、ワークフロー
 ```
 
-設計メモは `plugin/specs/reviewing-on-issue/` に分離配置。
+設計メモは `plugin/specs/review-issue/` に分離配置。
 
 ## トリガーキーワード
 

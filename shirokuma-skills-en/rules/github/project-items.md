@@ -49,10 +49,6 @@ Ideas and proposals start as **Discussions** (Research or Knowledge category), n
 | Decided to do | Issue (Backlog) | When the team agrees to implement |
 | Requirements firm | Issue (Spec Review) | When requirements need formal review |
 
-- Backlog tolerates varying levels of requirement detail
-- Do NOT create Issues for ideas that have not been decided on
-- Spec Review is the approval gate before implementation starts
-
 ## Size Estimation
 
 | Size | Time | Example |
@@ -102,152 +98,35 @@ AI MUST update issue status at these points:
 
 ### Preparing Usage
 
-The `preparing-on-issue` orchestrator transitions from Backlog → Preparing when starting plan creation.
-
 - **Purpose**: Visibility that planning is in progress; records planning start timestamp
 - **Entry**: `preparing-on-issue` sets this status before delegating to `planning-worker`
-- **Exit**: Plan complete → Designing (if design needed) or Spec Review (set by `preparing-on-issue` after plan review)
-- **Pre-work status**: Not included in `WORK_STARTED_STATUSES` (same treatment as Spec Review)
+- **Exit**: Plan complete → Designing (if design needed) or Spec Review
 
 ### Designing Usage
 
-The `designing-on-issue` orchestrator handles design work between Preparing and Spec Review.
-
 - **Purpose**: Visibility that design work is in progress
-- **Entry**: `preparing-on-issue` sets this status when design phase is needed (Step 5a assessment)
+- **Entry**: `preparing-on-issue` sets this status when design phase is needed
 - **Exit**: Design complete → Spec Review
-- **Pre-work status**: Not included in `WORK_STARTED_STATUSES` (same treatment as Preparing)
 
 ### Spec Review Usage
 
-The `preparing-on-issue` orchestrator transitions Preparing → Spec Review after `planning-worker` completes the plan and the plan review passes.
-
 - **Purpose**: User approval gate before implementation
-- **Entry**: `preparing-on-issue` sets this status after plan review passes (`plan-issue` writes the plan via `planning-worker`)
+- **Entry**: `preparing-on-issue` sets this status after plan review passes
 - **Exit**: User approves → `working-on-issue` starts implementation → In Progress
-- **Applies to**: All issues (plan depth scales with content: lightweight/standard/detailed)
 
 ### Ready Usage
-
-The `Ready` status indicates that the plan has been approved and the issue is available for implementation.
 
 - **Purpose**: Visibility that the issue is ready to start, plan approved
 - **Entry**: User approves plan in Spec Review, or manual setting
 - **Exit**: `working-on-issue` starts implementation → In Progress
-- **Pre-work status**: Not included in `WORK_STARTED_STATUSES`
-
-### Epic Status Management
-
-Epics (`subIssuesSummary.total > 0`) follow these rules:
-
-| Event | Epic Action |
-|-------|-------------|
-| First sub-issue becomes In Progress | Epic → In Progress |
-| Sub-issue PR merged | Epic remains In Progress |
-| Final PR: integration → develop merged | Epic → Done |
-| Sub-issue blocked | Epic → Pending (manual, reason comment required) |
-
-Epic Done is determined by the final integration branch merge, not by individual sub-issue completions. See `epic-workflow` reference for details.
 
 ### Rules
 
-1. **One In Progress at a time** - Move previous item out before starting new one (exception: batch mode allows multiple simultaneous In Progress per `batch-workflow` rule; epic issue and sub-issues can be simultaneously In Progress due to parent-child relationship)
-2. **Branch per issue** - Create a feature branch when starting work (see `branch-workflow` rule; exception: batch mode shares one branch per `batch-workflow` rule; epics use integration branch + sub-issue branches per `epic-workflow` reference)
-3. **Event-driven**: Status changes happen immediately when events occur (`create-pr-issue` sets Review after PR creation, `pr merge` sets Done)
+1. **One In Progress at a time** - Move previous item out before starting new one (exception: batch mode, epics)
+2. **Branch per issue** - Create a feature branch when starting work (exception: batch, epics)
+3. **Event-driven**: Status changes happen immediately when events occur
 4. **Session end safety net** - `ending-session` catches any missed status updates
 5. **Pending requires reason** - Add a comment explaining the blocker
 6. **Idempotency** - If status is already correct, skip the update (no error)
 
-## Built-in Automations
-
-GitHub Projects V2 provides built-in automation workflows that complement the CLI-based status updates.
-
-### Recommended Automations
-
-| Workflow | Trigger | Action | Status |
-|----------|---------|--------|--------|
-| Item closed | Issue is closed | Set Status → Done | **Enable** |
-| Pull request merged | PR merged | Set Status → Done | **Enable** |
-
-### How to Enable
-
-Built-in automations are configured via the GitHub UI (not API):
-
-1. Navigate to your GitHub Project's **Settings > Workflows**
-2. Enable "Item closed" → set target status to **Done**
-3. Enable "Pull request merged" → set target status to **Done**
-
-### CLI Compatibility
-
-| CLI Feature | Behavior with Automations |
-|-------------|--------------------------|
-| `session end --review` | Sets Review. When PR merges, automation moves to Done |
-| `session end --review` (PR already merged) | Auto-promotes to Done via `findMergedPrForIssue()` — idempotent with automation |
-| `session end --done` | Sets Done directly — idempotent with automation |
-| `session check` | Reports disabled recommended automations as warnings |
-| `session check --fix` | Fixes inconsistencies — compatible with automation |
-| `issues cancel` | Sets Not Planned after close. May race with "Item closed → Done" automation — CLI update usually wins. Use `session check --fix` to detect/correct. |
-
-### Checking Automation Status
-
-```bash
-shirokuma-docs projects workflows
-```
-
-Reports all workflows with their enabled/disabled status and recommendations.
-
-## Labels
-
-Labels indicate **where** work applies (cross-cutting attribute). Work type classification uses Issue Types (Type field).
-
-| Label type | Role | Example |
-|------------|------|---------|
-| Area labels | Scope of impact | `area:cli`, `area:plugin` |
-| Operational labels | Triage | `duplicate`, `invalid`, `wontfix` |
-
-### Label Rules
-
-1. **Area labels are optional** - Use when the affected area is not obvious from the title
-2. **Multiple area labels allowed** - Cross-cutting issues may have multiple areas
-3. **Operational labels for triage** - `duplicate`, `invalid`, `wontfix` are set when closing or redirecting
-
-### Label Categories
-
-| Prefix | Purpose | Examples |
-|--------|---------|---------|
-| `area:` | Codebase area affected | `area:cli`, `area:plugin`, `area:github` |
-| (none) | Operational / triage | `duplicate`, `invalid`, `wontfix` |
-
-## Item Body Maintenance (Issues / Discussions / PRs)
-
-**The body is the source of truth.** Comments serve as historical record; body must always be the latest consolidated version. For detailed procedures, see `managing-github-items/reference/item-maintenance.md`.
-
-> **Comment-first rule**: Always post a comment before updating the body. Comments must have independent value as primary records of work.
-
-Comment operation CLI commands:
-
-| Operation | Command | Notes |
-|-----------|---------|-------|
-| Add comment | `issues comment {number}` | Works for Issues and PRs |
-| List comments | `issues comments {number}` | JSON output |
-| Edit comment | `issues comment-edit {comment-id}` | Works for Issues and PRs, `--body-file` accepts file/stdin |
-
-## Creating Items
-
-When creating new items:
-
-1. Set all required fields immediately
-2. Use the body template
-3. XL items should be split into smaller items
-4. Link related items in body if applicable
-
-### Initial Status Guidelines
-
-`issues create` automatically sets Status to **Backlog** by default. Override with `--field-status` when needed:
-
-| Scenario | Status |
-|----------|--------|
-| Default (planned work) | Backlog |
-| Starting immediately | In Progress |
-| Low priority / future idea | Icebox |
-| Needs requirements review | Spec Review |
+For epic status management, built-in automations, label details, item body maintenance, and item creation guidelines, see `managing-github-items/reference/project-items-details.md`.

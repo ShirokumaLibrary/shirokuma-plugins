@@ -36,7 +36,7 @@ Delegate to Task(Explore) to reduce context consumption. Classify comments into 
 |----------|-------------|---------|
 | Rule friction | Rule doesn't match reality, was ignored | "git-commit-style scope is ambiguous" |
 | Missing pattern | Uncovered case | "Test naming convention undefined" |
-| Skill improvement | Skill behavior issue | "reviewing-on-issue lint execution order inefficient" |
+| Skill improvement | Skill behavior issue | "review-issue lint execution order inefficient" |
 | Lint trend | Lint violation trends | "Rule A violations increasing" |
 | Success rate | Task completion metrics | "First-review pass rate declining" |
 
@@ -168,7 +168,7 @@ shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-b
 
 ```bash
 # Close the Evolution Issue (1 analysis cycle = 1 Issue)
-gh issue close {number}
+shirokuma-docs issues close {number}
 ```
 
 New signals after closure are recorded in a new Evolution Issue (see `rule-evolution` rule, Evolution Issue Lifecycle section).

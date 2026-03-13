@@ -19,15 +19,32 @@ Follow `managing-github-items`'s `reference/create-item.md`.
 
 ## Chain Decision
 
-Whether to chain to `plan-issue` after creation:
+Default recommended chain target after creation:
 
-| Condition | Chain | Reason |
-|-----------|-------|--------|
-| User explicitly says "work on it now", "plan this" | Yes | Explicit intent |
-| Issue created from in-conversation problem | Confirm | Context is warm, can start planning immediately |
-| Batch creation (multiple issues in sequence) | No | Individual work is inefficient |
-| Priority: Low | No (recommended) | Not urgent |
-| Priority: Critical/High | Yes (recommended) | High urgency |
+| Condition | Default Recommendation | Reason |
+|-----------|----------------------|--------|
+| Size XS/S and requirements are clear (pattern replacement, type fix, rename, etc.) | `/working-on-issue` (start immediately) | Small task that needs no planning |
+| Size M or larger | `/preparing-on-issue` (create a plan first) | Planning ensures quality |
+| User explicitly says "work on it now" | `/working-on-issue` | Explicit intent |
+| User explicitly says "plan this" | `/preparing-on-issue` | Explicit intent |
+| Issue created from in-conversation problem | Follow default recommendation above, confirm | Context is warm, can start immediately |
+| Batch creation (multiple issues in sequence) | Place in Backlog | Individual work is inefficient |
+| Priority: Low | Place in Backlog | Not urgent |
+| Priority: Critical/High | Follow Size-based default above (XS/S → `/working-on-issue`, M+ → `/preparing-on-issue`) | High urgency, Size determines path |
+
+### Requirements Clarity Criteria
+
+"Requirements are clear" means:
+
+- The change target is specifically identified (e.g., "change this function to X", "fix the wording in this rule")
+- Completes as a mechanical transformation (pattern replacement, type fix, rename, format change)
+- No ambiguity in implementation scope
+
+"Requirements unclear" — recommend `preparing-on-issue` when:
+
+- Only "I want to improve X" with no concrete change specified
+- Multiple implementation approaches are possible
+- Impact scope is not clear
 
 ## Backlog-Only Path
 
@@ -41,4 +58,4 @@ Keep in Backlog without chaining when:
 
 When `working-on-issue` is invoked with text description only (no issue number), Step 1a calls `creating-item`. `creating-item` creates the Issue and returns the number, and `working-on-issue` continues. In this case, chain decision is not needed (as `working-on-issue` automatically continues).
 
-> **Note:** The chain from `creating-item` delegates directly to `plan-issue`, not `working-on-issue`. Since a newly created Issue has no plan, routing through `working-on-issue` is redundant.
+> **Note:** The chain from `creating-item` delegates to `working-on-issue`. `working-on-issue` evaluates the issue size and plan state — XS/S without planning proceeds directly to `code-issue`, while M+ delegates to `preparing-on-issue`.

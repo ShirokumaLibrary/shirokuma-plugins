@@ -1,5 +1,5 @@
 ---
-name: reviewing-on-issue
+name: review-issue
 description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, documentation, plan quality, design quality, and research quality. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "design review", "research review", "code review", "config review".
 allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---
@@ -362,7 +362,7 @@ Step 6/6: Saving report...
 ```text
 Step 1/6: Selecting role...
   Role: code → config (auto-switched by changed file analysis)
-  Changed files: plugin/shirokuma-skills-ja/skills/reviewing-on-issue/SKILL.md etc. 2 files
+  Changed files: plugin/shirokuma-skills-ja/skills/review-issue/SKILL.md etc. 2 files
   Files to load: reviewing-claude-config/SKILL.md
 
 Step 2/6: Loading knowledge...

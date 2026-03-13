@@ -18,7 +18,7 @@ Create and maintain rules that provide automatic, path-specific context to Claud
 │   ├── coding-nextjs/
 │   │   ├── patterns/              # Reusable patterns
 │   │   └── templates/             # Code templates
-│   ├── reviewing-on-issue/
+│   ├── review-issue/
 │   │   ├── criteria/              # Quality criteria
 │   │   └── roles/                 # Review role definitions
 │   └── managing-rules/            # This skill

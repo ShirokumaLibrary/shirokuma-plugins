@@ -57,7 +57,7 @@ For detailed bullets vs prose guidelines in GitHub content (Issues, PRs, Discuss
 | Config Management | Required (strict) | managing-rules, managing-skills, managing-agents |
 | Analysis | Required (with tables) | evolving-rules, preparing-on-issue |
 | Display / Orchestrator | Not required | showing-github, working-on-issue |
-| Delegator | Deferred to caller | reviewing-on-issue, creating-item |
+| Delegator | Deferred to caller | review-issue, creating-item |
 
 Skills that do not require templates may omit the completion report section entirely.
 

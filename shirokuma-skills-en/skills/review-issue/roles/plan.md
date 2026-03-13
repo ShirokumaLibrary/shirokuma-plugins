@@ -11,12 +11,12 @@ Quality review of the plan section (`## Plan` / `## 計画`) in Issue body:
 
 ## Distinction from `plan-issue`
 
-| Aspect | `plan-issue` built-in review | `reviewing-on-issue` plan role |
+| Aspect | `plan-issue` built-in review | `review-issue` plan role |
 |--------|-------------------------------------|-------------------------------|
 | Timing | Immediate check right after planning | User-initiated at any time |
 | Data retrieval | Issue body embedded in Task agent | Fetched via `shirokuma-docs show` by Issue number |
 | Purpose | Initial quality gate for plan | Independent second opinion |
-| Invocation | Auto-executed at `plan-issue` step 4 | `/reviewing-on-issue plan #N` or Spec Review Issue |
+| Invocation | Auto-executed at `plan-issue` step 4 | `/review-issue plan #N` or Spec Review Issue |
 
 ## Required Knowledge
 

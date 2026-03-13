@@ -21,7 +21,7 @@ Full project dashboard aggregating GitHub data.
 
 ### Workflow
 
-1. Get repository info: `gh repo view --json nameWithOwner -q '.nameWithOwner'`
+1. Get repository info: `shirokuma-docs repo info --format json` (refer to `nameWithOwner` field)
 2. Run in parallel:
    - `shirokuma-docs issues list` (project items by status + derive open issue count from `total_issues`)
    - `shirokuma-docs pr list` (open PRs list + derive PR count from line count)
@@ -134,9 +134,7 @@ GitHub Issues list with filtering.
 ### Workflow
 
 ```bash
-gh issue list --state open \
-  --json number,title,state,labels,assignees,createdAt,updatedAt \
-  --limit 20
+shirokuma-docs issues list --format json
 ```
 
 ### Display Format

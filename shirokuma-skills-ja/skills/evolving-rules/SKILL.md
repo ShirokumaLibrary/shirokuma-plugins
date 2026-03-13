@@ -36,7 +36,7 @@ Task(Explore) に委任してコンテキスト消費を抑制。コメントを
 |---------|------|---|
 | ルール摩擦 | ルールが実態に合わず無視された | 「git-commit-style のスコープが曖昧」 |
 | 不足パターン | カバーされていないケース | 「テスト命名規則が未定義」 |
-| スキル改善 | スキルの動作に問題 | 「reviewing-on-issue の lint 実行順序が非効率」 |
+| スキル改善 | スキルの動作に問題 | 「review-issue の lint 実行順序が非効率」 |
 | lint 傾向 | lint 違反の傾向 | 「ルール A の違反が増加」 |
 | 成功率 | タスク完了の指標 | 「初回レビューパス率低下」 |
 
@@ -168,7 +168,7 @@ shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-b
 
 ```bash
 # Evolution Issue をクローズ（1 分析サイクル = 1 Issue）
-gh issue close {number}
+shirokuma-docs issues close {number}
 ```
 
 クローズ後に新たなシグナルが発生した場合は、新しい Evolution Issue に記録する（`rule-evolution` ルールの Evolution Issue ライフサイクルセクション参照）。

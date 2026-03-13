@@ -53,6 +53,7 @@ A new session is required after cache update for skills to appear.
 - **Old cache version cleanup**: Keeps the latest 3 versions (`keepCount = 3`), removes older directories
 - **Semver sorting**: Resolves version directories by semver order (numeric comparison, not lexicographic)
 - **Marketplace source check**: Detects `Source: Directory` (local reference) and auto-re-registers as `Source: GitHub` (fresh clone)
+- **`local/` directory exclusion**: The `local/` directory is used for local installations (`plugin install-local`) and is not a semver version, so it is excluded from version sorting and cleanup
 
 ## When to Guide the User
 

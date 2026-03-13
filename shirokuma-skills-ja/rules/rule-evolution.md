@@ -49,23 +49,6 @@ Evolution Issue にシグナルをコメントとして蓄積する。
 | スキル完了時 | `working-on-issue`、`preparing-on-issue`、`creating-item`、`designing-on-issue`、`reviewing-on-pr` の完了時 | 検出チェックリストで自動記録。シグナル未検出時はリマインド表示（フォールバック） |
 | eval 失敗時 | `skill eval` または `skill optimize` で失敗が発生 | eval 結果パターンを Evolution シグナルとして記録。`evolving-rules` で説明改善を提案 |
 
-## eval データ参照
-
-`evolving-rules` がスキルを分析する際、eval データが定量的シグナルを提供する:
-
-```bash
-# 保存済み eval 結果を確認
-ls .shirokuma/evals/{skill-name}/
-
-# 最新の eval 結果を読み込む
-cat .shirokuma/evals/{skill-name}/eval_*.json | tail -1
-```
-
-記録すべき eval 失敗シグナル:
-- should_trigger クエリのトリガー率 < 50% → 説明が狭すぎる
-- should_not_trigger クエリのトリガー率 > 50% → 説明が広すぎる
-- 特定のクエリパターンで一貫して失敗 → 説明にキーワードが不足
-
 ## 責務境界
 
 | スキル | 責務 | 入力 |
@@ -76,148 +59,6 @@ cat .shirokuma/evals/{skill-name}/eval_*.json | tail -1
 
 **曖昧領域:** `discovering-codebase-rules` が既存ルールの不備を検出した場合、Evolution Issue にコメントとして記録する。`discovering-codebase-rules` 自体はルールの修正を行わない（新規提案のみ）。
 
-## Evolution Issue ライフサイクル
-
-1 分析サイクル = 1 Evolution Issue。分析完了後に Issue をクローズし、次回の `evolving-rules` 起動時に古いシグナルを再読するのを防ぐ。
-
-```
-Open → シグナル蓄積 → 分析（evolving-rules）→ Close → 次サイクルは新 Issue
-```
-
-| フェーズ | 状態 | アクション |
-|---------|------|----------|
-| シグナル蓄積中 | Open | スキル完了時の自動記録、手動記録 |
-| 分析トリガー | Open | `evolving-rules` が全コメントを読み取り処理 |
-| 分析完了 | Closed | `evolving-rules` ステップ 7 でサマリー投稿後にクローズ |
-| クローズ後の新シグナル | — | 新しい Evolution Issue が自動作成される（自動記録フロー） |
-
-**ルール:**
-- クローズ済み Evolution Issue を再オープンしない — 代わりに新しい Issue を作成
-- `evolving-rules` は常に最新の **open** な Evolution Issue を対象に操作する
-- クローズにより、分析済みシグナルの再処理を防止する
-
-## スキル完了時の自動記録手順
-
-主要スキル（`working-on-issue`, `preparing-on-issue`, `creating-item`, `designing-on-issue`, `reviewing-on-pr`）の完了時に、以下の手順でセッション中に発生した Evolution シグナルを自動記録する。各スキルはこのセクションを参照して自動記録を実行する。
-
-### シグナル検出チェックリスト
-
-スキル完了時に以下を自己チェックする。判定に迷う場合は記録しない（偽陽性回避）。
-
-#### 内省チェック（全対象スキル）
-
-| チェック項目 | シグナル種別 | 検出する例 | 検出しない例 |
-|------------|-----------|----------|------------|
-| ユーザーがルールに基づく動作を修正・上書きしたか | ルール摩擦 | 「コミットメッセージは英語で」とルール設定を上書き | タイポの修正指示（ルールの問題ではない） |
-| ユーザーが出力のやり直しを指示したか | やり直し指示 | 「PR 本文の形式が違う、テンプレートに合わせて」 | 「もう少し詳しく」（品質改善の通常指示） |
-| 想定外の障害やワークアラウンドが発生したか | 不足パターン | CLI コマンドの未対応オプションでフォールバック実行 | 初見ファイルの構造把握に時間がかかった（通常の探索） |
-| 同じパターンの問題がセッション中に繰り返されたか | レビュー指摘パターン | セルフレビューで同種の指摘が 2 回以上発生 | 異なる種類の修正を順次実施（繰り返しではない） |
-
-#### 環境チェック（`working-on-issue`、`reviewing-on-pr` のみ）
-
-コード変更を伴うスキル完了時に、プロジェクトの客観的状態を確認する。`preparing-on-issue` / `creating-item` / `designing-on-issue` はコード変更を伴わないため対象外。
-
-| チェック項目 | シグナル種別 | 検出条件 | 記録しない条件 |
-|------------|-----------|---------|-------------|
-| `shirokuma-docs lint tests -p . --format json` の結果を確認 | lint 違反傾向 | `errorCount > 0`: 常にフラグ | `warningCount` のみ: 件数報告のみ（閾値判定なし） |
-
-> **Note:** 全種一括実行には `shirokuma-docs lint all -p .` が利用可能。ただし環境チェックでは `--format json` のパースが必要なため、`lint tests` を個別実行する。
-
-**lint tests 実行手順:**
-
-```bash
-shirokuma-docs lint tests -p . --format json 2>/dev/null
-```
-
-- `summary.errorCount > 0`: Evolution シグナルとして記録 + フォローアップ Issue 作成を提案
-- `summary.warningCount`: 件数を報告（ハードコードされた閾値は設けない）
-- コマンド失敗時: スキップ（環境チェックは best-effort）
-
-### 自動記録フロー
-
-```
-スキル完了 → 内省チェックで自己振り返り → 環境チェック（working-on-issue のみ）
-  ├─ シグナルあり → Evolution Issue 検索 → コメント投稿 → 記録完了を 1 行表示
-  └─ シグナルなし → 既存シグナルの蓄積確認 → リマインド表示（フォールバック）
-```
-
-#### シグナルありの場合
-
-1. Evolution Issue を検索:
-   ```bash
-   shirokuma-docs issues list --issue-type Evolution --limit 1
-   ```
-2. Issue が 0 件の場合、汎用 Evolution Issue を作成:
-   ```bash
-   shirokuma-docs issues create --from-file /tmp/shirokuma-docs/evolution.md
-   ```
-3. シグナルをコメントとして投稿（複数シグナルは 1 コメントに集約）:
-   ```bash
-   shirokuma-docs issues comment {number} --body-file - <<'EOF'
-   **種別:** {種別}
-   **対象:** {ルール名 or スキル名}
-   **コンテキスト:** {発生状況}（Issue #{number} の作業中）
-   **提案:** {改善案}
-   EOF
-   ```
-4. 記録完了を 1 行表示:
-   > 🧬 Evolution シグナルを記録しました（{種別}: {対象}）。
-
-#### シグナルなしの場合（フォールバック）
-
-既存シグナルの蓄積を確認し、リマインド表示する:
-
-```bash
-shirokuma-docs issues list --issue-type Evolution --limit 1
-```
-
-- Issue が 0 件 → 何も表示しない
-- Issue が 1 件以上 → 以下を 1 行表示:
-
-> 🧬 Evolution シグナルが蓄積されています。`/evolving-rules` で分析できます。
-
-### 制約
-
-- 1 スキル完了あたり最大 1 コメント（複数シグナルは 1 コメントに集約）
-- TodoWrite に登録しない（ノンブロッキング処理）
-- 振り返りは簡潔なチェックリスト形式でコンテキスト消費を最小化
-- シグナル未検出時は CLI コマンド実行を最小化（`issues list` 1 回のみ）
-- `creating-item` が作成したアイテムの Issue Type が Evolution の場合、シグナル記録全体をスキップする（Evolution Issue 自体が改善提案であり重複記録を防止）
-
-## スタンドアロンシグナル記録
-
-セッションを使わない作業（スタンドアロンスキル起動、直接編集等）でもシグナルを記録できる。
-
-### ユースケース
-
-| ユースケース | シグナル種別 | 記録方法 |
-|------------|------------|---------|
-| スタンドアロン `/working-on-issue` 起動 | ルール摩擦、やり直し指示 | 記録テンプレート + リマインド。**コンテキスト**に Issue 番号を記載 |
-| スタンドアロン `/preparing-on-issue` 起動 | ルール摩擦、スキル改善 | 記録テンプレート + リマインド。**対象**に摩擦したルール/スキル名を記載 |
-| スタンドアロン `/creating-item` 起動 | スキル改善 | 記録テンプレート + リマインド。**提案**に改善案を記載 |
-| 直接的なファイル編集・コミット | ルール摩擦 | 記録テンプレート参照。**対象**に摩擦したルール名を記載 |
-| レビュー対応のみの短時間作業 | レビュー指摘パターン | Reports 蓄積（既存）。**提案**にパターン改善案を記載 |
-| lint 実行結果の確認 | lint 違反傾向 | 記録テンプレート参照。**コンテキスト**に違反数の推移を記載 |
-
-### 記録テンプレート
-
-Evolution Issue にシグナルを記録するコマンドスニペット:
-
-```bash
-# 1. Evolution Issue を検索
-shirokuma-docs issues list --issue-type Evolution --limit 5
-
-# 2. シグナルをコメントとして投稿
-shirokuma-docs issues comment {issue-number} --body-file - <<'EOF'
-**種別:** {ルール摩擦 | 不足パターン | スキル改善 | lint 傾向 | 成功率}
-**対象:** {ルール名 or スキル名 or 一般}
-**コンテキスト:** {発生状況}
-**提案:** {改善案}
-EOF
-```
-
-主要スキル完了時にリマインドが表示された場合、上記テンプレートをコピーして使用する。
-
 ## ルール
 
 1. **シグナルは Issue に記録** — メモリではなく Evolution Issue に蓄積する
@@ -225,3 +66,5 @@ EOF
 3. **慎重に提案** — 過度な提案はノイズになる。DemyAgent の「少ないツール呼び出しが効果的」を反映
 4. **既存スキルと重複しない** — `discovering-codebase-rules` は新規パターン発見、`evolving-rules` は既存の改善
 5. **ユーザー承認必須** — ルール・スキルの変更はユーザー確認後に適用
+
+eval データ参照・Evolution Issue ライフサイクル・スキル完了時の自動記録手順・スタンドアロンシグナル記録は `evolving-rules/reference/evolution-details.md` を参照。

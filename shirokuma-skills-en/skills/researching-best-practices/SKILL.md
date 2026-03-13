@@ -139,7 +139,7 @@ shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/findings.md
 
 When invoked via `working-on-issue` chain, research results are reviewed by `review-worker` (Opus) using the **research role** before being finalized. This ensures research quality through a different model perspective.
 
-The research role reviews the following aspects (see `reviewing-on-issue`'s `roles/research.md` and `criteria/research.md` for details):
+The research role reviews the following aspects (see `review-issue`'s `roles/research.md` and `criteria/research.md` for details):
 - **Requirement alignment**: Whether recommended patterns are compatible with the project's tech-stack, existing patterns, and dependencies
 - **Research quality**: Source diversity, version consistency, source attribution, currency
 - **Implementability**: Specificity, incremental adoption paths, risk identification

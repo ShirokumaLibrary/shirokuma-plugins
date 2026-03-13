@@ -75,6 +75,7 @@ shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md             # Met
 shirokuma-docs pr create --base main --head develop --title "release: v0.2.0"  # Release workflow (metadata only)
 shirokuma-docs pr list                                      # PR list (default: open)
 shirokuma-docs pr list --state merged --limit 5            # Filtering
+shirokuma-docs pr list --head {branch-name}                # Resolve PR from branch name
 shirokuma-docs pr show {number}                             # PR details (body, diff stats, linked issues)
 shirokuma-docs pr comments {number}                         # Review comments and threads
 shirokuma-docs pr merge {number} --squash                   # Merge + status update
@@ -125,9 +126,6 @@ shirokuma-docs issues create --repo docs --from-file /tmp/shirokuma-docs/new-iss
 # Label management
 gh label list
 gh label create "name" --color "0E8A16" --description "Desc"
-
-# Repository info
-gh repo view --json nameWithOwner -q '.nameWithOwner'
 
 # Authentication
 gh auth login

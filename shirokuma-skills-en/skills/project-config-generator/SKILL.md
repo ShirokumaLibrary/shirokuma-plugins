@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 # Project Config Generator
 
-Creates and maintains project-specific configuration directories for skills like `coding-nextjs` and `reviewing-on-issue`.
+Creates and maintains project-specific configuration directories for skills like `coding-nextjs` and `review-issue`.
 
 ## When to Use
 
@@ -52,7 +52,7 @@ ls .claude/skills/*/project/ 2>/dev/null || echo "No project configs found"
 
 Supported skills:
 - `coding-nextjs`
-- `reviewing-on-issue`
+- `review-issue`
 
 ### Step 2: Gather Project Information
 
@@ -177,7 +177,7 @@ Output summary:
 
 ### Target Skills
 - coding-nextjs
-- reviewing-on-issue
+- review-issue
 
 ### Files Created/Updated
 - project/reference/tech-stack.md

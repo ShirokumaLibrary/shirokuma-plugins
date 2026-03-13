@@ -80,7 +80,7 @@ EOF
 
 ### Step 4: Write Plan to Issue Body
 
-Write the plan section to the Issue body. This enables `reviewing-on-issue` to retrieve the plan content via `shirokuma-docs show {number}`.
+Write the plan section to the Issue body. This enables `review-issue` to retrieve the plan content via `shirokuma-docs show {number}`.
 
 Append a `## Plan` section to the existing issue body. Use the template from the depth level determined in Step 3.
 
@@ -88,7 +88,7 @@ Append a `## Plan` section to the existing issue body. Use the template from the
 shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-body.md
 ```
 
-**Important**: Preserve the existing body (overview, tasks, deliverables). **Append** the `## Plan` section. If an existing `## Tasks` section exists, the plan's `### Task Breakdown` coexists as more specific implementation steps.
+**Important**: Preserve the existing body (overview, tasks, deliverables). **Append** the `## Plan` section. If an existing `## Tasks` section exists, the plan's `### Task Breakdown` coexists as more specific implementation steps. When using `shirokuma-docs show {number}` output as the base for the existing body, always strip the YAML frontmatter block (metadata enclosed in `---`) before writing.
 
 > Plan section headings and content must comply with the `output-language` rule. Follow `github-writing-style` rule bullet-point guidelines.
 

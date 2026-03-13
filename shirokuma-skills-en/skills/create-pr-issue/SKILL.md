@@ -228,7 +228,7 @@ If invoked with an issue number (e.g., `/create-pr-issue 39`):
 
 PR titles and bodies must be in English. Conventional commit prefixes (`feat:`, `fix:`, etc.) are always in English.
 
-Review reports output by `reviewing-on-issue` must also follow the `output-language` rule.
+Review reports output by `review-issue` must also follow the `output-language` rule.
 
 ## Edge Cases
 

@@ -104,7 +104,7 @@ assistant: "[Response before invoking]"
 | **Creator** | 実装 | 「する」ルールのみ |
 | **Checker** | レビュー/監査 | 「する」+「しない」ルール |
 
-**例**: `coding-nextjs (Creator) ←→ reviewing-on-issue (Checker)`
+**例**: `coding-nextjs (Creator) ←→ review-issue (Checker)`
 
 ### 4. 最小ツールアクセス（ACI）
 

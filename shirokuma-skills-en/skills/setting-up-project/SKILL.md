@@ -18,7 +18,7 @@ Detect local/remote repository:
 
 ```bash
 git remote -v
-gh repo view --json name,owner 2>/dev/null
+shirokuma-docs repo info --format json 2>/dev/null
 ```
 
 | State | Action |

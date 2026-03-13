@@ -118,7 +118,7 @@ After a successful push on a feature branch, determine whether to chain into PR 
 **Pre-check before offering PR**:
 
 ```bash
-gh pr list --head {branch-name} --json number,url --jq '.[0]'
+shirokuma-docs pr list --head {branch-name} --format json
 ```
 
 If a PR already exists for this branch, include the existing URL in the result and skip.

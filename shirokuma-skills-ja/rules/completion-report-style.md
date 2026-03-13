@@ -57,7 +57,7 @@ GitHub 書き込み（Issues, PRs, Discussions）での箇条書き vs 散文の
 | Config Management | 必須（厳格） | managing-rules, managing-skills, managing-agents |
 | Analysis | 必須（テーブル含む） | evolving-rules, preparing-on-issue |
 | Display / Orchestrator | 不要 | showing-github, working-on-issue |
-| Delegator | 呼び出し元に委ねる | reviewing-on-issue, creating-item |
+| Delegator | 呼び出し元に委ねる | review-issue, creating-item |
 
 テンプレート不要のスキルは完了レポートセクションを持たなくてよい。
 

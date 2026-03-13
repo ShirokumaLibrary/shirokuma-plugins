@@ -4,12 +4,12 @@ description: Sub-agent for comprehensive role-based reviews. Orchestrates multip
 tools: Read, Edit, Grep, Glob, Bash, WebSearch, WebFetch
 model: opus
 skills:
-  - reviewing-on-issue
+  - review-issue
 ---
 
 # Issue Review (Orchestrator)
 
-Orchestrates execution of the `reviewing-on-issue` skill, aggregating results from multiple roles and making a final judgment.
+Orchestrates execution of the `review-issue` skill, aggregating results from multiple roles and making a final judgment.
 
 ## Workflow
 
@@ -28,7 +28,7 @@ Parse the prompt from the caller and determine which roles to execute.
 | No role specified + significant test file changes | `code` + `testing` |
 | No role specified + none of the above | `code` (default) |
 
-**Auto-detection**: When no role is specified, analyze changed files to determine roles. The `config` role switch is handled by `reviewing-on-issue` (when `code` role is selected and all changed files match config file patterns, it auto-switches to `config`).
+**Auto-detection**: When no role is specified, analyze changed files to determine roles. The `config` role switch is handled by `review-issue` (when `code` role is selected and all changed files match config file patterns, it auto-switches to `config`).
 
 ```bash
 git diff --name-only origin/{base-branch}...HEAD 2>/dev/null || git diff --name-only HEAD~1 HEAD
@@ -36,9 +36,9 @@ git diff --name-only origin/{base-branch}...HEAD 2>/dev/null || git diff --name-
 
 ### Step 2: Role Loop Execution
 
-For each selected role, execute the `reviewing-on-issue` 6-step workflow (Role Selection → Knowledge Loading → Lint → Analysis → Report → Save) sequentially.
+For each selected role, execute the `review-issue` 6-step workflow (Role Selection → Knowledge Loading → Lint → Analysis → Report → Save) sequentially.
 
-**Single role**: Execute all 6 steps of `reviewing-on-issue` normally. The report is saved (Step 6) as a PR/Issue comment. No final judgment comment is posted (the single role's report serves as the final result).
+**Single role**: Execute all 6 steps of `review-issue` normally. The report is saved (Step 6) as a PR/Issue comment. No final judgment comment is posted (the single role's report serves as the final result).
 
 **Multiple roles**: Control flow for each role execution:
 
@@ -49,12 +49,12 @@ For each selected role, execute the `reviewing-on-issue` 6-step workflow (Role S
 
 ```text
 Role 1 (code):
-  → Execute reviewing-on-issue 6 steps (role: code)
+  → Execute review-issue 6 steps (role: code)
   → Post report as PR/Issue comment
   → Record: { role: "code", status: PASS, critical: 0, high: 1, medium: 3 }
 
 Role 2 (security):
-  → Execute reviewing-on-issue 6 steps (role: security)
+  → Execute review-issue 6 steps (role: security)
   → Post report as PR/Issue comment
   → Record: { role: "security", status: PASS, critical: 0, high: 0, medium: 1 }
 ```
@@ -103,7 +103,7 @@ shirokuma-docs issues comment {PR#_or_Issue#} --body-file /tmp/shirokuma-docs/{n
 
 ### Single Role
 
-Return the `reviewing-on-issue` output template as-is (normal review mode).
+Return the `review-issue` output template as-is (normal review mode).
 
 ### Multiple Roles
 
@@ -122,6 +122,6 @@ comment_id: {final-comment-database-id}
 
 1. **Single role report IS the final result** — Final judgment comment is only posted for multiple roles
 2. **Each role's report is posted individually** — Even with multiple roles, each report is posted as a separate PR/Issue comment
-3. **No context sharing between roles** — Each role's `reviewing-on-issue` execution is independent (knowledge loading starts fresh)
+3. **No context sharing between roles** — Each role's `review-issue` execution is independent (knowledge loading starts fresh)
 4. **Final judgment after all roles complete** — Do not judge mid-process
 5. **CONDITIONAL_PASS is for minor issues only** — Any Critical issue always results in FAIL

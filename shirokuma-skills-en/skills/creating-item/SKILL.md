@@ -42,11 +42,22 @@ Args: create-item --title "{Title}" --issue-type "{Type}" --labels "{area:label}
 
 ### Step 3: Return to User
 
-After creation, display next action guidance:
+After creation, display next action guidance based on the default recommendation from [reference/chain-rules.md](reference/chain-rules.md):
+
+**When Size XS/S and requirements are clear (default: start immediately):**
 
 ```markdown
 Item created: #{number}
+→ `/working-on-issue #{number}` to start implementation directly (recommended)
 → `/preparing-on-issue #{number}` to start planning
+→ Or keep in Backlog
+```
+
+**When Size M+ or requirements are ambiguous (default: plan first):**
+
+```markdown
+Item created: #{number}
+→ `/preparing-on-issue #{number}` to start planning (recommended)
 → `/working-on-issue #{number}` to start implementation directly
 → Or keep in Backlog
 ```
@@ -62,12 +73,7 @@ See [reference/chain-rules.md](reference/chain-rules.md) for chain decision deta
 
 ## Next Steps
 
-```
-Item created: #{number}
-→ `/preparing-on-issue #{number}` to start planning
-→ `/working-on-issue #{number}` to start implementation directly
-→ Or keep in Backlog
-```
+Based on chain-rules.md: recommend `/working-on-issue` for Size XS/S with clear requirements, `/preparing-on-issue` for Size M+. See Step 3 for details.
 
 ## Evolution Signal Auto-Recording
 

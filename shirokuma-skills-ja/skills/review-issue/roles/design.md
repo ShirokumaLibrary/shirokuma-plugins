@@ -11,11 +11,11 @@
 
 ## `designing-on-issue` との使い分け
 
-| 観点 | `designing-on-issue` 内蔵チェック | `reviewing-on-issue` design ロール |
+| 観点 | `designing-on-issue` 内蔵チェック | `review-issue` design ロール |
 |------|----------------------------------|-----------------------------------|
 | タイミング | 設計フェーズ中の反復チェック | 設計完了後のゲートレビュー |
 | 目的 | 設計の方向性確認 | 独立したセカンドオピニオン |
-| 起動方法 | `designing-on-issue` のループ内 | `/reviewing-on-issue design #N` |
+| 起動方法 | `designing-on-issue` のループ内 | `/review-issue design #N` |
 
 ## 必要な知識
 

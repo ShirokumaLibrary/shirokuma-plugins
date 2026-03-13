@@ -6,7 +6,7 @@
 
 スキルがサブエージェントとしての実行をサポートしたことで、独立した隔離環境で実行可能に。ほとんどのユースケースでスキルを推奨:
 - リサーチタスク（`researching-best-practices` スキル参照）
-- レビュータスク（`reviewing-on-issue` スキル参照）
+- レビュータスク（`review-issue` スキル参照）
 - 設定検証（`reviewing-claude-config` スキル参照）
 
 **エージェントが適切な場合:**

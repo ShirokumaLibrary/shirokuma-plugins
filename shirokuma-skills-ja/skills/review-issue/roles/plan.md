@@ -11,12 +11,12 @@ Issue 本文の計画セクション（`## 計画`）の品質レビュー:
 
 ## `plan-issue` との使い分け
 
-| 観点 | `plan-issue` 内蔵レビュー | `reviewing-on-issue` plan ロール |
+| 観点 | `plan-issue` 内蔵レビュー | `review-issue` plan ロール |
 |------|--------------------------------|--------------------------------|
 | タイミング | 計画策定直後の即時チェック | ユーザーが任意タイミングで依頼 |
 | データ取得 | Task エージェントに Issue 本文を埋め込み | Issue 番号から `shirokuma-docs show` で取得 |
 | 目的 | 計画の初期品質ゲート | 独立したセカンドオピニオン |
-| 起動方法 | `plan-issue` のステップ 4 で自動実行 | `/reviewing-on-issue plan #N` または Spec Review Issue 指定 |
+| 起動方法 | `plan-issue` のステップ 4 で自動実行 | `/review-issue plan #N` または Spec Review Issue 指定 |
 
 ## 必要な知識
 
