@@ -41,4 +41,4 @@ working-on-issue（マネージャー＝メイン AI）
 
 ## スタンドアロン起動
 
-ユーザーは `/coding-nextjs` を直接呼び出すことも可能（非サブエージェント、TodoWrite/AskUserQuestion 利用可）。`code-issue` は `working-on-issue` からの標準ルートだが、既存のスタンドアロン起動パスは維持される。
+ユーザーは `/coding-nextjs` を直接呼び出すことも可能（非サブエージェント、Tasks API/AskUserQuestion 利用可）。`code-issue` は `working-on-issue` からの標準ルートだが、既存のスタンドアロン起動パスは維持される。

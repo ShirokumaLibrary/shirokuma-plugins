@@ -77,8 +77,8 @@ Return the following structured data to the caller:
 
 ```yaml
 ---
-action: CONTINUE
-next: open-pr-issue
+action: CONTINUE          # Directive to orchestrator (working-on-issue): invoke next immediately
+next: open-pr-issue       # Skill the orchestrator must invoke next
 status: SUCCESS
 ref: "#{issue-number}"
 comment_id: {comment-database-id}

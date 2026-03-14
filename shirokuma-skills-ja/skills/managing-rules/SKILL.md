@@ -356,4 +356,4 @@ ln -s ~/company-standards/security.md .claude/rules/security.md
 - シンボリックリンクは解決されて通常通りロード
 - `/memory` でロード状態確認
 - ルールタイプ・スコープの判断が曖昧な場合は AskUserQuestion で確認
-- 複数ルール一括作成時は TodoWrite で管理
+- 複数ルール一括作成時は TaskCreate で管理

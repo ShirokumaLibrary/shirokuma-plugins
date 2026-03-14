@@ -70,14 +70,14 @@ Simple questions, minor config edits, fine-tuning skill results, confirmation di
 ## Tool Usage
 
 - **AskUserQuestion**: Deviating from instructions, multiple approach selection, edge case decisions
-- **TodoWrite**: 3+ step tasks, multi-issue sessions, delegation chains
+- **TaskCreate, TaskUpdate**: 3+ step tasks, multi-issue sessions, delegation chains
 
 ## Subagent Completion
 
 **Subagent skill completion ≠ task completion.** When a custom sub-agent (e.g., `pr-worker`, `commit-worker`, `review-worker`) returns via the Agent tool, the main AI must:
 
 1. Parse the output template (YAML frontmatter)
-2. Check TodoWrite for remaining `pending` steps
+2. Check TaskList for remaining `pending` steps
 3. If pending steps exist → **immediately proceed to the next step in the same response** (do NOT stop, summarize, or ask the user)
 
 The Agent tool returning is a chain mid-point, not a completion signal.

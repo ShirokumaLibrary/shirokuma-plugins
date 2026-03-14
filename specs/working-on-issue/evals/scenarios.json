@@ -92,7 +92,7 @@
           "category": "convention"
         },
         {
-          "text": "TodoWrite でチェーンステップ（実装→コミット→PR→作業サマリー→Status 更新）を登録する",
+          "text": "TaskCreate でチェーンステップ（実装→コミット→PR→作業サマリー→Status 更新）を登録する",
           "category": "tooling"
         },
         {

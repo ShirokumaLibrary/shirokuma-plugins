@@ -1,7 +1,7 @@
 ---
 name: coding-nextjs
 description: Implements features in Next.js projects using framework-specific templates and patterns. TDD workflow is managed by working-on-issue. Triggers: "implement", "add feature", "create component", "build page", "create page".
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch, AskUserQuestion, TodoWrite
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Next.js Coding
@@ -24,7 +24,7 @@ Framework-compliant implementation using Next.js-specific templates and patterns
 
 ### Step 1: Implementation Plan
 
-Create progress tracker with TodoWrite.
+Create progress tracker with TaskCreate.
 
 ```markdown
 ## Implementation Plan

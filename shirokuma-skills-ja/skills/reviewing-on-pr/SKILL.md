@@ -1,7 +1,7 @@
 ---
 name: reviewing-on-pr
 description: PR番号を受け取り、コードレビュー実行および未解決レビュースレッドの対応を自動チェーンで処理します。トリガー: 「レビュー対応」「PR対応」「PRレビュー」「review response」「/reviewing-on-pr #123」。
-allowed-tools: Bash, Read, Grep, Glob, TodoWrite, AskUserQuestion, Agent
+allowed-tools: Bash, Read, Grep, Glob, TaskCreate, TaskUpdate, TaskGet, TaskList, AskUserQuestion, Agent
 ---
 
 # PR レビュー対応
@@ -110,9 +110,9 @@ shirokuma-docs pr comments {PR#}
 | 質問 | 説明や理由の質問 | 返信 → 解決 |
 | 意見相違 | レビュアーと判断が分かれる | 返信（解決しない） |
 
-### ステップ 4: TodoWrite 登録
+### ステップ 4: タスク登録
 
-分類結果に基づき、全スレッドの処理ステップを TodoWrite に登録:
+分類結果に基づき、全スレッドの処理ステップを TaskCreate で登録:
 
 ```
 1. [コード修正] スレッド: {要約} — 修正・コミット＆プッシュ・返信・解決
@@ -238,6 +238,7 @@ shirokuma-docs comment {PR#} --body-file /tmp/shirokuma-docs/pr-{PR#}-review-res
 | 古いコメント（コードが変更済み） | フィードバックがまだ有効なら返信、関連コミットを参照 |
 | レビュアーが再レビューを要求 | 返信するがスレッドは開いたまま |
 | PR に関連 Issue がない | コンテキスト復元の Issue 参照をスキップ |
+| 未解決スレッドあり かつ `comment_id` あり | `unresolved_threads > 0` が優先。ステップ 2b（レビュー結果確認）へ進む（`comment_id` の有無は無視される） |
 | 未解決スレッドなしだが `comment_id` あり | `review-worker` が改善提案を issue comment で投稿したケース。フロントマターの `comment_id` で識別。ステップ 2b の UCP を発動する |
 | コード修正が他のスレッドに影響 | 影響を確認して一括対応 |
 | ユーザーが修正不要と判断（UCP） | 完了レポートを表示して終了。スレッド対応をスキップ |
@@ -250,7 +251,7 @@ shirokuma-docs comment {PR#} --body-file /tmp/shirokuma-docs/pr-{PR#}-review-res
 | Agent | `review-worker` によるコードレビュー実行（ステップ 2a）、`coding-worker` / `commit-worker` によるコード修正・コミット（ステップ 5） |
 | Bash | `shirokuma-docs pr comments`, `pr reply`, `pr resolve`, git 操作 |
 | Read | コード確認、計画参照 |
-| TodoWrite | スレッド処理の進捗管理 |
+| TaskCreate, TaskUpdate | スレッド処理の進捗管理 |
 
 ## リファレンス
 

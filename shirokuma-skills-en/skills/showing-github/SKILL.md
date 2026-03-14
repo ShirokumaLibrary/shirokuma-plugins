@@ -359,4 +359,4 @@ If no batch candidates found, omit this section.
 - Combine Discussion and local handovers if both exist
 - Specs stored in "Ideas" category by convention
 - When the request is ambiguous, use AskUserQuestion to confirm which subcommand (dashboard/items/issues/prs/handovers/specs)
-- This is a display-only task; TodoWrite is not needed
+- This is a display-only task; Tasks API is not needed

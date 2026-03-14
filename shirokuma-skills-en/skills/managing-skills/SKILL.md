@@ -109,7 +109,7 @@ allowed-tools: Read, Grep, Glob
 | Tool | When to Include |
 |------|-----------------|
 | AskUserQuestion | Skill has decision points, confirmations, or edge cases requiring user input. Use structured options instead of plain text prompts |
-| TodoWrite | Skill has 4+ sequential steps where progress tracking helps the user. Not needed for simple linear workflows |
+| TaskCreate, TaskUpdate | Skill has 4+ sequential steps where progress tracking helps the user. Not needed for simple linear workflows |
 
 #### Advanced Frontmatter
 

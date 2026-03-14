@@ -359,4 +359,4 @@ Draft | Review | Approved | Rejected | Implementing
 - Discussion とローカル引き継ぎの両方が存在する場合は統合
 - 仕様は慣例として "Ideas" カテゴリに格納
 - 要求が曖昧な場合は AskUserQuestion でサブコマンド（dashboard/items/issues/prs/handovers/specs）を確認
-- 表示系タスクのため TodoWrite は不要
+- 表示系タスクのため Tasks API は不要

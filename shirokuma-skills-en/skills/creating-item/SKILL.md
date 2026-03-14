@@ -1,7 +1,7 @@
 ---
 name: creating-item
 description: Creates GitHub Issues or Discussions with auto-inferred metadata from conversation context and provides auto-chaining to working-on-issue. Triggers: "create issue", "make this an issue", "follow-up issue", "create spec", "new issue", "file an issue".
-allowed-tools: Bash, AskUserQuestion, Read, Write, TodoWrite
+allowed-tools: Bash, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Creating Items

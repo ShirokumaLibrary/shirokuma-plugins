@@ -94,7 +94,7 @@ shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-b
 
 ## Constraints
 
-- As an Agent tool (subagent), `TodoWrite` / `AskUserQuestion` are not available
+- As an Agent tool (subagent), Tasks API / `AskUserQuestion` are not available
 - Progress management and user interaction are handled by the orchestrator (`preparing-on-issue`)
 - Plan review is handled by `preparing-on-issue` — this skill only creates the plan
 - **Does not update status** — status transitions (Preparing, Designing, Spec Review) are managed by `preparing-on-issue`

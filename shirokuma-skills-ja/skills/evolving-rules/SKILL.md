@@ -1,7 +1,7 @@
 ---
 name: evolving-rules
 description: ルール・スキルの進化シグナルを分析し、蓄積されたフィードバックに基づく改善提案を行います。トリガー: 「ルール進化」「rule evolution」「進化フロー」「evolve rules」「シグナル分析」。
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite, Skill
+allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill
 ---
 
 # ルール・スキル進化

@@ -1,7 +1,7 @@
 ---
 name: researching-best-practices
 description: Researches official documentation and project patterns before implementation. Triggers: starting a new feature, unsure about best practices, "research best practices for X", "how should I implement Y".
-allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, TodoWrite
+allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Best Practices Researcher
@@ -37,7 +37,7 @@ Parse what the user wants to implement or understand:
 - Technologies involved
 - Specific concerns or constraints
 
-Use `AskUserQuestion` when the research direction is unclear. Use `TodoWrite` when researching multiple technologies.
+Use `AskUserQuestion` when the research direction is unclear. Use TaskCreate when researching multiple technologies.
 
 ### 2. Search Project Patterns
 
@@ -147,6 +147,10 @@ The research role reviews the following aspects (see `review-issue`'s `roles/res
 When mismatched but useful best practices are detected, adoption proposals are created.
 
 The orchestrator (`working-on-issue`) is responsible for invoking the review gate after this skill completes. This skill itself does not invoke the review.
+
+## Post-Research Flow
+
+For conditional branching logic after research completion (Discussion save, Issue creation, ADR, Knowledge, Rule extraction proposals), see [reference/post-research-flow.md](reference/post-research-flow.md).
 
 ## Notes
 

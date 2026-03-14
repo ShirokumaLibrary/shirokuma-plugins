@@ -234,5 +234,5 @@ description: Brief description
 - `/output-style` コマンド使用時はスタイル変更が即座に反映
 - コア機能（Read, Write, Bash 等）は全スタイルで保持
 - カスタムスタイルの方向性は AskUserQuestion で確認してから作成
-- 複数スタイル作成時は TodoWrite で管理
+- 複数スタイル作成時は TaskCreate で管理
 - ビルトインスタイル名（default, explanatory, learning）と衝突する名前を使わない

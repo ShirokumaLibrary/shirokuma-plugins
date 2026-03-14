@@ -1,7 +1,7 @@
 ---
 name: designing-on-issue
 description: 設計タイプに応じて適切な設計スキルにルーティングし、ディスカバリー・視覚評価ループを管理するオーケストレーター。UI 設計は designing-shadcn-ui に、アーキテクチャ設計は designing-nextjs に、データモデル設計は designing-drizzle に委任します。トリガー: 「デザイン」「UI」「印象的」「design」「設計」。
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TodoWrite, Skill, Agent
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill, Agent
 ---
 
 # デザインワークフロー（オーケストレーター）
@@ -188,7 +188,7 @@ shirokuma-docs issues update {number} --field-status "Spec Review"
 | ツール | タイミング |
 |--------|-----------|
 | AskUserQuestion | デザイン方向性確認、視覚評価ループ |
-| TodoWrite | Phase 進捗の追跡 |
+| TaskCreate, TaskUpdate | Phase 進捗の追跡 |
 | Skill | `designing-shadcn-ui`、`designing-nextjs`、`designing-drizzle` への委任 |
 | WebSearch | デザインリファレンス調査（オプション） |
 | Bash | dev サーバー確認、ビルド確認 |

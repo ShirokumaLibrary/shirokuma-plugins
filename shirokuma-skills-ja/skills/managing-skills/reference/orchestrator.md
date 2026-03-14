@@ -21,7 +21,7 @@ shirokuma-skills プラグインには 2 つの拡張可能なオーケストレ
 ---
 name: {orchestrating-domain}
 description: 要件に基づいて適切な {domain} スキルにルーティングする。{specialist-a}、{specialist-b} に委任。トリガー: 「{keyword1}」「{keyword2}」。
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TodoWrite, Skill
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill
 ---
 ```
 
@@ -92,7 +92,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 
 **allowed-tools ルール:**
 - `AskUserQuestion` を含めない — 専門スキルはインタラクティブツールを使用できない worker サブエージェント内で実行される
-- `TodoWrite` を含めない — 進捗管理は親オーケストレーターが担当
+- `TaskCreate` / `TaskUpdate` を含めない — 進捗管理は親オーケストレーターが担当
 - `Skill` は専門スキルがさらに他のスキルに委任する場合のみ含める
 
 ### 専門スキル構造
@@ -176,7 +176,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 
 - [ ] **命名**: `designing-` または `coding-` プレフィックスで始まる
 - [ ] **フロントマター**: `name` と `description` フィールドがある
-- [ ] **allowed-tools**: `AskUserQuestion` と `TodoWrite` を含まない
+- [ ] **allowed-tools**: `AskUserQuestion` と `TaskCreate` / `TaskUpdate` を含まない
 - [ ] **コンテキスト受信**: 委任（コンテキストあり）とスタンドアロンの両モードに対応
 - [ ] **ビルド検証なし**: 設計スキルはビルドステップをスキップ（オーケストレーターが管理）
 - [ ] **次のステップ**: 委任とスタンドアロンの両方の次のステップセクションを含む

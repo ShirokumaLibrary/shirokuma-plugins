@@ -1,7 +1,7 @@
 ---
 name: publishing
 description: shirokuma-docs repo pairs CLIを使用して公開リリースを管理します。ステータスチェック、ドライランプレビュー、リリース実行、.shirokumaignore設定を処理します。トリガー: 「publish」「release」「公開リリース」「リリース」。
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
+allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # パブリッシング
@@ -206,7 +206,7 @@ cd - && rm -rf "$TMPDIR"
 
 ## 注意事項
 
-- `TodoWrite` で進捗管理
+- `TaskCreate` で進捗管理
 - リリース前にドライラン（`--dry-run`）を実行する — リリースは不可逆であり、ドライランで設定エラーを早期発見できる
 - リリース前に作業ディレクトリがクリーンであることを確認する — 未コミットの変更が誤って含まれたり失われたりするリスクがある
 

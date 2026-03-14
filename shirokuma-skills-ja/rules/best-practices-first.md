@@ -70,14 +70,14 @@ graph LR
 ## ツール使い分け
 
 - **AskUserQuestion**: 指示からの逸脱、複数アプローチの選択、エッジケースの判断
-- **TodoWrite**: 3ステップ以上のタスク、マルチ Issue、委任チェーン
+- **TaskCreate, TaskUpdate**: 3ステップ以上のタスク、マルチ Issue、委任チェーン
 
 ## Subagent 結果処理
 
 **subagent スキル完了 ≠ タスク完了。** カスタムサブエージェント（例: `pr-worker`, `commit-worker`, `review-worker`）が Agent ツール経由で結果を返した後、メイン AI は:
 
 1. 出力テンプレート（YAML フロントマター）をパース
-2. TodoWrite の残り `pending` ステップを確認
+2. TaskList の残り `pending` ステップを確認
 3. pending ステップがあれば → **同じレスポンス内で即座に次のステップに進む**（停止・サマリー表示・ユーザーへの確認は禁止）
 
 Agent ツールの復帰はチェーンの中間地点であり、完了シグナルではない。

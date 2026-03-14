@@ -21,7 +21,7 @@ For creating a new orchestrator that routes to specialist skills (rare — most 
 ---
 name: {orchestrating-domain}
 description: Routes to appropriate {domain} skills based on requirements. Delegates to {specialist-a}, {specialist-b}. Triggers: "{keyword1}", "{keyword2}".
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TodoWrite, Skill
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill
 ---
 ```
 
@@ -92,7 +92,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 
 **allowed-tools rules:**
 - Do NOT include `AskUserQuestion` — specialist skills run inside worker subagents that cannot use interactive tools
-- Do NOT include `TodoWrite` — progress tracking is managed by the parent orchestrator
+- Do NOT include `TaskCreate` / `TaskUpdate` — progress tracking is managed by the parent orchestrator
 - Include `Skill` only if the specialist further delegates to other skills
 
 ### Specialist Structure
@@ -176,7 +176,7 @@ Before creating an orchestrator-compatible specialist skill, verify:
 
 - [ ] **Name**: Starts with `designing-` or `coding-` prefix
 - [ ] **Frontmatter**: Has `name` and `description` fields
-- [ ] **allowed-tools**: Does NOT include `AskUserQuestion` or `TodoWrite`
+- [ ] **allowed-tools**: Does NOT include `AskUserQuestion` or `TaskCreate` / `TaskUpdate`
 - [ ] **Context reception**: Handles both delegated (with context) and standalone modes
 - [ ] **No build verification**: Design skills skip build steps (orchestrator handles this)
 - [ ] **Next steps**: Includes both delegated and standalone next steps sections

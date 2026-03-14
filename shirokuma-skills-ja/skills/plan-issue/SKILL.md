@@ -94,7 +94,7 @@ shirokuma-docs issues update {number} --body-file /tmp/shirokuma-docs/{number}-b
 
 ## 制約
 
-- Agent ツール（サブエージェント）のため `TodoWrite` / `AskUserQuestion` は使用不可
+- Agent ツール（サブエージェント）のため Tasks API / `AskUserQuestion` は使用不可
 - 進捗管理とユーザーとのやりとりはオーケストレーター（`preparing-on-issue`）が担当
 - 計画レビューは `preparing-on-issue` が担当 — このスキルは計画の作成のみ
 - **ステータスは更新しない** — ステータス遷移（Preparing, Designing, Spec Review）は `preparing-on-issue` が管理

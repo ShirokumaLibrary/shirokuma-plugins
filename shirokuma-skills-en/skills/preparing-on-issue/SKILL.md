@@ -1,7 +1,7 @@
 ---
 name: preparing-on-issue
 description: "Orchestrates the planning phase for an issue: status management, plan delegation to planning-worker, plan review, and user approval gate. Triggers: \"plan\", \"plan #42\", \"design approach\", \"create plan\"."
-allowed-tools: Agent, Bash, AskUserQuestion, TodoWrite
+allowed-tools: Agent, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Preparing on Issue (Orchestrator)
@@ -315,7 +315,7 @@ At the end of the plan completion report, auto-record Evolution signals followin
 | Agent (planning-worker) | Step 3: Delegate plan creation |
 | Agent (review-worker) | Step 4: Fresh-context plan review (custom subagent delegation) |
 | AskUserQuestion | Overwrite confirmation, issue number prompt |
-| TodoWrite | Planning orchestration step progress tracking |
+| TaskCreate, TaskUpdate | Planning orchestration step progress tracking |
 
 ## Notes
 
@@ -323,4 +323,4 @@ At the end of the plan completion report, auto-record Evolution signals followin
 - **Does not implement** — planning only. Implementation is `working-on-issue`'s responsibility
 - Plans are persisted in the issue body — available across sessions
 - `Spec Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
-- **Chain autonomous progression**: After the review subagent (Step 4) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 5-6 based on the YAML frontmatter `action` field
+- **Chain autonomous progression**: After the review subagent (Step 4) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 5-6 based on the YAML frontmatter `action` field. Check TaskList for remaining pending steps after each subagent result

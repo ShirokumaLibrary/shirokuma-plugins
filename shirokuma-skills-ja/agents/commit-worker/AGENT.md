@@ -14,3 +14,7 @@ skills:
 ## 責務境界
 
 責務は **commit + push のみ**。PR 作成・セルフレビュー・レビューチェーンは呼び出し元（`working-on-issue` 等）が管理するため、このエージェントでは実行しない。
+
+**明示的な禁止事項:**
+- 注入スキル（`commit-issue`）の PR チェーンステップ（ステップ 4）は**実行しない**。PR 作成は呼び出し元が `pr-worker` 経由で制御する。ここで PR を作成すると `Closes #{number}` が欠落し、Issue リンクが成立しない。
+- `gh pr create` や `shirokuma-docs pr create` を直接呼び出さない。

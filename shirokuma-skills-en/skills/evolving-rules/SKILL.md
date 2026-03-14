@@ -1,7 +1,7 @@
 ---
 name: evolving-rules
 description: Analyzes evolution signals for rules and skills, proposing improvements based on accumulated feedback. Triggers: "rule evolution", "rules evolution", "evolve rules", "evolution flow", "signal analysis".
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite, Skill
+allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill
 ---
 
 # Rule & Skill Evolution

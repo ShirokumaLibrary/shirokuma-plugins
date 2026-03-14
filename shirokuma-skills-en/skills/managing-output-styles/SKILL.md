@@ -237,5 +237,5 @@ When run standalone, suggest next steps (activation command, testing method).
 ## Additional Notes
 
 - Confirm custom style direction with AskUserQuestion before creating
-- Use TodoWrite to track progress when creating multiple styles
+- Use TaskCreate to track progress when creating multiple styles
 - Do not use names that conflict with built-in styles (default, explanatory, learning)

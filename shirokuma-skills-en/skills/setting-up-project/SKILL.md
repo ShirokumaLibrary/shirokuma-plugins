@@ -1,7 +1,7 @@
 ---
 name: setting-up-project
 description: Runs interactive end-to-end project initial setup including configuration, skill installation, and rule deployment. Triggers: "initial setup", "set up project", "setup project", "new project", "initialize".
-allowed-tools: Bash, AskUserQuestion, Read, Write, Glob, TodoWrite
+allowed-tools: Bash, AskUserQuestion, Read, Write, Glob, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Project Setup
@@ -10,7 +10,7 @@ Interactive end-to-end initial setup. Integrates `github-project-setup` and `pro
 
 ## Workflow
 
-Track progress with TodoWrite (5 steps).
+Track progress with TaskCreate (5 steps).
 
 ### Step 1: Repository Check
 

@@ -1,5 +1,5 @@
 {
-  "description": "Default blocked command patterns for PreToolUse hook. Configure via hooks.allow in shirokuma-docs.config.yaml",
+  "description": "Default blocked command patterns for PreToolUse hook. Configure via hooks.allow in shirokuma-docs.config.yaml. Note: gh api commands are intentionally excluded due to high path variability making pattern matching impractical.",
   "rules": [
     {
       "id": "pr-merge",
@@ -35,6 +35,72 @@
       "id": "force-delete-branch",
       "pattern": "git branch (-D|--delete --force|--force --delete)",
       "reason": "Force deleting a branch requires explicit user approval.",
+      "enabled": true
+    },
+    {
+      "id": "gh-issue-list",
+      "pattern": "gh issue list",
+      "reason": "Use `shirokuma-docs issues list` instead of `gh issue list`.",
+      "enabled": true
+    },
+    {
+      "id": "gh-issue-view",
+      "pattern": "gh issue view",
+      "reason": "Use `shirokuma-docs show <number>` instead of `gh issue view`.",
+      "enabled": true
+    },
+    {
+      "id": "gh-issue-create",
+      "pattern": "gh issue create",
+      "reason": "Use `shirokuma-docs issues create` instead of `gh issue create`.",
+      "enabled": true
+    },
+    {
+      "id": "gh-issue-comment",
+      "pattern": "gh issue comment",
+      "reason": "Use `shirokuma-docs comment <number>` instead of `gh issue comment`.",
+      "enabled": true
+    },
+    {
+      "id": "gh-issue-edit",
+      "pattern": "gh issue edit",
+      "reason": "Use `shirokuma-docs issues update <number>` instead of `gh issue edit`.",
+      "enabled": true
+    },
+    {
+      "id": "gh-pr-create",
+      "pattern": "gh pr create",
+      "reason": "Use `shirokuma-docs pr create` instead of `gh pr create`.",
+      "enabled": true
+    },
+    {
+      "id": "gh-pr-view",
+      "pattern": "gh pr view",
+      "reason": "Use `shirokuma-docs pr show` instead of `gh pr view`.",
+      "enabled": true
+    },
+    {
+      "id": "gh-pr-list",
+      "pattern": "gh pr list",
+      "reason": "Use `shirokuma-docs pr list` instead of `gh pr list`.",
+      "enabled": true
+    },
+    {
+      "id": "gh-pr-review",
+      "pattern": "gh pr review",
+      "reason": "Use `shirokuma-docs pr comments`, `pr reply`, `pr resolve` instead of `gh pr review`.",
+      "enabled": true
+    },
+    {
+      "id": "gh-project",
+      "pattern": "gh project (item-list|field-list)",
+      "reason": "Use `shirokuma-docs projects list` or `projects fields` instead of `gh project`.",
+      "enabled": true
+    },
+    {
+      "id": "gh-search",
+      "pattern": "gh search issues",
+      "reason": "Use `shirokuma-docs search` instead of `gh search issues`.",
       "enabled": true
     }
   ]

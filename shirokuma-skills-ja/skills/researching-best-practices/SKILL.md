@@ -1,7 +1,7 @@
 ---
 name: researching-best-practices
 description: 公式ドキュメントとプロジェクトパターンを調査してから実装する。新機能の開始時、ベストプラクティスが不明な場合、「Xのベストプラクティスを調べて」「Yの実装方法は？」などのリクエスト時に使用。トリガー: "ベストプラクティス調査", "実装方法を調べて", "Drizzleでソフトデリートってどう実装するのがベスト？", "research best practices", "how should I implement".
-allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, TodoWrite
+allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # ベストプラクティス調査
@@ -37,7 +37,7 @@ allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, Tod
 - 関連技術
 - 特定の懸念事項や制約
 
-調査方向が不明確な場合は `AskUserQuestion` で確認。複数技術の調査時は `TodoWrite` で管理。
+調査方向が不明確な場合は `AskUserQuestion` で確認。複数技術の調査時は `TaskCreate` で管理。
 
 ### 2. プロジェクトパターン検索
 
@@ -147,6 +147,10 @@ research ロールは以下の観点でレビューする（詳細は `review-is
 不合致だが有用なベストプラクティスが検出された場合、取り込み提案が作成される。
 
 レビューゲートの呼び出しはオーケストレーター（`working-on-issue`）が担当する。このスキル自体はレビューを起動しない。
+
+## 完了後フロー
+
+リサーチ完了後の条件分岐ロジック（Discussion 保存、Issue 作成、ADR、Knowledge、Rule 化提案）は [reference/post-research-flow.md](reference/post-research-flow.md) を参照。
 
 ## 注意事項
 

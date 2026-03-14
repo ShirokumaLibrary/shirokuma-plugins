@@ -118,7 +118,7 @@ Define templates in ` ```markdown ` fenced code blocks.
 - Long explanations of LLM-known concepts
 - Motivational/philosophy sections ("why" over "what")
 - **Omitting workflows** (flows must not be left to LLM inference)
-- **Omitting tool usage instructions** (TodoWrite, AskUserQuestion, etc.)
+- **Omitting tool usage instructions** (TaskCreate, TaskUpdate, AskUserQuestion, etc.)
 - **Omitting NG cases** (without prohibitions, LLM defaults to its own behavior)
 
 ## Validation Checklist
@@ -130,7 +130,7 @@ Before committing:
 - [ ] Frontmatter: valid YAML (spaces, not tabs)
 - [ ] Paths: forward slashes only
 - [ ] **Workflow**: Step-by-step flow documented
-- [ ] **Tool usage**: TodoWrite / AskUserQuestion / Task usage points specified
+- [ ] **Tool usage**: TaskCreate / TaskUpdate / AskUserQuestion usage points specified
 - [ ] **NG cases**: Skill-specific prohibitions and checklists present
 - [ ] Coder skills: Known concept explanations removed, reference only
 - [ ] Reviewer skills: Checklist coverage is sufficient

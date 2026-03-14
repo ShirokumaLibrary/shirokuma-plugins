@@ -1,7 +1,7 @@
 ---
 name: discovering-codebase-rules
 description: Analyzes TypeScript applications to discover patterns and propose coding conventions for shirokuma-docs lint rules. Triggers: "rule discovery", "convention proposal", "pattern analysis", or when investigating codebases to extract patterns or propose new conventions.
-allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion, TodoWrite
+allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Codebase Rule Discovery
@@ -40,7 +40,7 @@ Checkability analysis → Propose conventions → Implement rules after adoption
 
 ## Workflow: Pattern Discovery
 
-Use `TodoWrite` for progress tracking (6+ steps). Use `AskUserQuestion` to confirm priority when proposing conventions.
+Use TaskCreate for progress tracking (6+ steps). Use `AskUserQuestion` to confirm priority when proposing conventions.
 
 ### Step 1-7: See workflow file
 

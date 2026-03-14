@@ -122,7 +122,7 @@ shirokuma-docs issues list --issue-type Evolution --limit 1
 ### 制約
 
 - 1 スキル完了あたり最大 1 コメント（複数シグナルは 1 コメントに集約）
-- TodoWrite に登録しない（ノンブロッキング処理）
+- タスクに登録しない（ノンブロッキング処理）
 - 振り返りは簡潔なチェックリスト形式でコンテキスト消費を最小化
 - シグナル未検出時は CLI コマンド実行を最小化（`issues list` 1 回のみ）
 - `creating-item` が作成したアイテムの Issue Type が Evolution の場合、シグナル記録全体をスキップする（Evolution Issue 自体が改善提案であり重複記録を防止）

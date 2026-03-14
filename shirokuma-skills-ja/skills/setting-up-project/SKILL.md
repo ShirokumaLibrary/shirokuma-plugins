@@ -1,7 +1,7 @@
 ---
 name: setting-up-project
 description: 対話式で初期セットアップを一気通貫実行し、設定ファイル・スキル・ルールを一括インストールします。トリガー: 「初期設定」「セットアップ」「setup project」「新規プロジェクト」「初期化」。
-allowed-tools: Bash, AskUserQuestion, Read, Write, Glob, TodoWrite
+allowed-tools: Bash, AskUserQuestion, Read, Write, Glob, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # プロジェクトセットアップ
@@ -10,7 +10,7 @@ allowed-tools: Bash, AskUserQuestion, Read, Write, Glob, TodoWrite
 
 ## ワークフロー
 
-TodoWrite で進捗管理（5ステップ）。
+TaskCreate で進捗管理（5ステップ）。
 
 ### ステップ 1: リポジトリ確認
 

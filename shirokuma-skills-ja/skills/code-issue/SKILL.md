@@ -72,7 +72,7 @@ shirokuma-docs skills routing coding
 
 ## 制約
 
-- Agent ツール（サブエージェント）のため `TodoWrite` / `AskUserQuestion` は使用不可
+- Agent ツール（サブエージェント）のため Tasks API / `AskUserQuestion` は使用不可
 - 進捗管理はマネージャー（メイン AI、`working-on-issue`）が担当
 - TDD ワークフローは `working-on-issue` が `code-issue` の呼び出しを TDD で包む形で管理（`code-issue` 自体は実装のみに集中）
 - UI デザインタスク（新規 UI ページ、ビジュアルリデザイン、デザインシステムトークン変更）は `designing-on-issue` → `designing-shadcn-ui` が担当し、本スキルの責務外
@@ -84,8 +84,8 @@ shirokuma-docs skills routing coding
 
 ```yaml
 ---
-action: CONTINUE
-next: commit-issue
+action: CONTINUE          # オーケストレーター（working-on-issue）への命令: 即座に next を起動せよ
+next: commit-issue        # オーケストレーターが次に起動すべきスキル
 status: SUCCESS
 ---
 

@@ -1,20 +1,20 @@
 ---
 name: working-on-issue
 description: Dispatches work by taking an issue number or task description, selecting the appropriate skill, and orchestrating the full workflow from implementation to PR. Triggers: "work on", "work on #42", "do this", "start working".
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TodoWrite
+allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Working on Issue (Orchestrator)
 
-> **Chain Autonomous Progression**: Subagent skill results are intermediate chain data, not final user-facing output. When TodoWrite has pending steps, immediately parse the YAML frontmatter and proceed to the next step. Stopping after a subagent result forces the user to manually type "continue", breaking the autonomous workflow that makes this orchestrator valuable. Log a one-line summary and invoke the next tool in the same response.
+> **Chain Autonomous Progression (MOST IMPORTANT RULE)**: When a subagent (Agent tool) returns a result, you **MUST invoke the next tool in the same response**. This is the single most important rule of this orchestrator. Generating a text-only response while TaskList has pending steps is a chain-breaking error that forces the user to manually type "continue". `action: CONTINUE` → immediately invoke the next Agent/Bash tool. `action: STOP` → stop chain and report to user.
 
 Orchestrate the full workflow from planning to implementation, commit, and PR based on issue type or task description.
 
 **Note**: For session setup, use `starting-session`. This skill works both within a session and standalone (without `starting-session`). It is the primary entry point for working on a specific task in either mode.
 
-## TodoWrite Registration (Required)
+## Task Registration (Required)
 
-Register **all chain steps** in TodoWrite **before starting work**.
+Register **all chain steps** via TaskCreate **before starting work**.
 
 **Implementation / Bug Fix / Refactoring / Chore:**
 
@@ -26,6 +26,8 @@ Register **all chain steps** in TodoWrite **before starting work**.
 | 4 | Post work summary | Posting work summary | Manager direct: `issues comment` |
 | 5 | Update Status to Review | Updating Status to Review | Manager direct: `issues update` |
 
+Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4.
+
 **Research:**
 
 | # | content | activeForm | Skill |
@@ -33,7 +35,9 @@ Register **all chain steps** in TodoWrite **before starting work**.
 | 1 | Conduct research | Conducting research | `researching-best-practices` (subagent) |
 | 2 | Save findings to Discussion | Creating Discussion | `shirokuma-docs discussions create` |
 
-Update each step to `in_progress` when starting and `completed` when done.
+Dependencies: step 2 blockedBy 1.
+
+Use TaskUpdate to set each step to `in_progress` when starting and `completed` when done.
 
 ## Workflow
 
@@ -165,18 +169,17 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 **Chain completion guarantee**: After each subagent skill returns its structured output, the manager (main AI) parses the YAML frontmatter and **immediately proceeds to the next step**. The body's first line is used as a one-line summary and does not wait for user input. The Status Update at the end of the chain is executed directly by the manager (main AI) (not via subagent), eliminating the risk of chain interruption.
 
-**Output parse checkpoint** — On receiving subagent output, execute these checks in order:
+**Output parse checkpoint** — On receiving subagent output:
 
-1. **Extract YAML frontmatter** (block delimited by `---`)
-2. **action field**: Read `action` → STOP/FIX/REVISE/CONTINUE determines the next behavior
-3. **status field**: Read `status` → log for record
-4. **UCP check**: If `ucp_required` or `suggestions_count > 0` → present to user via AskUserQuestion (see [reference/worker-completion-pattern.md](reference/worker-completion-pattern.md) for details)
-5. **Body first line**: Extract the first line of the body after the frontmatter → use as `log_one_line_summary()`
-6. **action = CONTINUE with no UCP**: Immediately invoke the skill specified in the `next` field
+1. Read `action` from YAML frontmatter
+2. `action: CONTINUE` → **immediately** invoke the skill in the `next` field **in the same response** (output only a one-line summary from the body's first line)
+3. `action: STOP` / `REVISE` → stop chain, report to user
 
-If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. Do not output anything except a one-line summary before the tool call.
+**The core rule: when you receive `action: CONTINUE`, respond with a tool call, not text output.**
 
-**TodoWrite continuation invariant**: After each subagent skill completes, check TodoWrite. If any step is still `pending`, you MUST invoke the next tool call in the same response — generating a final text-only response while pending steps remain is a chain-breaking error.
+Exception: If `ucp_required: true` or `suggestions_count > 0`, present to user via AskUserQuestion before continuing (see [reference/worker-completion-pattern.md](reference/worker-completion-pattern.md)).
+
+**Tasks continuation invariant**: After each subagent skill completes, check TaskList. If any step is still `pending`, you MUST invoke the next tool call in the same response — generating a final text-only response while pending steps remain is a chain-breaking error.
 
 **Chain delegation table (MUST follow)** — After receiving a subagent skill result, invoke exactly the skill indicated by the `next` field:
 
@@ -186,19 +189,21 @@ If action = CONTINUE, invoke the next Skill/Bash tool in the **same response**. 
 | `commit-issue` | `open-pr-issue` | `open-pr-issue` | Do NOT delegate to `code-issue` |
 | `open-pr-issue` | — | **Start manager-managed steps** (see below) | Do NOT delegate to subagent |
 
-**Manager-managed steps after `open-pr-issue` (required checklist):**
+**Manager-managed steps after `open-pr-issue` (most common break point):**
 
-When `open-pr-issue` returns its result, execute the following steps **within the same chain** sequentially. Each step is registered as `pending` in TodoWrite — do NOT stop while pending steps remain:
+`open-pr-issue` has no `next` field (the next steps are manager-direct, not subagent). PR creation gives a visual "done" feeling, but **TaskList still has pending steps**. When `open-pr-issue` returns, do NOT stop — execute the following via Bash tools **in the same response**:
 
-1. **Work Summary**: Post work summary as Issue comment
-2. **Status Update**: `shirokuma-docs issues update {number} --field-status "Review"`
+1. **Work Summary**: Post work summary as Issue comment (Bash: `shirokuma-docs issues comment`)
+2. **Status Update**: `shirokuma-docs issues update {number} --field-status "Review"` (Bash)
 3. **Evolution**: Auto-record signals (Step 6)
+
+> **Why breaks happen here**: PR creation has strong visual "completion" cues that cause the LLM to output a summary and stop. But the chain is not done until TaskList pending count reaches 0.
 
 **Post-subagent-result behavior (pseudocode):**
 
 ```text
 for each step in [commit, pr, work_summary, status_update]:
-  // GUARD: TodoWrite has pending steps → this iteration MUST execute (do NOT stop)
+  // GUARD: TaskList has pending steps → this iteration MUST execute (do NOT stop)
   subagent_output = invoke_subagent_skill(step)
   frontmatter, body = parse_yaml_frontmatter(subagent_output)
   action = frontmatter.action                    // CONTINUE | STOP | REVISE
@@ -208,10 +213,10 @@ for each step in [commit, pr, work_summary, status_update]:
   // action == "CONTINUE" → proceed immediately
   summary = body.split("\n")[0]                    // Body first line as summary
   log_one_line_summary(summary)
-  update_todo(step, "completed")
-  if todos.any(status == "pending"):              // Pending todos remain → MUST continue
+  TaskUpdate(step, "completed")
+  if TaskList.any(status == "pending"):           // Pending tasks remain → MUST continue
     invoke_skill(frontmatter.next)                // Invoke next skill in SAME response
-  // End of chain only when all todos are completed
+  // End of chain only when all tasks are completed
 ```
 
 **Output template field definitions:**
@@ -251,6 +256,7 @@ The following skills are launched via custom sub-agents (AGENT.md). `/simplify` 
 | `open-pr-issue` | `pr-worker` |
 | `reviewing-claude-config` | `config-review-worker` |
 | `researching-best-practices` | `research-worker` |
+| `code-issue` + `commit-issue` + `open-pr-issue` (parallel batch) | `parallel-coding-worker` |
 
 ```text
 Agent(
@@ -264,7 +270,7 @@ Agent(
 
 Each sub-agent has the corresponding skill's full content auto-injected via the `skills` frontmatter field.
 
-> **CRITICAL — Chain continuation after Agent tool returns**: When a custom sub-agent (e.g., `pr-worker`, `commit-worker`) completes and the Agent tool returns, **check TodoWrite for remaining `pending` steps**. If pending steps remain (work summary, status update, evolution), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. The Agent tool returning is a chain mid-point, not a completion signal.
+> **CRITICAL — Chain continuation after Agent tool returns**: When a custom sub-agent (e.g., `pr-worker`, `commit-worker`) completes and the Agent tool returns, **check TaskList for remaining `pending` steps**. If pending steps remain (work summary, status update, evolution), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. The Agent tool returning is a chain mid-point, not a completion signal.
 
 #### Work Summary (Issue Comment)
 
@@ -320,20 +326,97 @@ After Status update, present next action candidates to the user. Extract the PR 
 
 ### Step 6: Evolution Signal Auto-Recording
 
-After successful chain completion (skip on chain failure), auto-record Evolution signals following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule. Do not register in TodoWrite (non-blocking processing).
+After successful chain completion (skip on chain failure), auto-record Evolution signals following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule. Do not register as a task (non-blocking processing).
 
 ## Batch Mode
 
-When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batch mode. See [reference/batch-workflow.md](reference/batch-workflow.md) for detection, eligibility, TodoWrite template, workflow, and context details.
+When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batch mode.
+
+### Sequential Batch (Default)
+
+Process issues that share common files sequentially in a single branch and PR. See [reference/batch-workflow.md](reference/batch-workflow.md) for detection, eligibility, task registration template, workflow, and context details.
+
+### Parallel Batch (`--parallel`, Experimental)
+
+> **Experimental**: Parallel processing using `isolation: worktree`. Intended for advanced users due to incomplete documentation ([claude-code#27023](https://github.com/anthropics/claude-code/issues/27023)).
+
+Process issues that operate on completely independent file sets in parallel using worktree isolation. Each issue creates its own independent PR.
+
+**Activation**: Specify multiple issues with the `--parallel` flag (e.g., `/working-on-issue #101 #102 #103 --parallel`). Use `--parallel=N` to set concurrency (default 3, max 5).
+
+See the "Parallel Batch Mode" section in [reference/batch-workflow.md](reference/batch-workflow.md) for details.
 
 ## Arguments
 
 | Format | Example | Behavior |
 |--------|---------|----------|
 | Issue number | `#42` | Fetch issue, analyze type |
-| Multiple issues | `#101 #102 #103` | Batch mode |
+| Multiple issues | `#101 #102 #103` | Sequential batch mode |
+| Multiple issues + `--parallel` | `#101 #102 #103 --parallel` | Parallel batch mode (experimental) |
 | Description | `implement dashboard` | Text classification → `creating-item` |
 | No argument | — | AskUserQuestion |
+
+### Flags
+
+| Flag | Description |
+|------|-------------|
+| `--headless` | Headless mode. Applies default behaviors to UCPs and skips interactive confirmations |
+| `--parallel` | Parallel batch mode (experimental). Process issues in parallel with worktree isolation |
+| `--parallel=N` | Set parallel batch concurrency (default 3, max 5) |
+
+### Flag Combinations
+
+| Combination | Behavior |
+|-------------|----------|
+| `--headless --parallel` | Parallel batch mode with headless UCPs. Token cost warning (AskUserQuestion) is skipped; execution proceeds without confirmation |
+| `--headless` (single issue) | Headless mode for single issue (see Headless Mode section) |
+| `--parallel` (single issue) | Ignored; single issue uses normal mode |
+
+## Headless Mode
+
+When `--headless` is specified, default behaviors are applied to implementation-phase UCPs (User Control Points), completing the chain without interactive confirmations. Use for batch execution via `claude -p` or to skip confirmations within an interactive session.
+
+### Preconditions
+
+All of the following must be met to run in headless mode:
+
+1. An **explicit issue number** is provided as an argument
+2. The issue status is **Spec Review** or **Ready**
+3. The issue body contains a `## Plan` (EN) or `## 計画` (JA) section
+
+If any precondition is not met, display an error message and stop (no fallback to normal mode).
+
+> **Note:** Issues with statuses other than Spec Review / Ready (e.g., In Progress, Preparing, Backlog) will also stop with a precondition error when `--headless` is specified. Issues in Preparing status require interactive planning via `preparing-on-issue` and are therefore excluded from headless mode.
+
+### UCP Default Behaviors
+
+| UCP ID | Location | Normal Mode | Headless Mode Default |
+|--------|----------|-------------|----------------------|
+| W1 | No-argument invocation | AskUserQuestion for number | Stop with precondition error |
+| W2 | Issue is Done/Released | Confirm reopen | Warn and stop (prevent accidental execution) |
+| W3 | ADR proposal (Feature M+) | AskUserQuestion for confirmation | Skip (continue without ADR) |
+| W4 | Wrong branch detected | AskUserQuestion for switch | Warn and stop (highest risk) |
+| W5 | Worker's ucp_required flag | AskUserQuestion with suggestions | Skip and record in Issue comment |
+
+#### W5 Skip Recording in Issue Comment
+
+When W5 (worker UCP) is skipped in headless mode, record it as an Issue comment in the following format:
+
+```
+**[Headless] UCP Skipped:** {worker name}
+**Suggestion:** {summary of skipped suggestion}
+**Default action:** Skipped and continued
+```
+
+### Usage Examples
+
+```bash
+# Batch execution via claude -p
+claude -p "/working-on-issue --headless #42"
+
+# Skip confirmations within interactive session
+/working-on-issue #42 --headless
+```
 
 ## Edge Cases
 
@@ -346,6 +429,9 @@ When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batc
 | Chain failure | Report completed/remaining steps, return control |
 | Sub-issue with no integration branch | Use `develop` as base, warn user |
 | Epic issue selected directly | See "Epic Issue Entry Point" below |
+| `--headless` + precondition not met | Display error message and stop |
+| `--headless` + wrong branch (W4) | Warn and stop (no auto-switch) |
+| `--headless` + worker UCP (W5) | Skip and record in Issue comment |
 
 ## Epic Issue Entry Point
 
@@ -409,7 +495,8 @@ Sub-issue creation in this flow uses `shirokuma-docs issues create` directly (no
 | Tool | When |
 |------|------|
 | AskUserQuestion | Requirement clarification, approach selection, edge cases (manager (main AI) pre-resolves) |
-| TodoWrite | Chain step registration (required for all work) |
+| TaskCreate, TaskUpdate | Chain step registration and status updates (required for all work) |
+| TaskList, TaskGet | Check pending steps and task state |
 | Bash | Git operations, `shirokuma-docs issues` commands |
 
 ## Notes
@@ -420,4 +507,4 @@ Sub-issue creation in this flow uses `shirokuma-docs issues create` directly (no
 - TDD-applicable work types wrap `code-issue` invocation with TDD ([docs/tdd-workflow.md](docs/tdd-workflow.md))
 - Workflow executes sequentially (Commit → PR → Work Summary → Status Update). **Merge is NOT included**
 - Chain execution stops on error and returns control to user
-- **Chain autonomous progression**: Subagent outputs are intermediate chain data. Stopping after receiving one forces the user to manually prompt "continue", which defeats the purpose of an automated workflow chain. As long as TodoWrite has pending steps, immediately parse the YAML frontmatter and execute the next step's Agent/Bash tool call. Log a one-line summary and invoke the next tool in the same response
+- **Chain autonomous progression (MOST IMPORTANT)**: When you receive `action: CONTINUE`, respond with a tool call, not text output. As long as TaskList has pending steps, invoke the next Agent/Bash tool in the same response. The `open-pr-issue` → manager steps transition is the most common break point — immediately execute Work Summary → Status Update via Bash

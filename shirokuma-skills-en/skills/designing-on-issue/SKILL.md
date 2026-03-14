@@ -1,7 +1,7 @@
 ---
 name: designing-on-issue
 description: Routes to the appropriate design skill based on design type, managing discovery and visual evaluation loops. UI design delegates to designing-shadcn-ui; architecture design delegates to designing-nextjs; data model design delegates to designing-drizzle. Triggers: "design", "UI", "memorable", "impressive", "architecture".
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TodoWrite, Skill, Agent
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill, Agent
 ---
 
 # Design Workflow (Orchestrator)
@@ -188,7 +188,7 @@ Expand delegation to specialized skills per design type:
 | Tool | When |
 |------|------|
 | AskUserQuestion | Design direction confirmation, visual evaluation loop |
-| TodoWrite | Phase progress tracking |
+| TaskCreate, TaskUpdate | Phase progress tracking |
 | Skill | Delegation to `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` |
 | WebSearch | Design reference research (optional) |
 | Bash | Dev server check, build verification |

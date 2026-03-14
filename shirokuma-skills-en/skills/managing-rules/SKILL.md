@@ -365,4 +365,4 @@ When run standalone, suggest next steps (verification commands, testing methods)
 - Symlinks are resolved and loaded normally
 - Use `/memory` to see what's currently loaded
 - When rule type or scope is ambiguous, use AskUserQuestion to confirm before creating
-- For batch creation of multiple rules, use TodoWrite to track progress
+- For batch creation of multiple rules, use TaskCreate to track progress

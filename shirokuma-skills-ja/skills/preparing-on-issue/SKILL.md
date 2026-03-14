@@ -1,7 +1,7 @@
 ---
 name: preparing-on-issue
 description: "Issueの計画フェーズを統括します: ステータス管理、planning-workerへの計画委任、計画レビュー、ユーザー承認ゲート。トリガー: 「計画して」「plan」「設計して」「#42 の計画」。"
-allowed-tools: Agent, Bash, AskUserQuestion, TodoWrite
+allowed-tools: Agent, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Issue の計画準備（オーケストレーター）
@@ -315,7 +315,7 @@ shirokuma-docs issues update {number} --field-status "Designing"
 | Agent (planning-worker) | ステップ 3: 計画作成の委任 |
 | Agent (review-worker) | ステップ 4: まっさらコンテキストでの計画レビュー（カスタムサブエージェント委任） |
 | AskUserQuestion | 既存計画の上書き確認、Issue 番号の確認 |
-| TodoWrite | 計画統括ステップの進捗トラッキング |
+| TaskCreate, TaskUpdate | 計画統括ステップの進捗トラッキング |
 
 ## 注意事項
 

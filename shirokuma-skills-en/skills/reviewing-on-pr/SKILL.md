@@ -1,7 +1,7 @@
 ---
 name: reviewing-on-pr
 description: Takes a PR number, performs code review execution and processes unresolved review threads in an automated chain. Triggers: "review response", "PR review", "code review PR", "/reviewing-on-pr #123".
-allowed-tools: Bash, Read, Grep, Glob, TodoWrite, AskUserQuestion, Agent
+allowed-tools: Bash, Read, Grep, Glob, TaskCreate, TaskUpdate, TaskGet, TaskList, AskUserQuestion, Agent
 ---
 
 # PR Review Response
@@ -110,9 +110,9 @@ Classify each unresolved thread into one of 4 types:
 | Question | Asks for explanation or rationale | Reply → resolve |
 | Disagreement | Reviewer and AI differ in judgment | Reply (do NOT resolve) |
 
-### Step 4: TodoWrite Registration
+### Step 4: Task Registration
 
-Register all thread processing steps in TodoWrite based on classification:
+Register all thread processing steps via TaskCreate based on classification:
 
 ```
 1. [Code fix] Thread: {summary} — fix, commit & push, reply, resolve
@@ -238,6 +238,7 @@ Addressed {N} threads.
 | Outdated comment (code changed) | Reply if feedback is still valid, reference the relevant commit |
 | Reviewer requests re-review | Reply but leave thread open |
 | PR has no related Issue | Skip Issue reference in context restoration |
+| Unresolved threads present and `comment_id` present | `unresolved_threads > 0` takes priority. Proceed to Step 2b (review result confirmation). `comment_id` presence is ignored |
 | No unresolved threads but `comment_id` present | `review-worker` posted improvement suggestions as issue comment. Identified via frontmatter `comment_id`. Trigger Step 2b UCP |
 | Code fix affects other threads | Check impact and address together |
 | User decides no fixes needed (UCP) | Display completion report and exit. Skip thread resolution |
@@ -250,7 +251,7 @@ Addressed {N} threads.
 | Agent | Code review execution via `review-worker` (Step 2a), code fixes and commits via `coding-worker` / `commit-worker` (Step 5) |
 | Bash | `shirokuma-docs pr comments`, `pr reply`, `pr resolve`, git operations |
 | Read | Code review, plan reference |
-| TodoWrite | Track thread processing progress |
+| TaskCreate, TaskUpdate | Track thread processing progress |
 
 ## References
 

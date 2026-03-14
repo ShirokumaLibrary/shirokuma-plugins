@@ -259,4 +259,4 @@ Task({
 
 - AGENT.md は500行未満、参照は1階層まで
 - 要件不明確時は AskUserQuestion で用途・トリガー・ツールを確認
-- 作成+更新の複合タスクは TodoWrite で管理
+- 作成+更新の複合タスクは TaskCreate で管理

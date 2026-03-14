@@ -72,7 +72,7 @@ Skill delegate to `coding-nextjs`. Pass plan section and issue context.
 
 ## Constraints
 
-- As an Agent tool (subagent), `TodoWrite` / `AskUserQuestion` are not available
+- As an Agent tool (subagent), Tasks API / `AskUserQuestion` are not available
 - Progress management is handled by the manager (main AI, `working-on-issue`)
 - TDD workflow is managed by `working-on-issue` wrapping `code-issue` calls with TDD steps (`code-issue` focuses solely on implementation)
 - UI design tasks (new UI pages, visual redesigns, design system token changes) are handled by `designing-on-issue` → `designing-shadcn-ui`, not by this skill
@@ -84,8 +84,8 @@ After work completes, return the following structured data to the caller. Code c
 
 ```yaml
 ---
-action: CONTINUE
-next: commit-issue
+action: CONTINUE          # Directive to orchestrator (working-on-issue): invoke next immediately
+next: commit-issue        # Skill the orchestrator must invoke next
 status: SUCCESS
 ---
 

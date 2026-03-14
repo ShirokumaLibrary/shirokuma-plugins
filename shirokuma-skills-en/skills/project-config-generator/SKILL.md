@@ -292,7 +292,7 @@ Generate `.github/DISCUSSION_TEMPLATE/` files for the project.
 
 ## Notes
 
-- Use `TodoWrite` for progress tracking (6 steps)
+- Use TaskCreate for progress tracking (6 steps)
 - Confirm auto-detected results with the user via `AskUserQuestion`
 - Confirm before overwriting existing files — users may have manual customizations that would be lost
 - Run after major dependency updates

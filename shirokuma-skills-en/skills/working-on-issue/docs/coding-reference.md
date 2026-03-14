@@ -41,4 +41,4 @@ TDD common workflow is **required** for implementation work:
 
 ## Standalone Invocation
 
-Users can also invoke `/coding-nextjs` directly (non-subagent, with TodoWrite/AskUserQuestion access). `code-issue` is the standard route from `working-on-issue`, but the existing standalone invocation path is maintained.
+Users can also invoke `/coding-nextjs` directly (non-subagent, with Tasks API/AskUserQuestion access). `code-issue` is the standard route from `working-on-issue`, but the existing standalone invocation path is maintained.

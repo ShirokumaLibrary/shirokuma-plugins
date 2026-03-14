@@ -216,7 +216,7 @@ When reviewing skills/agents, identify which pattern they follow:
 - Keep report concise and scannable
 - Reference Anthropic's best practices when suggesting fixes
 - Runs as Agent tool (subagent) for isolated execution without polluting main context
-- **Subagent constraint**: TodoWrite / AskUserQuestion are unavailable in subagent mode; return results as a report only
+- **Subagent constraint**: Tasks API / AskUserQuestion are unavailable in subagent mode; return results as a report only
 
 ## Anti-Patterns
 

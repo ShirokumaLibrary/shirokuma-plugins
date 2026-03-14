@@ -259,4 +259,4 @@ When run standalone, suggest next steps (testing methods, invocation phrase exam
 
 - AGENT.md must be under 500 lines; references one level deep only
 - When requirements are unclear, use AskUserQuestion to confirm purpose, triggers, and tools
-- For compound tasks (create + update multiple agents), use TodoWrite to track progress
+- For compound tasks (create + update multiple agents), use TaskCreate to track progress

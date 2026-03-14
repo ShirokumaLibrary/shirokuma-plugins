@@ -25,4 +25,30 @@ Default to `chore` when types are mixed. Issue numbers are hyphen-separated, sor
 
 At batch start, move all issues to In Progress in bulk (exception to `project-items` rule).
 
-For details (quality standards, PR template, interruption recovery, batch candidate detection), see `working-on-issue/reference/batch-workflow.md`.
+## Parallel Batch Mode (Experimental)
+
+> Parallel processing using `isolation: worktree`. Activated with the `--parallel` flag.
+
+Process issues that operate on completely independent file sets in parallel using worktree isolation.
+
+### Sequential vs Parallel
+
+| Condition | Mode |
+|-----------|------|
+| Issues sharing common files | Sequential batch (1 branch, 1 PR) |
+| Issues with completely independent file sets | Parallel batch (each issue gets its own PR) |
+
+### Parallel Batch Eligibility
+
+In addition to sequential batch criteria:
+
+| Criterion | Requirement |
+|-----------|-------------|
+| File independence | No overlapping changed files between issues |
+| Concurrency | Default 3, max 5 (set via `--parallel=N`) |
+
+### Aggregation Pattern
+
+Each issue creates its own independent PR (PR-based aggregation). No batch branch is created.
+
+For details (workflow, error handling, verification procedures), see `working-on-issue/reference/batch-workflow.md`.
