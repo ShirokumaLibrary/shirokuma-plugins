@@ -10,6 +10,14 @@ Design Drizzle ORM data models with informed pattern selection. Focuses on desig
 
 > **Data model design is this skill's responsibility.** `code-issue` handles implementation based on the schema decisions made here.
 
+## Scope
+
+- **Category:** Investigation Worker
+- **Scope:** Reading tech stack and existing schema files (Read / Grep / Glob / Bash read-only commands), generating data model design documents (Write/Edit — for design artifact outputs), appending design sections to Issue bodies.
+- **Out of scope:** Implementing production code or creating schema files (delegated to `code-issue`), running migrations, build verification
+
+> **Design artifact writes**: When this skill uses Write/Edit on Issue bodies or design documents, it is producing design artifacts — not modifying production code. This is permitted as an exception for Investigation Workers.
+
 ## Workflow
 
 ### 0. Tech Stack Check

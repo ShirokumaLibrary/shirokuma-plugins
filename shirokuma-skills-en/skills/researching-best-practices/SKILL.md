@@ -8,6 +8,14 @@ allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, Tas
 
 Researches official documentation and project patterns to provide implementation guidance.
 
+## Scope
+
+- **Category:** Investigation Worker
+- **Scope:** Search official documentation (WebSearch / WebFetch), search project patterns (Read / Grep / Glob / Bash read-only commands), generate synthesized research reports, create Research Discussions.
+- **Out of scope:** Implementing production code (delegated to `coding-nextjs`), modifying rule/skill files
+
+> **Bash exception**: Read-only commands for checking project patterns (`cat`, `ls`, etc.) are permitted.
+
 ## Core Responsibilities
 
 - Search official documentation for recommended patterns

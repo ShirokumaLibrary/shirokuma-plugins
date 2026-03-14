@@ -8,6 +8,14 @@ allowed-tools: Read, Bash, Glob, Grep
 
 A skill that auto-scans dependency vulnerabilities using `lint security` and presents analysis and response recommendations.
 
+## Scope
+
+- **Category:** Investigation Worker
+- **Scope:** Vulnerability scanning via `shirokuma-docs lint security` (Bash read-only commands), analyzing and prioritizing results, generating security reports, presenting Issue creation candidates.
+- **Out of scope:** Automatically updating dependency packages, auto-creating Issues without user confirmation. Issue creation is performed via CLI (`shirokuma-docs issues create`) only after user confirmation
+
+> **Bash exception**: `shirokuma-docs lint security`, `shirokuma-docs search`, and similar read/search commands are permitted. Package update commands (`pnpm update`, etc.) are prohibited.
+
 ## Workflow
 
 ```

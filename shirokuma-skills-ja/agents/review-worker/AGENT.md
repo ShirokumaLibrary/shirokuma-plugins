@@ -34,6 +34,15 @@ skills:
 git diff --name-only origin/{base-branch}...HEAD 2>/dev/null || git diff --name-only HEAD~1 HEAD
 ```
 
+### ステップ 1.5: 制約確認（Issue ベースレビュー時）
+
+Issue 番号が渡されている場合、Issue の `## 検討事項` セクションを確認する:
+
+1. `shirokuma-docs show {issue-number}` で Issue 本文を取得
+2. `## 検討事項` に未決定事項（疑問形、「〜すべきか」等）がある場合、レビュー観点に追加:
+   - 未決定事項が実装で勝手に決定されていないかチェック
+   - 該当する場合は High 指摘として報告
+
 ### ステップ 2: ロール別ループ実行
 
 選択された各ロールについて、`review-issue` の6ステップ（ロール選択→ナレッジ読み込み→Lint→分析→レポート→保存）を順次実行する。
@@ -125,3 +134,4 @@ comment_id: {final-comment-database-id}
 3. **ロール間でコンテキストを共有しない** — 各ロールの `review-issue` 実行は独立（ナレッジ読み込みからやり直す）
 4. **最終判断は全ロール完了後** — 途中で判断しない
 5. **CONDITIONAL_PASS は軽微な問題のみ** — Critical があれば必ず FAIL
+6. **GitHub 出力は日本語** — レビューコメント・最終判断コメントは日本語で記述する（`output-language` ルール準拠）

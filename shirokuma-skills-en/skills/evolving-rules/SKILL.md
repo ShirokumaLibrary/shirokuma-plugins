@@ -1,12 +1,18 @@
 ---
 name: evolving-rules
 description: Analyzes evolution signals for rules and skills, proposing improvements based on accumulated feedback. Triggers: "rule evolution", "rules evolution", "evolve rules", "evolution flow", "signal analysis".
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill
+allowed-tools: Bash, Read, Grep, Glob, Skill, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Rule & Skill Evolution
 
 Analyze feedback signals accumulated in Evolution Issues and propose improvements to project-specific rules and skills.
+
+## Scope
+
+- **Category:** Orchestrator
+- **Scope:** Collect and analyze signals from Evolution Issues, record improvement proposals as Issues. Handles user confirmation (AskUserQuestion), delegation to `creating-item` skill, and closing Evolution Issues.
+- **Out of scope:** Directly modifying rule/skill files (proposals are recorded as Issues; implementation is delegated to the `working-on-issue` workflow)
 
 ## Workflow
 
@@ -79,30 +85,32 @@ Present concrete changes in before/after format:
 {Evidence from signals}
 ```
 
-### Step 5: User Approval
+### Step 5: User Decision
 
-Get approval via AskUserQuestion:
+Get the user's decision on whether to record the proposal as an Issue via AskUserQuestion:
 
 ```
-Apply this improvement proposal?
-- Apply
-- Modify and apply (enter feedback)
+Record this improvement proposal as an Issue?
+- Create Issue
+- Modify and create Issue (enter feedback)
 - Skip
 ```
 
-### Step 6: Apply
+### Step 6: Create Proposal Issue
 
-Delegate approved proposals to `managing-rules` or `managing-skills` skill via the Skill tool. The delegated skill handles EN/JA updates and quality checks per `config-authoring-flow` rule.
+Delegate to the `creating-item` skill to record approved proposals as Issues.
 
+Context to pass to `creating-item`:
+- **Title**: `{type}: Improve {target name} (Evolution #{evolution-number})`
+- **Type**: chore (rule/skill improvement)
+- **Background**: Improvement proposal based on signals accumulated in Evolution Issue #{evolution-number}
+- **Proposal content**: before/after and rationale from Step 4
+
+After creating the Issue, record a reference to the created Issue in a comment on the original Evolution Issue:
+
+```bash
+shirokuma-docs issues comment {evolution-number} --body "Created proposal Issue: #{created-issue-number}"
 ```
-Skill: managing-rules (or managing-skills)
-Args: Update {target file}
-```
-
-**Implementation approach:**
-- Delegate to `managing-rules` or `managing-skills` for file changes — direct editing of `plugin/` files bypasses the EN/JA sync and quality review that these skills provide
-- The delegated skill is responsible for updating both EN/JA files and running `reviewing-claude-config` per `config-authoring-flow` rule
-- If the Skill tool call fails, report the error to the user instead of falling back to direct editing (direct editing would skip the sync/review safeguards)
 
 ### Step 7: Update Records and Close Issue
 
@@ -123,8 +131,8 @@ shirokuma-docs issues comment {number} --body-file - <<'EOF'
 ### Analysis Summary
 Analyzed {N} signals. {Category distribution summary}.
 
-### Applied
-- {target}: {change summary}. {rationale for applying}
+### Issues Created
+- {target}: {proposal summary}. Recorded as Issue #{created-issue-number}.
 
 ### Skipped
 - {target}: {rationale for skipping}
@@ -145,12 +153,12 @@ Structure the comment content and consolidate into the body. The body records re
 - **Analysis date:** {date}
 - **Signals:** {N}
 - **Proposals:** {M}
-- **Applied:** {K}
+- **Issues created:** {K}
 
-### Applied Improvements
-| Target | Category | Change Summary |
-|--------|----------|---------------|
-| {name} | {category} | {summary} |
+### Created Proposal Issues
+| Target | Category | Issue |
+|--------|----------|-------|
+| {name} | {category} | #{issue-number} |
 
 ### Skip Reasons
 | Target | Category | Reason |
@@ -180,11 +188,11 @@ New signals after closure are recorded in a new Evolution Issue (see `rule-evolu
 
 **Signals analyzed:** {N}
 **Proposals:** {M}
-**Applied:** {K}
+**Issues created:** {K}
 
 | Target | Category | Action |
 |--------|----------|--------|
-| {name} | {category} | {Applied / Skipped} |
+| {name} | {category} | {Issue created (#NNN) / Skipped} |
 ```
 
 ## Edge Cases
@@ -200,5 +208,5 @@ New signals after closure are recorded in a new Evolution Issue (see `rule-evolu
 
 - Responsibility separation from `discovering-codebase-rules`: `evolving-rules` improves **existing** rules/skills, `discovering-codebase-rules` discovers **new** patterns
 - Avoid excessive proposals — respect the threshold (3+ signals), propose cautiously
-- Never modify rules/skills without user approval
+- `evolving-rules` does not directly apply changes to rules/skills. Proposals are recorded as Issues; implementation is delegated to the `working-on-issue` workflow
 - Delegate analysis phase to Task(Explore) to save main context

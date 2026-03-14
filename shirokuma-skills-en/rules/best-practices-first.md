@@ -46,6 +46,7 @@ For conversation flow, epic pattern, and session vs standalone details, see `wor
 | Architecture | `Plan` | Task (Built-in) |
 | Rule/Skill evolution | `evolving-rules` | Skill |
 | PR review response | `reviewing-on-pr` | Skill |
+| Commit / Push | `commit-issue` | Skill |
 | None match | Propose new skill | — |
 
 ## Task Scope Understanding (Pre-Execution Check)

@@ -10,6 +10,14 @@ Analyzes TypeScript applications in the monorepo for two purposes:
 1. **Pattern Discovery**: Extract existing patterns across apps
 2. **Convention Proposal**: Propose new conventions that enable mechanical checks
 
+## Scope
+
+- **Category:** Investigation Worker
+- **Scope:** Read and analyze codebases (Read / Grep / Glob / Bash read-only commands), generate pattern discovery reports, write convention proposals, create Knowledge Discussions.
+- **Out of scope:** Modifying existing rule/skill files (new pattern proposals only; existing rule improvements are the responsibility of `evolving-rules`), modifying production code
+
+> **Bash exception**: File structure analysis commands (`find`, `ls`, etc.) are permitted as read-only operations. Bash commands that modify code are prohibited.
+
 ## Two Modes
 
 ### Mode 1: Pattern Discovery

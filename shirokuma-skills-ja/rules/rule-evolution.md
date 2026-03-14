@@ -54,10 +54,27 @@ Evolution Issue にシグナルをコメントとして蓄積する。
 | スキル | 責務 | 入力 |
 |--------|------|------|
 | `discovering-codebase-rules` | コードパターン → 新規ルール提案 | コードベース分析 |
-| `evolving-rules` | 既存ルール・スキルの改善提案 | Evolution シグナル |
+| `evolving-rules` | 既存ルール・スキルの分析・提案・Issue 記録 | Evolution シグナル |
 | `managing-rules` | ルールファイルの作成・更新（実行者） | 提案内容 |
 
 **曖昧領域:** `discovering-codebase-rules` が既存ルールの不備を検出した場合、Evolution Issue にコメントとして記録する。`discovering-codebase-rules` 自体はルールの修正を行わない（新規提案のみ）。
+
+## 全体フロー
+
+`evolving-rules` はルール・スキルの変更を直接行わない。提案を記録し、実装は通常のワークフローに乗せる。
+
+```
+シグナル蓄積 → evolving-rules（分析・提案）→ Issue 作成 → working-on-issue（実装）
+```
+
+| フェーズ | 責任者 | 成果物 |
+|---------|--------|--------|
+| シグナル収集 | 各スキル（自動記録） | Evolution Issue のコメント |
+| 分析・提案 | `evolving-rules` | before/after 提案、提案 Issue |
+| ユーザー判断 | ユーザー | 提案 Issue の承認 |
+| 実装 | `working-on-issue` → `managing-rules`/`managing-skills` | ルール・スキルの変更 |
+
+**重要**: `evolving-rules` の責務は「分析・提案・記録」まで。変更の適用は `working-on-issue` ワークフローで実施する。
 
 ## ルール
 
@@ -65,6 +82,6 @@ Evolution Issue にシグナルをコメントとして蓄積する。
 2. **閾値を守る** — 3+ 件蓄積で分析起動、それ未満では自動提案しない
 3. **慎重に提案** — 過度な提案はノイズになる。DemyAgent の「少ないツール呼び出しが効果的」を反映
 4. **既存スキルと重複しない** — `discovering-codebase-rules` は新規パターン発見、`evolving-rules` は既存の改善
-5. **ユーザー承認必須** — ルール・スキルの変更はユーザー確認後に適用
+5. **変更の直接適用禁止** — `evolving-rules` は提案を Issue として記録するのみ。変更の適用は `working-on-issue` ワークフローで実施する
 
 eval データ参照・Evolution Issue ライフサイクル・スキル完了時の自動記録手順・スタンドアロンシグナル記録は `evolving-rules/reference/evolution-details.md` を参照。

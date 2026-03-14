@@ -34,6 +34,15 @@ Parse the prompt from the caller and determine which roles to execute.
 git diff --name-only origin/{base-branch}...HEAD 2>/dev/null || git diff --name-only HEAD~1 HEAD
 ```
 
+### Step 1.5: Constraint Validation (Issue-Based Review)
+
+When an issue number is provided, check the issue's `## Considerations` section:
+
+1. Fetch the issue body with `shirokuma-docs show {issue-number}`
+2. If `## Considerations` contains undecided items (questions, "should we...?" phrasing), add them as review criteria:
+   - Check whether undecided items were unilaterally resolved in the implementation
+   - Report as High severity if found
+
 ### Step 2: Role Loop Execution
 
 For each selected role, execute the `review-issue` 6-step workflow (Role Selection → Knowledge Loading → Lint → Analysis → Report → Save) sequentially.
@@ -125,3 +134,4 @@ comment_id: {final-comment-database-id}
 3. **No context sharing between roles** — Each role's `review-issue` execution is independent (knowledge loading starts fresh)
 4. **Final judgment after all roles complete** — Do not judge mid-process
 5. **CONDITIONAL_PASS is for minor issues only** — Any Critical issue always results in FAIL
+6. **GitHub output in English** — Review comments and final judgment comments must be written in English (`output-language` rule compliance)

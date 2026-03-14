@@ -38,7 +38,7 @@ shirokuma-docs skills routing coding
 | Next.js 実装 | `area:frontend`, `area:cli` + Next.js 関連 | `coding-nextjs` に Skill 委任 |
 | バグ修正（コード） | コードファイルに影響 | `coding-nextjs` に Skill 委任 |
 | Markdown / ドキュメント編集 | `.md` ファイルの変更 | 直接編集 |
-| スキル / ルール / エージェント編集 | `plugin/`, `.claude/` 配下 | 直接編集（`managing-*` スキルのベストプラクティスを参照） |
+| スキル / ルール / エージェント編集 | `plugin/`, `.claude/` 配下 | `managing-*` スキルに Skill 委任（`config-authoring-flow` ルール必須） |
 | リファクタリング | `refactor` キーワード | 直接編集 |
 | 設定 / Chore | `config`, `chore` キーワード | 直接編集 |
 
@@ -56,8 +56,7 @@ shirokuma-docs skills routing coding
 
 ### スキル / ルール / エージェント編集
 
-- `managing-rules`, `managing-skills`, `managing-agents` スキルのベストプラクティスを参照
-- EN/JA 両方の更新が必要な場合は両方を編集
+**`config-authoring-flow` ルールに従い、Skill ツールで `managing-rules` / `managing-skills` / `managing-agents` に委任する。** 直接編集は禁止（EN/JA 同期と品質レビューをバイパスするため）。
 - `plugin/` 配下のファイルは `plugin-version-bump` ルールに留意（バージョンバンプはリリース時のみ）
 
 ### リファクタリング

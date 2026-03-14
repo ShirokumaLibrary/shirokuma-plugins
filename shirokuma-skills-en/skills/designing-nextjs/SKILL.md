@@ -10,6 +10,14 @@ Design Next.js application architecture with informed pattern selection. Focuses
 
 > **Architecture design is this skill's responsibility.** `coding-nextjs` handles implementation based on the architecture decisions made here.
 
+## Scope
+
+- **Category:** Investigation Worker
+- **Scope:** Reading tech stack and project structure (Read / Grep / Glob / Bash read-only commands), generating architecture design documents (Write/Edit — for design artifact outputs), appending design sections to Issue bodies.
+- **Out of scope:** Implementing production code (delegated to `coding-nextjs`), build verification
+
+> **Design artifact writes**: When this skill uses Write/Edit on Issue bodies or design documents, it is producing design artifacts — not modifying production code. This is permitted as an exception for Investigation Workers.
+
 ## Workflow
 
 ### 0. Tech Stack Check

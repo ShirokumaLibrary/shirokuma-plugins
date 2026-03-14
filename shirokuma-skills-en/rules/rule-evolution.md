@@ -54,10 +54,27 @@ Accumulate signals as comments in Evolution Issues.
 | Skill | Responsibility | Input |
 |-------|---------------|-------|
 | `discovering-codebase-rules` | Code patterns → new rule proposals | Codebase analysis |
-| `evolving-rules` | Existing rule/skill improvement proposals | Evolution signals |
+| `evolving-rules` | Analysis, proposals, and Issue recording for existing rules/skills | Evolution signals |
 | `managing-rules` | Rule file creation/update (executor) | Proposal content |
 
 **Ambiguous area:** When `discovering-codebase-rules` detects existing rule deficiencies, record as a comment in an Evolution Issue. `discovering-codebase-rules` itself does not modify rules (new proposals only).
+
+## Overall Flow
+
+`evolving-rules` does not directly apply changes to rules/skills. It records proposals and delegates implementation to the standard workflow.
+
+```
+Signal accumulation → evolving-rules (analysis & proposals) → Issue creation → working-on-issue (implementation)
+```
+
+| Phase | Owner | Output |
+|-------|-------|--------|
+| Signal collection | Each skill (auto-record) | Evolution Issue comments |
+| Analysis & proposal | `evolving-rules` | Before/after proposals, proposal Issues |
+| User decision | User | Approval of proposal Issues |
+| Implementation | `working-on-issue` → `managing-rules`/`managing-skills` | Rule/skill changes |
+
+**Important**: `evolving-rules` is responsible for "analysis, proposals, and recording" only. Applying changes is done through the `working-on-issue` workflow.
 
 ## Rules
 
@@ -65,6 +82,6 @@ Accumulate signals as comments in Evolution Issues.
 2. **Respect thresholds** — Trigger analysis at 3+ accumulated signals, no auto-proposals below
 3. **Propose cautiously** — Excessive proposals become noise. Reflect DemyAgent's "fewer tool calls are more effective"
 4. **No overlap with existing skills** — `discovering-codebase-rules` discovers new patterns, `evolving-rules` improves existing
-5. **User approval required** — Apply rule/skill changes only after user confirmation
+5. **No direct application of changes** — `evolving-rules` only records proposals as Issues. Changes are applied through the `working-on-issue` workflow
 
 For eval data reference, Evolution Issue lifecycle, auto-recording procedure at skill completion, and standalone signal recording, see `evolving-rules/reference/evolution-details.md`.

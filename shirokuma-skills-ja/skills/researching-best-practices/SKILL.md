@@ -8,6 +8,14 @@ allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, Tas
 
 公式ドキュメントとプロジェクトパターンを調査し、実装ガイダンスを提供する。Agent ツール（サブエージェント）として隔離実行。
 
+## スコープ
+
+- **カテゴリ:** 調査系ワーカー
+- **スコープ:** 公式ドキュメントの検索（WebSearch / WebFetch）、プロジェクト内のパターン検索（Read / Grep / Glob / Bash 読み取り専用コマンド）、調査結果の統合レポート生成、Research Discussion の作成。
+- **スコープ外:** プロダクションコードの実装（`coding-nextjs` に委任）、ルール・スキルファイルの変更
+
+> **Bash 例外**: プロジェクトパターン確認のための読み取り専用コマンド（`cat`, `ls` 等）は許可。
+
 ## コア責務
 
 - 公式ドキュメントから推奨パターンを検索

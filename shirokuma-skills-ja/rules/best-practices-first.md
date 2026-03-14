@@ -46,6 +46,7 @@ graph LR
 | アーキテクチャ | `Plan` | Task (ビルトイン) |
 | ルール・スキル進化 | `evolving-rules` | Skill |
 | PR レビュー対応 | `reviewing-on-pr` | Skill |
+| コミット / プッシュ | `commit-issue` | Skill |
 | 該当なし | 新しいスキルを提案 | — |
 
 ## タスクスコープの理解（実行前チェック）

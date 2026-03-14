@@ -38,7 +38,7 @@ If a fixed table skill is optimal, it takes precedence regardless of discovery r
 | Next.js implementation | `area:frontend`, `area:cli` + Next.js related | Skill delegate to `coding-nextjs` |
 | Bug fix (code) | Affects code files | Skill delegate to `coding-nextjs` |
 | Markdown / documentation editing | `.md` file changes | Direct edit |
-| Skill / rule / agent editing | Under `plugin/`, `.claude/` | Direct edit (reference `managing-*` skill best practices) |
+| Skill / rule / agent editing | Under `plugin/`, `.claude/` | Skill delegate to `managing-*` skills (`config-authoring-flow` rule required) |
 | Refactoring | `refactor` keyword | Direct edit |
 | Config / Chore | `config`, `chore` keywords | Direct edit |
 
@@ -56,8 +56,7 @@ Skill delegate to `coding-nextjs`. Pass plan section and issue context.
 
 ### Skill / Rule / Agent Editing
 
-- Reference `managing-rules`, `managing-skills`, `managing-agents` skill best practices
-- Edit both EN/JA versions when both need updating
+**Follow `config-authoring-flow` rule and delegate to `managing-rules` / `managing-skills` / `managing-agents` via Skill tool.** Direct editing is prohibited (bypasses EN/JA sync and quality review).
 - Files under `plugin/` — note `plugin-version-bump` rule (version bumps at release time only)
 
 ### Refactoring
