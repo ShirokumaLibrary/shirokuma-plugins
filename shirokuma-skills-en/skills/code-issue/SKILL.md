@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, WebSearch, WebFetch
 
 # Generic Coding
 
-Generic coding skill delegated from `working-on-issue`. Routes to framework-specific skills (`coding-nextjs`) via Skill delegation or performs direct editing based on work type.
+Generic coding skill delegated from `working-on-issue`. Routes to framework-specific skills (discovered via `skills routing coding`) via Skill delegation or performs direct editing based on work type.
 
 ## Context
 
@@ -35,8 +35,8 @@ If a fixed table skill is optimal, it takes precedence regardless of discovery r
 
 | Work Type | Condition | Route |
 |-----------|-----------|-------|
-| Next.js implementation | `area:frontend`, `area:cli` + Next.js related | Skill delegate to `coding-nextjs` |
-| Bug fix (code) | Affects code files | Skill delegate to `coding-nextjs` |
+| Framework-specific implementation | `area:frontend`, `area:cli` + framework related | Skill delegate to discovered `coding-*` skill |
+| Bug fix (code) | Affects code files | Skill delegate to discovered `coding-*` skill or direct edit |
 | Markdown / documentation editing | `.md` file changes | Direct edit |
 | Skill / rule / agent editing | Under `plugin/`, `.claude/` | Skill delegate to `managing-*` skills (`config-authoring-flow` rule required) |
 | Refactoring | `refactor` keyword | Direct edit |
@@ -44,9 +44,9 @@ If a fixed table skill is optimal, it takes precedence regardless of discovery r
 
 ## Work Type Guidance
 
-### Next.js Implementation / Bug Fix
+### Framework-Specific Implementation / Bug Fix
 
-Skill delegate to `coding-nextjs`. Pass plan section and issue context.
+Skill delegate to the discovered `coding-*` skill that matches the project's framework. Pass plan section and issue context.
 
 ### Markdown / Documentation Editing
 
@@ -74,7 +74,7 @@ Skill delegate to `coding-nextjs`. Pass plan section and issue context.
 - As an Agent tool (subagent), Tasks API / `AskUserQuestion` are not available
 - Progress management is handled by the manager (main AI, `working-on-issue`)
 - TDD workflow is managed by `working-on-issue` wrapping `code-issue` calls with TDD steps (`code-issue` focuses solely on implementation)
-- UI design tasks (new UI pages, visual redesigns, design system token changes) are handled by `designing-on-issue` → `designing-shadcn-ui`, not by this skill
+- UI design tasks (new UI pages, visual redesigns, design system token changes) are handled by `designing-on-issue` → discovered design skills, not by this skill
 - **Commit, push, and PR creation are outside the scope of this skill**. This skill is responsible for code changes only — `commit-issue` handles commits and `open-pr-issue` handles PR creation in the subsequent chain. Do not directly execute `git commit` / `git push` / `gh pr create` / `shirokuma-docs pr create`
 
 ## Output Template

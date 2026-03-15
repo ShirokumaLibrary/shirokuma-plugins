@@ -1,6 +1,6 @@
 ---
 name: auditing-security
-description: 依存パッケージのセキュリティ脆弱性を分析し、critical/high の脆弱性を Issue として記録します。トリガー: 「セキュリティ監査」「audit」「脆弱性チェック」「dependency audit」「security audit」。
+description: Node.js (npm/pnpm/yarn) の依存パッケージのセキュリティ脆弱性を分析し、critical/high の脆弱性を Issue として記録します。トリガー: 「セキュリティ監査」「audit」「脆弱性チェック」「dependency audit」「security audit」。
 allowed-tools: Read, Bash, Glob, Grep
 ---
 

@@ -15,7 +15,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ```
 .claude/
 ├── skills/                        # 汎用（プロジェクト間で共有可能）
-│   ├── coding-nextjs/
+│   ├── coding-{domain}/           # フレームワーク固有コーディングスキル
 │   │   ├── patterns/              # 再利用可能なパターン
 │   │   └── templates/             # コードテンプレート
 │   └── managing-rules/            # このスキル
@@ -45,7 +45,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 
 **移行前**（Skills `project/` ディレクトリ）:
 ```
-.claude/skills/coding-nextjs/
+.claude/skills/coding-{domain}/
 ├── patterns/         # ✓ 維持（汎用パターン）
 ├── templates/        # ✓ 維持（コードテンプレート）
 └── project/          # → ルールに移動
@@ -56,7 +56,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 **移行後**（Rules）:
 ```
 .claude/
-├── skills/coding-nextjs/
+├── skills/coding-{domain}/
 │   ├── patterns/     # 汎用パターン
 │   └── templates/    # コードテンプレート
 │
@@ -282,7 +282,7 @@ cat .claude/rules/{name}.md
 
 現在のパターン:
 ```
-.claude/skills/coding-nextjs/project/patterns/lib-structure.md
+.claude/skills/coding-{domain}/project/patterns/lib-structure.md
 ```
 
 ルールとして:

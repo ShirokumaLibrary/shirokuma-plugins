@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 # プロジェクト設定ジェネレーター
 
-`coding-nextjs` や `review-issue` 向けにプロジェクト固有の設定ディレクトリを作成・管理。
+フレームワーク固有スキル（例: `shirokuma-nextjs` プラグインの `coding-nextjs`）や `review-issue` 向けにプロジェクト固有の設定ディレクトリを作成・管理。
 
 ## いつ使うか
 
@@ -50,7 +50,7 @@ ls .claude/skills/*/project/ 2>/dev/null || echo "No project configs found"
 ```
 
 対応スキル:
-- `coding-nextjs`
+- フレームワーク固有コーディングスキル（例: `shirokuma-nextjs` プラグインの `coding-nextjs`）
 - `review-issue`
 
 ### ステップ 2: プロジェクト情報の収集
@@ -175,7 +175,7 @@ mkdir -p .claude/rules
 ## Project Config Generated
 
 ### Target Skills
-- coding-nextjs
+- coding-{domain}（フレームワーク固有）
 - review-issue
 
 ### Files Created/Updated

@@ -159,7 +159,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch
 
 | ソース | 優先度 | 例 |
 |--------|--------|-----|
-| ビルトイン（プラグイン） | 高い | `designing-shadcn-ui`、`coding-nextjs` |
+| ビルトイン（プラグイン） | 高い | 例: `designing-shadcn-ui`、`coding-nextjs`（`shirokuma-nextjs` プラグイン） |
 | プロジェクト `.claude/skills/` | 標準 | `.claude/skills/designing-graphql/SKILL.md` |
 | 設定 `shirokuma-docs.config.yaml` | 標準 | `skills.routing.designing` エントリ |
 

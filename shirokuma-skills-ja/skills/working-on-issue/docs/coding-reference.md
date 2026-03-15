@@ -7,7 +7,7 @@
 ```text
 working-on-issue（マネージャー＝メイン AI）
   → code-issue（subagent ワーカー）
-      → coding-nextjs（Skill 委任、Next.js 固有の場合）
+      → フレームワーク固有スキル（Skill 委任、`skills routing coding` で動的発見）
       → 直接編集（Markdown, スキル, 設定等）
 ```
 
@@ -15,9 +15,9 @@ working-on-issue（マネージャー＝メイン AI）
 
 | 判定条件 | ルート |
 |---------|--------|
-| ラベル: `area:frontend`, `area:cli` + Next.js 関連 | `code-issue` → `coding-nextjs` |
-| キーワード: `implement`, `create`, `add`, `実装`, `作成`, `追加` | `code-issue` → `coding-nextjs` |
-| キーワード: `fix`, `bug`, `修正`, `バグ` | `code-issue` → `coding-nextjs` or 直接編集 |
+| ラベル: `area:frontend`, `area:cli` + フレームワーク関連 | `code-issue` → 発見された `coding-*` スキル |
+| キーワード: `implement`, `create`, `add`, `実装`, `作成`, `追加` | `code-issue` → 発見された `coding-*` スキル |
+| キーワード: `fix`, `bug`, `修正`, `バグ` | `code-issue` → 発見された `coding-*` スキル or 直接編集 |
 | Markdown / ドキュメント | `code-issue` → 直接編集 |
 | スキル / ルール / エージェント | `code-issue` → 直接編集 |
 | リファクタリング | `code-issue` → 直接編集 |
@@ -33,12 +33,14 @@ working-on-issue（マネージャー＝メイン AI）
 
 `working-on-issue` が TDD ステップをオーケストレートし、`code-issue` は実装のみに集中する。
 
-## coding-nextjs が提供するもの
+## フレームワーク固有スキルが提供するもの
 
-- Next.js 固有のテンプレート（Server Actions, コンポーネント, ページ）
-- フレームワーク固有のパターン（Better Auth, Drizzle ORM, CSP, CSRF 等）
+フレームワーク固有のコーディングスキル（例: `shirokuma-nextjs` プラグインの `coding-nextjs`）は以下を提供:
+
+- フレームワーク固有のテンプレート（Server Actions, コンポーネント, ページ等）
+- フレームワーク固有のパターン（認証, ORM, スタイリング, セキュリティ等）
 - 大規模機能実装のガイドライン
 
 ## スタンドアロン起動
 
-ユーザーは `/coding-nextjs` を直接呼び出すことも可能（非サブエージェント、Tasks API/AskUserQuestion 利用可）。`code-issue` は `working-on-issue` からの標準ルートだが、既存のスタンドアロン起動パスは維持される。
+ユーザーはフレームワーク固有スキルを直接呼び出すことも可能（非サブエージェント、Tasks API/AskUserQuestion 利用可）。`code-issue` は `working-on-issue` からの標準ルートだが、スタンドアロン起動パスは維持される。

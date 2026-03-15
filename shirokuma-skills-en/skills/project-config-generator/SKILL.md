@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 # Project Config Generator
 
-Creates and maintains project-specific configuration directories for skills like `coding-nextjs` and `review-issue`.
+Creates and maintains project-specific configuration directories for framework-specific skills (e.g., `coding-nextjs` from `shirokuma-nextjs` plugin) and `review-issue`.
 
 ## When to Use
 
@@ -51,7 +51,7 @@ ls .claude/skills/*/project/ 2>/dev/null || echo "No project configs found"
 ```
 
 Supported skills:
-- `coding-nextjs`
+- Framework-specific coding skills (e.g., `coding-nextjs` from `shirokuma-nextjs` plugin)
 - `review-issue`
 
 ### Step 2: Gather Project Information
@@ -176,7 +176,7 @@ Output summary:
 ## Project Config Generated
 
 ### Target Skills
-- coding-nextjs
+- coding-{domain} (framework-specific)
 - review-issue
 
 ### Files Created/Updated

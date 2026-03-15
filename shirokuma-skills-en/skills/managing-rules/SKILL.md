@@ -15,7 +15,7 @@ Create and maintain rules that provide automatic, path-specific context to Claud
 ```
 .claude/
 ├── skills/                        # GENERIC (shareable across projects)
-│   ├── coding-nextjs/
+│   ├── coding-{domain}/           # Framework-specific coding skill
 │   │   ├── patterns/              # Reusable patterns
 │   │   └── templates/             # Code templates
 │   ├── review-issue/
@@ -52,7 +52,7 @@ Project-specific rules always take precedence since they are loaded alongside ma
 
 **Before** (Skills `project/` directory):
 ```
-.claude/skills/coding-nextjs/
+.claude/skills/coding-{domain}/
 ├── patterns/         # ✓ Keep (generic patterns)
 ├── templates/        # ✓ Keep (code templates)
 └── project/          # → Move to rules
@@ -64,7 +64,7 @@ Project-specific rules always take precedence since they are loaded alongside ma
 **After** (Rules):
 ```
 .claude/
-├── skills/coding-nextjs/
+├── skills/coding-{domain}/
 │   ├── patterns/     # Generic patterns
 │   └── templates/    # Code templates
 │
@@ -291,7 +291,7 @@ cat .claude/rules/{name}.md
 
 Current pattern:
 ```
-.claude/skills/coding-nextjs/project/patterns/lib-structure.md
+.claude/skills/coding-{domain}/project/patterns/lib-structure.md
 ```
 
 Better as rule:

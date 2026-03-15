@@ -4,7 +4,7 @@ Complete agent templates for common use cases.
 
 ## Vibe Coder Template (Rich Description Format)
 
-This template demonstrates the **recommended rich description format** with `<example>` blocks for complex agents.
+This template demonstrates the **recommended rich description format** with `<example>` blocks for complex agents. The example uses `coding-nextjs` (provided by `shirokuma-nextjs` plugin) as a concrete illustration.
 
 ```markdown
 ---

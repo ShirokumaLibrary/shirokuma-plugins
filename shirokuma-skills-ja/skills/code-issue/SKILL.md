@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, Skill, WebSearch, WebFetch
 
 # 汎用コーディング
 
-`working-on-issue` から委任される汎用コーディングスキル。作業タイプに応じてフレームワーク固有スキル（`coding-nextjs`）に Skill 委任するか、直接編集を行う。
+`working-on-issue` から委任される汎用コーディングスキル。作業タイプに応じてフレームワーク固有スキル（`skills routing coding` で動的発見）に Skill 委任するか、直接編集を行う。
 
 ## コンテキスト
 
@@ -35,8 +35,8 @@ shirokuma-docs skills routing coding
 
 | 作業タイプ | 判定条件 | ルート |
 |-----------|---------|--------|
-| Next.js 実装 | `area:frontend`, `area:cli` + Next.js 関連 | `coding-nextjs` に Skill 委任 |
-| バグ修正（コード） | コードファイルに影響 | `coding-nextjs` に Skill 委任 |
+| フレームワーク固有の実装 | `area:frontend`, `area:cli` + フレームワーク関連 | 発見された `coding-*` スキルに Skill 委任 |
+| バグ修正（コード） | コードファイルに影響 | 発見された `coding-*` スキルに Skill 委任 or 直接編集 |
 | Markdown / ドキュメント編集 | `.md` ファイルの変更 | 直接編集 |
 | スキル / ルール / エージェント編集 | `plugin/`, `.claude/` 配下 | `managing-*` スキルに Skill 委任（`config-authoring-flow` ルール必須） |
 | リファクタリング | `refactor` キーワード | 直接編集 |
@@ -44,9 +44,9 @@ shirokuma-docs skills routing coding
 
 ## 作業タイプ別ガイダンス
 
-### Next.js 実装 / バグ修正
+### フレームワーク固有の実装 / バグ修正
 
-`coding-nextjs` に Skill 委任する。計画セクションと Issue コンテキストを渡す。
+プロジェクトのフレームワークに適合する発見された `coding-*` スキルに Skill 委任する。計画セクションと Issue コンテキストを渡す。
 
 ### Markdown / ドキュメント編集
 
@@ -74,7 +74,7 @@ shirokuma-docs skills routing coding
 - Agent ツール（サブエージェント）のため Tasks API / `AskUserQuestion` は使用不可
 - 進捗管理はマネージャー（メイン AI、`working-on-issue`）が担当
 - TDD ワークフローは `working-on-issue` が `code-issue` の呼び出しを TDD で包む形で管理（`code-issue` 自体は実装のみに集中）
-- UI デザインタスク（新規 UI ページ、ビジュアルリデザイン、デザインシステムトークン変更）は `designing-on-issue` → `designing-shadcn-ui` が担当し、本スキルの責務外
+- UI デザインタスク（新規 UI ページ、ビジュアルリデザイン、デザインシステムトークン変更）は `designing-on-issue` → 発見された設計スキルが担当し、本スキルの責務外
 - **コミット・プッシュ・PR 作成は本スキルの責務外**。コード変更のみを担当し、コミットは `commit-issue`、PR 作成は `open-pr-issue` が後続チェーンで担当する。`git commit` / `git push` / `gh pr create` / `shirokuma-docs pr create` を直接実行しないこと
 
 ## 出力テンプレート

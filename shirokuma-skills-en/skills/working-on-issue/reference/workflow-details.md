@@ -66,10 +66,8 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 | preparing-on-issue | Yes | Yes | Via working-on-issue or standalone |
 | plan-issue | Yes | — | Via Skill tool (from preparing-on-issue) |
 | code-issue | Yes | — | Via Skill tool (from working-on-issue) |
-| coding-nextjs | Yes | Yes | Via code-issue or standalone |
+| Framework-specific skills | Yes | Yes | Via code-issue / designing-on-issue or standalone (dynamically discovered) |
 | designing-on-issue | — | Yes | Currently standalone (invoked from preparing-on-issue completion report) |
-| designing-shadcn-ui | Yes | Yes | Via designing-on-issue or standalone |
-| designing-nextjs | Yes | Yes | Via designing-on-issue or standalone |
 | creating-item | — | Yes | Always standalone-capable |
 | commit-issue | Yes | Yes | Subagent (standalone also runs as subagent) |
 | open-pr-issue | Yes | Yes | Subagent (via chain or standalone) |

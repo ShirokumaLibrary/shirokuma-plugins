@@ -25,7 +25,7 @@ graph LR
 | フェーズ | オーケストレーター | 責務 | 実作業の委任先 |
 |---------|-----------------|------|-------------|
 | Preparing | `preparing-on-issue` | 計画策定・計画レビュー | `plan-issue` (Skill), `review-issue` (Skill) |
-| Designing | `designing-on-issue` | 設計ルーティング・設計レビュー | `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` 等 |
+| Designing | `designing-on-issue` | 設計ルーティング・設計レビュー | フレームワーク固有設計スキル（動的発見） |
 | Working | `working-on-issue` | 実装・コミット・PR | `code-issue` (Skill), `commit-worker`, `pr-worker` |
 
 会話フロー・エピックパターン・セッション vs スタンドアロンの詳細は `working-on-issue/reference/workflow-details.md` を参照。

@@ -1,12 +1,12 @@
 ---
 name: designing-on-issue
-description: Routes to the appropriate design skill based on design type, managing discovery and visual evaluation loops. UI design delegates to designing-shadcn-ui; architecture design delegates to designing-nextjs; data model design delegates to designing-drizzle. Triggers: "design", "UI", "memorable", "impressive", "architecture".
+description: Routes to the appropriate design skill based on design type, managing discovery and visual evaluation loops. Delegates to framework-specific design skills discovered via `skills routing designing`. Triggers: "design", "UI", "memorable", "impressive", "architecture".
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill, Agent
 ---
 
 # Design Workflow (Orchestrator)
 
-Route to the appropriate skill based on design type, orchestrating discovery, implementation delegation, and visual evaluation loops. UI design delegates to `designing-shadcn-ui`; architecture design delegates to `designing-nextjs`; data model design delegates to `designing-drizzle`.
+Route to the appropriate skill based on design type, orchestrating discovery, implementation delegation, and visual evaluation loops. Delegates to framework-specific design skills discovered dynamically via `shirokuma-docs skills routing designing`.
 
 ## Workflow
 
@@ -94,35 +94,17 @@ When a project-specific skill matches the requirements, use it with higher prior
 
 | Design Type | Condition | Route |
 |-------------|-----------|-------|
-| UI Design | shadcn/ui + Tailwind project, keywords: `UI`, `impressive`, `design` | Skill delegate to `designing-shadcn-ui` |
-| Architecture Design | `area:frontend`, API design, component composition, routing | Skill delegate to `designing-nextjs` |
-| Data Model Design | DB schema, migrations | Skill delegate to `designing-drizzle` |
+| UI Design | shadcn/ui + Tailwind project, keywords: `UI`, `impressive`, `design` | Skill delegate to discovered `designing-*` UI skill |
+| Architecture Design | `area:frontend`, API design, component composition, routing | Skill delegate to discovered `designing-*` architecture skill |
+| Data Model Design | DB schema, migrations | Skill delegate to discovered `designing-*` data model skill |
 
-#### UI Design
+#### Delegating to Discovered Design Skills
 
-Invoke `designing-shadcn-ui` via `Skill` tool. Pass the following context:
-
-- Design Brief
-- Aesthetic Direction
-- Technical constraints (from Phase 1 context)
-- Plan section (if available)
-
-#### Architecture Design
-
-Invoke `designing-nextjs` via `Skill` tool. Pass the following context:
+Invoke the matched design skill via `Skill` tool. Pass the following context:
 
 - Design Brief
-- Architecture requirements (from Phase 1 context)
-- Technical constraints (framework version, existing patterns)
-- Plan section (if available)
-
-#### Data Model Design
-
-Invoke `designing-drizzle` via `Skill` tool. Pass the following context:
-
-- Design Brief
-- Data model requirements (from Phase 1 context)
-- Technical constraints (DB engine, existing schema)
+- Requirements specific to the design type (from Phase 1 context)
+- Technical constraints (framework version, existing patterns, DB engine, etc.)
 - Plan section (if available)
 
 ### Phase 3b: UCP Check After Worker Completion
@@ -188,11 +170,7 @@ Design complete. Next steps:
 
 Expand delegation to specialized skills per design type:
 
-| Design Type | Delegate To | Condition | Status |
-|-------------|-------------|-----------|--------|
-| UI Design | `designing-shadcn-ui` | shadcn/ui + Tailwind projects | Supported |
-| Architecture Design | `designing-nextjs` | Next.js architecture | Supported |
-| Data Model Design | `designing-drizzle` | Drizzle ORM schema | Supported |
+Design skills are discovered dynamically via `shirokuma-docs skills routing designing`. Any skill following the `designing-{domain}` naming convention is automatically discoverable. See `managing-skills/reference/orchestrator.md` for the discovery mechanism.
 
 ## Tool Usage
 
@@ -200,7 +178,7 @@ Expand delegation to specialized skills per design type:
 |------|------|
 | AskUserQuestion | Design direction confirmation, visual evaluation loop |
 | TaskCreate, TaskUpdate | Phase progress tracking |
-| Skill | Delegation to `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` |
+| Skill | Delegation to discovered `designing-*` skills |
 | WebSearch | Design reference research (optional) |
 | Bash | Dev server check, build verification |
 
@@ -209,4 +187,4 @@ Expand delegation to specialized skills per design type:
 - Currently standalone (invoked via `/designing-on-issue` from `preparing-on-issue` completion report)
 - Confirm design direction with user before implementation — implementing without alignment risks extensive rework
 - Visual evaluation loop limited to 3 iterations maximum
-- `designing-shadcn-ui` handles build verification (not needed in this skill)
+- The delegated design skill handles build verification (not needed in this skill)

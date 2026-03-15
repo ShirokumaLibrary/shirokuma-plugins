@@ -7,7 +7,7 @@ Guide for delegating from `working-on-issue` to `code-issue` (subagent).
 ```text
 working-on-issue (manager = main AI)
   → code-issue (subagent worker)
-      → coding-nextjs (Skill delegation, Next.js specific)
+      → framework-specific skill (Skill delegation, dynamically discovered via `skills routing coding`)
       → direct edit (Markdown, skills, config, etc.)
 ```
 
@@ -15,9 +15,9 @@ working-on-issue (manager = main AI)
 
 | Condition | Route |
 |-----------|-------|
-| Labels: `area:frontend`, `area:cli` + Next.js related | `code-issue` → `coding-nextjs` |
-| Keywords: `implement`, `create`, `add`, `build` | `code-issue` → `coding-nextjs` |
-| Keywords: `fix`, `bug` | `code-issue` → `coding-nextjs` or direct edit |
+| Labels: `area:frontend`, `area:cli` + framework related | `code-issue` → discovered `coding-*` skill |
+| Keywords: `implement`, `create`, `add`, `build` | `code-issue` → discovered `coding-*` skill |
+| Keywords: `fix`, `bug` | `code-issue` → discovered `coding-*` skill or direct edit |
 | Markdown / documentation | `code-issue` → direct edit |
 | Skill / rule / agent editing | `code-issue` → direct edit |
 | Refactoring | `code-issue` → direct edit |
@@ -33,12 +33,14 @@ TDD common workflow is **required** for implementation work:
 
 `working-on-issue` orchestrates TDD steps, `code-issue` focuses on implementation only.
 
-## What coding-nextjs Provides
+## What Framework-Specific Skills Provide
 
-- Next.js-specific templates (Server Actions, components, pages)
-- Framework-specific patterns (Better Auth, Drizzle ORM, CSP, CSRF, etc.)
+Framework-specific coding skills (e.g., `coding-nextjs` from `shirokuma-nextjs` plugin) provide:
+
+- Framework-specific templates (Server Actions, components, pages, etc.)
+- Framework-specific patterns (auth, ORM, styling, security, etc.)
 - Large-scale feature implementation guidelines
 
 ## Standalone Invocation
 
-Users can also invoke `/coding-nextjs` directly (non-subagent, with Tasks API/AskUserQuestion access). `code-issue` is the standard route from `working-on-issue`, but the existing standalone invocation path is maintained.
+Users can invoke framework-specific skills directly (non-subagent, with Tasks API/AskUserQuestion access). `code-issue` is the standard route from `working-on-issue`, but standalone invocation paths are maintained.

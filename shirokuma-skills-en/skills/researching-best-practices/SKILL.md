@@ -12,7 +12,7 @@ Researches official documentation and project patterns to provide implementation
 
 - **Category:** Investigation Worker
 - **Scope:** Search official documentation (WebSearch / WebFetch), search project patterns (Read / Grep / Glob / Bash read-only commands), generate synthesized research reports, create Research Discussions.
-- **Out of scope:** Implementing production code (delegated to `coding-nextjs`), modifying rule/skill files
+- **Out of scope:** Implementing production code (delegated to framework-specific coding skills), modifying rule/skill files
 
 > **Bash exception**: Read-only commands for checking project patterns (`cat`, `ls`, etc.) are permitted.
 
@@ -56,8 +56,8 @@ Check existing patterns in the project:
 Grep: [relevant pattern] in {project}/
 ```
 
-**Reference patterns** (provided in `coding-nextjs` skill knowledge base):
-- `code-patterns.md` - Server Actions, i18n, forms
+**Reference patterns** (provided in framework-specific coding skill knowledge bases, e.g., `coding-nextjs` from `shirokuma-nextjs` plugin):
+- `code-patterns.md` - Framework-specific patterns
 - `better-auth.md` - Authentication patterns
 - `drizzle-orm.md` - Database patterns
 - `tailwind-v4.md` - Styling patterns
@@ -162,6 +162,6 @@ For conditional branching logic after research completion (Discussion save, Issu
 
 ## Notes
 
-- Results can be passed to `coding-nextjs` skill for implementation
+- Results can be passed to framework-specific coding skills for implementation
 - Runs as Agent tool (`research-worker` subagent) for isolated execution without polluting main context
 - Research results are reviewed by `review-issue` (Skill) when invoked through the workflow chain

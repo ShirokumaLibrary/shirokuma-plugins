@@ -25,7 +25,7 @@ graph LR
 | Phase | Orchestrator | Responsibility | Delegates to |
 |-------|-------------|----------------|-------------|
 | Preparing | `preparing-on-issue` | Planning + plan review | `plan-issue` (Skill), `review-issue` (Skill) |
-| Designing | `designing-on-issue` | Design routing + design review | `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` etc. |
+| Designing | `designing-on-issue` | Design routing + design review | Framework-specific design skills (dynamically discovered) |
 | Working | `working-on-issue` | Implementation, commit, PR | `code-issue` (Skill), `commit-worker`, `pr-worker` |
 
 For conversation flow, epic pattern, and session vs standalone details, see `working-on-issue/reference/workflow-details.md`.

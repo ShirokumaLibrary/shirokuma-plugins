@@ -104,7 +104,7 @@ One clear, focused purpose per agent. Heavy agents (25k+ tokens) create bottlene
 | **Creator** | Implementation | "Do" rules only |
 | **Checker** | Review/Audit | "Do" + "Don't" rules |
 
-**Example**: `coding-nextjs (Creator) ←→ review-issue (Checker)`
+**Example**: `coding-* skill (Creator) ←→ review-issue (Checker)`
 
 ### 4. Minimal Tool Access (ACI)
 

@@ -1,6 +1,6 @@
 ---
 name: auditing-security
-description: Analyzes dependency security vulnerabilities and records critical/high vulnerabilities as Issues. Triggers: "security audit", "audit", "vulnerability check", "dependency audit".
+description: Analyzes Node.js (npm/pnpm/yarn) dependency security vulnerabilities and records critical/high vulnerabilities as Issues. Triggers: "security audit", "audit", "vulnerability check", "dependency audit".
 allowed-tools: Read, Bash, Glob, Grep
 ---
 

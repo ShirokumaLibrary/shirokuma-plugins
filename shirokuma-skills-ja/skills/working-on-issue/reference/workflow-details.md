@@ -66,10 +66,8 @@ graph TD
 | preparing-on-issue | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
 | plan-issue | 対応 | — | Skill ツール経由（preparing-on-issue から） |
 | code-issue | 対応 | — | Skill ツール経由（working-on-issue から） |
-| coding-nextjs | 対応 | 対応 | code-issue 経由またはスタンドアロン |
+| フレームワーク固有スキル | 対応 | 対応 | code-issue / designing-on-issue 経由またはスタンドアロン（動的発見） |
 | designing-on-issue | — | 対応 | 現時点ではスタンドアロン起動（preparing-on-issue の完了レポートから起動） |
-| designing-shadcn-ui | 対応 | 対応 | designing-on-issue 経由またはスタンドアロン |
-| designing-nextjs | 対応 | 対応 | designing-on-issue 経由またはスタンドアロン |
 | creating-item | — | 対応 | 常にスタンドアロン対応 |
 | commit-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | open-pr-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |

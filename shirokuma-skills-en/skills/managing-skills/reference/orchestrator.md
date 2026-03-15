@@ -159,7 +159,7 @@ When standalone:
 
 | Source | Priority | Example |
 |--------|----------|---------|
-| Built-in (plugin) | Higher | `designing-shadcn-ui`, `coding-nextjs` |
+| Built-in (plugin) | Higher | e.g., `designing-shadcn-ui`, `coding-nextjs` (`shirokuma-nextjs` plugin) |
 | Project `.claude/skills/` | Standard | `.claude/skills/designing-graphql/SKILL.md` |
 | Config `shirokuma-docs.config.yaml` | Standard | `skills.routing.designing` entries |
 

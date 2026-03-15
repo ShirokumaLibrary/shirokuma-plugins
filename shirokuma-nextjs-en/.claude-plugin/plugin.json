@@ -1,6 +1,6 @@
 {
-  "name": "shirokuma-hooks",
-  "description": "Safety hooks for destructive git/GitHub operations",
+  "name": "shirokuma-nextjs-en",
+  "description": "Next.js/shadcn/Drizzle framework-specific skills for Claude Code",
   "version": "0.3.0-alpha.29",
   "author": {
     "name": "ShirokumaLibrary"
@@ -9,9 +9,11 @@
   "repository": "https://github.com/ShirokumaLibrary/shirokuma-plugins",
   "keywords": [
     "claude-code",
-    "hooks",
-    "safety",
-    "git"
+    "skills",
+    "nextjs",
+    "shadcn-ui",
+    "drizzle",
+    "frontend"
   ],
   "license": "MIT"
 }

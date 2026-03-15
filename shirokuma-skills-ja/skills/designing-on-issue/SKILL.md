@@ -1,12 +1,12 @@
 ---
 name: designing-on-issue
-description: 設計タイプに応じて適切な設計スキルにルーティングし、ディスカバリー・視覚評価ループを管理するオーケストレーター。UI 設計は designing-shadcn-ui に、アーキテクチャ設計は designing-nextjs に、データモデル設計は designing-drizzle に委任します。トリガー: 「デザイン」「UI」「印象的」「design」「設計」。
+description: 設計タイプに応じて適切な設計スキルにルーティングし、ディスカバリー・視覚評価ループを管理するオーケストレーター。`skills routing designing` で動的に発見されたフレームワーク固有設計スキルに委任します。トリガー: 「デザイン」「UI」「印象的」「design」「設計」。
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill, Agent
 ---
 
 # デザインワークフロー（オーケストレーター）
 
-設計タイプに応じて適切なスキルにルーティングし、ディスカバリーから実装委任、視覚評価ループまでを統括する。UI 設計は `designing-shadcn-ui` に、アーキテクチャ設計は `designing-nextjs` に、データモデル設計は `designing-drizzle` に委任する。
+設計タイプに応じて適切なスキルにルーティングし、ディスカバリーから実装委任、視覚評価ループまでを統括する。`shirokuma-docs skills routing designing` で動的に発見されたフレームワーク固有設計スキルに委任する。
 
 ## ワークフロー
 
@@ -94,35 +94,17 @@ shirokuma-docs skills routing designing
 
 | 設計タイプ | 判定条件 | ルート |
 |-----------|---------|--------|
-| UI 設計 | shadcn/ui + Tailwind プロジェクト、キーワード: `UI`, `印象的`, `design` | `designing-shadcn-ui` に Skill 委任 |
-| アーキテクチャ設計 | `area:frontend`, API 設計、コンポーネント構成、ルーティング | `designing-nextjs` に Skill 委任 |
-| データモデル設計 | DB スキーマ、マイグレーション | `designing-drizzle` に Skill 委任 |
+| UI 設計 | shadcn/ui + Tailwind プロジェクト、キーワード: `UI`, `印象的`, `design` | 発見された `designing-*` UI スキルに Skill 委任 |
+| アーキテクチャ設計 | `area:frontend`, API 設計、コンポーネント構成、ルーティング | 発見された `designing-*` アーキテクチャスキルに Skill 委任 |
+| データモデル設計 | DB スキーマ、マイグレーション | 発見された `designing-*` データモデルスキルに Skill 委任 |
 
-#### UI 設計の場合
+#### 発見された設計スキルへの委任
 
-`Skill` ツールで `designing-shadcn-ui` を呼び出す。以下のコンテキストを渡す:
-
-- Design Brief
-- Aesthetic Direction
-- 技術的制約（Phase 1 のコンテキストから）
-- 計画セクション（存在する場合）
-
-#### アーキテクチャ設計の場合
-
-`Skill` ツールで `designing-nextjs` を呼び出す。以下のコンテキストを渡す:
+マッチした設計スキルを `Skill` ツールで呼び出す。以下のコンテキストを渡す:
 
 - Design Brief
-- アーキテクチャ要件（Phase 1 のコンテキストから）
-- 技術的制約（フレームワークバージョン、既存パターン）
-- 計画セクション（存在する場合）
-
-#### データモデル設計の場合
-
-`Skill` ツールで `designing-drizzle` を呼び出す。以下のコンテキストを渡す:
-
-- Design Brief
-- データモデル要件（Phase 1 のコンテキストから）
-- 技術的制約（DB エンジン、既存スキーマ）
+- 設計タイプ固有の要件（Phase 1 のコンテキストから）
+- 技術的制約（フレームワークバージョン、既存パターン、DB エンジン等）
 - 計画セクション（存在する場合）
 
 ### Phase 3b: Worker 完了後の UCP チェック
@@ -188,11 +170,7 @@ shirokuma-docs issues update {number} --field-status "Spec Review"
 
 設計タイプごとに専門スキルへの委任を拡張する:
 
-| 設計タイプ | 委任先 | 条件 | ステータス |
-|-----------|--------|------|----------|
-| UI 設計 | `designing-shadcn-ui` | shadcn/ui + Tailwind プロジェクト | 対応済み |
-| アーキテクチャ設計 | `designing-nextjs` | Next.js アーキテクチャ | 対応済み |
-| データモデル設計 | `designing-drizzle` | Drizzle ORM スキーマ | 対応済み |
+設計スキルは `shirokuma-docs skills routing designing` で動的に発見される。`designing-{domain}` の命名規約に従うスキルは自動的に発見可能。発見メカニズムの詳細は `managing-skills/reference/orchestrator.md` を参照。
 
 ## ツール使用
 
@@ -200,7 +178,7 @@ shirokuma-docs issues update {number} --field-status "Spec Review"
 |--------|-----------|
 | AskUserQuestion | デザイン方向性確認、視覚評価ループ |
 | TaskCreate, TaskUpdate | Phase 進捗の追跡 |
-| Skill | `designing-shadcn-ui`、`designing-nextjs`、`designing-drizzle` への委任 |
+| Skill | 発見された `designing-*` スキルへの委任 |
 | WebSearch | デザインリファレンス調査（オプション） |
 | Bash | dev サーバー確認、ビルド確認 |
 
@@ -209,4 +187,4 @@ shirokuma-docs issues update {number} --field-status "Spec Review"
 - 現時点ではスタンドアロン起動（`preparing-on-issue` の完了レポートから `/designing-on-issue` で起動）
 - 実装前にデザイン方向性をユーザーに確認する — 合意なく実装すると大幅な手戻りリスクがある
 - 視覚評価ループは最大 3 イテレーション
-- `designing-shadcn-ui` がビルド検証を実施（このスキルでは不要）
+- 委任先の設計スキルがビルド検証を実施（このスキルでは不要）

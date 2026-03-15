@@ -12,7 +12,7 @@ allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, Tas
 
 - **カテゴリ:** 調査系ワーカー
 - **スコープ:** 公式ドキュメントの検索（WebSearch / WebFetch）、プロジェクト内のパターン検索（Read / Grep / Glob / Bash 読み取り専用コマンド）、調査結果の統合レポート生成、Research Discussion の作成。
-- **スコープ外:** プロダクションコードの実装（`coding-nextjs` に委任）、ルール・スキルファイルの変更
+- **スコープ外:** プロダクションコードの実装（フレームワーク固有コーディングスキルに委任）、ルール・スキルファイルの変更
 
 > **Bash 例外**: プロジェクトパターン確認のための読み取り専用コマンド（`cat`, `ls` 等）は許可。
 
@@ -56,8 +56,8 @@ allowed-tools: Read, Grep, Glob, WebSearch, WebFetch, Bash, AskUserQuestion, Tas
 Grep: [関連パターン] in {project}/
 ```
 
-**参考パターン**（`coding-nextjs` スキルのナレッジベースで提供）:
-- `code-patterns.md` - Server Actions、i18n、フォーム
+**参考パターン**（フレームワーク固有コーディングスキルのナレッジベースで提供、例: `shirokuma-nextjs` プラグインの `coding-nextjs`）:
+- `code-patterns.md` - フレームワーク固有パターン
 - `better-auth.md` - 認証パターン
 - `drizzle-orm.md` - データベースパターン
 - `tailwind-v4.md` - スタイリングパターン
@@ -162,6 +162,6 @@ research ロールは以下の観点でレビューする（詳細は `review-is
 
 ## 注意事項
 
-- 調査結果は `coding-nextjs` スキルに渡して実装可能
+- 調査結果はフレームワーク固有コーディングスキルに渡して実装可能
 - Agent ツール（`research-worker` サブエージェント）として隔離実行（メインコンテキストを汚染しない）
 - ワークフローチェーン経由の場合、調査結果は `review-issue`（Skill）によるレビューを経る

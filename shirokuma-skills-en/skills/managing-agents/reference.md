@@ -93,7 +93,7 @@ assistant: "[Response pattern]"
 | `assistant:` | Expected response | `"I'll implement this with TDD."` |
 | `<Task...>` | Tool invocation placeholder | `<Task tool call to coder agent>` |
 
-**Complete Example** (from coding-nextjs):
+**Complete Example** (from `coding-nextjs`, `shirokuma-nextjs` plugin):
 
 ```yaml
 description: Use this agent when the user wants to implement new features, create components, or build pages using natural language. This agent transforms vibe descriptions into working code with TDD.
