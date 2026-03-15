@@ -201,7 +201,7 @@ shirokuma-docs skill validate .claude/skills/skill-name
 ### ステップ 10: テスト
 
 1. トリガーフレーズで起動テスト（5+ should-trigger、5+ should-not-trigger）
-2. eval シナリオを `plugin/specs/{skill-name}/evals/scenarios.json` に作成
+2. eval シナリオを `plugin/specs/skills/{skill-name}/evals/scenarios.json` に作成
 3. Two-Instance 方式でワークフローをステップごとに実行（Claude A: 開発、Claude B: テスト）
 4. 複数モデル（Haiku, Sonnet, Opus）でテスト
 5. 観察に基づきイテレーション

@@ -69,17 +69,28 @@ shirokuma-docs show {number}
 
 #### スキル発見（ディスパッチ前に実行）
 
-ディスパッチテーブルの固定エントリに加え、プロジェクト固有スキルを動的に検出する:
+まず動的発見を実行し、プロジェクト固有スキルを検出する:
 
 ```bash
 shirokuma-docs skills routing designing
 ```
 
 出力の `routes` 配列の各エントリの `description` を参照し、Issue の要件に最も適合するスキルにルーティングする。
-`source: "discovered"` / `source: "config"` のエントリはプロジェクト固有スキルである。
-固定テーブルのスキルが最適な場合は、発見結果に関わらず固定テーブルを優先してよい。
 
-#### ディスパッチテーブル
+- `source: "discovered"` / `source: "config"` のエントリは**プロジェクト固有スキル**（優先度高）
+- `source: "builtin"` のエントリは組み込みスキル（下記ディスパッチテーブルと同一）
+
+プロジェクト固有スキルが要件に適合する場合は優先して使用する。発見結果に該当スキルがない場合はデフォルトのディスパッチテーブルにフォールバックする。
+
+#### ルーティング判定フロー
+
+| 条件 | 動作 |
+|------|------|
+| `routes.length > 0` | 発見されたスキルを優先使用 |
+| `routes.length === 0` かつフォールバックテーブルにマッチ | フォールバックテーブルのスキルを使用 |
+| いずれにもマッチしない | ユーザーに確認（AskUserQuestion） |
+
+#### ディスパッチテーブル（フォールバック）
 
 | 設計タイプ | 判定条件 | ルート |
 |-----------|---------|--------|
@@ -116,7 +127,7 @@ shirokuma-docs skills routing designing
 
 ### Phase 3b: Worker 完了後の UCP チェック
 
-設計スキル / review-worker が構造化データを返した場合、`working-on-issue/reference/worker-completion-pattern.md` の統一パターンに従い UCP チェックを実行する。`suggestions_count > 0` の場合、worker が Issue コメントに投稿した Suggestions をユーザーに提示する。
+設計スキル / review-issue が構造化データを返した場合、`working-on-issue/reference/worker-completion-pattern.md` の統一パターンに従い UCP チェックを実行する。`suggestions_count > 0` の場合、スキルが Issue コメントに投稿した Suggestions をユーザーに提示する。
 
 ### Phase 4: 視覚評価ループ
 

@@ -99,7 +99,7 @@ AI MUST update issue status at these points:
 ### Preparing Usage
 
 - **Purpose**: Visibility that planning is in progress; records planning start timestamp
-- **Entry**: `preparing-on-issue` sets this status before delegating to `planning-worker`
+- **Entry**: `preparing-on-issue` sets this status before delegating to `plan-issue`
 - **Exit**: Plan complete → Designing (if design needed) or Spec Review
 
 ### Designing Usage

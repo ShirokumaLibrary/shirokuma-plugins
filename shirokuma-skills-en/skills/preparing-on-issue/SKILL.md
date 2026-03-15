@@ -1,14 +1,14 @@
 ---
 name: preparing-on-issue
-description: "Orchestrates the planning phase for an issue: status management, plan delegation to planning-worker, plan review, and user approval gate. Triggers: \"plan\", \"plan #42\", \"design approach\", \"create plan\"."
-allowed-tools: Agent, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
+description: "Orchestrates the planning phase for an issue: status management, plan delegation to plan-issue, plan review, and user approval gate. Triggers: \"plan\", \"plan #42\", \"design approach\", \"create plan\"."
+allowed-tools: Skill, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Preparing on Issue (Orchestrator)
 
 > **Chain Autonomous Progression**: After the plan review subagent (review step) returns its result, immediately proceed to status update and user return. Stopping after the review subagent forces the user to manually prompt continuation, breaking the planning workflow. Parse the YAML frontmatter `action` field and act without waiting for user input.
 
-Orchestrate the planning phase for an issue: fetch the issue, manage status transitions, delegate plan creation to `planning-worker`, conduct plan review, and return control to the user with a Spec Review approval gate. **Does not proceed to implementation.**
+Orchestrate the planning phase for an issue: fetch the issue, manage status transitions, delegate plan creation to `plan-issue` (via Skill tool), conduct plan review, and return control to the user with a Spec Review approval gate. **Does not proceed to implementation.**
 
 ## Workflow
 
@@ -39,22 +39,22 @@ Check if issue body contains `## Plan` section (detected by `^## Plan` line pref
 
 | Plan state | Action |
 |-----------|--------|
-| No plan | Proceed to Step 3 (delegate to planning-worker) |
+| No plan | Proceed to Step 3 (delegate to plan-issue) |
 | Plan exists | Ask whether to overwrite (AskUserQuestion) before proceeding |
 
-### Step 3: Delegate to Planning Worker
+### Step 3: Delegate to Plan Issue Skill
 
-Invoke `plan-issue` via the Agent tool (custom subagent `planning-worker`).
+Invoke `plan-issue` via the Skill tool (runs in main context to access project-specific rules).
 
 ```text
-Agent(planning-worker, args: "#{number}")
+Skill(plan-issue, args: "#{number}")
 ```
 
-The planning worker performs codebase investigation, creates the plan, posts a thinking process comment, and writes the plan to the issue body. It returns structured output on completion.
+The plan-issue skill performs codebase investigation, creates the plan, posts a thinking process comment, and writes the plan to the issue body. It returns structured output on completion.
 
-#### Processing Subagent Output
+#### Processing Skill Output
 
-Parse the YAML frontmatter from the planning worker's output:
+Parse the YAML frontmatter from the plan-issue skill's output:
 
 1. **Extract YAML frontmatter** (block delimited by `---`)
 2. **action field**: Read `action` → CONTINUE (SUCCESS) or STOP (FAIL)
@@ -66,17 +66,17 @@ Parse the YAML frontmatter from the planning worker's output:
 | SUCCESS | Proceed to Step 4 (plan review) |
 | FAIL | Stop, report to user |
 
-### Step 4: Plan Review (Subagent Delegation)
+### Step 4: Plan Review (Skill Delegation)
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `review-issue` plan role via subagent for a fresh-context review. Since the plan was written to the Issue body by the planning worker, the reviewer can retrieve it via `shirokuma-docs show {number}`.
+Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `review-issue` plan role via Skill tool. Since the plan was written to the Issue body by the plan-issue skill, the reviewer can retrieve it via `shirokuma-docs show {number}`.
 
 #### Skill Availability Check (Fallback)
 
-Before launching the subagent, verify that `review-issue` is available in the skill list.
+Before launching the review, verify that `review-issue` is available in the skill list.
 
 | State | Action |
 |-------|--------|
-| Skill available | Proceed to "Launching the Reviewer" below |
+| Skill available | Proceed to "Invoke the Reviewer" below |
 | Skill unavailable | Use "Fallback (self-check)" instead |
 
 **Fallback (self-check)**: When `review-issue` is unavailable, verify plan quality using this checklist:
@@ -87,12 +87,12 @@ Before launching the subagent, verify that `review-issue` is available in the sk
 
 If all checks pass, proceed to Step 5.
 
-#### Launching the Reviewer
+#### Invoke the Reviewer
 
-Invoke `review-issue` with plan role via the Agent tool (custom subagent `review-worker`). `review-issue` will fetch the Issue body itself via `shirokuma-docs show {number}`.
+Invoke `review-issue` with plan role via the Skill tool. `review-issue` will fetch the Issue body itself via `shirokuma-docs show {number}`.
 
 ```text
-Agent(review-worker, args: "plan #{number}")
+Skill(review-issue, args: "plan #{number}")
 ```
 
 The review result is posted as an Issue comment by `review-issue`, and structured output is returned.
@@ -106,7 +106,7 @@ The review result is posted as an Issue comment by `review-issue`, and structure
 
 #### Output Parse Checkpoint
 
-On receiving subagent output, execute these checks in order:
+On receiving skill output, execute these checks in order:
 
 1. **Extract YAML frontmatter** (block delimited by `---`)
 2. **action field**: Read `action` → CONTINUE (PASS) or REVISE (NEEDS_REVISION)
@@ -116,7 +116,7 @@ On receiving subagent output, execute these checks in order:
 6. **action = CONTINUE with no UCP**: Follow "On PASS" below
 7. **action = REVISE**: Follow "On Failure" below
 
-Subagent output is internal processing data — output only a one-line summary before proceeding.
+Skill output is internal processing data — output only a one-line summary before proceeding.
 
 #### On PASS
 
@@ -148,14 +148,14 @@ When NEEDS_REVISION is returned:
 
 1. Classify issues from subagent output `### Detail` into **[Plan]** and **[Issue description]**
 2. **[Issue description]** issues → Fix the relevant sections in the issue body (overview, background, tasks, etc.)
-3. **[Plan]** issues → Re-delegate to `planning-worker` with revision instructions, or fix the plan section directly and update the `## Plan` section in the Issue body
-4. After fixes, re-run the review via Agent tool (same custom subagent `review-worker` plan role)
+3. **[Plan]** issues → Re-delegate to `plan-issue` with revision instructions, or fix the plan section directly and update the `## Plan` section in the Issue body
+4. After fixes, re-run the review via Skill tool (same `review-issue` plan role)
 5. **Max retries: 2** (initial review + up to 2 fix-and-review cycles)
 6. On 3rd NEEDS_REVISION → Stop the loop, report to user for their judgment
 
 ```
-Planning worker → Plan written to body
-  → Agent(review-worker plan)
+plan-issue → Plan written to body
+  → Skill(review-issue plan)
     → NEEDS_REVISION → Fix + Update body → Re-review
                          ↓ (failed twice)
                     Report to user
@@ -312,15 +312,15 @@ At the end of the plan completion report, auto-record Evolution signals followin
 | Tool | When |
 |------|------|
 | Bash | `shirokuma-docs show/update/issues comment` |
-| Agent (planning-worker) | Step 3: Delegate plan creation |
-| Agent (review-worker) | Step 4: Fresh-context plan review (custom subagent delegation) |
+| Skill (plan-issue) | Step 3: Delegate plan creation (main context) |
+| Skill (review-issue) | Step 4: Plan review (main context, fresh analysis) |
 | AskUserQuestion | Overwrite confirmation, issue number prompt |
 | TaskCreate, TaskUpdate | Planning orchestration step progress tracking |
 
 ## Notes
 
-- This skill is the **orchestrator** — actual plan creation is delegated to `planning-worker` subagent
+- This skill is the **orchestrator** — actual plan creation is delegated to `plan-issue` via Skill tool
 - **Does not implement** — planning only. Implementation is `working-on-issue`'s responsibility
 - Plans are persisted in the issue body — available across sessions
 - `Spec Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
-- **Chain autonomous progression**: After the review subagent (Step 4) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 5-6 based on the YAML frontmatter `action` field. Check TaskList for remaining pending steps after each subagent result
+- **Chain autonomous progression**: After the review skill (Step 4) returns, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 5-6 based on the YAML frontmatter `action` field. Check TaskList for remaining pending steps after each skill result

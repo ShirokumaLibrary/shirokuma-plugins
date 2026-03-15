@@ -331,9 +331,9 @@ Review complete. If changes were made based on findings:
 → `/commit-issue` to stage and commit your changes
 ```
 
-## Orchestration (when invoked as sub-agent)
+## Execution Context
 
-When this skill runs as an Agent tool (subagent), it operates in an isolated context:
+When invoked via Skill tool, this skill runs in the main context with access to project-specific rules from `.claude/rules/`. This enables rule-compliant reviews.
 
 ### Progress Reporting
 
@@ -434,17 +434,17 @@ If analysis is incomplete:
 
 ## Multi-Role Execution Mode
 
-When `review-worker` executes multiple roles sequentially, this skill is invoked repeatedly for each role.
+When multiple roles are requested, this skill is invoked repeatedly for each role.
 
 ### Behavioral Differences
 
 | Aspect | Normal (Single Role) | Multi-Role |
 |--------|---------------------|------------|
-| Role Selection | Determined from user request | Uses the role specified by `review-worker` |
+| Role Selection | Determined from user request | Uses the role specified by the caller |
 | Report Save | Posted as PR/Issue comment | Posted as PR/Issue comment (no change) |
 | Output Template | Normal review mode output template | Same (no change) |
 
-The final judgment in multi-role mode is aggregated by `review-worker`. Each role's report is posted individually.
+Each role's report is posted individually.
 
 ## Notes
 
@@ -452,14 +452,13 @@ The final judgment in multi-role mode is aggregated by `review-worker`. Each rol
 - **Role-based**: Load only relevant knowledge files
 - **Progressive**: Summary first, details on request
 - **Updateable**: Use `--update` to refresh knowledge
-- **Rules auto-loaded**: Project conventions from `.claude/rules/`
-- **Sub-agent mode**: Runs as Agent tool (subagent) for isolated execution
-- **Subagent constraint**: Tasks API / AskUserQuestion are unavailable in subagent mode; return results as a report only
-- **Caller's comment-first compliance**: This skill does not update bodies (as a subagent, it only posts comments), but when caller skills (`open-pr-issue`, `working-on-issue`) update Issue/PR bodies based on review results, they must follow the comment-first principle in `item-maintenance.md`. See the "Updating Body from Review Results" section in `item-maintenance.md` for specific procedure patterns
+- **Rules auto-loaded**: Project conventions from `.claude/rules/` (including paths-based rules when running in main context)
+- **Main context execution**: Runs via Skill tool in the main context, enabling access to project-specific rules
+- **Caller's comment-first compliance**: This skill posts review comments but does not update bodies. When caller skills (`open-pr-issue`, `working-on-issue`) update Issue/PR bodies based on review results, they must follow the comment-first principle in `item-maintenance.md`
 
 ## Plan Review Mode
 
-When invoked from `plan-issue` with plan role via subagent, post the plan review result as an Issue comment and return structured output.
+When invoked from `preparing-on-issue` with plan role via Skill tool, post the plan review result as an Issue comment and return structured output.
 
 ### Output Template (Plan Review)
 
@@ -506,7 +505,7 @@ followup_candidates:
 
 ## Design Review Mode
 
-When invoked with the design role via subagent, post the design review result as an Issue comment and return structured output.
+When invoked with the design role via Skill tool, post the design review result as an Issue comment and return structured output.
 
 ### Output Template (Design Review)
 
@@ -551,7 +550,7 @@ followup_candidates:
 
 ## Research Review Mode
 
-When invoked with the research role via subagent, post the research review result as an Issue comment and return structured output.
+When invoked with the research role via Skill tool, post the research review result as an Issue comment and return structured output.
 
 ### Output Template (Research Review)
 
@@ -574,7 +573,7 @@ followup_candidates:
 
 ## Normal Review Mode (Non-Plan-Review, Non-Design-Review)
 
-When invoked standalone or as subagent, and it is neither a plan review nor a design review, save the report to GitHub and return structured output.
+When invoked standalone or via Skill tool, and it is neither a plan review nor a design review, save the report to GitHub and return structured output.
 
 ### Output Template (Normal Review)
 

@@ -105,23 +105,9 @@ Issue ループ間で以下を保持:
 
 2. **一括ステータス更新**: 全 Issue → In Progress
 
-3. **並列エージェント起動**: 各 Issue に対して `parallel-coding-worker` を同時起動
+3. **並列エージェント起動（廃止済み）**: `parallel-coding-worker` は廃止されました。逐次バッチモードを使用してください。
 
-   ```text
-   Agent(
-     description: "parallel-coding-worker #{n}",
-     subagent_type: "parallel-coding-worker",
-     isolation: "worktree",
-     prompt: "#{issue-number} を実装→コミット→PR 作成してください。",
-     run_in_background: true
-   )
-   ```
-
-   - 全エージェントを **1 つのレスポンス内**で同時に起動する（`run_in_background: true`）
-   - 各エージェントは独立したワークツリーで動作し、`{type}/{number}-{slug}` ブランチを作成
-   - 各エージェントが自己完結で PR を作成（PR ベース集約）
-
-4. **完了待機と結果集約**: 全エージェント完了後、各結果の YAML フロントマターをパース
+4. **完了待機と結果集約（廃止済み）**: 上記に伴い廃止
 
 5. **ステータス一括更新**:
    - 成功した Issue → `Review` に更新

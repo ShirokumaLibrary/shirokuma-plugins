@@ -1,14 +1,14 @@
 ---
 name: preparing-on-issue
-description: "Issueの計画フェーズを統括します: ステータス管理、planning-workerへの計画委任、計画レビュー、ユーザー承認ゲート。トリガー: 「計画して」「plan」「設計して」「#42 の計画」。"
-allowed-tools: Agent, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
+description: "Issueの計画フェーズを統括します: ステータス管理、plan-issueへの計画委任、計画レビュー、ユーザー承認ゲート。トリガー: 「計画して」「plan」「設計して」「#42 の計画」。"
+allowed-tools: Skill, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Issue の計画準備（オーケストレーター）
 
 > **チェーン自律進行**: 計画レビューサブエージェント（レビューステップ）が結果を返した後、即座にステータス更新とユーザーへの返却に進んでください。レビューサブエージェントの結果で停止するとユーザーが手動で継続を促す必要が生じ、計画ワークフローが中断します。YAML フロントマターの `action` フィールドをパースし、ユーザー入力を待たずに進行してください。
 
-Issue の計画フェーズを統括する: Issue の取得、ステータス遷移の管理、`planning-worker` への計画作成委任、計画レビューの実施、Spec Review 承認ゲートでのユーザーへの返却。**実装には進まない。**
+Issue の計画フェーズを統括する: Issue の取得、ステータス遷移の管理、Skill ツール経由での `plan-issue` への計画作成委任、計画レビューの実施、Spec Review 承認ゲートでのユーザーへの返却。**実装には進まない。**
 
 ## ワークフロー
 
@@ -39,22 +39,22 @@ Issue 本文に `## 計画` セクション（`^## 計画` で前方一致検出
 
 | 計画状態 | アクション |
 |---------|----------|
-| 計画なし | ステップ 3（planning-worker に委任）へ進む |
+| 計画なし | ステップ 3（plan-issue に委任）へ進む |
 | 計画あり | 上書きするか確認（AskUserQuestion）してから進む |
 
-### ステップ 3: Planning Worker に委任
+### ステップ 3: plan-issue スキルに委任
 
-Agent ツール（カスタムサブエージェント `planning-worker`）で `plan-issue` を起動する。
+Skill ツールで `plan-issue` を起動する（プロジェクト固有ルールへのアクセスのためメインコンテキストで実行）。
 
 ```text
-Agent(planning-worker, args: "#{number}")
+Skill(plan-issue, args: "#{number}")
 ```
 
-Planning Worker はコードベース調査、計画策定、思考プロセスコメント投稿、Issue 本文への計画書き込みを実行し、完了時に構造化データを返す。
+plan-issue スキルはコードベース調査、計画策定、思考プロセスコメント投稿、Issue 本文への計画書き込みを実行し、完了時に構造化データを返す。
 
-#### 構造化データの処理
+#### スキル出力の処理
 
-Planning Worker の出力から YAML フロントマターをパースする:
+plan-issue スキルの出力から YAML フロントマターをパースする:
 
 1. **YAML フロントマターを抽出**（`---` で囲まれたブロック）
 2. **action フィールド**: `action` を読み取り → CONTINUE（SUCCESS）または STOP（FAIL）
@@ -66,17 +66,17 @@ Planning Worker の出力から YAML フロントマターをパースする:
 | SUCCESS | ステップ 4（計画レビュー）へ進む |
 | FAIL | 停止、ユーザーに報告 |
 
-### ステップ 4: 計画レビュー（サブエージェント委任）
+### ステップ 4: 計画レビュー（Skill 委任）
 
-計画策定と同じエージェントがレビューしても盲点に気づけない。`review-issue` の plan ロールにサブエージェント委任し、まっさらなコンテキストでレビューを実行する。Planning Worker が Issue 本文に計画を書き込み済みのため、reviewer は `shirokuma-docs show {number}` で計画内容を取得できる。
+計画策定と同じコンテキストでレビューしても盲点に気づけない。`review-issue` の plan ロールに Skill ツールで委任する。plan-issue スキルが Issue 本文に計画を書き込み済みのため、reviewer は `shirokuma-docs show {number}` で計画内容を取得できる。
 
 #### スキル利用可能チェック（フォールバック）
 
-サブエージェント起動前に `review-issue` スキルがスキルリストに存在するか確認する。
+レビュー起動前に `review-issue` スキルがスキルリストに存在するか確認する。
 
 | 状態 | アクション |
 |------|----------|
-| スキルが利用可能 | 下記「レビュアーの起動」へ進む |
+| スキルが利用可能 | 下記「レビュアーの呼び出し」へ進む |
 | スキルが利用不可 | 下記「フォールバック（自己チェック）」で代替する |
 
 **フォールバック（自己チェック）**: `review-issue` が利用できない場合、以下のチェックリストで計画品質を自己確認する:
@@ -87,12 +87,12 @@ Planning Worker の出力から YAML フロントマターをパースする:
 
 全チェックをパスした場合はステップ 5 へ進む。
 
-#### レビュアーの起動
+#### レビュアーの呼び出し
 
-Agent ツール（カスタムサブエージェント `review-worker`）で `review-issue` を plan ロールで起動する。`review-issue` が自身で `shirokuma-docs show {number}` を実行して Issue 本文を取得する。
+Skill ツールで `review-issue` を plan ロールで起動する。`review-issue` が自身で `shirokuma-docs show {number}` を実行して Issue 本文を取得する。
 
 ```text
-Agent(review-worker, args: "plan #{number}")
+Skill(review-issue, args: "plan #{number}")
 ```
 
 レビュー結果は `review-issue` が Issue コメントとして投稿し、構造化データを返却する。
@@ -106,7 +106,7 @@ Agent(review-worker, args: "plan #{number}")
 
 #### 出力パースチェックポイント
 
-サブエージェント出力を受け取ったら、以下のチェックを順に実行する:
+スキル出力を受け取ったら、以下のチェックを順に実行する:
 
 1. **YAML フロントマターを抽出**（`---` で囲まれたブロック）
 2. **action フィールド**: `action` を読み取り → CONTINUE（PASS）または REVISE（NEEDS_REVISION）
@@ -116,7 +116,7 @@ Agent(review-worker, args: "plan #{number}")
 6. **action = CONTINUE かつ UCP なし**: 「PASS 時の動作」へ進む
 7. **action = REVISE**: 「不合格時の動作」に従う
 
-構造化データは内部処理データ — 1 行サマリーのみ出力して次に進む。
+スキル出力は内部処理データ — 1 行サマリーのみ出力して次に進む。
 
 #### PASS 時の動作
 
@@ -148,14 +148,14 @@ NEEDS_REVISION が返された場合:
 
 1. 構造化データの `### Detail` から Issues を **[計画]** と **[Issue記述]** に分類
 2. **[Issue記述]** の問題 → Issue 本文の該当セクション（概要、背景、タスク等）を修正
-3. **[計画]** の問題 → `planning-worker` に修正指示付きで再委任するか、計画セクションを直接修正して Issue 本文の `## 計画` セクションを更新
-4. 修正後に Agent ツール（カスタムサブエージェント `review-worker`）で再レビュー（同じ plan ロールで再実行）
+3. **[計画]** の問題 → `plan-issue` に修正指示付きで再委任するか、計画セクションを直接修正して Issue 本文の `## 計画` セクションを更新
+4. 修正後に Skill ツール（`review-issue` plan ロール）で再レビュー
 5. **最大再試行: 2回**（初回レビュー + 最大2回の修正・再レビュー）
 6. 3回目の NEEDS_REVISION → ループ停止、ユーザーに報告して判断を委ねる
 
 ```
-Planning Worker → 本文に計画書き込み
-  → Agent(review-worker plan)
+plan-issue → 本文に計画書き込み
+  → Skill(review-issue plan)
     → NEEDS_REVISION → 修正 + 本文更新 → 再レビュー
                          ↓ (2回失敗)
                     ユーザーに報告
@@ -312,15 +312,15 @@ shirokuma-docs issues update {number} --field-status "Designing"
 | ツール | タイミング |
 |--------|-----------|
 | Bash | `shirokuma-docs show/update/issues comment` |
-| Agent (planning-worker) | ステップ 3: 計画作成の委任 |
-| Agent (review-worker) | ステップ 4: まっさらコンテキストでの計画レビュー（カスタムサブエージェント委任） |
+| Skill (plan-issue) | ステップ 3: 計画作成の委任（メインコンテキスト） |
+| Skill (review-issue) | ステップ 4: 計画レビュー（メインコンテキスト） |
 | AskUserQuestion | 既存計画の上書き確認、Issue 番号の確認 |
 | TaskCreate, TaskUpdate | 計画統括ステップの進捗トラッキング |
 
 ## 注意事項
 
-- このスキルは**オーケストレーター**であり、実際の計画作成は `planning-worker` サブエージェントに委任する
+- このスキルは**オーケストレーター**であり、実際の計画作成は Skill ツール経由で `plan-issue` に委任する
 - **実装には進まない** — 計画のみ。実装は `working-on-issue` の責務
 - 計画は Issue 本文に永続化される — セッションをまたいでも参照可能
 - `Spec Review` はユーザー承認のゲート — 自己承認はヒューマンチェックを迂回し、認識のズレを早期に検出できなくなる
-- **チェーン自律進行**: レビューサブエージェント（ステップ 4）が結果を返した後、停止するとユーザーが手動で継続を促す必要が生じる。YAML フロントマターの `action` フィールドに基づき即座にステップ 5-6 に進む
+- **チェーン自律進行**: レビュースキル（ステップ 4）が結果を返した後、停止するとユーザーが手動で継続を促す必要が生じる。YAML フロントマターの `action` フィールドに基づき即座にステップ 5-6 に進む

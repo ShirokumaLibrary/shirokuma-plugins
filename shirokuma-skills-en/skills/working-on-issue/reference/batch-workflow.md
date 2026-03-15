@@ -105,23 +105,9 @@ Track files changed per issue using `git diff --name-only` before/after each imp
 
 2. **Bulk status update**: All issues → In Progress
 
-3. **Parallel agent launch**: Launch `parallel-coding-worker` simultaneously for each issue
+3. **Parallel agent launch (Deprecated)**: `parallel-coding-worker` has been deprecated. Use sequential batch mode instead.
 
-   ```text
-   Agent(
-     description: "parallel-coding-worker #{n}",
-     subagent_type: "parallel-coding-worker",
-     isolation: "worktree",
-     prompt: "Implement, commit, and create PR for #{issue-number}.",
-     run_in_background: true
-   )
-   ```
-
-   - Launch all agents **in a single response** (`run_in_background: true`)
-   - Each agent operates in its own worktree, creating a `{type}/{number}-{slug}` branch
-   - Each agent self-sufficiently creates a PR (PR-based aggregation)
-
-4. **Wait and aggregate results**: After all agents complete, parse each result's YAML frontmatter
+4. **Wait and aggregate results (Deprecated)**: Deprecated along with the above
 
 5. **Bulk status update**:
    - Successful issues → update to `Review`

@@ -64,8 +64,8 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 |-------|---------|------------|-------|
 | working-on-issue | Yes | Yes | Entry point for both modes |
 | preparing-on-issue | Yes | Yes | Via working-on-issue or standalone |
-| plan-issue | Yes | — | Subagent via planning-worker (from preparing-on-issue) |
-| code-issue | Yes | — | Subagent delegation from working-on-issue only |
+| plan-issue | Yes | — | Via Skill tool (from preparing-on-issue) |
+| code-issue | Yes | — | Via Skill tool (from working-on-issue) |
 | coding-nextjs | Yes | Yes | Via code-issue or standalone |
 | designing-on-issue | — | Yes | Currently standalone (invoked from preparing-on-issue completion report) |
 | designing-shadcn-ui | Yes | Yes | Via designing-on-issue or standalone |

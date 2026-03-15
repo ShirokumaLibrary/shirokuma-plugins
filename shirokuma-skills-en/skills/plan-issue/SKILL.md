@@ -1,12 +1,12 @@
 ---
 name: plan-issue
-description: "Sub-agent skill for issue planning. Delegated from preparing-on-issue via planning-worker, performs codebase investigation, plan creation, and issue body updates. Not intended for direct invocation."
+description: "Skill for issue planning. Delegated from preparing-on-issue via Skill tool, performs codebase investigation, plan creation, and issue body updates. Not intended for direct invocation."
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
 ---
 
 # Planning on Issue
 
-Analyze issue requirements, create an implementation plan, and persist it to the issue body. This skill performs the actual planning work as a subagent — orchestration (status management, review delegation, user interaction) is handled by `preparing-on-issue`.
+Analyze issue requirements, create an implementation plan, and persist it to the issue body. This skill performs the actual planning work — orchestration (status management, review delegation, user interaction) is handled by `preparing-on-issue`.
 
 ## Plan Depth Levels
 
@@ -174,4 +174,4 @@ Add GitHub writing rule references to each skill...
 
 - **Does not implement** — planning only. Implementation is `working-on-issue`'s responsibility
 - Plans are persisted in the issue body — available across sessions
-- This skill runs as a subagent via `planning-worker` — orchestration is handled by `preparing-on-issue`
+- This skill is invoked via Skill tool from `preparing-on-issue` — orchestration is handled by `preparing-on-issue`

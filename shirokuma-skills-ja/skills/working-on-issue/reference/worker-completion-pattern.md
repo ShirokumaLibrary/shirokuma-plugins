@@ -75,13 +75,13 @@ worker が #{ref} に投稿したコメントを確認してください。
 
 | オーケストレーター | worker / skill | 次のステップ |
 |------------------|---------------|------------|
-| preparing-on-issue | planning-worker | → review-worker |
-| preparing-on-issue | review-worker (plan) | → ステータス更新 |
-| designing-on-issue | 設計スキル群 | → review-worker |
-| designing-on-issue | review-worker (design) | → 視覚評価 or 完了 |
-| working-on-issue | coding-worker | → commit-worker |
-| reviewing-on-pr | review-worker (code) | → スレッド対応 |
-| reviewing-on-pr | coding-worker (修正) | → commit-worker |
+| preparing-on-issue | plan-issue (Skill) | → review-issue |
+| preparing-on-issue | review-issue (plan) | → ステータス更新 |
+| designing-on-issue | 設計スキル群 | → review-issue |
+| designing-on-issue | review-issue (design) | → 視覚評価 or 完了 |
+| working-on-issue | code-issue (Skill) | → commit-worker |
+| reviewing-on-pr | review-issue (code, Skill) | → スレッド対応 |
+| reviewing-on-pr | code-issue (修正, Skill) | → commit-worker |
 
 ## Status → Action マッピング
 

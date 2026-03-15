@@ -9,7 +9,7 @@ Defines the conditional branching logic after research completion. The flow diff
 `working-on-issue` controls the entire flow. The research skill only returns findings.
 
 ```
-researching-best-practices → review-worker(research) → Discussion auto-save → chain complete
+researching-best-practices → review-issue(research, Skill) → Discussion auto-save → chain complete
 ```
 
 - Discussion save: **Required** (executed by `working-on-issue`'s `researching-reference.md`)

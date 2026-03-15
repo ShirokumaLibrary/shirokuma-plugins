@@ -145,7 +145,7 @@ shirokuma-docs discussions create --from-file /tmp/shirokuma-docs/findings.md
 
 ## レビューゲート
 
-`working-on-issue` チェーン経由で呼び出された場合、調査結果は `review-worker`（Opus）の **research ロール**によるレビューを経て確定する。異なるモデルの視点による品質担保を実現する。
+`working-on-issue` チェーン経由で呼び出された場合、調査結果は `review-issue`（Skill）の **research ロール**によるレビューを経て確定する。異なるモデルの視点による品質担保を実現する。
 
 research ロールは以下の観点でレビューする（詳細は `review-issue` の `roles/research.md` および `criteria/research.md` を参照）:
 - **要件合致性**: 推奨パターンがプロジェクトの tech-stack・既存パターン・依存関係と互換か
@@ -163,5 +163,5 @@ research ロールは以下の観点でレビューする（詳細は `review-is
 ## 注意事項
 
 - 調査結果は `coding-nextjs` スキルに渡して実装可能
-- Agent ツール（サブエージェント）として隔離実行（メインコンテキストを汚染しない）
-- ワークフローチェーン経由の場合、調査結果は `review-worker`（Opus）によるレビューを経る
+- Agent ツール（`research-worker` サブエージェント）として隔離実行（メインコンテキストを汚染しない）
+- ワークフローチェーン経由の場合、調査結果は `review-issue`（Skill）によるレビューを経る

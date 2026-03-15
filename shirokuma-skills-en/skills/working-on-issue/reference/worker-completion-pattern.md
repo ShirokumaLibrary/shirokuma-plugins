@@ -75,13 +75,13 @@ Would you like to proceed?
 
 | Orchestrator | Worker / Skill | Next Step |
 |--------------|---------------|-----------|
-| preparing-on-issue | planning-worker | → review-worker |
-| preparing-on-issue | review-worker (plan) | → status update |
-| designing-on-issue | design skill group | → review-worker |
-| designing-on-issue | review-worker (design) | → visual evaluation or completion |
-| working-on-issue | coding-worker | → commit-worker |
-| reviewing-on-pr | review-worker (code) | → thread response |
-| reviewing-on-pr | coding-worker (fixes) | → commit-worker |
+| preparing-on-issue | plan-issue (Skill) | → review-issue |
+| preparing-on-issue | review-issue (plan) | → status update |
+| designing-on-issue | design skill group | → review-issue |
+| designing-on-issue | review-issue (design) | → visual evaluation or completion |
+| working-on-issue | code-issue (Skill) | → commit-worker |
+| reviewing-on-pr | review-issue (code, Skill) | → thread response |
+| reviewing-on-pr | code-issue (fixes, Skill) | → commit-worker |
 
 ## Status → Action Mapping
 

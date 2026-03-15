@@ -1,18 +1,18 @@
 ---
 name: reviewing-on-pr
 description: Takes a PR number, performs code review execution and processes unresolved review threads in an automated chain. Triggers: "review response", "PR review", "code review PR", "/reviewing-on-pr #123".
-allowed-tools: Bash, Read, Grep, Glob, TaskCreate, TaskUpdate, TaskGet, TaskList, AskUserQuestion, Agent
+allowed-tools: Bash, Read, Grep, Glob, Skill, TaskCreate, TaskUpdate, TaskGet, TaskList, AskUserQuestion, Agent
 ---
 
 # PR Review Response
 
-Takes a PR number and performs code review execution (via `review-worker`) and processes unresolved review threads through an automated chain: classify, fix, commit, reply, and resolve.
+Takes a PR number and performs code review execution (via `review-issue` Skill) and processes unresolved review threads through an automated chain: classify, fix, commit, reply, and resolve.
 
 ## Responsibility Boundary
 
 | Skill | Responsibility |
 |-------|---------------|
-| `review-issue` | Code review execution engine. Invoked via `review-worker` |
+| `review-issue` | Code review execution engine. Invoked via Skill tool |
 | `reviewing-on-pr` (this skill) | PR review orchestrator (review execution + thread response). Entry point for a new conversation |
 
 ## Arguments
@@ -59,36 +59,35 @@ First check the `review_count` obtained in Step 1:
 shirokuma-docs pr comments {PR#}
 ```
 
-- 0 unresolved threads → display completion report and propose re-review ("Would you like to run a re-review with `review-worker`?" via AskUserQuestion). If user accepts, transition to Step 2a
+- 0 unresolved threads → display completion report and propose re-review ("Would you like to run a re-review with `review-issue`?" via AskUserQuestion). If user accepts, transition to Step 2a
 - Unresolved threads exist → proceed to existing flow (Step 3 onwards)
 
 ### Step 2a: Review Execution Mode (when `review_count: 0`)
 
-When no review has been submitted yet, invoke `review-worker` via the Agent tool to perform a code review.
+When no review has been submitted yet, invoke `review-issue` via the Skill tool to perform a code review.
 
-1. Invoke `review-worker` via Agent tool to perform a code review on the PR diff:
+1. Invoke `review-issue` via Skill tool to perform a code review on the PR diff:
    ```text
-   Agent(
-     description: "review-worker PR #{PR#}",
-     subagent_type: "review-worker",
-     prompt: "Perform a code review for PR #{PR#}."
+   Skill(
+     skill: "review-issue",
+     args: "code PR #{PR#}"
    )
    ```
-2. `review-worker` posts the review results as a PR comment
-3. Extract `comment_id` from `review-worker`'s output frontmatter (present when `review-worker` posted an issue comment)
+2. `review-issue` posts the review results as a PR comment
+3. Extract `comment_id` from `review-issue`'s output frontmatter (present when `review-issue` posted an issue comment)
 4. Check for unresolved threads:
    ```bash
    shirokuma-docs pr comments {PR#}
    ```
    - Unresolved threads exist (`unresolved_threads > 0`) → proceed to Step 2b (review result confirmation)
-   - No unresolved threads but `comment_id` present → proceed to Step 2b (review result confirmation). This occurs when `review-worker` posts improvement suggestions as an issue comment
+   - No unresolved threads but `comment_id` present → proceed to Step 2b (review result confirmation). This occurs when `review-issue` posts improvement suggestions as an issue comment
    - No unresolved threads and no `comment_id` → display completion report and exit (see Step 6)
 
 ### Step 2b: Review Result Confirmation (User Control Point)
 
 > **Scope:** This step applies only after Step 2a (new review execution, `review_count: 0`). When processing existing threads with `review_count > 0`, the user is already aware of the review content, so UCP is not required.
 
-After `review-worker` completes in Step 2a and unresolved threads or `comment_id` (an issue comment posted by review-worker) exist, present the review results to the user and confirm the response approach. `review-worker` may post findings as review threads or as issue comments; the UCP must trigger for either format.
+After `review-issue` completes in Step 2a and unresolved threads or `comment_id` (an issue comment posted by review-issue) exist, present the review results to the user and confirm the response approach. `review-issue` may post findings as review threads or as issue comments; the UCP must trigger for either format.
 
 1. Display a summary of review results (number of issues, breakdown by type) to the user
 2. Confirm via `AskUserQuestion`:
@@ -125,17 +124,16 @@ Register all thread processing steps via TaskCreate based on classification:
 
 #### Code Fix Threads
 
-Process code fix threads together. Delegate fixes to `coding-worker` and commits to `commit-worker`.
+Process code fix threads together. Delegate fixes to `code-issue` via Skill tool and commits to `commit-worker` via Agent tool.
 
-1. **Fix**: Delegate to `coding-worker` with the thread information (file paths, review feedback) for all threads at once:
+1. **Fix**: Delegate to `code-issue` with the thread information (file paths, review feedback) for all threads at once:
    ```text
-   Agent(
-     description: "coding-worker PR #{PR#} review fixes",
-     subagent_type: "coding-worker",
-     prompt: "Address the review feedback for PR #{PR#}.\n\n{fix instructions for each thread}"
+   Skill(
+     skill: "code-issue",
+     args: "Address the review feedback for PR #{PR#}.\n\n{fix instructions for each thread}"
    )
    ```
-   After `coding-worker` completes, parse its output following the unified pattern in `working-on-issue/reference/worker-completion-pattern.md`.
+   After `code-issue` completes, parse its output following the unified pattern in `working-on-issue/reference/worker-completion-pattern.md`.
 
 2. **Commit & Push**: Delegate all fix commits and pushes to `commit-worker`:
    ```text
@@ -225,21 +223,21 @@ Addressed {N} threads.
 4. **Commit per fix** — Do not mix fixes for different threads in one commit (call `git commit-push` once per fix)
 5. **Do not resolve disagreements** — Let the reviewer decide
 6. **Restore context first** — Step 1 must always run first; obtain `review_count` before branching
-7. **Review execution via `review-worker`** — Step 2a invokes `review-worker` via Agent tool; do not write reviews directly
-8. **Code fixes via worker delegation** — Step 5 code fixes are delegated to `coding-worker` / `commit-worker`; the orchestrator does not modify code directly
+7. **Review execution via `review-issue`** — Step 2a invokes `review-issue` via Skill tool; do not write reviews directly
+8. **Code fixes via skill/subagent delegation** — Step 5 code fixes are delegated to `code-issue` (Skill) / `commit-worker` (Agent); the orchestrator does not modify code directly
 
 ## Edge Cases
 
 | Situation | Action |
 |-----------|--------|
-| `review_count: 0` | Execute code review via `review-worker` in review execution mode (Step 2a) |
+| `review_count: 0` | Execute code review via `review-issue` Skill in review execution mode (Step 2a) |
 | 0 unresolved threads (`review_count > 0`) | Display completion report and propose re-review |
 | Thread already resolved | Skip |
 | Outdated comment (code changed) | Reply if feedback is still valid, reference the relevant commit |
 | Reviewer requests re-review | Reply but leave thread open |
 | PR has no related Issue | Skip Issue reference in context restoration |
 | Unresolved threads present and `comment_id` present | `unresolved_threads > 0` takes priority. Proceed to Step 2b (review result confirmation). `comment_id` presence is ignored |
-| No unresolved threads but `comment_id` present | `review-worker` posted improvement suggestions as issue comment. Identified via frontmatter `comment_id`. Trigger Step 2b UCP |
+| No unresolved threads but `comment_id` present | `review-issue` posted improvement suggestions as issue comment. Identified via frontmatter `comment_id`. Trigger Step 2b UCP |
 | Code fix affects other threads | Check impact and address together |
 | User decides no fixes needed (UCP) | Display completion report and exit. Skip thread resolution |
 | User selects partial addressing (UCP) | Process only specified threads, leave the rest unresolved |
@@ -248,7 +246,8 @@ Addressed {N} threads.
 
 | Tool | When |
 |------|------|
-| Agent | Code review execution via `review-worker` (Step 2a), code fixes and commits via `coding-worker` / `commit-worker` (Step 5) |
+| Skill | Code review execution via `review-issue` (Step 2a), code fixes via `code-issue` (Step 5) |
+| Agent | Commits and pushes via `commit-worker` (Step 5) |
 | Bash | `shirokuma-docs pr comments`, `pr reply`, `pr resolve`, git operations |
 | Read | Code review, plan reference |
 | TaskCreate, TaskUpdate | Track thread processing progress |

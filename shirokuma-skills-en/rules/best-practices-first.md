@@ -24,9 +24,9 @@ graph LR
 
 | Phase | Orchestrator | Responsibility | Delegates to |
 |-------|-------------|----------------|-------------|
-| Preparing | `preparing-on-issue` | Planning + plan review | `planning-worker` → `plan-issue` |
+| Preparing | `preparing-on-issue` | Planning + plan review | `plan-issue` (Skill), `review-issue` (Skill) |
 | Designing | `designing-on-issue` | Design routing + design review | `designing-shadcn-ui`, `designing-nextjs`, `designing-drizzle` etc. |
-| Working | `working-on-issue` | Implementation, commit, PR | `coding-worker`, `commit-worker`, `pr-worker` |
+| Working | `working-on-issue` | Implementation, commit, PR | `code-issue` (Skill), `commit-worker`, `pr-worker` |
 
 For conversation flow, epic pattern, and session vs standalone details, see `working-on-issue/reference/workflow-details.md`.
 
@@ -34,11 +34,11 @@ For conversation flow, epic pattern, and session vs standalone details, see `wor
 
 | Task Type | Route To | Method |
 |-----------|----------|--------|
-| General Coding | `code-issue` | Agent (custom subagent, via `working-on-issue`) |
+| General Coding | `code-issue` | Skill (via `working-on-issue`) |
 | UI Design | `designing-on-issue` | Skill (currently standalone; invoked when recommended by `preparing-on-issue` completion report) |
-| Research | `researching-best-practices` | Agent (custom subagent) |
-| Review | `review-issue` | Agent (custom subagent) |
-| Claude Config | `reviewing-claude-config` | Agent (custom subagent) |
+| Research | `researching-best-practices` | Agent (`research-worker`) |
+| Review | `review-issue` | Skill |
+| Claude Config | `reviewing-claude-config` | Skill |
 | Issue / Discussion creation | `creating-item` | Skill |
 | GitHub data display | `showing-github` | Skill |
 | Project setup | `setting-up-project` | Skill |
@@ -75,7 +75,7 @@ Simple questions, minor config edits, fine-tuning skill results, confirmation di
 
 ## Subagent Completion
 
-**Subagent skill completion ≠ task completion.** When a custom sub-agent (e.g., `pr-worker`, `commit-worker`, `review-worker`) returns via the Agent tool, the main AI must:
+**Skill/subagent completion ≠ task completion.** When a Skill tool or Agent tool (e.g., `pr-worker`, `commit-worker`) returns a result, the main AI must:
 
 1. Parse the output template (YAML frontmatter)
 2. Check TaskList for remaining `pending` steps
@@ -87,7 +87,7 @@ The Agent tool returning is a chain mid-point, not a completion signal.
 
 | Skill | UCP Position | Reason |
 |-------|-------------|--------|
-| `reviewing-on-pr` | After `review-worker` completes (before thread resolution starts) | Fix approach requires user confirmation before proceeding |
+| `reviewing-on-pr` | After `review-issue` completes (before thread resolution starts) | Fix approach requires user confirmation before proceeding |
 
 ## Error Recovery
 

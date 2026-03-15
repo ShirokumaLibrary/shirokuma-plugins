@@ -69,17 +69,28 @@ Present design direction via `AskUserQuestion` and obtain approval:
 
 #### Skill Discovery (Run Before Dispatch)
 
-In addition to fixed dispatch table entries, dynamically detect project-specific skills:
+First run dynamic discovery to detect project-specific skills:
 
 ```bash
 shirokuma-docs skills routing designing
 ```
 
 Refer to the `description` of each entry in the output `routes` array and route to the skill that best matches the issue requirements.
-Entries with `source: "discovered"` / `source: "config"` are project-specific skills.
-If a fixed table skill is optimal, it takes precedence regardless of discovery results.
 
-#### Dispatch Table
+- Entries with `source: "discovered"` / `source: "config"` are **project-specific skills** (higher priority)
+- Entries with `source: "builtin"` are built-in skills (same as the dispatch table below)
+
+When a project-specific skill matches the requirements, use it with higher priority. Fall back to the default dispatch table when no discovery result matches.
+
+#### Routing Decision Flow
+
+| Condition | Action |
+|-----------|--------|
+| `routes.length > 0` | Use discovered skills with priority |
+| `routes.length === 0` and fallback table matches | Use skill from fallback dispatch table |
+| Neither matches | Ask user for confirmation (`AskUserQuestion`) |
+
+#### Dispatch Table (Fallback)
 
 | Design Type | Condition | Route |
 |-------------|-----------|-------|
@@ -116,7 +127,7 @@ Invoke `designing-drizzle` via `Skill` tool. Pass the following context:
 
 ### Phase 3b: UCP Check After Worker Completion
 
-When design skills / review-worker return structured output, execute UCP check following the unified pattern in `working-on-issue/reference/worker-completion-pattern.md`. When `suggestions_count > 0`, present the Suggestions posted by the worker to the Issue comment to the user.
+When design skills / review-issue return structured output, execute UCP check following the unified pattern in `working-on-issue/reference/worker-completion-pattern.md`. When `suggestions_count > 0`, present the Suggestions posted by the skill to the Issue comment to the user.
 
 ### Phase 4: Visual Evaluation Loop
 

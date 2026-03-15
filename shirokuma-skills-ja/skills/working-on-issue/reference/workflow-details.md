@@ -64,8 +64,8 @@ graph TD
 |--------|-----------|--------------|------|
 | working-on-issue | 対応 | 対応 | 両モードのエントリーポイント |
 | preparing-on-issue | 対応 | 対応 | working-on-issue 経由またはスタンドアロン |
-| plan-issue | 対応 | — | planning-worker 経由のサブエージェント（preparing-on-issue から） |
-| code-issue | 対応 | — | working-on-issue から subagent 委任のみ |
+| plan-issue | 対応 | — | Skill ツール経由（preparing-on-issue から） |
+| code-issue | 対応 | — | Skill ツール経由（working-on-issue から） |
 | coding-nextjs | 対応 | 対応 | code-issue 経由またはスタンドアロン |
 | designing-on-issue | — | 対応 | 現時点ではスタンドアロン起動（preparing-on-issue の完了レポートから起動） |
 | designing-shadcn-ui | 対応 | 対応 | designing-on-issue 経由またはスタンドアロン |

@@ -1,7 +1,7 @@
 ---
 name: working-on-issue
 description: Dispatches work by taking an issue number or task description, selecting the appropriate skill, and orchestrating the full workflow from implementation to PR. Triggers: "work on", "work on #42", "do this", "start working".
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
+allowed-tools: Bash, Read, Grep, Glob, Skill, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Working on Issue (Orchestrator)
@@ -20,7 +20,7 @@ Register **all chain steps** via TaskCreate **before starting work**.
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Implement changes | Implementing changes | `code-issue` (subagent) |
+| 1 | Implement changes | Implementing changes | `code-issue` (Skill) |
 | 2 | Commit and push changes | Committing and pushing | `commit-issue` (subagent) |
 | 3 | Create pull request | Creating pull request | `open-pr-issue` (subagent) |
 | 4 | Post work summary | Posting work summary | Manager direct: `issues comment` |
@@ -123,9 +123,9 @@ For Feature type, Size M+, suggest ADR creation (AskUserQuestion).
 
 | Work Type | Condition | Delegate To | TDD |
 |-----------|-----------|-------------|-----|
-| General Coding | Implementation, bug fix, refactoring, config, Markdown editing | `code-issue` (subagent) | Yes (implementation, bug fix, refactoring) |
+| General Coding | Implementation, bug fix, refactoring, config, Markdown editing | `code-issue` (Skill) | Yes (implementation, bug fix, refactoring) |
 | Research | Keywords: `research`, `investigate` | `researching-best-practices` (subagent) | No |
-| Review | Keywords: `review`, `audit` | `review-issue` (subagent) | No |
+| Review | Keywords: `review`, `audit` | `review-issue` (Skill) | No |
 | Project Setup | Keywords: `setup project`, `initialize` | `setting-up-project` | No |
 
 **Pre-resolution logic**: Subagent workers cannot use `AskUserQuestion`, so the manager (main AI) resolves edge cases before invocation:
@@ -244,19 +244,29 @@ The `Summary` field is abolished. Instead, the **body's first line** is treated 
 
 Subagent outputs are internal processing data, not user-facing output. Presenting raw subagent output exposes technical intermediates that disrupt the user's workflow experience. Output only a one-line summary and immediately proceed to the next tool call.
 
-#### Subagent Invocation Pattern
+#### Skill and Subagent Invocation Pattern
 
-The following skills are launched via custom sub-agents (AGENT.md). `/simplify` continues to be launched via Skill tool.
+Skills are invoked via Skill tool (main context) or Agent tool (subagent). Skills that need project-specific rules (paths-based) run in the main context via Skill tool. Simple operations (git, gh) run as subagents.
 
-| Skill | Sub-agent name |
-|-------|---------------|
-| `plan-issue` | `planning-worker` |
-| `code-issue` | `coding-worker` |
-| `commit-issue` | `commit-worker` |
-| `open-pr-issue` | `pr-worker` |
-| `reviewing-claude-config` | `config-review-worker` |
-| `researching-best-practices` | `research-worker` |
-| `code-issue` + `commit-issue` + `open-pr-issue` (parallel batch) | `parallel-coding-worker` |
+| Skill | Invocation | Reason |
+|-------|-----------|--------|
+| `code-issue` | Skill tool | Needs project rules (development-patterns, security-boundary, etc.) |
+| `review-issue` | Skill tool | Needs project rules for rule-compliant review |
+| `reviewing-claude-config` | Skill tool | Needs project rules for quality standards |
+| `commit-issue` | Agent (`commit-worker`) | Git operations only, no project rules needed |
+| `open-pr-issue` | Agent (`pr-worker`) | GitHub operations only, no project rules needed |
+| `researching-best-practices` | Agent (`research-worker`) | External research, no project rules needed |
+
+**Skill tool invocation:**
+
+```text
+Skill(
+  skill: "{skill-name}",
+  args: "#{issue-number}"
+)
+```
+
+**Agent tool invocation (for kept subagents only):**
 
 ```text
 Agent(
@@ -268,9 +278,7 @@ Agent(
 
 **The `pr-worker` prompt MUST include the issue number.** `open-pr-issue` includes `Closes #{issue-number}` in the PR body when launched with an issue number, linking the PR to the issue. If the issue number is omitted, `Closes` is skipped and the PR will not be linked to the issue.
 
-Each sub-agent has the corresponding skill's full content auto-injected via the `skills` frontmatter field.
-
-> **CRITICAL — Chain continuation after Agent tool returns**: When a custom sub-agent (e.g., `pr-worker`, `commit-worker`) completes and the Agent tool returns, **check TaskList for remaining `pending` steps**. If pending steps remain (work summary, status update, evolution), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. The Agent tool returning is a chain mid-point, not a completion signal.
+> **CRITICAL — Chain continuation after Agent tool returns**: When a sub-agent (e.g., `pr-worker`, `commit-worker`) completes and the Agent tool returns, **check TaskList for remaining `pending` steps**. If pending steps remain (work summary, status update, evolution), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. The Agent tool returning is a chain mid-point, not a completion signal.
 
 #### Work Summary (Issue Comment)
 
@@ -336,15 +344,9 @@ When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batc
 
 Process issues that share common files sequentially in a single branch and PR. See [reference/batch-workflow.md](reference/batch-workflow.md) for detection, eligibility, task registration template, workflow, and context details.
 
-### Parallel Batch (`--parallel`, Experimental)
+### Parallel Batch (Deprecated)
 
-> **Experimental**: Parallel processing using `isolation: worktree`. Intended for advanced users due to incomplete documentation ([claude-code#27023](https://github.com/anthropics/claude-code/issues/27023)).
-
-Process issues that operate on completely independent file sets in parallel using worktree isolation. Each issue creates its own independent PR.
-
-**Activation**: Specify multiple issues with the `--parallel` flag (e.g., `/working-on-issue #101 #102 #103 --parallel`). Use `--parallel=N` to set concurrency (default 3, max 5).
-
-See the "Parallel Batch Mode" section in [reference/batch-workflow.md](reference/batch-workflow.md) for details.
+> **Deprecated**: Parallel batch mode (`--parallel` flag) has been removed. The `parallel-coding-worker` agent has been deprecated as part of the subagent architecture simplification. Use sequential batch mode instead.
 
 ## Arguments
 
@@ -352,7 +354,6 @@ See the "Parallel Batch Mode" section in [reference/batch-workflow.md](reference
 |--------|---------|----------|
 | Issue number | `#42` | Fetch issue, analyze type |
 | Multiple issues | `#101 #102 #103` | Sequential batch mode |
-| Multiple issues + `--parallel` | `#101 #102 #103 --parallel` | Parallel batch mode (experimental) |
 | Description | `implement dashboard` | Text classification → `creating-item` |
 | No argument | — | AskUserQuestion |
 
@@ -361,16 +362,12 @@ See the "Parallel Batch Mode" section in [reference/batch-workflow.md](reference
 | Flag | Description |
 |------|-------------|
 | `--headless` | Headless mode. Applies default behaviors to UCPs and skips interactive confirmations |
-| `--parallel` | Parallel batch mode (experimental). Process issues in parallel with worktree isolation |
-| `--parallel=N` | Set parallel batch concurrency (default 3, max 5) |
 
 ### Flag Combinations
 
 | Combination | Behavior |
 |-------------|----------|
-| `--headless --parallel` | Parallel batch mode with headless UCPs. Token cost warning (AskUserQuestion) is skipped; execution proceeds without confirmation |
 | `--headless` (single issue) | Headless mode for single issue (see Headless Mode section) |
-| `--parallel` (single issue) | Ignored; single issue uses normal mode |
 
 ## Headless Mode
 
@@ -501,10 +498,10 @@ Sub-issue creation in this flow uses `shirokuma-docs issues create` directly (no
 
 ## Notes
 
-- This skill is the **manager (the main-process AI agent)** — actual work is delegated to subagent workers
+- This skill is the **manager (the main-process AI agent)** — work is delegated via Skill tool (code-issue, review-issue, reviewing-claude-config) or Agent tool (commit-worker, pr-worker, research-worker)
 - Update issue status before starting
 - Ensure correct feature branch
 - TDD-applicable work types wrap `code-issue` invocation with TDD ([docs/tdd-workflow.md](docs/tdd-workflow.md))
 - Workflow executes sequentially (Commit → PR → Work Summary → Status Update). **Merge is NOT included**
 - Chain execution stops on error and returns control to user
-- **Chain autonomous progression (MOST IMPORTANT)**: When you receive `action: CONTINUE`, respond with a tool call, not text output. As long as TaskList has pending steps, invoke the next Agent/Bash tool in the same response. The `open-pr-issue` → manager steps transition is the most common break point — immediately execute Work Summary → Status Update via Bash
+- **Chain autonomous progression (MOST IMPORTANT)**: When you receive `action: CONTINUE`, respond with a tool call, not text output. As long as TaskList has pending steps, invoke the next Skill/Agent/Bash tool in the same response. The `open-pr-issue` → manager steps transition is the most common break point — immediately execute Work Summary → Status Update via Bash
