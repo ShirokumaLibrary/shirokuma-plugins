@@ -118,7 +118,11 @@ On receiving skill output, execute these checks in order:
 
 Skill output is internal processing data — output only a one-line summary before proceeding.
 
+> **Immediate Progression (Required)**: When `action = CONTINUE` (PASS), **do NOT stop here** — proceed immediately to "On PASS" below → Step 5 → Step 6. Update the TodoList "plan review" task to `completed` before moving on. Ending with text-only output is a chain break error.
+
 #### On PASS
+
+> **Chain Autonomous Progression**: Once you reach this section, execute all actions (post comment → Step 5 → Step 6) **within the same response** without stopping. Do not pause for user input.
 
 1. Post a **plan review response comment** (evidence that the review passed):
 

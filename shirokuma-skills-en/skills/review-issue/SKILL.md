@@ -48,6 +48,38 @@ Based on user request, select appropriate role:
 | "design", "設計レビュー", "デザイン" | design | criteria/design, roles/design |
 | "research", "リサーチレビュー" | research | roles/research, criteria/research |
 
+#### Multi-Role Auto-Detection
+
+Scan all keywords in the user request. When 2 or more code review roles match, switch to multi-role mode.
+
+**Detection Flow:**
+
+```
+User request
+  ↓ Scan all keywords
+  ↓ Generate list of matched roles
+  ↓
+  [1 role] → Normal single-role execution
+  [2+ roles] → Sequential execution based on role execution order table
+```
+
+**Role Execution Order Table:**
+
+| Priority | Role | Reason |
+|----------|------|--------|
+| 1 | code | Foundation role. Code quality insights benefit other roles |
+| 2 | security | Security analysis builds on code structure understanding |
+| 3 | testing | Code and security insights inform test perspectives |
+| 4 | nextjs | Framework-specific insights |
+| 5 | docs | Document analysis is independent of code analysis |
+| 6 | code+annotation | Special mode of code |
+
+**Excluded roles:** plan / design / research are excluded from multi-role auto-detection (they are issue analysis roles, and mixing with code review roles is unnatural).
+
+**Exclusion rules:**
+- `code` and `config` are subject to auto-switching, so when both match, the existing `config` auto-detection logic takes priority (no multi-role).
+- `code` and `code+annotation` are mutually exclusive. When both match, `code+annotation` takes priority (it is a superset of `code`).
+
 #### `config` Role Auto-Detection (when `code` role is selected)
 
 When the role resolves to `code`, analyze changed files to auto-determine the review strategy:
@@ -318,6 +350,11 @@ For token efficiency:
 "research review #42"
 "リサーチレビュー #42"
 
+# Multi-role review
+"security + code review lib/actions/"
+"コードとセキュリティレビュー"
+"code and testing review src/"
+
 # Update knowledge base
 "reviewer --update"
 ```
@@ -434,17 +471,51 @@ If analysis is incomplete:
 
 ## Multi-Role Execution Mode
 
-When multiple roles are requested, this skill is invoked repeatedly for each role.
+When multiple roles are requested, this skill is invoked repeatedly for each role. There are 2 paths for multi-role execution.
+
+### Invocation Paths
+
+| Path | Trigger | Role Determination |
+|------|---------|-------------------|
+| Internal auto-detection | User request contains keywords matching multiple roles | Detected by Step 1 multi-role auto-detection |
+| Caller-specified | Caller explicitly specifies multiple roles | Uses roles specified by the caller |
 
 ### Behavioral Differences
 
 | Aspect | Normal (Single Role) | Multi-Role |
 |--------|---------------------|------------|
-| Role Selection | Determined from user request | Uses the role specified by the caller |
-| Report Save | Posted as PR/Issue comment | Posted as PR/Issue comment (no change) |
+| Role Selection | Determined from user request | Auto-detected or caller-specified |
+| Execution | 6-step workflow executed once | 6-step workflow executed sequentially for each role |
+| Report Save | Posted as PR/Issue comment | Posted individually per role |
 | Output Template | Normal review mode output template | Same (no change) |
 
 Each role's report is posted individually.
+
+### Auto-Detection Mode Progress Reporting Example
+
+```text
+Step 1/6: Selecting role...
+  Multi-role detected: code, security
+  Execution order: code → security
+
+[code role]
+Step 2/6: Loading knowledge...
+Step 3/6: Running shirokuma-docs lints...
+Step 4/6: Analyzing code...
+Step 5/6: Generating report...
+Step 6/6: Saving report...
+
+[security role]
+Step 2/6: Loading knowledge...
+Step 3/6: Running shirokuma-docs lints...
+Step 4/6: Analyzing code...
+Step 5/6: Generating report...
+Step 6/6: Saving report...
+```
+
+### Context Sharing Between Roles
+
+Results from earlier roles (lint results, detected issues) are available as context for subsequent roles. However, each role's report is generated independently.
 
 ## Notes
 
