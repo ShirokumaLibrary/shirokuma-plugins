@@ -1,0 +1,155 @@
+---
+paths:
+  - ".claude/skills/**/*.md"
+  - ".claude/agents/**/*.md"
+  - ".claude/output-styles/**/*.md"
+  - ".claude/commands/**/*.md"
+---
+
+# Claude 設定ファイル作成ルール
+
+## 命名規約
+
+**形式**: `動名詞形`（動詞 + -ing）、小文字、ハイフン、最大64文字
+
+```yaml
+# 良い例
+name: processing-pdfs
+name: managing-agents
+
+# 悪い例
+name: PDF-Processor    # 動名詞でない、大文字
+name: helper           # 曖昧すぎる
+```
+
+### オーケストレータースキルの命名パターン
+
+オーケストレータースキル（複数のワーカーを調整するスキル）は `{verb}-flow` パターンを使用する。
+
+```yaml
+# オーケストレーター（良い例）
+name: prepare-flow     # 計画フェーズのオーケストレーター
+name: design-flow      # 設計フェーズのオーケストレーター
+name: implement-flow   # 実装フェーズのオーケストレーター
+name: review-flow      # レビュー対応のオーケストレーター
+
+# ワーカースキル（通常の動名詞形）
+name: plan-issue       # 計画ワーカー
+name: code-issue       # 実装ワーカー
+name: commit-issue     # コミットワーカー
+```
+
+`-flow` サフィックスはオーケストレーター専用。ワーカースキルには使用しない。
+
+## description（重要）
+
+**テンプレート**: `[機能の説明]. Use when [トリガー].`
+
+**要件**:
+- 最大1024文字
+- 三人称
+- WHAT（機能）と WHEN（トリガー）を含む
+- 山括弧禁止（`<example>` は不可）
+
+```yaml
+# 良い例
+description: PDFファイルからテキストを抽出します。PDFを扱う場合や「PDF」「PDF処理」に言及された場合に使用。
+
+# 悪い例
+description: Helps with documents  # 曖昧、トリガーなし
+```
+
+## ファイルサイズ制限
+
+- `SKILL.md` / `AGENT.md`: 500行以下
+- すべての文の必要性を精査
+- 詳細な内容はリファレンスファイルに移動
+
+## 言語ガイドライン
+
+| ファイルタイプ | 言語 |
+|---------------|------|
+| SKILL.md / AGENT.md | 日本語 |
+| rules/*.md | 日本語 |
+| output-styles/*.md | 日本語 |
+| CLAUDE.md | 日本語 |
+| description (SKILL.md frontmatter) | 日本語 + 英語技術用語（下記参照） |
+
+- **避ける**: 重いテーブルフォーマット（トークン非効率）
+- **EN版 description**: 英語キーワードのみ（日本語トリガー不要）
+- **JA版 description**: 日本語 + 日本語ユーザーが実際に使う英語技術用語（例: 「コミット」+「commit」）
+- **存在しないスラッシュコマンド禁止**: `/skill-name` は実在するコマンドのみ参照可。引用符付きキーワードを使用（例: 「commit」であって「/commit」ではない）
+
+## ファイル構造
+
+```
+skill-name/
+├── SKILL.md        # 必須、500行以下
+├── reference.md    # オプション、詳細仕様
+├── examples.md     # オプション、I/O 例
+└── scripts/        # オプション、自動化
+```
+
+## テンプレート定義規約
+
+### プレースホルダ記法
+
+標準記法は `{placeholder}`（中括弧・小文字・スネークケースまたはケバブケース）。
+
+```markdown
+**ブランチ:** {branch-name}
+**ステータス:** {status}
+**Issue:** #{number} {title}
+```
+
+| 記法 | 使用可否 | 用途 |
+|------|---------|------|
+| `{placeholder}` | 標準 | 全テンプレート |
+| `{{PLACEHOLDER}}` | テンプレートエンジン内のみ | Handlebars 等の `.template` ファイル |
+| `<placeholder>` | CLI コマンド例のみ | bash コマンドの引数表記 |
+
+SKILL.md 内の説明テキストでは常に `{placeholder}` を使用する。
+
+### 完了レポートテンプレート
+
+完了レポートテンプレートが必要なのは、**サブエージェントスキル**（Agent ツールで起動）がオーケストレーターに構造化データを返す場合のみ。Skill ツールで起動されるスキル（メインコンテキスト実行）は `completion-report-style` ルールに従い、個別テンプレートは不要。
+
+| スキルタイプ | テンプレート要否 | 例 |
+|------------|----------------|-----|
+| サブエージェント（Agent ツール） | 必要 — YAML フロントマター + markdown | commit-issue, open-pr-issue |
+| メインコンテキスト（Skill ツール） | 不要 — `completion-report-style` ルールを使用 | managing-rules, code-issue |
+
+### コードブロック言語タグ
+
+| コンテンツ | 言語タグ |
+|-----------|---------|
+| CLI コマンド例 | `bash` |
+| 設定ファイル例 | `yaml` / `json` |
+| GitHub 本文テンプレート | `markdown` |
+
+## アンチパターン
+
+- 深い参照チェーン（SKILL.md から1レベルに保つ）
+- Windows のバックスラッシュ（フォワードスラッシュのみ）
+- デフォルトなしのオプション過多
+- 具体的なトリガーのない曖昧な命名
+- LLM が知っている概念の長い説明
+- 動機付け・哲学セクション（"なぜ" より "何を"）
+- **ワークフローの省略**（フローは LLM に推測させてはいけない）
+- **ツール使用指示の省略**（TaskCreate, TaskUpdate, AskUserQuestion 等の使い所）
+- **NGケースの省略**（禁止事項がないと LLM はデフォルト動作する）
+
+## バリデーションチェックリスト
+
+コミット前に確認：
+- [ ] 名前: 動名詞形、小文字
+- [ ] description: トリガー、三人称、`<>` なし
+- [ ] SKILL.md: 500行以下
+- [ ] フロントマター: 有効な YAML（タブではなくスペース）
+- [ ] パス: フォワードスラッシュのみ
+- [ ] **ワークフロー**: ステップバイステップのフローが記載されているか
+- [ ] **ツール使用**: TaskCreate / TaskUpdate / AskUserQuestion の使い所が明記されているか
+- [ ] **NGケース**: スキル固有の禁止事項・チェックリストがあるか
+- [ ] コーダー系: 既知概念の説明を削除し参照のみにしたか
+- [ ] レビュアー系: チェックリストの網羅性は十分か
+- [ ] **書き込み品質**: GitHub への書き込みテンプレートに暗黙参照がないか（`best-practices-writing.md` の「暗黙参照禁止」セクション参照）

@@ -1,0 +1,213 @@
+# cd-deploy.yml.template
+# CD Pipeline: dev (auto) → staging (auto) → prod (manual approval)
+#
+# Prerequisites:
+#   1. Create GitHub Environments:
+#      - dev: No protection rules (auto-deploy)
+#      - staging: No protection rules (auto) or Required reviewers (1 person)
+#      - production: Required reviewers (minimum 1 person)
+#
+#   2. Configure AWS OIDC provider (separate role per environment recommended):
+#      - dev role: CDK_DEPLOY_ROLE_ARN_DEV or DEPLOY_ROLE_ARN (environment secrets)
+#      - staging role: CDK_DEPLOY_ROLE_ARN_STAGING
+#      - prod role: CDK_DEPLOY_ROLE_ARN_PROD (separate account recommended, least privilege)
+#
+#   3. Configure GitHub Secrets / Variables:
+#      - DEPLOY_ROLE_ARN: Set in each environment's secrets
+#      - AWS_REGION: Repository Variable (e.g., ap-northeast-1)
+#      - ECR_REGISTRY: Repository Variable (if using ECR)
+#
+# When including CDK deploy:
+#   Reference coding-cdk's templates/github-actions-cdk.yml.template and
+#   replace the deploy step. This template assumes application deployment
+#   (ECS / Lambda, etc.).
+#
+# Customization points:
+#   - {PACKAGE_MANAGER}: npm / pnpm / yarn
+#   - {LOCK_FILE}: package-lock.json / pnpm-lock.yaml / yarn.lock
+#   - {NODE_VERSION}: 20 / 22 etc.
+#   - deploy steps: Update for ECS / Lambda / S3 etc. based on your project
+
+name: CD
+
+on:
+  push:
+    branches:
+      - develop   # Auto-deploy to dev environment
+      - main      # Deploy to staging / prod environments
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target deployment environment'
+        required: true
+        type: choice
+        options: [dev, staging, production]
+
+permissions:
+  contents: read
+  id-token: write   # Required for OIDC authentication
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'ap-northeast-1' }}
+  NODE_VERSION: '{NODE_VERSION}'
+
+jobs:
+  # ============================================================
+  # Job 1: CI check (verify CI passes before deploy)
+  # ============================================================
+  check-ci:
+    name: Check CI status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: '{PACKAGE_MANAGER}'
+          cache-dependency-path: '{LOCK_FILE}'
+
+      - name: Install dependencies
+        run: {PACKAGE_MANAGER} install --frozen-lockfile
+
+      - name: Run tests
+        run: {PACKAGE_MANAGER} run test
+        env:
+          CI: true
+
+      - name: Build
+        run: {PACKAGE_MANAGER} run build
+        env:
+          NODE_ENV: production
+
+  # ============================================================
+  # Job 2: deploy-dev (auto-run on develop branch push)
+  # ============================================================
+  deploy-dev:
+    name: Deploy to dev
+    runs-on: ubuntu-latest
+    needs: check-ci
+    if: |
+      (github.ref == 'refs/heads/develop' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
+    environment: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ----------------------------------------------------------
+      # Deploy step (update to match your project)
+      # ----------------------------------------------------------
+      # For ECS:
+      # - name: Deploy to ECS
+      #   run: |
+      #     aws ecs update-service \
+      #       --cluster {cluster-name}-dev \
+      #       --service {service-name} \
+      #       --force-new-deployment
+      #     aws ecs wait services-stable \
+      #       --cluster {cluster-name}-dev \
+      #       --services {service-name}
+      #
+      # For Lambda:
+      # - name: Deploy Lambda
+      #   run: |
+      #     aws lambda update-function-code \
+      #       --function-name {function-name}-dev \
+      #       --image-uri ${{ vars.ECR_REGISTRY }}/{image-name}:${{ github.sha }}
+      #
+      # For CDK:
+      # Reference deploy-dev job in coding-cdk's github-actions-cdk.yml.template
+
+      - name: Deploy (placeholder)
+        run: echo "Implement dev deploy here"
+
+      - name: Notify deployment
+        if: always()
+        run: |
+          echo "::notice::dev deploy complete: ${{ github.sha }}"
+
+  # ============================================================
+  # Job 3: deploy-staging (auto-run on main branch push)
+  # ============================================================
+  deploy-staging:
+    name: Deploy to staging
+    runs-on: ubuntu-latest
+    needs: check-ci
+    if: |
+      (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    environment: staging
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ----------------------------------------------------------
+      # Deploy step (update to match your project)
+      # ----------------------------------------------------------
+      - name: Deploy (placeholder)
+        run: echo "Implement staging deploy here"
+
+      - name: Run smoke tests
+        run: |
+          # Smoke tests against staging endpoint
+          # curl -f https://staging.{your-domain}/health || exit 1
+          echo "Implement smoke tests here"
+
+  # ============================================================
+  # Job 4: deploy-prod (run after staging success + manual approval)
+  # ============================================================
+  deploy-prod:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: |
+      (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    environment: production   # Manual approval gate via GitHub Environments
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
+          # Recommended to use a separate role for production from dev/staging
+          # For separate account: role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ----------------------------------------------------------
+      # Production deploy step (update to match your project)
+      # ----------------------------------------------------------
+      - name: Deploy (placeholder)
+        run: echo "Implement production deploy here"
+
+      - name: Run smoke tests
+        run: |
+          # Production smoke tests
+          # curl -f https://{your-domain}/health || exit 1
+          echo "Implement production smoke tests here"
+
+      - name: Create deployment record
+        if: success()
+        run: |
+          echo "::notice::Production deploy complete: ${{ github.sha }}"
+          # Add deployment notifications (Slack, etc.) as needed

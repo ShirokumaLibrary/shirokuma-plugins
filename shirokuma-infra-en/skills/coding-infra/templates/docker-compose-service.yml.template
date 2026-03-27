@@ -1,0 +1,42 @@
+# docker-compose Service Definition Template
+# Usage: Copy this snippet into the services: section of docker-compose.yml and edit it
+#
+# Substitution variables:
+#   {project}        - Project name (e.g., myapp)
+#   {service}        - Service name (e.g., postgres, valkey, mailpit)
+#   {image}          - Docker image name (e.g., postgres)
+#   {version}        - Image version (e.g., 16-alpine)
+#   {PORT}           - Port environment variable name (e.g., POSTGRES_PORT)
+#   {host-port}      - Host-side default port (e.g., 5432)
+#   {container-port} - Container-internal port (e.g., 5432)
+#   {volume-name}    - Volume name (e.g., postgres-data)
+#   {data-path}      - Container-internal data path (e.g., /var/lib/postgresql/data)
+
+  {service}:
+    image: {image}:{version}
+    container_name: {project}-{service}
+    restart: unless-stopped
+    environment:
+      - EXAMPLE_VAR=${EXAMPLE_VAR:-default_value}
+    ports:
+      - "${PORT:-{host-port}}:{container-port}"
+    volumes:
+      - {volume-name}:/{data-path}
+    networks:
+      - {project}-network
+    healthcheck:
+      test: ["CMD", "echo", "ok"]   # Adjust for your service
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+# --- Add to volumes section ---
+# volumes:
+#   {volume-name}:
+#     name: {project}-{volume-name}
+
+# --- Add to networks section (if not defined) ---
+# networks:
+#   {project}-network:
+#     name: {project}-network

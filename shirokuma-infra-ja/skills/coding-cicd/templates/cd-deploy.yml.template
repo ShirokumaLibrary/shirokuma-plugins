@@ -1,0 +1,213 @@
+# cd-deploy.yml.template
+# CD パイプライン: dev（自動）→ staging（自動）→ prod（手動承認）
+#
+# 前提条件:
+#   1. GitHub Environments を作成:
+#      - dev: Protection rules なし（自動デプロイ）
+#      - staging: Protection rules なし（自動）または Required reviewers 1名
+#      - production: Required reviewers 最低1名
+#
+#   2. AWS OIDC プロバイダーを設定（各環境用ロール推奨）:
+#      - dev 用: CDK_DEPLOY_ROLE_ARN_DEV または DEPLOY_ROLE_ARN（environment secrets）
+#      - staging 用: CDK_DEPLOY_ROLE_ARN_STAGING
+#      - prod 用: CDK_DEPLOY_ROLE_ARN_PROD（最小権限・別アカウント推奨）
+#
+#   3. GitHub Secrets / Variables を設定:
+#      - DEPLOY_ROLE_ARN: 各 environment の secrets に設定
+#      - AWS_REGION: リポジトリ Variables（例: ap-northeast-1）
+#      - ECR_REGISTRY: リポジトリ Variables（ECR を使用する場合）
+#
+# CDK デプロイを含む場合:
+#   coding-cdk の templates/github-actions-cdk.yml.template を参照して
+#   deploy ステップを差し替えること。本テンプレートはアプリケーションデプロイ
+#   （ECS / Lambda 等）を想定している。
+#
+# カスタマイズ箇所:
+#   - {PACKAGE_MANAGER}: npm / pnpm / yarn
+#   - {LOCK_FILE}: package-lock.json / pnpm-lock.yaml / yarn.lock
+#   - {NODE_VERSION}: 20 / 22 等
+#   - deploy ステップ: ECS / Lambda / S3 等プロジェクトのデプロイ方式に変更
+
+name: CD
+
+on:
+  push:
+    branches:
+      - develop   # dev 環境へ自動デプロイ
+      - main      # staging / prod 環境へデプロイ
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'デプロイ先環境'
+        required: true
+        type: choice
+        options: [dev, staging, production]
+
+permissions:
+  contents: read
+  id-token: write   # OIDC 認証に必須
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'ap-northeast-1' }}
+  NODE_VERSION: '{NODE_VERSION}'
+
+jobs:
+  # ============================================================
+  # Job 1: CI 確認（デプロイ前に CI パスを確認）
+  # ============================================================
+  check-ci:
+    name: Check CI status
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: '{PACKAGE_MANAGER}'
+          cache-dependency-path: '{LOCK_FILE}'
+
+      - name: Install dependencies
+        run: {PACKAGE_MANAGER} install --frozen-lockfile
+
+      - name: Run tests
+        run: {PACKAGE_MANAGER} run test
+        env:
+          CI: true
+
+      - name: Build
+        run: {PACKAGE_MANAGER} run build
+        env:
+          NODE_ENV: production
+
+  # ============================================================
+  # Job 2: deploy-dev（develop ブランチ push で自動実行）
+  # ============================================================
+  deploy-dev:
+    name: Deploy to dev
+    runs-on: ubuntu-latest
+    needs: check-ci
+    if: |
+      (github.ref == 'refs/heads/develop' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
+    environment: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ----------------------------------------------------------
+      # デプロイステップ（プロジェクトに合わせて変更）
+      # ----------------------------------------------------------
+      # ECS を使用する場合:
+      # - name: Deploy to ECS
+      #   run: |
+      #     aws ecs update-service \
+      #       --cluster {cluster-name}-dev \
+      #       --service {service-name} \
+      #       --force-new-deployment
+      #     aws ecs wait services-stable \
+      #       --cluster {cluster-name}-dev \
+      #       --services {service-name}
+      #
+      # Lambda を使用する場合:
+      # - name: Deploy Lambda
+      #   run: |
+      #     aws lambda update-function-code \
+      #       --function-name {function-name}-dev \
+      #       --image-uri ${{ vars.ECR_REGISTRY }}/{image-name}:${{ github.sha }}
+      #
+      # CDK を使用する場合:
+      # coding-cdk の github-actions-cdk.yml.template の deploy-dev ジョブを参照
+
+      - name: Deploy (placeholder)
+        run: echo "dev デプロイを実装してください"
+
+      - name: Notify deployment
+        if: always()
+        run: |
+          echo "::notice::dev デプロイ完了: ${{ github.sha }}"
+
+  # ============================================================
+  # Job 3: deploy-staging（main ブランチ push で自動実行）
+  # ============================================================
+  deploy-staging:
+    name: Deploy to staging
+    runs-on: ubuntu-latest
+    needs: check-ci
+    if: |
+      (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    environment: staging
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ----------------------------------------------------------
+      # デプロイステップ（プロジェクトに合わせて変更）
+      # ----------------------------------------------------------
+      - name: Deploy (placeholder)
+        run: echo "staging デプロイを実装してください"
+
+      - name: Run smoke tests
+        run: |
+          # スモークテスト（staging のエンドポイントに簡易リクエスト）
+          # curl -f https://staging.{your-domain}/health || exit 1
+          echo "スモークテストを実装してください"
+
+  # ============================================================
+  # Job 4: deploy-prod（staging 成功後 + 手動承認で実行）
+  # ============================================================
+  deploy-prod:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: |
+      (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    environment: production   # GitHub Environments の手動承認ゲート
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN }}
+          # production 用ロールは dev/staging と分離することを推奨
+          # 別アカウント構成の場合: role-to-assume: ${{ secrets.DEPLOY_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ----------------------------------------------------------
+      # 本番デプロイステップ（プロジェクトに合わせて変更）
+      # ----------------------------------------------------------
+      - name: Deploy (placeholder)
+        run: echo "production デプロイを実装してください"
+
+      - name: Run smoke tests
+        run: |
+          # 本番スモークテスト
+          # curl -f https://{your-domain}/health || exit 1
+          echo "本番スモークテストを実装してください"
+
+      - name: Create deployment record
+        if: success()
+        run: |
+          echo "::notice::本番デプロイ完了: ${{ github.sha }}"
+          # 必要に応じてデプロイ通知（Slack 等）を追加

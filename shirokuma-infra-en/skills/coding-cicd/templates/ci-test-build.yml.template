@@ -1,0 +1,180 @@
+# ci-test-build.yml.template
+# CI Pipeline: lint → test → build
+#
+# Prerequisites:
+#   - The following scripts must be defined in package.json:
+#     "lint": "eslint ." or "biome check ."
+#     "test": "jest" or "vitest run"
+#     "build": "next build" or "tsc" etc.
+#     "typecheck": "tsc --noEmit" (optional)
+#
+# Customization points:
+#   - {PACKAGE_MANAGER}: npm / pnpm / yarn
+#   - {LOCK_FILE}: package-lock.json / pnpm-lock.yaml / yarn.lock
+#   - {NODE_VERSION}: 20 / 22 etc.
+#   - {MAIN_BRANCH}: main / master
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+# Minimize default permissions
+permissions:
+  contents: read
+
+jobs:
+  # ============================================================
+  # Job 1: lint (code style and static analysis)
+  # ============================================================
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '{NODE_VERSION}'
+          cache: '{PACKAGE_MANAGER}'
+          cache-dependency-path: '{LOCK_FILE}'
+
+      - name: Install dependencies
+        run: {PACKAGE_MANAGER} install --frozen-lockfile
+        # For npm: npm ci
+        # For yarn: yarn install --immutable
+
+      - name: Run lint
+        run: {PACKAGE_MANAGER} run lint
+
+      - name: Type check
+        run: {PACKAGE_MANAGER} run typecheck
+        # Remove or comment out if typecheck script is not defined
+
+  # ============================================================
+  # Job 2: test (unit tests and integration tests)
+  # ============================================================
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '{NODE_VERSION}'
+          cache: '{PACKAGE_MANAGER}'
+          cache-dependency-path: '{LOCK_FILE}'
+
+      - name: Install dependencies
+        run: {PACKAGE_MANAGER} install --frozen-lockfile
+
+      - name: Run tests
+        run: {PACKAGE_MANAGER} run test
+        env:
+          CI: true
+          # Add environment variables required for tests
+          # NODE_ENV: test
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+        # Remove if coverage directory does not exist
+
+  # ============================================================
+  # Job 3: build (production build validation)
+  # ============================================================
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, test]  # Run only after lint and test pass
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.version }}
+      # Remove this section if not using Docker images
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '{NODE_VERSION}'
+          cache: '{PACKAGE_MANAGER}'
+          cache-dependency-path: '{LOCK_FILE}'
+
+      - name: Install dependencies
+        run: {PACKAGE_MANAGER} install --frozen-lockfile
+
+      - name: Build
+        run: {PACKAGE_MANAGER} run build
+        env:
+          NODE_ENV: production
+          # Add environment variables required for build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: |
+            .next/
+            dist/
+            out/
+          # Update build output directories to match your project
+          retention-days: 1
+          if-no-files-found: warn
+
+  # ============================================================
+  # Optional: Docker image build (for container-based projects)
+  # ============================================================
+  # docker-build:
+  #   name: Docker Build
+  #   runs-on: ubuntu-latest
+  #   needs: [lint, test]
+  #
+  #   outputs:
+  #     image-digest: ${{ steps.build.outputs.digest }}
+  #
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+  #
+  #     - name: Extract metadata
+  #       id: meta
+  #       uses: docker/metadata-action@v5
+  #       with:
+  #         images: ${{ vars.ECR_REGISTRY }}/${{ vars.IMAGE_NAME }}
+  #         tags: |
+  #           type=sha,prefix=
+  #           type=ref,event=branch
+  #
+  #     - name: Build Docker image (no push on PR)
+  #       id: build
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         push: false
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         cache-from: type=gha
+  #         cache-to: type=gha,mode=max

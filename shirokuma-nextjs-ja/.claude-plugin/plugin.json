@@ -1,0 +1,19 @@
+{
+  "name": "shirokuma-nextjs-ja",
+  "description": "Next.js/shadcn/Drizzle フレームワーク固有スキル（Claude Code 用）",
+  "version": "0.3.0-alpha.64",
+  "author": {
+    "name": "ShirokumaLibrary"
+  },
+  "homepage": "https://github.com/ShirokumaLibrary/shirokuma-plugins",
+  "repository": "https://github.com/ShirokumaLibrary/shirokuma-plugins",
+  "keywords": [
+    "claude-code",
+    "skills",
+    "nextjs",
+    "shadcn-ui",
+    "drizzle",
+    "frontend"
+  ],
+  "license": "MIT"
+}
