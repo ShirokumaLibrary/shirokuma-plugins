@@ -248,7 +248,7 @@ docs: update CLAUDE.md command table     ← 日本語設定では不正
 ```text
 PR を作成しました。次のステップ:
 → レビュー対応が必要な場合は `/review-flow #{PR番号}` を実行
-→ `/ending-session` で引き継ぎを保存し Issue ステータスを更新
+→ `shirokuma-docs session end --review {issue-number}` で Issue ステータスを更新
 ```
 
 ## 注意事項

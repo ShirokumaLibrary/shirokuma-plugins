@@ -98,9 +98,8 @@ AI MUST update issue status at these points:
 | PR creation complete | → Review | `open-pr-issue` | frontmatter `status: "Review"` → `items push {n}` |
 | PR merged | → Done | `commit-issue` (via `pr merge`) | Automatic |
 | Blocked by dependency | → Pending | Manual | frontmatter `status: "Pending"` → `items push {n}` + comment |
-| Complete (no PR needed) | → Done | `ending-session` | `session end --done {n}` |
+| Complete (no PR needed) | → Done | Manual | `session end --done {n}` |
 | Cancelled | → Not Planned | `issues cancel` | `issues cancel {n}` |
-| Session end | → Review or Done | `ending-session` (safety net) | `session end --review/--done {n}` |
 
 ### Preparing Usage
 
@@ -131,9 +130,8 @@ AI MUST update issue status at these points:
 1. **One In Progress at a time** - Move previous item out before starting new one (exception: batch mode, epics)
 2. **Branch per issue** - Create a feature branch when starting work (exception: batch, epics)
 3. **Event-driven**: Status changes happen immediately when events occur
-4. **Session end safety net** - `ending-session` catches any missed status updates
-5. **Pending requires reason** - Add a comment explaining the blocker
-6. **Idempotency** - If status is already correct, skip the update (no error)
+4. **Pending requires reason** - Add a comment explaining the blocker
+5. **Idempotency** - If status is already correct, skip the update (no error)
 
 ## Plan Comment-Link Body Structure
 

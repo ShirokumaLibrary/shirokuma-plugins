@@ -59,7 +59,7 @@ GitHub 書き込み（Issues, PRs, Discussions）での箇条書き vs 散文の
 
 | カテゴリ | テンプレート要否 | 例 |
 |---------|----------------|-----|
-| Workflow | 必須（厳格） | commit-issue, open-pr-issue, ending-session |
+| Workflow | 必須（厳格） | commit-issue, open-pr-issue |
 | Config Management | 必須（厳格） | coding-claude-config |
 | Analysis | 必須（テーブル含む） | evolving-rules, prepare-flow |
 | Display / Orchestrator | 不要 | showing-github, implement-flow |

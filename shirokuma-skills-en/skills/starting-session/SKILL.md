@@ -1,25 +1,18 @@
 ---
 name: starting-session
-description: Starts a work session by loading project status, previous handovers, and pending issues. Triggers: "start session", "begin work", "session start".
-allowed-tools: Bash, Read, Grep, AskUserQuestion
+description: Conversation initialization skill that loads rules and displays project state at the start of a conversation. Triggers: "start session", "begin work", "session start", "initialize conversation", "init session".
+allowed-tools: Bash, Read, Grep
 ---
 
 !`shirokuma-docs rules inject --scope main`
 
-# Starting Session
+# Conversation Initialization
 
-Start a new work session and display project context.
-
-## Modes
-
-| Mode | Invocation | Context Source | Use Case |
-|------|-----------|----------------|----------|
-| Issue-bound | `/starting-session #N` | Issue comments (work summaries) | Continuing work on a specific issue across conversations |
-| Unbound | `/starting-session` | Handovers Discussion (transitional) | Triage, issue management, general exploration |
+A simple entry point that loads rules and displays project state for a new conversation.
 
 ## Workflow
 
-### Step 1: Fetch Session Context (Single Command)
+### Step 1: Fetch Project State
 
 ```bash
 shirokuma-docs session start
@@ -34,33 +27,12 @@ This returns JSON with:
 - `total_issues` - Count of active issues
 - `openPRs` - Open pull requests with review status
 
-### Step 1a: Issue-Bound Context Restoration (when `#N` provided)
-
-When invoked with an issue number (e.g., `/starting-session #42`), restore context from Issue comments:
-
-```bash
-shirokuma-docs issues comments {N}
-```
-
-Parse comments in reverse chronological order and extract work summaries (look for `## Work Summary` or `## Session Summary` headers). Display the most recent summary as the primary context:
-
-```markdown
-### Previous Context (from Issue #{N})
-**Last work summary:** {date}
-- {summary content}
-- **Next Steps:** {extracted next steps}
-```
-
-This replaces the Handovers-based context for issue-bound sessions. The `lastHandover` field from `session start` output is still available but de-prioritized — Issue comments are the primary context source.
-
-After context display, automatically route to `implement-flow #{N}` (skip Step 3 direction selection).
-
 ### Step 1b: Backup Detection
 
 If the `backups` field is present, a previous session may have been interrupted before proper handover.
 Show the backup contents (branch, uncommitted changes, recent commits) to help the user recover context.
 
-### Step 2: Display Session Context
+### Step 2: Display Project State
 
 Parse the JSON output and display:
 
@@ -70,11 +42,6 @@ Parse the JSON output and display:
 **Repository:** {repository}
 **Time:** {current time}
 **Branch:** {git.currentBranch} {git.hasUncommittedChanges ? "(uncommitted changes)" : "(clean)"}
-
-### Previous Handover
-{lastHandover.title or "None found"}
-- Summary: {parse body for Summary section}
-- Next Steps: {parse body for Next Steps section}
 
 ### Open PRs
 | # | Title | Review | Threads |
@@ -99,96 +66,16 @@ Group issues by status: In Progress → Ready → Backlog → Icebox → (no sta
 
 If there are uncommitted changes (`git.hasUncommittedChanges`), inform the user before proceeding.
 
-### Step 3: Ask for Direction
+## Issue-Bound Mode (when `#N` provided)
 
-Use AskUserQuestion to present the top items as selectable options. Include the highest-priority In Progress and Ready items as options, plus an "Other" option for free-form input.
-
-If the session has many active items, prioritize showing In Progress items first, then Ready, then top Backlog items (max 4 options total).
-
-## If Item Selected
-
-Route to the appropriate skill based on the issue's status.
-
-### Status-Based Routing
-
-| Issue Status | Delegate To | Reason |
-|-------------|-------------|--------|
-| Backlog | `plan-issue` | Needs planning |
-| Preparing | `prepare-flow` | Preparing in progress |
-| Designing | `design-flow` | Designing in progress |
-| Spec Review | `implement-flow` | Implicit approval, start implementation |
-| Ready | `implement-flow` | Ready to start, begin implementation |
-| In Progress | `implement-flow` | Resume work |
-| Review / Pending | `implement-flow` | Continue work |
-| (Other / No status) | `implement-flow` | Default |
-
-### Skill Invocation
+When invoked with `/starting-session #N`, display the issue state and route to `implement-flow #N`:
 
 ```
-Skill: {skill name based on routing table}
-Args: #{number}
+Skill: implement-flow
+Args: #{N}
 ```
 
-`implement-flow` handles status update, branch creation, plan check, skill selection, execution, and post-work flow.
-`plan-issue` handles plan creation and status transitions.
-Status updates and branch creation are `implement-flow`'s responsibility — duplicating them in `starting-session` causes race conditions and double updates.
-
-## When Other Selected
-
-Routing for selections outside the issue list, such as handover remaining tasks or new tasks.
-
-### Flow
-
-1. AskUserQuestion: "Do you have a corresponding issue number? If not, we'll create a new one."
-   - Options: "Enter issue number", "No issue - create new"
-2. Issue number provided → Join status-based routing (same as "If Item Selected" above)
-3. No issue → Create issue via `managing-github-items` skill → Route created issue to `plan-issue`
-
-```
-Other selected
-├── AskUserQuestion: "Corresponding issue?"
-├── Issue number provided → Status-based routing
-└── No issue
-    ├── Create issue via managing-github-items
-    └── Route created issue to plan-issue
-```
-
-**For handover remaining tasks**: Pass the handover's Next Steps content as context to `managing-github-items` for the issue body.
-
-## Multi-Developer Mode
-
-In team development, add options to `session start`:
-
-```bash
-# Show handovers from a specific user
-shirokuma-docs session start --user {username}
-
-# Show handovers from all members (no filter)
-shirokuma-docs session start --all
-
-# Team dashboard (grouped by member)
-shirokuma-docs session start --team
-```
-
-| Option | Behavior |
-|--------|----------|
-| (default) | Fetches only handovers created by the current GitHub user |
-| `--user {username}` | Fetches handovers from the specified user |
-| `--all` | Fetches handovers from all members (no filter) |
-| `--team` | Groups handovers and issues by member for team overview |
-
-**Default behavior**: `shirokuma-docs session start` internally retrieves the current GitHub username and filters handovers to that user only.
-
-## Error Handling
-
-| Error | Action |
-|-------|--------|
-| `shirokuma-docs: command not found` | Install: `pnpm install` in shirokuma-docs |
-| `gh: command not found` | Install: `brew install gh` or `sudo apt install gh` |
-| `not logged in` | Run: `gh auth login` |
-| lastHandover is null | Show "No previous handover found" |
-| issues is empty | Show "No active issues" |
-| git pull fails | Warn and continue with local base branch |
+Status-based routing is handled by `implement-flow` — `starting-session` does not perform additional confirmation.
 
 ## Batch Candidate Suggestion
 
@@ -212,19 +99,7 @@ If candidates found, add after the Active Issues section:
 | CLI improvements | #110, #112, #115 | area:cli |
 ```
 
-### AskUserQuestion Integration
-
-Include batch options alongside individual issue options in Step 3:
-
-```
-Options:
-- #42 Current task (In Progress)
-- #50 Next feature (Backlog)
-- Batch: #101 #102 #105 (Plugin fixes)    ← batch option
-- Other
-```
-
-When a batch option is selected, invoke `implement-flow` with all issue numbers (e.g., `#101 #102 #105`).
+To start batch processing, run `/implement-flow #101 #102 #105`.
 
 ## Evolution Signal Reminder
 
@@ -242,13 +117,52 @@ If signals are accumulated, show a single line after the Active Issues section:
 
 - **No auto-execution** — reminder only (user decides whether to invoke)
 - **Hidden when empty** — avoid noise
-- **Non-blocking** — does not affect Step 3 direction selection
+
+## Multi-Developer Mode
+
+In team development, add options to `session start`:
+
+```bash
+# Show handovers from a specific user
+shirokuma-docs session start --user {username}
+
+# Show handovers from all members (no filter)
+shirokuma-docs session start --all
+
+# Team dashboard (grouped by member)
+shirokuma-docs session start --team
+```
+
+| Option | Behavior |
+|--------|----------|
+| (default) | Fetches only handovers created by the current GitHub user |
+| `--user {username}` | Fetches handovers from the specified user |
+| `--all` | Fetches handovers from all members (no filter) |
+| `--team` | Groups handovers and issues by member for team overview |
+
+## Error Handling
+
+| Error | Action |
+|-------|--------|
+| `shirokuma-docs: command not found` | Install: `pnpm install` in shirokuma-docs |
+| `gh: command not found` | Install: `brew install gh` or `sudo apt install gh` |
+| `not logged in` | Run: `gh auth login` |
+| issues is empty | Show "No active issues" |
+| git pull fails | Warn and continue with local base branch |
+
+## Next Steps
+
+After displaying state, the user selects the next action:
+
+- Work on a specific issue: `/implement-flow #N`
+- Create a new issue: `/creating-item`
+- Start planning: `/prepare-flow #N`
+- Batch processing: `/implement-flow #N1 #N2 #N3`
 
 ## Notes
 
 - Always show current time in session header
-- Parse handover body for Summary and Next Steps sections
 - Show items in priority order within each status
 - Done/Released items are automatically excluded by `session start`
-- After item selection, delegate to `implement-flow` or `plan-issue` based on status-based routing (status updates and branch creation are handled by the delegated skill)
 - Use `shirokuma-docs session start` instead of raw `gh` commands — the CLI aggregates handover, issues, and PRs in one call, saving context window
+- Handover save/restore is not this skill's responsibility. Context saving is done via `session end` CLI, not managed directly by this skill

@@ -174,7 +174,7 @@ shirokuma-docs pr merge --head {current-branch}
 
 This single command handles: resolve PR from branch name, squash merge, extract linked Issues from PR body (`Closes/Fixes/Resolves #N`), update their Project Status to "Done", and delete the branch.
 
-**Status update idempotency**: `pr merge` CLI automatically updates related Issue Project Status to Done. If `ending-session --done` runs for the same issue later, it operates idempotently (no-op if already Done).
+**Status update idempotency**: `pr merge` CLI automatically updates related Issue Project Status to Done. If `session end --done` runs for the same issue later, it operates idempotently (no-op if already Done).
 
 **PR-Issue Link Graph Verification**: `pr merge` verifies the PR-Issue link graph:
 

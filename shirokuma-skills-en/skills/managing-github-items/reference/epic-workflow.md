@@ -101,7 +101,7 @@ Sub-issues follow the standard `project-items` rule. The only difference is that
 
 ### `session end` Operational Guidance
 
-The `ending-session` safety net is not epic-aware. Using `--done` on an epic issue while sub-issues are incomplete risks prematurely transitioning the epic to Done.
+The `session end` CLI is not epic-aware. Using `--done` on an epic issue while sub-issues are incomplete risks prematurely transitioning the epic to Done.
 
 | Situation | Recommended Action |
 |-----------|--------------------|
@@ -205,4 +205,4 @@ Sub-issue creation in the epic kickoff uses `shirokuma-docs items add issue` dir
 The following are out of scope for now and will be addressed in separate issues:
 
 - Epic progress display in `starting-session` / `showing-github` (sub-issue summary visualization)
-- Epic awareness in `ending-session` (automated epic status protection when sub-issues are incomplete)
+- Epic awareness in `session end` CLI (automated epic status protection when sub-issues are incomplete)

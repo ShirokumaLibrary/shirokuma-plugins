@@ -30,6 +30,16 @@
       "name": "shirokuma-nextjs-ja",
       "source": "./shirokuma-nextjs-ja",
       "description": "Next.js/shadcn/Drizzle framework-specific skills (Japanese)"
+    },
+    {
+      "name": "shirokuma-infra-en",
+      "source": "./shirokuma-infra-en",
+      "description": "AWS/CDK/CI-CD/Docker infrastructure skills for Claude Code"
+    },
+    {
+      "name": "shirokuma-infra-ja",
+      "source": "./shirokuma-infra-ja",
+      "description": "AWS/CDK/CI-CD/Docker infrastructure skills (Japanese)"
     }
   ]
 }

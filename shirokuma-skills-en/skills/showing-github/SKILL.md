@@ -316,7 +316,7 @@ Draft | Review | Approved | Rejected | Implementing
 | No project found | Show only Issues/PRs/Commits |
 | No items match filter | "No items with status '{filter}'. Try `/show-items`." |
 | No Discussions/category | Check local files or skip gracefully |
-| No handovers found | "No handover history. Start with `/ending-session`." |
+| No handovers found | "No handover history." |
 | No specs found | "No specs found. Create one with `/create-spec`." |
 | gh not authenticated | Prompt: `gh auth login` |
 

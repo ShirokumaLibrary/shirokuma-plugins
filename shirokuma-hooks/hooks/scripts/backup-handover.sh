@@ -58,7 +58,7 @@ ${ACTIVE_ISSUES:-情報取得失敗}
 
 ---
 > このファイルは PreCompact フックにより自動生成されました。
-> 正式な引き継ぎは \`/ending-session\` で GitHub Discussions に保存してください。
+> Issue ステータス更新が必要な場合は \`shirokuma-docs session end\` を実行してください。
 EOF
 
 echo '{}'

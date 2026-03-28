@@ -270,7 +270,7 @@ Only when invoked standalone:
 ```text
 PR created. Next steps:
 → Run `/review-flow #{pr-number}` to respond to reviewer feedback
-→ `/ending-session` to save handover and update issue statuses
+→ `shirokuma-docs session end --review {issue-number}` to update issue status
 ```
 
 ## Notes

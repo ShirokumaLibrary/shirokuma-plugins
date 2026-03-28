@@ -12,7 +12,7 @@ graph TD
     C2["会話 2: 計画策定<br/>/prepare-flow #N（スタンドアロン）"]
     C2D["会話 2.5: 設計（任意）<br/>/design-flow #N（スタンドアロン）"]
     C3["会話 3: 製造<br/>小規模: /implement-flow #N（スタンドアロン）<br/>大規模: /starting-session #N"]
-    C4["会話 4: 製造の続き（大規模のみ）<br/>/starting-session #N → コンテキスト復元"]
+    C4["会話 4: 製造の続き（大規模のみ）<br/>/starting-session #N → /implement-flow #N"]
 
     C1 -->|"Backlog → ユーザー判断"| C2
     C2 -->|"設計が必要"| C2D
@@ -72,17 +72,16 @@ graph TD
 | commit-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | open-pr-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | review-flow | — | 対応 | PR レビュー対応（新会話のエントリーポイント） |
-| starting-session | 対応 | — | セッション開始専用（`#N` で Issue バウンド、引数なしでアンバウンド） |
-| ending-session | 対応 | — | セッション終了専用 |
+| starting-session | 対応 | — | 会話初期化専用（`#N` で Issue バウンド、引数なしで状態表示） |
 
 ### スタンドアロンハンドオーバー指針
 
-スタンドアロン `implement-flow` はチェーン完了時に Issue コメントへ作業サマリーを自動投稿する。`ending-session` は不要。
+スタンドアロン `implement-flow` はチェーン完了時に Issue コメントへ作業サマリーを自動投稿する。
 
 `implement-flow` を使わない大規模なスタンドアロン作業の場合:
 
 | スタンドアロン作業の規模 | アクション |
 |------------------------|----------|
 | 単一スキルの簡易起動（タイポ修正、アイテム作成） | 不要 |
-| 複数コミットまたは大幅なコード変更 | `ending-session` を推奨 |
+| 複数コミットまたは大幅なコード変更 | `session end` CLI で Issue ステータスを手動更新 |
 | 調査結果やアーキテクチャ検討 | Discussion の作成を推奨 |

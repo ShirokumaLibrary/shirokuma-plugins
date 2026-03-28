@@ -6,8 +6,12 @@ Reusable AI skills, rules, and safety hooks for [Claude Code](https://docs.anthr
 
 | Plugin | Description |
 |--------|-------------|
-| **shirokuma-skills-en** | AI skills and rules for Claude Code (English) |
-| **shirokuma-skills-ja** | AI skills and rules for Claude Code (Japanese) |
+| **shirokuma-skills-en** | AI skills, rules, and agents for Claude Code (English) |
+| **shirokuma-skills-ja** | AI skills, rules, and agents for Claude Code (Japanese) |
+| **shirokuma-nextjs-en** | Next.js / shadcn / Drizzle framework-specific skills (English) |
+| **shirokuma-nextjs-ja** | Next.js / shadcn / Drizzle framework-specific skills (Japanese) |
+| **shirokuma-infra-en** | AWS / CDK / CI/CD / Docker infrastructure skills (English) |
+| **shirokuma-infra-ja** | AWS / CDK / CI/CD / Docker infrastructure skills (Japanese) |
 | **shirokuma-hooks** | Safety hooks for destructive git/GitHub operations |
 
 ## Installation
@@ -15,20 +19,7 @@ Reusable AI skills, rules, and safety hooks for [Claude Code](https://docs.anthr
 ### Via shirokuma-docs CLI (recommended)
 
 ```bash
-npx @shirokuma-library/shirokuma-docs init --with-skills
-```
-
-### Via Claude Code plugin commands
-
-```bash
-# Register the marketplace
-claude plugin marketplace add ShirokumaLibrary/shirokuma-plugins
-
-# Install a plugin
-claude plugin install shirokuma-skills-en@shirokuma-library --scope project
-
-# Update to the latest version
-claude plugin update shirokuma-skills-en@shirokuma-library --scope project
+shirokuma-docs init --with-skills
 ```
 
 ## Documentation

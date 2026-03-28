@@ -276,9 +276,9 @@ Agent(
 
 #### Work Summary (Issue Comment)
 
-After PR creation, post a technical work summary to the Issue as a comment. This is the primary context record that `starting-session #N` will restore in future sessions.
+After PR creation, post a technical work summary to the Issue as a comment. This is the primary context record referenced in future conversations for Issue context.
 
-The work summary focuses on **technical work details** — what was changed, which files were modified, and technical decisions made. Session-level context (cross-cutting decisions, blockers, next steps) is handled separately by `ending-session`.
+The work summary focuses on **technical work details** — what was changed, which files were modified, and technical decisions made.
 
 ```bash
 shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md
@@ -304,7 +304,7 @@ PR #{pr-number}
 
 Skip this step if no issue number is associated with the work.
 
-**Standalone completion**: When `implement-flow` completes its chain (standalone or within a session), the Work Summary is automatically posted. This eliminates the need for `ending-session` to repeat technical details — `ending-session` only adds session-level context (cross-cutting decisions, blockers, next steps).
+**Standalone completion**: When `implement-flow` completes its chain (standalone or within a session), the Work Summary is automatically posted.
 
 #### Status Update (End of Chain)
 

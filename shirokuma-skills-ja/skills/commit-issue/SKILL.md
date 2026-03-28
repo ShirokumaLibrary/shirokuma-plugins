@@ -183,7 +183,7 @@ shirokuma-docs pr merge --head {current-branch}
 
 この 1 コマンドでブランチから PR 特定、squash マージ、PR 本文から関連 Issue 抽出（`Closes/Fixes/Resolves #N`）、Project Status を "Done" に更新、ブランチ削除を処理する。
 
-**Status 更新の冪等性**: `pr merge` CLI が関連 Issue の Project Status を自動で Done に更新する。`ending-session --done` が同じ Issue に対して実行されても冪等に動作する（既に Done なら no-op）。
+**Status 更新の冪等性**: `pr merge` CLI が関連 Issue の Project Status を自動で Done に更新する。`session end --done` が同じ Issue に対して実行されても冪等に動作する（既に Done なら no-op）。
 
 **PR-Issue リンクグラフ検証**: `pr merge` は PR 本文の `Closes/Fixes/Resolves #N` からリンクグラフを構築し、複雑さに応じて振る舞いを分ける:
 

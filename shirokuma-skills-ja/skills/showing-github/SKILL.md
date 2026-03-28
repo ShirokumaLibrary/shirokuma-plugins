@@ -316,7 +316,7 @@ Draft | Review | Approved | Rejected | Implementing
 | プロジェクト未発見 | Issue/PR/コミットのみ表示 |
 | フィルター不一致 | 「該当なし。`/show-items` を試してください。」 |
 | Discussion/カテゴリなし | ローカルファイルを確認またはスキップ |
-| 引き継ぎなし | 「引き継ぎ履歴なし。`/ending-session` で開始。」 |
+| 引き継ぎなし | 「引き継ぎ履歴なし。」 |
 | 仕様なし | 「仕様なし。`/create-spec` で作成。」 |
 | gh 未認証 | `gh auth login` を案内 |
 

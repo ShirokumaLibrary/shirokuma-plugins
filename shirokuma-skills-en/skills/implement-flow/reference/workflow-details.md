@@ -12,7 +12,7 @@ graph TD
     C2["Conversation 2: Planning<br/>/prepare-flow #N (standalone)"]
     C2D["Conversation 2.5: Design (optional)<br/>/design-flow #N (standalone)"]
     C3["Conversation 3: Implementation<br/>Small: /implement-flow #N (standalone)<br/>Large: /starting-session #N"]
-    C4["Conversation 4: Continuation (large only)<br/>/starting-session #N → context restore"]
+    C4["Conversation 4: Continuation (large only)<br/>/starting-session #N → /implement-flow #N"]
 
     C1 -->|"Backlog → user decision"| C2
     C2 -->|"design needed"| C2D
@@ -72,17 +72,16 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 | commit-issue | Yes | Yes | Subagent (standalone also runs as subagent) |
 | open-pr-issue | Yes | Yes | Subagent (via chain or standalone) |
 | review-flow | — | Yes | PR review response (new conversation entry point) |
-| starting-session | Yes | — | Session start only (`#N` for issue-bound, no arg for unbound) |
-| ending-session | Yes | — | Session end only |
+| starting-session | Yes | — | Conversation init only (`#N` for issue-bound, no arg for project state display) |
 
 ### Standalone Handover Guideline
 
-Standalone `implement-flow` automatically posts a work summary to the Issue comment on chain completion. No `ending-session` needed.
+Standalone `implement-flow` automatically posts a work summary to the Issue comment on chain completion.
 
 For substantial standalone work without `implement-flow`:
 
 | Standalone Scope | Action |
 |-----------------|--------|
 | Quick single-skill invocation (typo fix, item creation) | Not needed |
-| Multiple commits or significant code changes | Recommend `ending-session` |
+| Multiple commits or significant code changes | Update issue status manually via `session end` CLI |
 | Research findings or architecture investigation | Recommend creating a Discussion |

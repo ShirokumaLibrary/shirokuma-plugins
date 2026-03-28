@@ -332,7 +332,7 @@ Content that skills write to GitHub (Issue comments, PR bodies, Discussions) mus
 
 ### Why This Matters
 
-When a session transfers, the next AI can only access what was written to GitHub. `starting-session #N` restores context by fetching Issue comments via `shirokuma-docs issues comments {N}`, so the quality of GitHub writes directly affects session continuity.
+When a session transfers, the next AI can only access what was written to GitHub. Work summaries posted as Issue comments serve as the primary context for future conversations, so the quality of GitHub writes directly affects session continuity.
 
 ### Patterns to Avoid (Implicit References)
 
