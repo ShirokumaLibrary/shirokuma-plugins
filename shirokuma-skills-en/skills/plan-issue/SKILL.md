@@ -50,6 +50,11 @@ Investigate code related to the issue requirements.
 1. **Existing implementation**: Use Grep/Glob to identify related files
 2. **Dependencies**: Identify modules and tests affected by changes
 3. **Patterns**: Check for similar implementations in the codebase
+4. **Skill behavior change ripple check**: When the issue involves skill behavior changes (deprecation, responsibility change, behavioral modification), grep for the skill name across the following file categories and verify no descriptions based on the old behavior remain:
+   - `i18n/cli/{ja,en}.json` skill descriptions
+   - `plugin/*/rules/` skill responsibility descriptions
+   - `plugin/*/skills/*/reference/` descriptions referencing other skill behavior
+   - `plugin/specs/skills/*/evals/` evaluation scenarios
 
 ### Step 3: Create Plan
 

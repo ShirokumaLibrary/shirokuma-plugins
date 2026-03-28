@@ -43,3 +43,15 @@ Config files are all loaded in parallel into the same context. Relative directiv
 |-----|------|
 | "here", "this", "this file" | Use explicit file/section names |
 | "the above rule" | `branch-workflow rule` |
+
+## Workarounds Are Plugin Deficiency Signals
+
+When memory contains a workaround (e.g., "in case X, manually do Y"), it signals a deficiency in the plugin (skills, rules, agents). Memory is a temporary record, not a permanent workaround repository.
+
+**How to apply**: When creating feedback-type memories, if it's a problem the plugin should solve, record it as an Evolution signal and connect it to improvement proposals.
+
+## Memory Accumulation → Evolution Flow
+
+Information stored in memory should be treated as future input for updating agents and skills. When memories accumulate, use the `evolving-rules` skill to analyze them and turn them into improvement proposals.
+
+**Flow**: Save memory → detect accumulation → record as Evolution signal → analyze with `evolving-rules` → promote to skill/rule and delete memory.

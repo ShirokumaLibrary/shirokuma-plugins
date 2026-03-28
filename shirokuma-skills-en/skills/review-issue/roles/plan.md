@@ -64,6 +64,7 @@ Load these files for context:
 - [ ] No missing files (all changes inferred from requirements are included)
 - [ ] No extraneous files (no out-of-scope changes)
 - [ ] New files and existing file updates are clearly distinguished
+- [ ] When `src/` source files are being changed, corresponding `__tests__/` test files are included in the changed files list (including indirect references such as snapshot tests)
 
 ### Task Granularity
 - [ ] Each task is specific and actionable (not just "implement" but what and how)

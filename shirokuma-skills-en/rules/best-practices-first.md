@@ -72,6 +72,20 @@ Before delegating to a skill, accurately understand the issue requirements. Fric
 - Executing only some tasks from the plan and ignoring the rest
 - Taking the default approach without reviewing considerations
 
+## Design Principles
+
+### Config Simplicity First
+
+Keep user-facing config files (e.g., `shirokuma-docs.config.yaml`) simple. Do not expose internal strategy parameters (`fetchStrategy`, `repoPath`, `branch`, `stripLinePattern`, etc.) to the user.
+
+**When to apply**: When designing refactors or new features, before adding a config field, ask "does the user need to know this?" If it can be resolved automatically internally, don't expose it in config. Frame Issue goals around "improving user experience", not "improving internal structure".
+
+### Prioritize "Cannot Be Used Wrongly" Design
+
+Prefer "change the default behavior" over "add a flag" or "enforce by convention". Opt-in mechanisms (flags, extra calls, conventions) should be designed assuming they will be forgotten.
+
+**When to apply**: During feature design and planning, ask "can this design be used incorrectly?" Rather than enforcing correct usage through flags or conventions, make the default behavior correct so the system stays intact even when steps are forgotten. Include this perspective when delegating to plan-worker.
+
 ## Direct Handling OK
 
 Simple questions, minor config edits, fine-tuning skill results, confirmation dialogues.
