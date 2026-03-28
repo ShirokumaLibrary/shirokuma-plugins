@@ -83,8 +83,6 @@ researching-best-practices → [review-issue（research ロール）] → Discus
 調査結果は Research カテゴリの Discussion に保存する:
 
 ```bash
-shirokuma-docs discussions create \
-  --category Research \
-  --title "[Research] {トピック}" \
-  --body-file research-result.md
+# frontmatter に title: "[Research] {トピック}" と category: Research を設定してから実行
+shirokuma-docs items add discussion --file research-result.md
 ```

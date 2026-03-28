@@ -18,7 +18,7 @@ Register all chain steps via TaskCreate **before starting work**.
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Fetch issue and update status | Fetching issue and updating status | Manager direct: `shirokuma-docs show/update` |
+| 1 | Fetch issue and update status | Fetching issue and updating status | Manager direct: `shirokuma-docs items pull/push` |
 | 2 | [Conditional] Conduct research | Conducting research | `researching-best-practices` (subagent: `research-worker`) |
 | 3 | Create the plan | Creating the plan | `plan-issue` (subagent: `plan-worker`) |
 | 4 | Review the plan | Reviewing the plan | `review-issue` (subagent: `review-worker`) |
@@ -35,7 +35,8 @@ Update each step to `in_progress` at start and `completed` on finish via TaskUpd
 ### Step 1: Fetch Issue
 
 ```bash
-shirokuma-docs show {number}
+shirokuma-docs items pull {number}
+# → Read .shirokuma/github/{number}.md
 ```
 
 Review title, body, type, priority, size, labels, and comments.
@@ -157,7 +158,7 @@ If all checks pass, proceed to Step 6.
 
 #### Invoke the Reviewer
 
-Invoke `review-worker` with plan role via the Agent tool. `review-issue` will fetch the Issue body itself via `shirokuma-docs show {number}`.
+Invoke `review-worker` with plan role via the Agent tool. `review-issue` will fetch the Issue body itself via `shirokuma-docs items pull {number}`.
 
 ```text
 Agent(
@@ -312,7 +313,7 @@ At the end of the plan completion report, auto-record Evolution signals followin
 
 | Tool | When |
 |------|------|
-| Bash | `shirokuma-docs show/update/issues comment` |
+| Bash | `shirokuma-docs items pull/push/add comment` |
 | Agent (research-worker) | Step 2a: Conduct research (conditional, subagent, context isolation) |
 | Agent (plan-worker) | Step 3: Delegate plan creation (sub-agent, context isolation) |
 | Agent (review-worker) | Step 5: Plan review (subagent, context isolation) |

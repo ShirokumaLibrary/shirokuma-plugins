@@ -1,7 +1,7 @@
 {
   "name": "shirokuma-infra-ja",
   "description": "ローカル開発インフラ（docker-compose・スクリプト）運用スキル（Claude Code 用）",
-  "version": "0.3.0-alpha.66",
+  "version": "0.3.0-alpha.67",
   "author": {
     "name": "ShirokumaLibrary"
   },

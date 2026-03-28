@@ -67,7 +67,7 @@ shirokuma-docs issues list --issue-type Evolution --limit 1
 
 ### Body Template for New Issues
 
-If 0 issues found, write the following to `/tmp/shirokuma-docs/evolution.md` and create via `issues create --from-file`:
+If 0 issues found, write the following to `/tmp/shirokuma-docs/evolution.md` and create via `items add issue --file`:
 
 ```markdown
 ---

@@ -126,15 +126,13 @@ CDK コードを読み込み、レビュー観点テーブルを適用する。
 
 PR コンテキストがある場合:
 ```bash
-shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/review-aws.md
+shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/review-aws.md
 ```
 
 PR コンテキストがない場合:
 ```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Review] aws: {target}" \
-  --body-file /tmp/shirokuma-docs/review-aws.md
+# frontmatter に title: "[Review] aws: {target}" と category: Reports を設定してから実行
+shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-aws.md
 ```
 
 ## レビュー結果の判定

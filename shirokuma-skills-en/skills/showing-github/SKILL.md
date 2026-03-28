@@ -238,7 +238,8 @@ Past session handover information.
 shirokuma-docs discussions list --category Handovers --limit {count}
 
 # Get specific handover
-shirokuma-docs show {number}
+shirokuma-docs items pull {number}
+# → Read .shirokuma/github/{number}.md
 
 # From local files (fallback)
 ls -t .claude/sessions/*-handover.md 2>/dev/null | head -{count}

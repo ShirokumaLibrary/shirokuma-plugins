@@ -40,7 +40,8 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 
 2. 関連 Issue がある場合、Issue の計画を参照してコンテキストを把握:
    ```bash
-   shirokuma-docs show {issue-number}
+   shirokuma-docs items pull {issue-number}
+   # → .shirokuma/github/{issue-number}.md を Read ツールで読み込む
    ```
 3. PR の diff を確認:
    ```bash
@@ -55,7 +56,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
    - `Closes #N` / `Fixes #N` / `Refs #N` / `References #N` パターンに一致するものは linked issues として除外する
    - `## Summary` / `## 概要` セクション内の残りの `#N` 参照、または `## Artifacts` / `## 成果物` セクション内の `#N` 参照を成果物候補とする
    - 成果物候補が 0 件の場合 → 成果物レビューをスキップ（従来通り diff のみレビュー）
-   - 成果物候補がある場合 → `shirokuma-docs show {N}` で Discussion / Issue / PR を判別し、Discussion と Issue のみをレビュー対象とする
+   - 成果物候補がある場合 → `shirokuma-docs items pull {N}` でキャッシュし、`.shirokuma/github/{N}.md` の frontmatter `type` フィールドで Discussion / Issue / PR を判別し、Discussion と Issue のみをレビュー対象とする
    - **上限**: 成果物は最大 10 件まで。超過時は最初の 10 件のみレビューし、警告を出力する
 
    **成果物候補リスト** として記録する（形式: `#N (Discussion)`, `#N (Issue)` 等）
@@ -230,7 +231,7 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
 
 1. **コメント編集**: 誤りのあるコメントを修正
    ```bash
-   shirokuma-docs issues comment-edit {comment-id} --body-file /tmp/shirokuma-docs/{number}-updated.md
+   shirokuma-docs items push {number} {comment-id}
    ```
 2. **返信**: 修正した旨をスレッドに返信
 3. **解決**: スレッドを解決
@@ -250,7 +251,7 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
 コード修正を含むスレッド対応が完了した後、対応全体のサマリーを PR コメントとして投稿する。レビュアーが PR 上で全対応履歴を追跡できるようにするため。
 
 ```bash
-shirokuma-docs comment {PR#} --body-file /tmp/shirokuma-docs/pr-{PR#}-review-response.md
+shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/pr-{PR#}-review-response.md
 ```
 
 `/tmp/shirokuma-docs/pr-{PR#}-review-response.md` の内容:

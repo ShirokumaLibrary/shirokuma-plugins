@@ -87,7 +87,7 @@ shirokuma-docs projects workflows
 |------|---------|------|
 | コメント追加 | `items add comment {number} --file {file}` | Issue/Discussion 両対応、キャッシュ自動保存 |
 | コメント一覧 | `issues comments {number}` | JSON 出力 |
-| コメント編集 | `issues comment-edit {comment-id}` | Issue/PR 両対応、`--body-file` でファイル/stdin 指定 |
+| コメント編集 | `items push {number} {comment-id}` | キャッシュ編集 → push のワークフロー |
 
 ## アイテム作成
 
@@ -100,7 +100,7 @@ shirokuma-docs projects workflows
 
 ### 初期ステータスガイドライン
 
-`issues create` はデフォルトで Status を **Backlog** に設定する。必要に応じて `--field-status` でオーバーライド:
+`items add issue` はデフォルトで Status を **Backlog** に設定する。frontmatter の `status` フィールドでオーバーライド可能:
 
 | シナリオ | ステータス |
 |---------|----------|

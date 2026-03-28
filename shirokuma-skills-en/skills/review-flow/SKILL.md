@@ -40,7 +40,8 @@ Takes a PR number and performs code review execution (via `review-issue` Agent /
 
 2. If a related Issue exists, reference its plan for context:
    ```bash
-   shirokuma-docs show {issue-number}
+   shirokuma-docs items pull {issue-number}
+   # → Read .shirokuma/github/{issue-number}.md
    ```
 3. Review the PR diff:
    ```bash
@@ -55,7 +56,7 @@ Takes a PR number and performs code review execution (via `review-issue` Agent /
    - Exclude references matching `Closes #N` / `Fixes #N` / `Refs #N` / `References #N` patterns as linked issues
    - The remaining `#N` references in the `## Summary` / `## 概要` section, or any `#N` references in the `## Artifacts` / `## 成果物` section, become artifact candidates
    - If 0 artifact candidates → skip artifact review (diff-only review as before)
-   - If artifact candidates exist → use `shirokuma-docs show {N}` to identify Discussion / Issue / PR type, and include only Discussions and Issues as review targets
+   - If artifact candidates exist → use `shirokuma-docs items pull {N}` to cache and read `.shirokuma/github/{N}.md` frontmatter `type` field to identify Discussion / Issue / PR type, and include only Discussions and Issues as review targets
    - **Limit**: Up to 10 artifacts maximum. If exceeded, review only the first 10 and output a warning
 
    Record as **artifact candidate list** (format: `#N (Discussion)`, `#N (Issue)`, etc.)
@@ -230,7 +231,7 @@ Process code fix threads together. Delegate fixes to `code-issue` via Skill tool
 
 1. **Edit comment**: Fix the erroneous comment
    ```bash
-   shirokuma-docs issues comment-edit {comment-id} --body-file /tmp/shirokuma-docs/{number}-updated.md
+   shirokuma-docs items push {number} {comment-id}
    ```
 2. **Reply**: Reply noting the correction
 3. **Resolve**: Resolve the thread
@@ -250,7 +251,7 @@ Process code fix threads together. Delegate fixes to `code-issue` via Skill tool
 After completing thread responses that include code fixes, post a summary comment to the PR so that reviewers can track all response actions within the PR history.
 
 ```bash
-shirokuma-docs comment {PR#} --body-file /tmp/shirokuma-docs/pr-{PR#}-review-response.md
+shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/pr-{PR#}-review-response.md
 ```
 
 Content of `/tmp/shirokuma-docs/pr-{PR#}-review-response.md`:

@@ -122,15 +122,13 @@ grep -r "aws-actions/configure-aws-credentials" .github/workflows/ | head -10
 
 PR コンテキストがある場合:
 ```bash
-shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/review-cicd.md
+shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/review-cicd.md
 ```
 
 PR コンテキストがない場合:
 ```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Review] cicd: {target}" \
-  --body-file /tmp/shirokuma-docs/review-cicd.md
+# frontmatter に title: "[Review] cicd: {target}" と category: Reports を設定してから実行
+shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-cicd.md
 ```
 
 ## レビュー結果の判定

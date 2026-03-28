@@ -56,7 +56,7 @@ git push -u origin {branch-name}
 
 #### サブ Issue の自動検出
 
-`shirokuma-docs show {number}` の出力に `parentIssue` フィールドがあれば、その Issue はサブ Issue:
+`.shirokuma/github/{number}.md` の frontmatter に `parentIssue` フィールドがあれば、その Issue はサブ Issue:
 
 ```yaml
 parentIssue:
@@ -70,7 +70,7 @@ parentIssue:
 
 サブ Issue を検出した場合、以下の順序で integration ブランチを決定する:
 
-1. **親 Issue の本文から抽出**: `shirokuma-docs show {parent-number}` で親 Issue を取得し、`### Integration ブランチ`（JA）/ `### Integration Branch`（EN）ヘッディングを探す。直後のバッククォート内のブランチ名を採用（プレフィックスは `epic/`, `chore/`, `feat/` 等任意）
+1. **親 Issue の本文から抽出**: `shirokuma-docs items pull {parent-number}` で親 Issue を取得し `.shirokuma/github/{parent-number}.md` を Read ツールで読み込む。`### Integration ブランチ`（JA）/ `### Integration Branch`（EN）ヘッディングを探す。直後のバッククォート内のブランチ名を採用（プレフィックスは `epic/`, `chore/`, `feat/` 等任意）
 2. **フォールバック（リモートブランチ検索）**: `git branch -r --list "origin/*/{parent-number}-*"` で検索
    - 1件マッチ → 自動採用
    - 複数マッチ → 最初のマッチを採用し、結果に代替候補を記載

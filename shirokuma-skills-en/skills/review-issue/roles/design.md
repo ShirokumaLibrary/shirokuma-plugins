@@ -27,7 +27,7 @@ Load these files for context:
 
 ```
 1. Role selection: "design review" or design-related Issue
-2. Fetch Issue body: shirokuma-docs show {number}
+2. Fetch Issue body: shirokuma-docs items pull {number} (→ Read .shirokuma/github/{number}.md)
 3. Lint execution: Skip (target is not code files)
 4. Design analysis: Review Design Brief, Aesthetic Direction, UI implementation
 5. Report generation: Template format

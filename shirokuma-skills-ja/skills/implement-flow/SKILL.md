@@ -47,11 +47,11 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 
 ### ステップ 1: 作業の分析
 
-**Issue 番号あり**: `shirokuma-docs show {number}` で取得し、title/body/labels/status/priority/size を抽出。
+**Issue 番号あり**: `shirokuma-docs items pull {number}` で取得し、`.shirokuma/github/{number}.md` を Read ツールで読み込んで title/body/labels/status/priority/size を抽出。
 
 #### サブ Issue 検出
 
-`shirokuma-docs show {number}` の出力に `parentIssue` フィールドがある場合、サブ Issue モードで動作する:
+`.shirokuma/github/{number}.md` の frontmatter に `parentIssue` フィールドがある場合、サブ Issue モードで動作する:
 
 1. 親 Issue の `## 計画` セクションを参照し、全体コンテキストを把握
 2. ベースブランチを `develop` ではなく親の integration ブランチに設定（ステップ 3 参照）
@@ -59,7 +59,8 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 
 ```bash
 # 親 Issue の確認
-shirokuma-docs show {parent-number}
+shirokuma-docs items pull {parent-number}
+# → .shirokuma/github/{parent-number}.md を Read ツールで読み込む
 ```
 
 #### 計画済み判定（Issue 番号ありの場合）
@@ -74,7 +75,7 @@ Issue 本文に `## 計画` セクション（`^## 計画` で前方一致検出
 
 #### 計画詳細コメントの取得
 
-`## 計画` セクションに `> 詳細: {URL}` 形式のコメントリンクがある場合、計画の詳細はそのコメントに記載されている。`shirokuma-docs show` の出力にはコメントが含まれないため、明示的にコメントを取得して計画詳細を把握する:
+`## 計画` セクションに `> 詳細: {URL}` 形式のコメントリンクがある場合、計画の詳細はそのコメントに記載されている。`items pull` では本文とコメントがキャッシュに書き込まれるため、`.shirokuma/github/{number}/` 配下のコメントファイルを直接参照して計画詳細を把握する。コメントが未取得の場合は以下を実行して明示的に取得する:
 
 ```bash
 # コメントリンクがある場合のみ実行
@@ -318,7 +319,7 @@ Issue 番号ありの場合に Status を Review に更新（キャッシュの 
 shirokuma-docs items push {number}
 ```
 
-**Status フォールバック検証**: チェーン完了後、`shirokuma-docs show {number}` で Status を確認。In Progress のまま → キャッシュの `status` を `"Review"` に書き換えて `shirokuma-docs items push {number}` で更新（冪等: 既に Review なら再更新は無害）。
+**Status フォールバック検証**: チェーン完了後、`.shirokuma/github/{number}.md` の frontmatter を Read ツールで確認。status が In Progress のまま → キャッシュの `status` を `"Review"` に書き換えて `shirokuma-docs items push {number}` で更新（冪等: 既に Review なら再更新は無害）。
 
 #### 次のステップ提案（チェーン末尾）
 
@@ -470,7 +471,7 @@ claude -p "/implement-flow --headless #42"
 
 ### 責務に関する注記
 
-このフローでのサブ Issue 作成は `shirokuma-docs issues create` を直接使用する（`creating-item` ではない）。計画でサブ Issue の詳細が確定済みのため、`creating-item` の推論ロジックは不要。
+このフローでのサブ Issue 作成は `shirokuma-docs items add issue` を直接使用する（`creating-item` ではない）。計画でサブ Issue の詳細が確定済みのため、`creating-item` の推論ロジックは不要。
 
 ## ルール参照
 

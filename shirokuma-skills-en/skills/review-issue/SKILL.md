@@ -237,7 +237,7 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 
 **Plan role:**
 
-1. Fetch Issue body via `shirokuma-docs show {number}`
+1. Fetch Issue body via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{number}.md`
 2. Extract `## Plan` / `## 計画` section
 3. Evaluate each item in review checklist (`roles/plan.md`)
 4. Check against anti-patterns
@@ -245,7 +245,7 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 
 **Design role:**
 
-1. Fetch Issue body via `shirokuma-docs show {number}`
+1. Fetch Issue body via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{number}.md`
 2. Extract Design Brief, Aesthetic Direction, and UI implementation results
 3. Evaluate each item in review checklist (`roles/design.md`)
 4. Check against review criteria (`criteria/design.md`)
@@ -265,7 +265,7 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 
 For each `#N` listed in the "Artifact review targets:" / "成果物レビュー対象:" section of the prompt:
 
-1. Fetch the Discussion or Issue body via `shirokuma-docs show {N}`
+1. Fetch the Discussion or Issue body via `shirokuma-docs items pull {N}` and read `.shirokuma/github/{N}.md`
 2. Apply the "GitHub Document Review Perspectives" from `roles/code.md`:
    - Format compliance (format appropriate for the Discussion category)
    - YAML frontmatter leakage check (metadata starting with `---` must not appear in the body)

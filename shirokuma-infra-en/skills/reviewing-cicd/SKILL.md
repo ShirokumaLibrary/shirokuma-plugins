@@ -122,15 +122,13 @@ Priority check order:
 
 When PR context is present:
 ```bash
-shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/review-cicd.md
+shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/review-cicd.md
 ```
 
 When no PR context:
 ```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Review] cicd: {target}" \
-  --body-file /tmp/shirokuma-docs/review-cicd.md
+# Set title: "[Review] cicd: {target}" and category: Reports in frontmatter first
+shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-cicd.md
 ```
 
 ## Review Verdict

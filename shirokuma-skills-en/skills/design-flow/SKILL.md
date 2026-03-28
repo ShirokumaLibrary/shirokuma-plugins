@@ -34,7 +34,8 @@ Update each step to `in_progress` at start and `completed` on finish via TaskUpd
 Confirm issue number via `AskUserQuestion` or obtain from arguments. Fetch the issue to understand the plan section and design requirements.
 
 ```bash
-shirokuma-docs show {number}
+shirokuma-docs items pull {number}
+# → Read .shirokuma/github/{number}.md
 ```
 
 | Field | Required | Content |

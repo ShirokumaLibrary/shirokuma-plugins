@@ -85,9 +85,9 @@ Comment operation CLI commands:
 
 | Operation | Command | Notes |
 |-----------|---------|-------|
-| Add comment | `issues comment {number}` | Works for Issues and PRs |
+| Add comment | `items add comment {number} --file {file}` | Works for Issues and PRs/Discussions, auto-saves to cache |
 | List comments | `issues comments {number}` | JSON output |
-| Edit comment | `issues comment-edit {comment-id}` | Works for Issues and PRs, `--body-file` accepts file/stdin |
+| Edit comment | `items push {number} {comment-id}` | Cache-edit → push workflow |
 
 ## Creating Items
 
@@ -100,7 +100,7 @@ When creating new items:
 
 ### Initial Status Guidelines
 
-`issues create` automatically sets Status to **Backlog** by default. Override with `--field-status` when needed:
+`items add issue` automatically sets Status to **Backlog** by default. Override with `status` frontmatter field when needed:
 
 | Scenario | Status |
 |----------|--------|

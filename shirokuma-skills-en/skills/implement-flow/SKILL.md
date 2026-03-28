@@ -27,7 +27,7 @@ Register **all chain steps** via TaskCreate **before starting work**.
 | 3 | Create pull request | Creating pull request | `open-pr-issue` (subagent) |
 | 4 | Simplify and improve code | Improving code | `/simplify` (Skill tool) |
 | 5 | Run security review | Running security review | `reviewing-security` (Skill tool) |
-| 6 | Post work summary | Posting work summary | Manager direct: `issues comment` |
+| 6 | Post work summary | Posting work summary | Manager direct: `items add comment` |
 | 7 | Update Status to Review | Updating Status to Review | Manager direct: `issues update` |
 
 Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5, step 7 blockedBy 6.
@@ -47,11 +47,11 @@ Use TaskUpdate to set each step to `in_progress` when starting and `completed` w
 
 ### Step 1: Analyze Work
 
-**Issue number provided**: `shirokuma-docs show {number}` to fetch title/body/labels/status/priority/size.
+**Issue number provided**: `shirokuma-docs items pull {number}` to fetch and cache, then read `.shirokuma/github/{number}.md` to extract title/body/labels/status/priority/size.
 
 #### Sub-Issue Detection
 
-When `shirokuma-docs show {number}` output contains a `parentIssue` field, the issue is a sub-issue of an epic:
+When `.shirokuma/github/{number}.md` frontmatter contains a `parentIssue` field, the issue is a sub-issue of an epic:
 
 1. Reference the parent issue's `## Plan` section to understand overall context
 2. Set base branch to the parent's integration branch instead of `develop` (Step 3)
@@ -59,7 +59,8 @@ When `shirokuma-docs show {number}` output contains a `parentIssue` field, the i
 
 ```bash
 # Check parent issue
-shirokuma-docs show {parent-number}
+shirokuma-docs items pull {parent-number}
+# → Read .shirokuma/github/{parent-number}.md
 ```
 
 #### Plan Check (when issue number provided)
@@ -74,12 +75,7 @@ Check if issue body contains `## Plan` section (detected by `^## Plan` line pref
 
 #### Fetching Plan Detail Comment
 
-When the `## Plan` section contains a `> Details: {URL}` comment link, the full plan details are in that comment. Since `shirokuma-docs show` does not include comments, fetch them explicitly to understand the plan detail:
-
-```bash
-# Only when comment link exists in ## Plan section
-shirokuma-docs show {number}
-```
+When the `## Plan` section contains a `> Details: {URL}` comment link, the full plan details are in that comment. `items pull` caches both the body and comments, so check `.shirokuma/github/{number}/` directory for comment files. If not yet cached, run the following to fetch explicitly:
 
 Identify the comment containing the plan details from the retrieved comments and pass it as context to the implementation skill.
 
@@ -318,7 +314,7 @@ shirokuma-docs items push {number}
 
 (Cache frontmatter `status` should be set to `"Review"` before push.)
 
-**Status fallback verification**: After chain completion, check Status via `shirokuma-docs show {number}`. If still In Progress → edit cache frontmatter `status: "Review"` and `shirokuma-docs items push {number}` (idempotent: re-updating to Review when already Review is harmless).
+**Status fallback verification**: After chain completion, read `.shirokuma/github/{number}.md` frontmatter to check status. If still In Progress → edit cache frontmatter `status: "Review"` and `shirokuma-docs items push {number}` (idempotent: re-updating to Review when already Review is harmless).
 
 #### Next Steps Suggestion (End of Chain)
 

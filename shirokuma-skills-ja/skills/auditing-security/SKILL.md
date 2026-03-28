@@ -12,7 +12,7 @@ allowed-tools: Read, Bash, Glob, Grep
 
 - **カテゴリ:** 調査系ワーカー
 - **スコープ:** `shirokuma-docs lint security` による脆弱性スキャン（Bash 読み取り系コマンド）、結果の分析・優先度付け、セキュリティレポートの生成、Issue 作成候補の提示。
-- **スコープ外:** 依存パッケージの自動更新、ユーザー確認なしの Issue 自動作成。Issue 作成はユーザー確認後に CLI（`shirokuma-docs issues create`）経由で実行する
+- **スコープ外:** 依存パッケージの自動更新、ユーザー確認なしの Issue 自動作成。Issue 作成はユーザー確認後に CLI（`shirokuma-docs items add issue`）経由で実行する
 
 > **Bash 例外**: `shirokuma-docs lint security` および `shirokuma-docs search` 等の読み取り・検索コマンドは許可。パッケージ更新コマンド（`pnpm update` 等）は禁止。
 
@@ -102,11 +102,13 @@ shirokuma-docs search "{package-name} vulnerability"
 ユーザーの確認を得てから Issue を作成する。スキルは自動で Issue を作成しない。
 
 ```bash
-shirokuma-docs issues create \
-  --title "security: {package-name} に {severity} 脆弱性 ({cve})" \
-  --body-file /tmp/shirokuma-docs/security-issue.md \
-  --field-priority "High" \
-  --field-size "S"
+# frontmatter 付き Markdown を準備してから実行
+# /tmp/shirokuma-docs/security-issue.md の frontmatter に以下を設定:
+# title: "security: {package-name} に {severity} 脆弱性 ({cve})"
+# type: Bug
+# priority: High
+# size: S
+shirokuma-docs items add issue --file /tmp/shirokuma-docs/security-issue.md
 ```
 
 Issue 本文テンプレート:

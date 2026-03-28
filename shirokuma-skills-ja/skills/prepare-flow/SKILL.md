@@ -18,7 +18,7 @@ Issue の計画フェーズを統括する: Issue の取得、ステータス遷
 
 | # | content | activeForm | スキル |
 |---|---------|------------|--------|
-| 1 | Issue を取得しステータスを更新する | Issue を取得しステータスを更新中 | マネージャー直接: `shirokuma-docs show/update` |
+| 1 | Issue を取得しステータスを更新する | Issue を取得しステータスを更新中 | マネージャー直接: `shirokuma-docs items pull/push` |
 | 2 | [条件付き] リサーチを実施する | リサーチを実施中 | `researching-best-practices` (subagent: `research-worker`) |
 | 3 | 計画を作成する | 計画を作成中 | `plan-issue` (subagent: `plan-worker`) |
 | 4 | 計画をレビューする | 計画をレビュー中 | `review-issue` (subagent: `review-worker`) |
@@ -35,7 +35,8 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 ### ステップ 1: Issue 取得
 
 ```bash
-shirokuma-docs show {number}
+shirokuma-docs items pull {number}
+# → .shirokuma/github/{number}.md を Read ツールで読み込む
 ```
 
 title, body, type, priority, size, labels, コメントを確認。
@@ -45,12 +46,10 @@ title, body, type, priority, size, labels, コメントを確認。
 Issue のステータスが Backlog の場合、Preparing に遷移して計画開始を記録する。同時にユーザーを自動アサインする。
 
 ```bash
-# items pull でキャッシュを取得してから frontmatter の status を書き換えて push
+# items pull でキャッシュを取得してから frontmatter を書き換えて push
 shirokuma-docs items pull {number}
-# .shirokuma/github/{number}.md の status: フィールドを "Preparing" に変更
+# .shirokuma/github/{number}.md の status: を "Preparing"、assignees: に [@me のログイン名] を設定
 shirokuma-docs items push {number}
-# アサインは issues update で継続使用（items push は --add-assignee をサポートしないため）
-shirokuma-docs issues update {number} --add-assignee @me
 ```
 
 既に Preparing / Spec Review の場合はステータス更新をスキップ。アサインは冪等なので常に実行する。
@@ -160,7 +159,7 @@ plan-worker が正常に完了したらステップ 5（計画レビュー）へ
 
 #### レビュアーの呼び出し
 
-Agent ツールで `review-worker` を plan ロールで起動する。`review-issue` が自身で `shirokuma-docs show {number}` を実行して Issue 本文を取得する。
+Agent ツールで `review-worker` を plan ロールで起動する。`review-issue` が自身で `shirokuma-docs items pull {number}` を実行して Issue 本文を取得する。
 
 ```text
 Agent(
@@ -328,7 +327,7 @@ shirokuma-docs items push {number}
 
 | ツール | タイミング |
 |--------|-----------|
-| Bash | `shirokuma-docs show/update/issues comment` |
+| Bash | `shirokuma-docs items pull/push/add comment` |
 | Agent (research-worker) | ステップ 2a: リサーチ実施（条件付き、サブエージェント、コンテキスト分離） |
 | Agent (plan-worker) | ステップ 3: 計画作成の委任（サブエージェント、コンテキスト分離） |
 | Agent (review-worker) | ステップ 5: 計画レビュー（サブエージェント、コンテキスト分離） |

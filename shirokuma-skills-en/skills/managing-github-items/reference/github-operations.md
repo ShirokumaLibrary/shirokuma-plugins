@@ -39,10 +39,10 @@ Project naming convention: Project name = repository name (e.g., `blogcms` repo 
 | `#number` | No | Yes (`#123`) |
 | External reference | No | Yes |
 | Comments | No | Yes |
-| Create command | `projects create` | `issues create` |
+| Create command | `projects create` | `items add issue` |
 | Use case | Lightweight memo | Full task |
 
-**Recommendation**: Use `issues create` by default for `#number` support.
+**Recommendation**: Use `items add issue` by default for `#number` support.
 
 ## shirokuma-docs CLI Reference
 
@@ -54,14 +54,14 @@ Prefer shirokuma-docs CLI over direct `gh` commands. Config in `shirokuma-docs.c
 shirokuma-docs issues list                          # Open issues
 shirokuma-docs issues list --all                    # Include closed
 shirokuma-docs issues list --status "In Progress"   # Filter by status
-shirokuma-docs show {number}                  # Details
+shirokuma-docs items pull {number}                   # Fetch details and cache (→ Read .shirokuma/github/{number}.md)
 shirokuma-docs items add issue --file /tmp/shirokuma-docs/new-issue.md  # Metadata + body in one file
 shirokuma-docs items push {number}                                       # Update (edit cache frontmatter then push)
-shirokuma-docs issues update {number} --add-label "area:cli"       # Add label (items push does not support labels yet)
-shirokuma-docs issues update {number} --remove-label "area:docs"   # Remove label (items push does not support labels yet)
+# Add/remove labels: items pull → edit frontmatter labels field → items push {number}
+# Add/remove assignees: items pull → edit frontmatter assignees field → items push {number}
 shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-comment.md
 shirokuma-docs issues comments {number}                 # List comments
-shirokuma-docs issues comment-edit {comment-id} --body-file /tmp/shirokuma-docs/comment.md  # Works for Issue/PR comments
+shirokuma-docs items push {number} {comment-id}         # Edit comment (cache-edit → push)
 shirokuma-docs issues close {number}
 shirokuma-docs issues reopen {number}
 ```
@@ -99,7 +99,7 @@ shirokuma-docs projects update {number} --field-status "Done"
 
 ```bash
 shirokuma-docs discussions list --category Handovers --limit 5
-shirokuma-docs show {number}
+shirokuma-docs items pull {number}   # Fetch details and cache (→ Read .shirokuma/github/{number}.md)
 shirokuma-docs items add discussion --file /tmp/shirokuma-docs/discussion.md  # Metadata + body in one file
 ```
 
@@ -137,10 +137,10 @@ gh auth status
 
 | Pattern | Commands | Reason |
 |---------|----------|--------|
-| `--from-file` recommended | `issues create`, `pr create`, `discussions create` | Metadata + body in one file, prevents flag combination errors |
-| `--body-file` kept | `issues comment`, `pr reply`, `issues comment-edit`, `session end` | Body only, no metadata needed |
-| `--body-file` kept | `issues update` (body-only update) | `--body-file` is sufficient for rewriting existing Issue body |
-| `--from-file` also | `issues update` (metadata + body bulk update) | Round-trip: `--to-file` → edit → `--from-file` |
+| `items add` recommended | `items add issue`, `items add discussion` | Metadata + body in one file, prevents flag combination errors |
+| `--body-file` kept | `pr reply`, `session end` | Body only, no metadata needed |
+| `items push` recommended | Status/body/title/labels/assignees update | Cache-edit → push consistent workflow |
+| `issues update` continued | title/state/issueType changes | Updates not covered by `items push` (e.g. milestone, issue type) |
 
 ### `--from-file` Frontmatter Format
 
@@ -160,9 +160,9 @@ Safe frontmatter fields vary by command:
 
 | Command | Safe Fields |
 |---------|-------------|
-| `issues create` / `issues update` | `title`, `type`, `priority`, `size`, `labels` |
+| `items add issue` / `issues update` | `title`, `type`, `priority`, `size`, `labels` |
 | `pr create` | `title`, `base`, `head` |
-| `discussions create` | `title`, `category` |
+| `items add discussion` | `title`, `category` |
 
 CLI flags take precedence when set. `--from-file` and `--body-file` are mutually exclusive (error if both specified).
 

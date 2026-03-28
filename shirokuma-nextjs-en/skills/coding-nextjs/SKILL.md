@@ -63,10 +63,8 @@ Based on implementation feedback:
 ### Step 4: Report Generation
 
 ```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Implementation] {feature-name}" \
-  --body-file report.md
+# Set title: "[Implementation] {feature-name}" and category: Reports in frontmatter first
+shirokuma-docs items add discussion --file report.md
 ```
 
 ### Step 5: Portal Update (for significant changes)

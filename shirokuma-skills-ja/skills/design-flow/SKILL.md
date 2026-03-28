@@ -34,7 +34,8 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 Issue 番号を `AskUserQuestion` で確認するか、引数から取得する。Issue を取得して計画セクションとデザイン要件を把握する。
 
 ```bash
-shirokuma-docs show {number}
+shirokuma-docs items pull {number}
+# → .shirokuma/github/{number}.md を Read ツールで読み込む
 ```
 
 | フィールド | 必須 | 内容 |

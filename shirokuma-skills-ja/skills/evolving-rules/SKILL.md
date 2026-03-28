@@ -28,8 +28,8 @@ shirokuma-docs issues list --issue-type Evolution --limit 10
 Issue が見つかったら、コメントを含む詳細を取得:
 
 ```bash
-shirokuma-docs show {number}
-shirokuma-docs issues comments {number}
+shirokuma-docs items pull {number}
+# → .shirokuma/github/{number}.md と .shirokuma/github/{number}/ 配下のコメントファイルを Read ツールで読み込む
 ```
 
 **シグナルがない場合**: 「Evolution シグナルがまだ蓄積されていません。日常作業中にシグナルを記録してください。」と報告して終了。

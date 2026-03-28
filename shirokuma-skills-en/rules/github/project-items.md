@@ -92,7 +92,7 @@ AI MUST update issue status at these points:
 
 | Trigger | Action | Owner | Command |
 |---------|--------|-------|---------|
-| Preparing started | → Preparing + assign | `prepare-flow` | `items pull {n}` → edit frontmatter → `items push {n}` + `--add-assignee @me` |
+| Preparing started | → Preparing + assign | `prepare-flow` | `items pull {n}` → edit frontmatter `status` + `assignees` → `items push {n}` |
 | Plan created | → Spec Review | `prepare-flow` | frontmatter `status: "Spec Review"` → `items push {n}` |
 | User approves plan, starts work | → In Progress + branch | `implement-flow` | frontmatter `status: "In Progress"` → `items push {n}` |
 | PR creation complete | → Review | `open-pr-issue` | frontmatter `status: "Review"` → `items push {n}` |
@@ -156,7 +156,7 @@ Plan details are posted as a comment, and only a summary link is written to the 
 | Standard | Summary link only | Plan details (approach, target files, task breakdown) |
 | Detailed / Epic | Summary link only | Plan details (approach, target files, task breakdown, risks, etc.) |
 
-> `review-issue` accesses the detailed plan from the link in the body retrieved via `shirokuma-docs show {number}`.
+> `review-issue` accesses the detailed plan from the link in the body retrieved via `shirokuma-docs items pull {number}` (cached to `.shirokuma/github/{number}.md`).
 
 ### Getting the Comment URL
 
@@ -211,18 +211,18 @@ Epic status management, built-in automations, label details, item body maintenan
 
 ## Comment Retrieval Convention When Reviewing Issues/PRs/Discussions
 
-### `show` vs Direct Subcommand Usage
+### `items pull` vs Direct Subcommand Usage
 
 | Command | Returns | Use case |
 |---------|---------|----------|
-| `shirokuma-docs show {number}` | Body + all comments | Content review, pre-implementation research |
+| `shirokuma-docs items pull {number}` | Body + all comments (cached) | Content review, pre-implementation research |
 | `shirokuma-docs issues show {number}` | Body only | Checking field values (Status/Priority, etc.) |
 | `shirokuma-docs pr show {number}` | Body only | PR metadata (branches, change counts, etc.) |
 | `shirokuma-docs discussions show {number}` | Body only | Discussion body only |
 
 ### Workflow That Assumes Full Comment Loading
 
-When AI reviews the content of an Issue/PR/Discussion, **use `shirokuma-docs show {number}` to retrieve all comments in one call**. This gives you:
+When AI reviews the content of an Issue/PR/Discussion, **use `shirokuma-docs items pull {number}` to cache comments, then read `.shirokuma/github/{number}.md` with the Read tool**. This gives you:
 
 - Issue: body + all comments (plan details, discussion history, blocker information)
 - PR: body + review comments + review threads + regular comments

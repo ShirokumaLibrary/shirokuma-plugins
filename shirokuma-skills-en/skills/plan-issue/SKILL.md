@@ -38,7 +38,8 @@ If any criterion matches a higher level, use that level.
 ### Step 1: Fetch Issue
 
 ```bash
-shirokuma-docs show {number}
+shirokuma-docs items pull {number}
+# → Read .shirokuma/github/{number}.md
 ```
 
 Review title, body, type, priority, size, labels, and comments.
@@ -89,7 +90,7 @@ After posting, use the returned `comment_url` in the next step.
 
 ### Step 4.5: Write Summary Link to Issue Body
 
-Write the plan summary link section to the Issue body. This enables `review-issue` to retrieve the plan link via `shirokuma-docs show {number}` and access the detailed comment.
+Write the plan summary link section to the Issue body. This enables `review-issue` to retrieve the plan link via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{number}.md` to access the detailed comment.
 
 Append a `## Plan` section to the existing issue body. Format:
 
@@ -106,7 +107,7 @@ Append a `## Plan` section to the existing issue body. Format:
 shirokuma-docs items push {number}
 ```
 
-**Important**: Preserve the existing body (overview, tasks, deliverables). **Append** the `## Plan` section. When using `shirokuma-docs show {number}` output as the base for the existing body, always strip the YAML frontmatter block (metadata enclosed in `---`) before writing.
+**Important**: Preserve the existing body (overview, tasks, deliverables). **Append** the `## Plan` section. When using `.shirokuma/github/{number}.md` content (from `items pull`) as the base for the existing body, always strip the YAML frontmatter block (metadata enclosed in `---`) before writing.
 
 > Plan section headings and content must comply with the `output-language` rule.
 

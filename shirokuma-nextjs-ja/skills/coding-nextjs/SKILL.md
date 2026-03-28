@@ -69,10 +69,8 @@ TaskCreate で進捗トラッカーを作成。
 **Reports カテゴリに Discussion を作成:**
 
 ```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Implementation] {feature-name}" \
-  --body-file report.md
+# frontmatter に title: "[Implementation] {feature-name}" と category: Reports を設定してから実行
+shirokuma-docs items add discussion --file report.md
 ```
 
 ### ステップ 5: ポータル更新（重要な変更の場合）

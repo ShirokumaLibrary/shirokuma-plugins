@@ -139,15 +139,13 @@ shirokuma-docs lint annotations -p . -f terminal
 
 PR コンテキストがある場合:
 ```bash
-shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/review-nextjs.md
+shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/review-nextjs.md
 ```
 
 PR コンテキストがない場合:
 ```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Review] next.js: {target}" \
-  --body-file /tmp/shirokuma-docs/review-nextjs.md
+# frontmatter に title: "[Review] next.js: {target}" と category: Reports を設定してから実行
+shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-nextjs.md
 ```
 
 ## レビュー結果の判定

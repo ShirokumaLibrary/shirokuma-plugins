@@ -46,19 +46,19 @@
     {
       "id": "gh-issue-view",
       "pattern": "gh issue view",
-      "reason": "Use `shirokuma-docs show <number>` instead of `gh issue view`.",
+      "reason": "Use `shirokuma-docs items pull <number>` instead of `gh issue view`.",
       "enabled": true
     },
     {
       "id": "gh-issue-create",
       "pattern": "gh issue create",
-      "reason": "Use `shirokuma-docs issues create` instead of `gh issue create`.",
+      "reason": "Use `shirokuma-docs items add issue` instead of `gh issue create`.",
       "enabled": true
     },
     {
       "id": "gh-issue-comment",
       "pattern": "gh issue comment",
-      "reason": "Use `shirokuma-docs comment <number>` instead of `gh issue comment`.",
+      "reason": "Use `shirokuma-docs items add comment <number> --file <file>` instead of `gh issue comment`.",
       "enabled": true
     },
     {

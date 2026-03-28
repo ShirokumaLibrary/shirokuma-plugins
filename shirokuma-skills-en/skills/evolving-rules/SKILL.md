@@ -28,8 +28,8 @@ shirokuma-docs issues list --issue-type Evolution --limit 10
 If an Issue is found, fetch details including comments:
 
 ```bash
-shirokuma-docs show {number}
-shirokuma-docs issues comments {number}
+shirokuma-docs items pull {number}
+# → Read .shirokuma/github/{number}.md and comment files in .shirokuma/github/{number}/
 ```
 
 **If no signals**: Report "No Evolution signals accumulated yet. Record signals during daily work." and exit.

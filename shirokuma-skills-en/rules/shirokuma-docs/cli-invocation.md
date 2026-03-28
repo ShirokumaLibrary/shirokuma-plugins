@@ -26,8 +26,8 @@ The following commands are handled internally by the `shirokuma-docs` CLI. Direc
 
 | Prohibited Command | CLI Alternative |
 |-------------------|----------------|
-| `gh issue list`, `gh issue view`, `gh issue create` | `shirokuma-docs issues list`, `show`, `issues create` |
-| `gh issue comment` | `shirokuma-docs issues comment` / `comment` |
+| `gh issue list`, `gh issue view`, `gh issue create` | `shirokuma-docs issues list`, `items pull {number}`, `items add issue` |
+| `gh issue comment` | `shirokuma-docs items add comment {number} --file {file}` |
 | `gh issue edit` | `shirokuma-docs issues update` |
 | `gh issue close` | `shirokuma-docs issues close` |
 | `gh pr create`, `gh pr view`, `gh pr list` | `shirokuma-docs pr create`, `pr show`, `pr list` |
@@ -44,7 +44,7 @@ gh issue view 42
 gh pr create --base develop --title "..."
 
 # OK: shirokuma-docs CLI
-shirokuma-docs show 42
+shirokuma-docs items pull 42
 shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
 ```
 

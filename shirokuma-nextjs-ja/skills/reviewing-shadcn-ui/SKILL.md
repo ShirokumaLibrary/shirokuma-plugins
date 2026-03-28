@@ -138,15 +138,13 @@ shirokuma-docs lint structure -p . -f terminal
 
 PR コンテキストがある場合:
 ```bash
-shirokuma-docs issues comment {PR#} --body-file /tmp/shirokuma-docs/review-shadcn-ui.md
+shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/review-shadcn-ui.md
 ```
 
 PR コンテキストがない場合:
 ```bash
-shirokuma-docs discussions create \
-  --category Reports \
-  --title "[Review] shadcn-ui: {target}" \
-  --body-file /tmp/shirokuma-docs/review-shadcn-ui.md
+# frontmatter に title: "[Review] shadcn-ui: {target}" と category: Reports を設定してから実行
+shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-shadcn-ui.md
 ```
 
 ## レビュー結果の判定

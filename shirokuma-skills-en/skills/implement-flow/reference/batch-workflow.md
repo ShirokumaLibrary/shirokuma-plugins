@@ -44,7 +44,7 @@ Register all chain steps via TaskCreate:
    Type determination: single type → use it; mixed → `chore`.
 
 3. **Issue loop**: For each issue:
-   - Fetch issue details: `shirokuma-docs show {number}`
+   - Fetch issue details: `shirokuma-docs items pull {number}` (→ Read `.shirokuma/github/{number}.md`)
    - Execute implementation (delegate to `code-issue` subagent)
    - Quality checkpoint: verify changed files + run related tests
    - Track `filesByIssue` mapping for scoped commits

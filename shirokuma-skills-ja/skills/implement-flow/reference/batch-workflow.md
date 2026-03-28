@@ -46,7 +46,7 @@ TaskCreate で全チェーンステップを登録する:
    type の決定: 単一 type → その type。混在 → `chore`。
 
 3. **Issue ループ**: 各 Issue に対して:
-   - Issue 詳細取得: `shirokuma-docs show {number}`
+   - Issue 詳細取得: `shirokuma-docs items pull {number}`（→ `.shirokuma/github/{number}.md` を Read ツールで読み込む）
    - 実装実行（`code-issue` にサブエージェント委任）
    - 品質チェックポイント: 変更ファイル確認 + 関連テスト実行
    - `filesByIssue` マッピングを記録（スコープ付きコミット用）
