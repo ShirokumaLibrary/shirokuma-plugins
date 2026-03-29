@@ -57,7 +57,7 @@ git checkout -b hotfix/{issue-number}-{slug}
 
 # 3. Create PR to main
 git push -u origin hotfix/{issue-number}-{slug}
-shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
+shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md
 
 # 4. After merge to main, sync to develop
 git checkout develop
@@ -77,7 +77,7 @@ Releases are created by merging `develop` into `main`.
 
 ```bash
 # 1. Create PR from develop to main
-shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
+shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md
 
 # 2. After PR merge, tag the release
 git checkout main

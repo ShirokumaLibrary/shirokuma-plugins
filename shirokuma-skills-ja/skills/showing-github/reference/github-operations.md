@@ -71,39 +71,49 @@ shirokuma-docs items reopen {number}
 ### Pull Requests
 
 ```bash
-shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md             # メタデータ+本文を一括入力
-shirokuma-docs pr create --base main --head develop --title "release: v0.2.0"  # リリースワークフロー（メタデータのみ）
-shirokuma-docs pr list                                      # PR 一覧（デフォルト: open）
-shirokuma-docs pr list --state merged --limit 5            # フィルタリング
-shirokuma-docs pr list --head {branch-name}                # ブランチから PR を逆引き
-shirokuma-docs pr show {number}                             # PR 詳細（body, diff stats, linked issues）
-shirokuma-docs pr comments {number}                         # レビューコメント・スレッド
-shirokuma-docs pr merge {number} --squash                   # マージ + ステータス更新
-shirokuma-docs pr reply {number} --reply-to {id} --body-file - <<'EOF'
+shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md             # メタデータ+本文を一括入力
+shirokuma-docs items pr create --base main --head develop --title "release: v0.2.0"  # リリースワークフロー（メタデータのみ）
+shirokuma-docs items pr list                                      # PR 一覧（デフォルト: open）
+shirokuma-docs items pr list --state merged --limit 5            # フィルタリング
+shirokuma-docs items pr list --head {branch-name}                # ブランチから PR を逆引き
+shirokuma-docs items pr show {number}                             # PR 詳細（body, diff stats, linked issues）
+shirokuma-docs items pr comments {number}                         # レビューコメント・スレッド
+shirokuma-docs items pr merge {number} --squash                   # マージ + ステータス更新
+shirokuma-docs items pr reply {number} --reply-to {id} --body-file - <<'EOF'
 返信内容
 EOF
-shirokuma-docs pr resolve {number} --thread-id {id}        # スレッド解決
+shirokuma-docs items pr resolve {number} --thread-id {id}        # スレッド解決
 ```
 
-### Projects（低レベルアクセス）
+### Projects（アイテム操作）
 
 ```bash
-shirokuma-docs projects list                        # プロジェクトアイテム一覧
-shirokuma-docs projects fields                      # フィールドオプション表示
-shirokuma-docs projects add-issue {number}          # Issue をプロジェクトに追加
-shirokuma-docs projects create \
+shirokuma-docs items projects list                  # プロジェクトアイテム一覧
+shirokuma-docs items projects fields                # フィールドオプション表示
+shirokuma-docs items projects add-issue {number}    # Issue をプロジェクトに追加
+shirokuma-docs items projects create \
   --title "Title" --body-file /tmp/shirokuma-docs/body.md \
   --field-status "Backlog" --priority "Medium"               # DraftIssue
-shirokuma-docs projects get PVTI_xxx                # アイテム ID で取得
-shirokuma-docs projects update {number} --field-status "Done"
+shirokuma-docs items projects get PVTI_xxx          # アイテム ID で取得
+shirokuma-docs items projects update {number} --field-status "Done"
 ```
 
 ### Discussions
 
 ```bash
-shirokuma-docs discussions list --category Handovers --limit 5
+shirokuma-docs items discussions list --category Handovers --limit 5
+shirokuma-docs items discussions search "キーワード"         # Discussions 検索
+shirokuma-docs items search --type discussions "キーワード"  # items search 経由でも可
 shirokuma-docs items pull {number}   # 詳細取得・キャッシュ（→ .shirokuma/github/{number}.md を Read ツールで読み込む）
 shirokuma-docs items add discussion --file /tmp/shirokuma-docs/discussion.md  # メタデータ+本文を一括入力
+```
+
+### 横断検索
+
+```bash
+shirokuma-docs items search "キーワード"                          # Issues / PR 検索（デフォルト）
+shirokuma-docs items search --type discussions "キーワード"       # Discussions のみ
+shirokuma-docs items search --type issues,discussions "キーワード" # Issues + Discussions 横断
 ```
 
 ### Repository
@@ -140,7 +150,7 @@ gh auth status
 | `items add` 推奨 | `items add issue`, `items add discussion` | メタデータ+本文を1ファイルに集約、フラグ組み合わせミス防止 |
 | `items add comment` 推奨 | Issue/Discussion へのコメント追加 | キャッシュへの自動保存 + `comment_url` 返却 |
 | `items push` 推奨 | Status/body/title/labels/assignees 更新 | キャッシュ編集 → push の一貫したワークフロー |
-| `--body-file` 維持 | `pr reply`, `session end` | 本文のみでメタデータ不要な操作 |
+| `--body-file` 維持 | `items pr reply`, `session end` | 本文のみでメタデータ不要な操作 |
 | `items push` で統一 | title/state/issueType を含む全フィールド更新 | frontmatter 編集 → push のワークフロー |
 
 ### `--from-file` フロントマター形式
@@ -162,7 +172,7 @@ labels: [area:cli]
 | コマンド | 安全フィールド |
 |---------|--------------|
 | `items add issue` / `items push` | `title`, `type`, `priority`, `size`, `labels`, `state`, `state_reason`, `parent` |
-| `pr create` | `title`, `base`, `head` |
+| `items pr create` | `title`, `base`, `head` |
 | `items add discussion` | `title`, `category` |
 
 CLI フラグが設定済みの場合はフラグを優先。`--from-file` と `--body-file` は排他（同時指定でエラー）。

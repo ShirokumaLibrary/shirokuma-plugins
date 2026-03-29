@@ -31,15 +31,15 @@
 
 ```bash
 # キーワード検索
-shirokuma-docs discussions search "{keyword}"
+shirokuma-docs items discussions search "{keyword}"
 
 # カテゴリでフィルタ
-shirokuma-docs discussions list --category Knowledge
-shirokuma-docs discussions list --category Research
-shirokuma-docs discussions list --category ADR
+shirokuma-docs items discussions list --category Knowledge
+shirokuma-docs items discussions list --category Research
+shirokuma-docs items discussions list --category ADR
 
 # 最近の引き継ぎ（セッションコンテキスト用）
-shirokuma-docs discussions list --category Handovers --limit 5
+shirokuma-docs items discussions list --category Handovers --limit 5
 ```
 
 **検索するタイミング**:

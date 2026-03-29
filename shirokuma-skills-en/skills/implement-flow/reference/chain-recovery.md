@@ -36,7 +36,7 @@ Before recovery, identify where the chain stopped. Check the following in order:
 
 | Check | Command |
 |-------|---------|
-| Was a PR already created? | `gh pr list --head {branch}` (direct `gh` — `shirokuma-docs pr list` does not support branch filter) |
+| Was a PR already created? | `gh pr list --head {branch}` (direct `gh` — `shirokuma-docs items pr list` does not support branch filter) |
 | Are commits pushed to remote? | `git log --oneline origin/{branch}..HEAD` |
 
 **Idempotent**: Conditional — if the PR already exists, `open-pr-issue` will detect and skip creation. If not, it will create one.

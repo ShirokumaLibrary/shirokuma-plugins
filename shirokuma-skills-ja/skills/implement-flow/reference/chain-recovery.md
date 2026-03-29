@@ -36,7 +36,7 @@
 
 | 確認項目 | コマンド |
 |---------|---------|
-| PR がすでに作成されているか？ | `gh pr list --head {branch}`（直接 `gh` — `shirokuma-docs pr list` はブランチフィルタ未対応） |
+| PR がすでに作成されているか？ | `gh pr list --head {branch}`（直接 `gh` — `shirokuma-docs items pr list` はブランチフィルタ未対応） |
 | コミットがリモートにプッシュされているか？ | `git log --oneline origin/{branch}..HEAD` |
 
 **冪等性**: 条件付き — PR がすでに存在する場合、`open-pr-issue` は検出してスキップする。存在しない場合は新規作成する。

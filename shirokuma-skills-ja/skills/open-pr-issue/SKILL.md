@@ -108,7 +108,7 @@ Closes #{issue-number}
 ```
 
 ```bash
-shirokuma-docs pr create --from-file /tmp/shirokuma-docs/{number}-pr.md
+shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/{number}-pr.md
 ```
 
 **タイトルルール**: 70文字以内、プレフィックス(`feat:` 等)は英語、**それ以降は日本語**で記述する。Issue番号はタイトルに入れない。

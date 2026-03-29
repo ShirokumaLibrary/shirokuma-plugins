@@ -217,8 +217,8 @@ Epic status management, built-in automations, label details, item body maintenan
 |---------|---------|----------|
 | `shirokuma-docs items pull {number}` | Body + all comments (cached) | Content review, pre-implementation research |
 | `shirokuma-docs items pull {number}` | Body only | Checking field values (Status/Priority, etc.) |
-| `shirokuma-docs pr show {number}` | Body only | PR metadata (branches, change counts, etc.) |
-| `shirokuma-docs discussions show {number}` | Body only | Discussion body only |
+| `shirokuma-docs items pr show {number}` | Body only | PR metadata (branches, change counts, etc.) |
+| `shirokuma-docs items discussions show {number}` | Body only | Discussion body only |
 
 ### Workflow That Assumes Full Comment Loading
 

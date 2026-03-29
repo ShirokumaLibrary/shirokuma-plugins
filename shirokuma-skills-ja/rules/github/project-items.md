@@ -215,8 +215,8 @@ shirokuma-docs items push {number}
 |---------|---------|------|
 | `shirokuma-docs items pull {number}` | 本文 + コメント全件（キャッシュ） | Issue/PR/Discussion の内容確認、レビュー、実装前調査 |
 | `shirokuma-docs items pull {number}` | 本文のみ | フィールド値（Status/Priority 等）の確認のみ |
-| `shirokuma-docs pr show {number}` | 本文のみ | PR メタデータ（ブランチ、変更数等）の確認のみ |
-| `shirokuma-docs discussions show {number}` | 本文のみ | Discussion 本文の確認のみ |
+| `shirokuma-docs items pr show {number}` | 本文のみ | PR メタデータ（ブランチ、変更数等）の確認のみ |
+| `shirokuma-docs items discussions show {number}` | 本文のみ | Discussion 本文の確認のみ |
 
 ### コメント全件読み込みを前提とするワークフロー
 

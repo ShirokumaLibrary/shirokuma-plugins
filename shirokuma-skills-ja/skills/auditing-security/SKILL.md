@@ -14,7 +14,7 @@ allowed-tools: Read, Bash, Glob, Grep
 - **スコープ:** `shirokuma-docs lint security` による脆弱性スキャン（Bash 読み取り系コマンド）、結果の分析・優先度付け、セキュリティレポートの生成、Issue 作成候補の提示。
 - **スコープ外:** 依存パッケージの自動更新、ユーザー確認なしの Issue 自動作成。Issue 作成はユーザー確認後に CLI（`shirokuma-docs items add issue`）経由で実行する
 
-> **Bash 例外**: `shirokuma-docs lint security` および `shirokuma-docs search` 等の読み取り・検索コマンドは許可。パッケージ更新コマンド（`pnpm update` 等）は禁止。
+> **Bash 例外**: `shirokuma-docs lint security` および `shirokuma-docs items search` 等の読み取り・検索コマンドは許可。パッケージ更新コマンド（`pnpm update` 等）は禁止。
 
 ## ワークフロー
 
@@ -66,7 +66,7 @@ shirokuma-docs items list --search "security" --search "vulnerability"
 または個別パッケージ名で検索:
 
 ```bash
-shirokuma-docs search "{package-name} vulnerability"
+shirokuma-docs items search "{package-name} vulnerability"
 ```
 
 重複する Issue がある場合はスキップし、既存 Issue を更新する。

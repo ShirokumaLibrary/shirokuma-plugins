@@ -76,37 +76,37 @@
     {
       "id": "gh-pr-create",
       "pattern": "gh pr create",
-      "reason": "Use `shirokuma-docs pr create` instead of `gh pr create`.",
+      "reason": "Use `shirokuma-docs items pr create` instead of `gh pr create`.",
       "enabled": true
     },
     {
       "id": "gh-pr-view",
       "pattern": "gh pr view",
-      "reason": "Use `shirokuma-docs pr show` instead of `gh pr view`.",
+      "reason": "Use `shirokuma-docs items pr show` instead of `gh pr view`.",
       "enabled": true
     },
     {
       "id": "gh-pr-list",
       "pattern": "gh pr list",
-      "reason": "Use `shirokuma-docs pr list` instead of `gh pr list`.",
+      "reason": "Use `shirokuma-docs items pr list` instead of `gh pr list`.",
       "enabled": true
     },
     {
       "id": "gh-pr-review",
       "pattern": "gh pr review",
-      "reason": "Use `shirokuma-docs pr comments`, `pr reply`, `pr resolve` instead of `gh pr review`.",
+      "reason": "Use `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve` instead of `gh pr review`.",
       "enabled": true
     },
     {
       "id": "gh-project",
       "pattern": "gh project (item-list|field-list)",
-      "reason": "Use `shirokuma-docs projects list` or `projects fields` instead of `gh project`.",
+      "reason": "Use `shirokuma-docs items projects list` or `items projects fields` instead of `gh project`.",
       "enabled": true
     },
     {
       "id": "gh-search",
       "pattern": "gh search issues",
-      "reason": "Use `shirokuma-docs search` instead of `gh search issues`.",
+      "reason": "Use `shirokuma-docs items search` instead of `gh search issues`.",
       "enabled": true
     }
   ]

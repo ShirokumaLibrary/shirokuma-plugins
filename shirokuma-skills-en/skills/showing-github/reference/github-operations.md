@@ -70,39 +70,49 @@ shirokuma-docs items reopen {number}
 ### Pull Requests
 
 ```bash
-shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md             # Metadata + body in one file
-shirokuma-docs pr create --base main --head develop --title "release: v0.2.0"  # Release workflow (metadata only)
-shirokuma-docs pr list                                      # PR list (default: open)
-shirokuma-docs pr list --state merged --limit 5            # Filtering
-shirokuma-docs pr list --head {branch-name}                # Resolve PR from branch name
-shirokuma-docs pr show {number}                             # PR details (body, diff stats, linked issues)
-shirokuma-docs pr comments {number}                         # Review comments and threads
-shirokuma-docs pr merge {number} --squash                   # Merge + status update
-shirokuma-docs pr reply {number} --reply-to {id} --body-file - <<'EOF'
+shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md             # Metadata + body in one file
+shirokuma-docs items pr create --base main --head develop --title "release: v0.2.0"  # Release workflow (metadata only)
+shirokuma-docs items pr list                                      # PR list (default: open)
+shirokuma-docs items pr list --state merged --limit 5            # Filtering
+shirokuma-docs items pr list --head {branch-name}                # Resolve PR from branch name
+shirokuma-docs items pr show {number}                             # PR details (body, diff stats, linked issues)
+shirokuma-docs items pr comments {number}                         # Review comments and threads
+shirokuma-docs items pr merge {number} --squash                   # Merge + status update
+shirokuma-docs items pr reply {number} --reply-to {id} --body-file - <<'EOF'
 Reply content
 EOF
-shirokuma-docs pr resolve {number} --thread-id {id}        # Resolve thread
+shirokuma-docs items pr resolve {number} --thread-id {id}        # Resolve thread
 ```
 
-### Projects (Low-level Access)
+### Projects (Item Operations)
 
 ```bash
-shirokuma-docs projects list                        # Project items
-shirokuma-docs projects fields                      # Show field options
-shirokuma-docs projects add-issue {number}          # Add issue to project
-shirokuma-docs projects create \
+shirokuma-docs items projects list                  # Project items
+shirokuma-docs items projects fields                # Show field options
+shirokuma-docs items projects add-issue {number}    # Add issue to project
+shirokuma-docs items projects create \
   --title "Title" --body-file /tmp/shirokuma-docs/body.md \
   --field-status "Backlog" --priority "Medium"               # DraftIssue
-shirokuma-docs projects get PVTI_xxx                # By item ID
-shirokuma-docs projects update {number} --field-status "Done"
+shirokuma-docs items projects get PVTI_xxx          # By item ID
+shirokuma-docs items projects update {number} --field-status "Done"
 ```
 
 ### Discussions
 
 ```bash
-shirokuma-docs discussions list --category Handovers --limit 5
+shirokuma-docs items discussions list --category Handovers --limit 5
+shirokuma-docs items discussions search "keyword"            # Discussion search
+shirokuma-docs items search --type discussions "keyword"     # Via items search
 shirokuma-docs items pull {number}   # Fetch details and cache (→ Read .shirokuma/github/{number}.md)
 shirokuma-docs items add discussion --file /tmp/shirokuma-docs/discussion.md  # Metadata + body in one file
+```
+
+### Cross-search
+
+```bash
+shirokuma-docs items search "keyword"                          # Issues / PR search (default)
+shirokuma-docs items search --type discussions "keyword"       # Discussions only
+shirokuma-docs items search --type issues,discussions "keyword" # Issues + Discussions cross-search
 ```
 
 ### Repository
@@ -137,7 +147,7 @@ gh auth status
 | Pattern | Commands | Reason |
 |---------|----------|--------|
 | `items add` recommended | `items add issue`, `items add discussion` | Metadata + body in one file, prevents flag combination errors |
-| `--body-file` kept | `pr reply`, `session end` | Body only, no metadata needed |
+| `--body-file` kept | `items pr reply`, `session end` | Body only, no metadata needed |
 | `items push` recommended | Status/body/title/labels/assignees/state/issue-type/parent update | Cache-edit → push consistent workflow |
 
 ### `--from-file` Frontmatter Format
@@ -159,7 +169,7 @@ Safe frontmatter fields vary by command:
 | Command | Safe Fields |
 |---------|-------------|
 | `items add issue` / `items push` | `title`, `type`, `priority`, `size`, `labels`, `state`, `state_reason`, `parent` |
-| `pr create` | `title`, `base`, `head` |
+| `items pr create` | `title`, `base`, `head` |
 | `items add discussion` | `title`, `category` |
 
 CLI flags take precedence when set. `--from-file` and `--body-file` are mutually exclusive (error if both specified).

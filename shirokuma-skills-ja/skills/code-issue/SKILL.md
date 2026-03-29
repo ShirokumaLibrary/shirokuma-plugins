@@ -89,4 +89,4 @@ shirokuma-docs docs search "<キーワード>" --source <ソース名> --section
 - Skill ツール（メインコンテキスト）で実行されるが、進捗管理はマネージャー（`implement-flow`）が担当
 - TDD ワークフローは `implement-flow` が `code-issue` の呼び出しを TDD で包む形で管理（`code-issue` 自体は実装のみに集中）
 - UI デザインタスク（新規 UI ページ、ビジュアルリデザイン、デザインシステムトークン変更）は `design-flow` → 発見された設計スキルが担当し、本スキルの責務外
-- **コミット・プッシュ・PR 作成は本スキルの責務外**。コード変更のみを担当し、コミットは `commit-issue`、PR 作成は `open-pr-issue` が後続チェーンで担当する。`git commit` / `git push` / `gh pr create` / `shirokuma-docs pr create` を直接実行しないこと
+- **コミット・プッシュ・PR 作成は本スキルの責務外**。コード変更のみを担当し、コミットは `commit-issue`、PR 作成は `open-pr-issue` が後続チェーンで担当する。`git commit` / `git push` / `gh pr create` / `shirokuma-docs items pr create` を直接実行しないこと

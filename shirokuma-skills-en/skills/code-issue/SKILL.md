@@ -89,4 +89,4 @@ Skill delegate to the discovered `coding-*` skill that matches the project's fra
 - Runs via Skill tool (main context), but progress management is handled by the manager (`implement-flow`)
 - TDD workflow is managed by `implement-flow` wrapping `code-issue` calls with TDD steps (`code-issue` focuses solely on implementation)
 - UI design tasks (new UI pages, visual redesigns, design system token changes) are handled by `design-flow` → discovered design skills, not by this skill
-- **Commit, push, and PR creation are outside the scope of this skill**. This skill is responsible for code changes only — `commit-issue` handles commits and `open-pr-issue` handles PR creation in the subsequent chain. Do not directly execute `git commit` / `git push` / `gh pr create` / `shirokuma-docs pr create`
+- **Commit, push, and PR creation are outside the scope of this skill**. This skill is responsible for code changes only — `commit-issue` handles commits and `open-pr-issue` handles PR creation in the subsequent chain. Do not directly execute `git commit` / `git push` / `gh pr create` / `shirokuma-docs items pr create`

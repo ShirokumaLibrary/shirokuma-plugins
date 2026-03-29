@@ -30,7 +30,7 @@ Takes a PR number and performs code review execution (via `review-issue` Agent /
 
 1. Fetch PR information and record `review_count` and `linked_issues` (used for branching in Step 2):
    ```bash
-   shirokuma-docs pr show {PR#}
+   shirokuma-docs items pr show {PR#}
    ```
    Fields to extract:
    - `review_count`: Number of submitted reviews (0 = triggers new review mode)
@@ -70,7 +70,7 @@ First check the `review_count` obtained in Step 1:
 **If `review_count > 0` → fetch unresolved threads and branch**:
 
 ```bash
-shirokuma-docs pr comments {PR#}
+shirokuma-docs items pr comments {PR#}
 ```
 
 - 0 unresolved threads → display completion report and propose re-review ("Would you like to run a re-review with `review-issue`?" via AskUserQuestion). If user accepts, transition to Step 2a
@@ -103,7 +103,7 @@ When no review has been submitted yet, invoke `review-issue` via the Agent tool 
 3. If `review-issue` posted an issue comment, check for its presence via `pr comments`
 4. Check for unresolved threads:
    ```bash
-   shirokuma-docs pr comments {PR#}
+   shirokuma-docs items pr comments {PR#}
    ```
    - Unresolved threads exist (`unresolved_threads > 0`) → proceed to Step 2b (review result confirmation)
    - No unresolved threads but `issue_comments` contains a review comment → proceed to Step 2b (review result confirmation). This occurs when `review-issue` posts improvement suggestions as an issue comment
@@ -216,7 +216,7 @@ Process code fix threads together. Delegate fixes to `code-issue` via Skill tool
 
 6. **Reply**: Reply to each thread referencing the commit (use numeric `database_id` from `pr comments` output for `--reply-to`)
    ```bash
-   shirokuma-docs pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
+   shirokuma-docs items pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
    Fixed in {commit-hash}.
 
    {description of the fix}
@@ -224,7 +224,7 @@ Process code fix threads together. Delegate fixes to `code-issue` via Skill tool
    ```
 7. **Resolve**: Resolve the thread (use `PRRT_`-prefixed ID from `pr comments` output for `--thread-id`)
    ```bash
-   shirokuma-docs pr resolve {PR#} --thread-id {PRRT_id}
+   shirokuma-docs items pr resolve {PR#} --thread-id {PRRT_id}
    ```
 
 #### Comment Fix Threads
@@ -305,7 +305,7 @@ Addressed {N} threads.
 |------|------|
 | Skill | Code fixes via `code-issue` (Step 5) |
 | Agent | Code review execution via `review-worker` (Step 2a), commits and pushes via `commit-worker` (Step 5) |
-| Bash | `shirokuma-docs pr comments`, `pr reply`, `pr resolve`, git operations |
+| Bash | `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve`, git operations |
 | Read | Code review, plan reference |
 | TaskCreate, TaskUpdate | Track thread processing progress |
 

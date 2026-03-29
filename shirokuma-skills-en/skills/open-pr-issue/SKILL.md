@@ -114,7 +114,7 @@ Closes #{issue-number}
 ```
 
 ```bash
-shirokuma-docs pr create --from-file /tmp/shirokuma-docs/{number}-pr.md
+shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/{number}-pr.md
 ```
 
 **Title rules:**

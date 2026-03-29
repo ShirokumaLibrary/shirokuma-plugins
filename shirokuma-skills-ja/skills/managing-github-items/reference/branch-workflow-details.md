@@ -57,7 +57,7 @@ git checkout -b hotfix/{issue-number}-{slug}
 
 # 3. main への PR を作成
 git push -u origin hotfix/{issue-number}-{slug}
-shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
+shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md
 
 # 4. main へのマージ後、develop に同期
 git checkout develop
@@ -77,7 +77,7 @@ git push origin develop
 
 ```bash
 # 1. develop から main への PR を作成
-shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
+shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md
 
 # 2. PR マージ後、リリースにタグ付け
 git checkout main

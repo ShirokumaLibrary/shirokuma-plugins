@@ -31,15 +31,15 @@ Before creating a new Discussion, search for existing ones to avoid duplicates a
 
 ```bash
 # Search by keyword
-shirokuma-docs discussions search "{keyword}"
+shirokuma-docs items discussions search "{keyword}"
 
 # Filter by category
-shirokuma-docs discussions list --category Knowledge
-shirokuma-docs discussions list --category Research
-shirokuma-docs discussions list --category ADR
+shirokuma-docs items discussions list --category Knowledge
+shirokuma-docs items discussions list --category Research
+shirokuma-docs items discussions list --category ADR
 
 # Recent handovers (for session context)
-shirokuma-docs discussions list --category Handovers --limit 5
+shirokuma-docs items discussions list --category Handovers --limit 5
 ```
 
 **When to search**:

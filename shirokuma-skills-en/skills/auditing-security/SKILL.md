@@ -14,7 +14,7 @@ A skill that auto-scans dependency vulnerabilities using `lint security` and pre
 - **Scope:** Vulnerability scanning via `shirokuma-docs lint security` (Bash read-only commands), analyzing and prioritizing results, generating security reports, presenting Issue creation candidates.
 - **Out of scope:** Automatically updating dependency packages, auto-creating Issues without user confirmation. Issue creation is performed via CLI (`shirokuma-docs items add issue`) only after user confirmation
 
-> **Bash exception**: `shirokuma-docs lint security`, `shirokuma-docs search`, and similar read/search commands are permitted. Package update commands (`pnpm update`, etc.) are prohibited.
+> **Bash exception**: `shirokuma-docs lint security`, `shirokuma-docs items search`, and similar read/search commands are permitted. Package update commands (`pnpm update`, etc.) are prohibited.
 
 ## Workflow
 
@@ -66,7 +66,7 @@ shirokuma-docs items list --search "security" --search "vulnerability"
 Or search by package name:
 
 ```bash
-shirokuma-docs search "{package-name} vulnerability"
+shirokuma-docs items search "{package-name} vulnerability"
 ```
 
 If a duplicate Issue exists, skip creation and update the existing Issue instead.

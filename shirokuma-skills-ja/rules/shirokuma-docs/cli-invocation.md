@@ -30,11 +30,14 @@ npx shirokuma-docs session start
 | `gh issue comment` | `shirokuma-docs items add comment {number} --file {file}` |
 | `gh issue edit` | `shirokuma-docs items push {number}` |
 | `gh issue close` | `shirokuma-docs items close {number}` |
-| `gh pr create`, `gh pr view`, `gh pr list` | `shirokuma-docs pr create`, `pr show`, `pr list` |
-| `gh pr review`, `gh api .../pulls/.../comments` | `shirokuma-docs pr comments`, `pr reply`, `pr resolve` |
-| `gh project item-list`, `gh project field-list` | `shirokuma-docs projects list`, `projects fields` |
-| `gh api .../discussions` | `shirokuma-docs discussions list`, `discussions search` |
-| `gh search issues` | `shirokuma-docs search` |
+| `gh pr create`, `gh pr view`, `gh pr list` | `shirokuma-docs items pr create`, `items pr show`, `items pr list` |
+| `gh pr review`, `gh api .../pulls/.../comments` | `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve` |
+| `gh project item-list`, `gh project field-list` | `shirokuma-docs items projects list`, `items projects fields` |
+| `gh api .../discussions` | `shirokuma-docs items discussions list`, `items discussions search` |
+| `gh search issues` | `shirokuma-docs items search` |
+| `gh search issues --include-prs` | `shirokuma-docs items search --type issues` |
+| Discussions 横断検索 | `shirokuma-docs items search --type discussions` |
+| Issues + Discussions 横断検索 | `shirokuma-docs items search --type issues,discussions` |
 
 ### よくある誤りパターン
 
@@ -45,7 +48,7 @@ gh pr create --base develop --title "..."
 
 # OK: shirokuma-docs CLI
 shirokuma-docs items pull 42
-shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
+shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md
 ```
 
 **例外**: `gh repo view`（リポジトリメタデータ取得）など、`shirokuma-docs` CLI でカバーされていない操作は直接 `gh` を使用してよい。

@@ -30,7 +30,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 
 1. PR 情報を取得し、`review_count` と `linked_issues` を記録する（ステップ 2 の分岐判定で使用）:
    ```bash
-   shirokuma-docs pr show {PR#}
+   shirokuma-docs items pr show {PR#}
    ```
    取得すべきフィールド:
    - `review_count`: レビュー提出数（0 = 新規レビューモード判定に使用）
@@ -70,7 +70,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 **`review_count > 0` の場合 → 未解決スレッドを取得して分岐**:
 
 ```bash
-shirokuma-docs pr comments {PR#}
+shirokuma-docs items pr comments {PR#}
 ```
 
 - 未解決スレッドが 0 件 → 完了レポートを表示し、再レビューを提案（「`review-issue` で再レビューを実行しますか？」と AskUserQuestion）。ユーザーが承認した場合はステップ 2a へ遷移
@@ -103,7 +103,7 @@ shirokuma-docs pr comments {PR#}
 3. `review-issue` が issue comment を投稿した場合、PR コメントの存在を `pr comments` で確認する
 4. 未解決スレッドを確認する:
    ```bash
-   shirokuma-docs pr comments {PR#}
+   shirokuma-docs items pr comments {PR#}
    ```
    - 未解決スレッドあり（`unresolved_threads > 0`）→ ステップ 2b（レビュー結果確認）へ
    - 未解決スレッドなし かつ `issue_comments` にレビューコメントあり → ステップ 2b（レビュー結果確認）へ。`review-issue` が改善提案を issue comment として投稿した場合に該当
@@ -216,7 +216,7 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
 
 6. **返信**: 各スレッドにコミット参照で返信（`--reply-to` には `pr comments` 出力の数値 `database_id` を使用）
    ```bash
-   shirokuma-docs pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
+   shirokuma-docs items pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
    {commit-hash} で修正しました。
 
    {修正内容の説明}
@@ -224,7 +224,7 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
    ```
 7. **解決**: スレッドを解決（`--thread-id` には `pr comments` 出力の `PRRT_` プレフィックス ID を使用）
    ```bash
-   shirokuma-docs pr resolve {PR#} --thread-id {PRRT_id}
+   shirokuma-docs items pr resolve {PR#} --thread-id {PRRT_id}
    ```
 
 #### コメント修正スレッド
@@ -305,7 +305,7 @@ shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/pr-{PR#}-revie
 |--------|-----------|
 | Skill | `code-issue` によるコード修正（ステップ 5） |
 | Agent | `review-worker` によるコードレビュー実行（ステップ 2a）、`commit-worker` によるコミット・プッシュ（ステップ 5） |
-| Bash | `shirokuma-docs pr comments`, `pr reply`, `pr resolve`, git 操作 |
+| Bash | `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve`, git 操作 |
 | Read | コード確認、計画参照 |
 | TaskCreate, TaskUpdate | スレッド処理の進捗管理 |
 

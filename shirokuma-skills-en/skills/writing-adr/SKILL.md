@@ -23,7 +23,7 @@ Create Architecture Decision Records (ADRs) as GitHub Discussions (ADR category)
 ADR numbers are assigned sequentially. Before creating a new ADR:
 
 ```bash
-shirokuma-docs adr list
+shirokuma-docs items adr list
 ```
 
 Extract the highest existing ADR number and increment by 1.
@@ -50,8 +50,8 @@ If key information is missing, use `AskUserQuestion` to gather it.
 Check for related or conflicting ADRs:
 
 ```bash
-shirokuma-docs adr list
-shirokuma-docs discussions search "relevant keywords"
+shirokuma-docs items adr list
+shirokuma-docs items discussions search "relevant keywords"
 ```
 
 If a related ADR exists, note it in the "Related Decisions" section.
@@ -78,7 +78,7 @@ ADREOF
 ### Step 5: Create Discussion
 
 ```bash
-shirokuma-docs adr create "ADR-{NNN}: {title}"
+shirokuma-docs items adr create "ADR-{NNN}: {title}"
 ```
 
 Then update the body with the generated content:
@@ -129,7 +129,7 @@ shirokuma-docs items push {number}
 
 | Situation | Action |
 |-----------|--------|
-| ADR number conflict | Re-check `adr list` and use next available |
+| ADR number conflict | Re-check `items adr list` and use next available |
 | Related ADR found during search | Reference it in "Related Decisions" |
 | User unsure about alternatives | Help brainstorm with `AskUserQuestion` |
 | Decision is trivial | Suggest lightweight template or skip ADR |
@@ -163,7 +163,7 @@ This skill creates ADR Discussions only. It does not:
 
 | Tool | When |
 |------|------|
-| Bash | `shirokuma-docs adr` commands, temp file creation |
+| Bash | `shirokuma-docs items adr` commands, temp file creation |
 | Read | Reading existing ADR content for superseding links |
 | AskUserQuestion | Gathering missing decision context from user |
 

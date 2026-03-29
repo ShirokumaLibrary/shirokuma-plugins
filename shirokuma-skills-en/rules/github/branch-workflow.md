@@ -127,7 +127,7 @@ git checkout -b {type}/{issue-number}-{slug}
 
 ```bash
 git push -u origin {branch-name}
-shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md
+shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md
 ```
 
 - PR title: concise summary (under 70 characters)
@@ -191,7 +191,7 @@ When work on an issue is stopped without completing it (context switch, blocked,
 
 ```bash
 # 1. Close the PR without merging (add reason as a comment)
-shirokuma-docs pr close <pr-number> --body-file - <<'EOF'
+shirokuma-docs items pr close <pr-number> --body-file - <<'EOF'
 Closing due to: <reason>
 Work in progress. Can be resumed from branch feat/N-slug.
 EOF

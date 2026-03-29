@@ -24,9 +24,9 @@ Full project dashboard aggregating GitHub data.
 1. Get repository info: `shirokuma-docs repo info --format json` (refer to `nameWithOwner` field)
 2. Run in parallel:
    - `shirokuma-docs items list` (project items by status + derive open issue count from `total_issues`)
-   - `shirokuma-docs pr list` (open PRs list + derive PR count from line count)
+   - `shirokuma-docs items pr list` (open PRs list + derive PR count from line count)
    - `gh api repos/{owner}/{repo}/commits?per_page=5` (recent commits)
-   - `shirokuma-docs discussions list --category Handovers --limit 3` (recent handovers)
+   - `shirokuma-docs items discussions list --category Handovers --limit 3` (recent handovers)
 
 ### Display Format
 
@@ -169,17 +169,17 @@ PR list and details.
 
 ```bash
 # Default (open PRs)
-shirokuma-docs pr list
+shirokuma-docs items pr list
 
 # With filters
-shirokuma-docs pr list --state merged --limit 10
-shirokuma-docs pr list --state all
+shirokuma-docs items pr list --state merged --limit 10
+shirokuma-docs items pr list --state all
 ```
 
 **Detail view:**
 
 ```bash
-shirokuma-docs pr show {number}
+shirokuma-docs items pr show {number}
 ```
 
 ### Display Format (List)
@@ -235,7 +235,7 @@ Past session handover information.
 
 ```bash
 # From Discussions
-shirokuma-docs discussions list --category Handovers --limit {count}
+shirokuma-docs items discussions list --category Handovers --limit {count}
 
 # Get specific handover
 shirokuma-docs items pull {number}

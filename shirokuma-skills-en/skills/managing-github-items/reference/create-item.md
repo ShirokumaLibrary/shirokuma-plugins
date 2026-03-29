@@ -217,7 +217,7 @@ shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
 shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
 
 # DraftIssue (lightweight)
-shirokuma-docs projects create \
+shirokuma-docs items projects create \
   --title "Title" --body-file /tmp/shirokuma-docs/add-format-option-body.md \
   --field-status "Backlog" --priority "Medium"
 ```
