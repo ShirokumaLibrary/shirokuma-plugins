@@ -87,7 +87,7 @@ Args: #{N}
 コンテキスト表示（ステップ 2）後、Evolution Issue にシグナルが蓄積されているか確認する（検索コマンドは `evolution-details.md`「標準検索・作成フロー」参照）。
 
 ```bash
-shirokuma-docs issues list --issue-type Evolution --limit 1
+shirokuma-docs items list --issue-type Evolution --limit 1
 ```
 
 シグナルが蓄積されている場合、アクティブな Issue セクションの後に 1 行で表示:

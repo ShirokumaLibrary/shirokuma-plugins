@@ -197,7 +197,7 @@ shirokuma-docs pr close <pr-number> --body-file - <<'EOF'
 EOF
 
 # 2. Issue をキャンセル（ステータスを Not Planned に設定）
-shirokuma-docs issues cancel <issue-number> --body-file - <<'EOF'
+shirokuma-docs items cancel <issue-number> --body-file - <<'EOF'
 <見送り理由>
 EOF
 

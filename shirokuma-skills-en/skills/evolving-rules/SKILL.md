@@ -22,7 +22,7 @@ Fetch signals from Evolution Issues.
 
 ```bash
 # Search for Evolution Issues (analysis phase uses --limit 10 for cross-analysis. See evolution-details.md "Standard Search & Creation Flow" for value guidelines)
-shirokuma-docs issues list --issue-type Evolution --limit 10
+shirokuma-docs items list --issue-type Evolution --limit 10
 ```
 
 If an Issue is found, fetch details including comments:
@@ -162,7 +162,7 @@ shirokuma-docs items push {number}
 
 ```bash
 # Close the Evolution Issue (1 analysis cycle = 1 Issue)
-shirokuma-docs issues close {number}
+shirokuma-docs items close {number}
 ```
 
 New signals after closure are recorded in a new Evolution Issue (see `rule-evolution` rule, Evolution Issue Lifecycle section).

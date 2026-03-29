@@ -23,7 +23,7 @@ Issue の計画フェーズを統括する: Issue の取得、ステータス遷
 | 3 | 計画を作成する | 計画を作成中 | `plan-issue` (subagent: `plan-worker`) |
 | 4 | 計画をレビューする | 計画をレビュー中 | `review-issue` (subagent: `review-worker`) |
 | 5 | [条件付き] レビュー指摘を修正し再レビューする | レビュー指摘を修正し再レビュー中 | `plan-issue` (subagent: `plan-worker`) + `review-issue` (subagent: `review-worker`) |
-| 6 | デザインフェーズ要否を判定しステータスを更新する | デザインフェーズ要否を判定しステータスを更新中 | マネージャー直接: `shirokuma-docs issues update` |
+| 6 | デザインフェーズ要否を判定しステータスを更新する | デザインフェーズ要否を判定しステータスを更新中 | マネージャー直接: `shirokuma-docs items push` |
 | 7 | 計画サマリーをユーザーに返す | 計画サマリーをユーザーに返却中 | マネージャー直接 |
 
 Dependencies: step 2 blockedBy 1 (条件付き: リサーチトリガー該当時のみ), step 3 blockedBy 1 or 2, step 4 blockedBy 3, step 5 blockedBy 4 (条件付き: NEEDS_REVISION 時のみ), step 6 blockedBy 4 or 5, step 7 blockedBy 6.

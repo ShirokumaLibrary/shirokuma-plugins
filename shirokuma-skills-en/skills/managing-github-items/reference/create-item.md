@@ -226,7 +226,7 @@ shirokuma-docs projects create \
 
 When creating sub-issues of an epic (parent issue):
 
-- Use `--parent {parent-issue-number}` to set the parent-child relationship
+- Use `items parent {number} {parent-issue-number}` to set the parent-child relationship
 - Include a reference to the parent issue (`Refs #{parent-number}`) in the sub-issue body
 - Set Issue Type appropriate to the individual task, not inherited from the parent
 - Size should reflect the individual task's effort (sub-issues are typically S/M even if parent is L/XL)

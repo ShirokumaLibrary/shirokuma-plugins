@@ -42,7 +42,7 @@ graph LR
 | Review | Code review |
 | Testing | QA testing |
 | Done | Completed |
-| Not Planned | Explicitly not planned (set by `issues cancel`) |
+| Not Planned | Explicitly not planned (set by `items cancel`) |
 | Released | Deployed to production |
 
 ### Idea → Issue Flow
@@ -99,7 +99,7 @@ AI MUST update issue status at these points:
 | PR merged | → Done | `commit-issue` (via `pr merge`) | Automatic |
 | Blocked by dependency | → Pending | Manual | frontmatter `status: "Pending"` → `items push {n}` + comment |
 | Complete (no PR needed) | → Done | Manual | `session end --done {n}` |
-| Cancelled | → Not Planned | `issues cancel` | `issues cancel {n}` |
+| Cancelled | → Not Planned | `items cancel` | `items cancel {n}` |
 
 ### Preparing Usage
 
@@ -216,7 +216,7 @@ Epic status management, built-in automations, label details, item body maintenan
 | Command | Returns | Use case |
 |---------|---------|----------|
 | `shirokuma-docs items pull {number}` | Body + all comments (cached) | Content review, pre-implementation research |
-| `shirokuma-docs issues show {number}` | Body only | Checking field values (Status/Priority, etc.) |
+| `shirokuma-docs items pull {number}` | Body only | Checking field values (Status/Priority, etc.) |
 | `shirokuma-docs pr show {number}` | Body only | PR metadata (branches, change counts, etc.) |
 | `shirokuma-docs discussions show {number}` | Body only | Discussion body only |
 

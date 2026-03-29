@@ -23,7 +23,7 @@ allowed-tools: Bash, Read, Glob
 
 1. リポジトリ情報取得: `shirokuma-docs repo info --format json`（`nameWithOwner` フィールドを参照）
 2. 並列実行:
-   - `shirokuma-docs issues list`（ステータス別アイテム + `total_issues` でオープン Issue 数を導出）
+   - `shirokuma-docs items list`（ステータス別アイテム + `total_issues` でオープン Issue 数を導出）
    - `shirokuma-docs pr list`（オープン PR 一覧 + 行数から PR 数を導出）
    - `gh api repos/{owner}/{repo}/commits?per_page=5`（最近のコミット）
    - `shirokuma-docs discussions list --category Handovers --limit 3`（最近の引き継ぎ）
@@ -83,12 +83,12 @@ GitHub Project アイテムをステータスフィルター付きで表示。
 
 ```bash
 # デフォルト（オープン Issue）
-shirokuma-docs issues list
+shirokuma-docs items list
 
 # フィルター付き
-shirokuma-docs issues list --all
-shirokuma-docs issues list --status Ready
-shirokuma-docs issues list --status "In Progress" --status Ready
+shirokuma-docs items list --all
+shirokuma-docs items list --status Ready
+shirokuma-docs items list --status "In Progress" --status Ready
 ```
 
 ### 表示フォーマット（グループ化ビュー）
@@ -134,7 +134,7 @@ GitHub Issue リストをフィルタリング付きで表示。
 ### ワークフロー
 
 ```bash
-shirokuma-docs issues list --format json
+shirokuma-docs items list --format json
 ```
 
 ### 表示フォーマット

@@ -40,7 +40,7 @@
     {
       "id": "gh-issue-list",
       "pattern": "gh issue list",
-      "reason": "Use `shirokuma-docs issues list` instead of `gh issue list`.",
+      "reason": "Use `shirokuma-docs items list` instead of `gh issue list`.",
       "enabled": true
     },
     {
@@ -64,13 +64,13 @@
     {
       "id": "gh-issue-edit",
       "pattern": "gh issue edit",
-      "reason": "Use `shirokuma-docs issues update <number>` instead of `gh issue edit`.",
+      "reason": "Use `shirokuma-docs items push <number>` instead of `gh issue edit`. Edit the cached frontmatter and push.",
       "enabled": true
     },
     {
       "id": "gh-issue-close",
       "pattern": "gh issue close",
-      "reason": "Use `shirokuma-docs issues close <number>` instead of `gh issue close`.",
+      "reason": "Use `shirokuma-docs items close <number>` instead of `gh issue close`.",
       "enabled": true
     },
     {

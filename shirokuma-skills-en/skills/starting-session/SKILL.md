@@ -106,7 +106,7 @@ To start batch processing, run `/implement-flow #101 #102 #105`.
 After context display (Step 2), check if signals have accumulated in Evolution Issues (see `evolution-details.md` "Standard Search & Creation Flow" for the search command).
 
 ```bash
-shirokuma-docs issues list --issue-type Evolution --limit 1
+shirokuma-docs items list --issue-type Evolution --limit 1
 ```
 
 If signals are accumulated, show a single line after the Active Issues section:

@@ -79,7 +79,7 @@ Issue 本文に `## 計画` セクション（`^## 計画` で前方一致検出
 
 ```bash
 # コメントリンクがある場合のみ実行
-shirokuma-docs issues comments {number} --format json
+shirokuma-docs items comments {number} --format json
 ```
 
 取得したコメントの中から計画詳細を含むコメントを特定し、その内容をコンテキストとして実装スキルに渡す。
@@ -451,7 +451,7 @@ claude -p "/implement-flow --headless #42"
    shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
    ```
    本文ファイルの frontmatter に `title`、`status: "Backlog"` を設定し、本文には親計画への参照（`#{epic-number} の計画を参照`）を記述する。
-   作成後、`shirokuma-docs issues update {sub-number} --parent {epic-number}` でサブ Issue の親を設定する。
+   作成後、`shirokuma-docs items parent {sub-number} {epic-number}` でサブ Issue の親を設定する。
    作成後、エピックの `### サブ Issue 構成` テーブルを実際の Issue 番号で更新する。
 
 3. **実行順序の案内**: `### 実行順序` セクションまたは依存列に基づき、推奨順序を表示して終了する。即時作業開始は提案しない — `best-practices-first` ルールのエピックパターンに従い、各サブ Issue は別の会話で作業する:
@@ -492,7 +492,7 @@ claude -p "/implement-flow --headless #42"
 |--------|-----------|
 | AskUserQuestion | 要件確認、アプローチ選択、エッジケース判断（マネージャー（メイン AI）が事前解決） |
 | TaskCreate, TaskUpdate | チェーンステップ登録（全作業で必須） |
-| Bash | Git 操作、`shirokuma-docs issues` コマンド |
+| Bash | Git 操作、`shirokuma-docs items` コマンド |
 
 ## 注意事項
 

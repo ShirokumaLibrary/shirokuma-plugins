@@ -183,7 +183,7 @@ This single command handles: resolve PR from branch name, squash merge, extract 
 | 1:1 / 1:N / N:1 | Auto-process (Status → Done) |
 | N:N (complex link graph) | Error and stop with structured output |
 
-N:N detection: CLI outputs a structured list of related PRs/Issues. Review the list and individually update Status via `issues update`. Use `--skip-link-check` to bypass after reviewing.
+N:N detection: CLI outputs a structured list of related PRs/Issues. Review the list and individually update Status via `items push`. Use `--skip-link-check` to bypass after reviewing.
 
 **Integration branch merge (important)**: For sub-issue PRs targeting an integration branch, GitHub's native auto-close does NOT work (it only triggers on merges to the default branch). Therefore, `shirokuma-docs pr merge` is **required** — merging via `gh pr merge` or the GitHub UI will not update Issue status. The PR body must include `Closes #N` (not `Refs` — `parseLinkedIssues()` cannot parse `Refs`).
 

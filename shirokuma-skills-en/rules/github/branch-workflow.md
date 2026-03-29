@@ -197,7 +197,7 @@ Work in progress. Can be resumed from branch feat/N-slug.
 EOF
 
 # 2. Cancel the issue (set status to Not Planned)
-shirokuma-docs issues cancel <issue-number> --body-file - <<'EOF'
+shirokuma-docs items cancel <issue-number> --body-file - <<'EOF'
 <cancellation reason>
 EOF
 

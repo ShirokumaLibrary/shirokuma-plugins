@@ -28,7 +28,7 @@ Register **all chain steps** via TaskCreate **before starting work**.
 | 4 | Simplify and improve code | Improving code | `/simplify` (Skill tool) |
 | 5 | Run security review | Running security review | `reviewing-security` (Skill tool) |
 | 6 | Post work summary | Posting work summary | Manager direct: `items add comment` |
-| 7 | Update Status to Review | Updating Status to Review | Manager direct: `issues update` |
+| 7 | Update Status to Review | Updating Status to Review | Manager direct: `items push` |
 
 Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5, step 7 blockedBy 6.
 
@@ -487,7 +487,7 @@ Sub-issue creation in this flow uses `shirokuma-docs items add issue` directly (
 | AskUserQuestion | Requirement clarification, approach selection, edge cases (manager (main AI) pre-resolves) |
 | TaskCreate, TaskUpdate | Chain step registration and status updates (required for all work) |
 | TaskList, TaskGet | Check pending steps and task state |
-| Bash | Git operations, `shirokuma-docs issues` commands |
+| Bash | Git operations, `shirokuma-docs items` commands |
 
 ## Notes
 

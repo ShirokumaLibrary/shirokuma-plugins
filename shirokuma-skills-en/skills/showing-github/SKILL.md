@@ -23,7 +23,7 @@ Full project dashboard aggregating GitHub data.
 
 1. Get repository info: `shirokuma-docs repo info --format json` (refer to `nameWithOwner` field)
 2. Run in parallel:
-   - `shirokuma-docs issues list` (project items by status + derive open issue count from `total_issues`)
+   - `shirokuma-docs items list` (project items by status + derive open issue count from `total_issues`)
    - `shirokuma-docs pr list` (open PRs list + derive PR count from line count)
    - `gh api repos/{owner}/{repo}/commits?per_page=5` (recent commits)
    - `shirokuma-docs discussions list --category Handovers --limit 3` (recent handovers)
@@ -83,12 +83,12 @@ GitHub Project items with Status filter.
 
 ```bash
 # Default (open issues)
-shirokuma-docs issues list
+shirokuma-docs items list
 
 # With filter
-shirokuma-docs issues list --all
-shirokuma-docs issues list --status Ready
-shirokuma-docs issues list --status "In Progress" --status Ready
+shirokuma-docs items list --all
+shirokuma-docs items list --status Ready
+shirokuma-docs items list --status "In Progress" --status Ready
 ```
 
 ### Display Format (Grouped View)
@@ -134,7 +134,7 @@ GitHub Issues list with filtering.
 ### Workflow
 
 ```bash
-shirokuma-docs issues list --format json
+shirokuma-docs items list --format json
 ```
 
 ### Display Format

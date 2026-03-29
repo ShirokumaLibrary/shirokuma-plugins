@@ -22,7 +22,7 @@ Evolution Issue からシグナルを取得する。
 
 ```bash
 # Evolution Issue を検索（分析フェーズは --limit 10 で横断分析。値の使い分けは evolution-details.md「標準検索・作成フロー」参照）
-shirokuma-docs issues list --issue-type Evolution --limit 10
+shirokuma-docs items list --issue-type Evolution --limit 10
 ```
 
 Issue が見つかったら、コメントを含む詳細を取得:
@@ -183,7 +183,7 @@ shirokuma-docs items push {number}
 
 ```bash
 # Evolution Issue をクローズ（1 分析サイクル = 1 Issue）
-shirokuma-docs issues close {number}
+shirokuma-docs items close {number}
 ```
 
 クローズ後に新たなシグナルが発生した場合は、新しい Evolution Issue に記録する（`rule-evolution` ルールの Evolution Issue ライフサイクルセクション参照）。

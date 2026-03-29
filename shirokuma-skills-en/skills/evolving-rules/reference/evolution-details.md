@@ -62,7 +62,7 @@ Search (--limit 1) → Check results
 ### Search Command
 
 ```bash
-shirokuma-docs issues list --issue-type Evolution --limit 1
+shirokuma-docs items list --issue-type Evolution --limit 1
 ```
 
 ### Body Template for New Issues
@@ -155,7 +155,7 @@ Use the "Standard Search & Creation Flow" search command to check for accumulate
 - Maximum 1 comment per skill completion (consolidate multiple signals)
 - Do not register as a task (non-blocking processing)
 - Self-review uses concise checklist format to minimize context consumption
-- When no signals detected, minimize CLI command execution (`issues list` once only)
+- When no signals detected, minimize CLI command execution (`items list` once only)
 - When `creating-item` creates an item with Issue Type Evolution, skip the entire signal recording (the Evolution Issue itself is an improvement proposal, preventing duplicate recording)
 
 ## Standalone Signal Recording
@@ -179,7 +179,7 @@ Follow the "Standard Search & Creation Flow" to secure an Evolution Issue, then 
 
 ```bash
 # 1. Secure Evolution Issue (follow Standard Search & Creation Flow)
-shirokuma-docs issues list --issue-type Evolution --limit 1
+shirokuma-docs items list --issue-type Evolution --limit 1
 # → If 0 found, create new (see body template in "Standard Search & Creation Flow")
 
 # 2. Post signal as comment

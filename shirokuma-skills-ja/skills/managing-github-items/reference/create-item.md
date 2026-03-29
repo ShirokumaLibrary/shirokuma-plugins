@@ -218,7 +218,7 @@ shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
 
 # サブ Issue として作成後に親 Issue を設定
 shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
-# 作成後: shirokuma-docs issues update {number} --parent 958
+# 作成後: shirokuma-docs items parent {number} {parent-number}
 
 # DraftIssue（軽量）
 shirokuma-docs projects create \
@@ -230,7 +230,7 @@ shirokuma-docs projects create \
 
 エピック（親 Issue）のサブ Issue を作成する場合:
 
-- `--parent {親Issue番号}` で親子関係を設定する
+- `items parent {number} {親Issue番号}` で親子関係を設定する
 - サブ Issue の本文に親 Issue への参照（`Refs #{親番号}`）を含める
 - サブ Issue の Issue Type は親から継承せず、個々のタスクに適切な Type を設定する
 - サイズは個々のタスクの工数で設定（親が L/XL でもサブ Issue は S/M が一般的）

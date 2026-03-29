@@ -43,7 +43,7 @@ GitHub Projects V2 のビルトイン自動化ワークフローが、CLI ベー
 | `session end --done` | Done を直接設定 — 自動化と冪等 |
 | `session check` | 無効化されている推奨自動化を警告として報告 |
 | `session check --fix` | 不整合を修正 — 自動化と互換 |
-| `issues cancel` | close 後に Not Planned を設定。「Item closed → Done」自動化と競合の可能性あり — 通常は CLI の更新が優先。`session check --fix` で検出・修正可能 |
+| `items cancel` | close 後に Not Planned を設定。「Item closed → Done」自動化と競合の可能性あり — 通常は CLI の更新が優先。`session check --fix` で検出・修正可能 |
 
 ### 自動化状態の確認
 
@@ -86,7 +86,7 @@ shirokuma-docs projects workflows
 | 操作 | コマンド | 備考 |
 |------|---------|------|
 | コメント追加 | `items add comment {number} --file {file}` | Issue/Discussion 両対応、キャッシュ自動保存 |
-| コメント一覧 | `issues comments {number}` | JSON 出力 |
+| コメント一覧 | `items comments {number}` | JSON 出力 |
 | コメント編集 | `items push {number} {comment-id}` | キャッシュ編集 → push のワークフロー |
 
 ## アイテム作成

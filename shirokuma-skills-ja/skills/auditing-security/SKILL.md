@@ -60,7 +60,7 @@ JSON 出力の `vulnerabilities` を以下の観点で分類する:
 ### 3. 既存 Issue の重複チェック
 
 ```bash
-shirokuma-docs issues list --search "security" --search "vulnerability"
+shirokuma-docs items list --search "security" --search "vulnerability"
 ```
 
 または個別パッケージ名で検索:

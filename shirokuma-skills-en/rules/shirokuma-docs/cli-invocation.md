@@ -13,7 +13,7 @@ priority: required
 ```bash
 # Correct
 shirokuma-docs session start
-shirokuma-docs issues list
+shirokuma-docs items list
 shirokuma-docs lint tests -p .
 
 # Wrong - unnecessary overhead
@@ -26,10 +26,10 @@ The following commands are handled internally by the `shirokuma-docs` CLI. Direc
 
 | Prohibited Command | CLI Alternative |
 |-------------------|----------------|
-| `gh issue list`, `gh issue view`, `gh issue create` | `shirokuma-docs issues list`, `items pull {number}`, `items add issue` |
+| `gh issue list`, `gh issue view`, `gh issue create` | `shirokuma-docs items list`, `items pull {number}`, `items add issue` |
 | `gh issue comment` | `shirokuma-docs items add comment {number} --file {file}` |
-| `gh issue edit` | `shirokuma-docs issues update` |
-| `gh issue close` | `shirokuma-docs issues close` |
+| `gh issue edit` | `shirokuma-docs items push {number}` |
+| `gh issue close` | `shirokuma-docs items close {number}` |
 | `gh pr create`, `gh pr view`, `gh pr list` | `shirokuma-docs pr create`, `pr show`, `pr list` |
 | `gh pr review`, `gh api .../pulls/.../comments` | `shirokuma-docs pr comments`, `pr reply`, `pr resolve` |
 | `gh project item-list`, `gh project field-list` | `shirokuma-docs projects list`, `projects fields` |

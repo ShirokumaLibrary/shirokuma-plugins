@@ -47,7 +47,7 @@ Before recovery, identify where the chain stopped. Check the following in order:
 
 | Check | Command |
 |-------|---------|
-| Was a review report posted? | Check Issue comments via `shirokuma-docs issues comments {number}` |
+| Was a review report posted? | Check Issue comments via `shirokuma-docs items comments {number}` |
 
 **Idempotent**: Yes — re-invoking `review-issue` (Agent: `review-worker`) is safe. A new report will be generated.
 

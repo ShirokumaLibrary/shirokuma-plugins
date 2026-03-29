@@ -60,7 +60,7 @@ Classify the `vulnerabilities` array in the JSON output by:
 ### 3. Duplicate Issue Check
 
 ```bash
-shirokuma-docs issues list --search "security" --search "vulnerability"
+shirokuma-docs items list --search "security" --search "vulnerability"
 ```
 
 Or search by package name:

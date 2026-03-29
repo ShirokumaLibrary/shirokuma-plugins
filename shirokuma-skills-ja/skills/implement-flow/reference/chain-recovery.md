@@ -47,7 +47,7 @@
 
 | 確認項目 | コマンド |
 |---------|---------|
-| レビューレポートが投稿されているか？ | `shirokuma-docs issues comments {number}` で Issue コメントを確認 |
+| レビューレポートが投稿されているか？ | `shirokuma-docs items comments {number}` で Issue コメントを確認 |
 
 **冪等性**: あり — `review-issue`（Agent: `review-worker`）の再実行は安全。新しいレポートが生成される。
 

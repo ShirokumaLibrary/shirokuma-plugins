@@ -43,7 +43,7 @@ Built-in automations are configured via the GitHub UI (not API):
 | `session end --done` | Sets Done directly — idempotent with automation |
 | `session check` | Reports disabled recommended automations as warnings |
 | `session check --fix` | Fixes inconsistencies — compatible with automation |
-| `issues cancel` | Sets Not Planned after close. May race with "Item closed → Done" automation — CLI update usually wins. Use `session check --fix` to detect/correct. |
+| `items cancel` | Sets Not Planned after close. May race with "Item closed → Done" automation — CLI update usually wins. Use `session check --fix` to detect/correct. |
 
 ### Checking Automation Status
 
@@ -86,7 +86,7 @@ Comment operation CLI commands:
 | Operation | Command | Notes |
 |-----------|---------|-------|
 | Add comment | `items add comment {number} --file {file}` | Works for Issues and PRs/Discussions, auto-saves to cache |
-| List comments | `issues comments {number}` | JSON output |
+| List comments | `items comments {number}` | JSON output |
 | Edit comment | `items push {number} {comment-id}` | Cache-edit → push workflow |
 
 ## Creating Items

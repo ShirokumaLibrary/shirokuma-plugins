@@ -51,19 +51,20 @@ Prefer shirokuma-docs CLI over direct `gh` commands. Config in `shirokuma-docs.c
 ### Issues (Primary Interface)
 
 ```bash
-shirokuma-docs issues list                          # Open issues
-shirokuma-docs issues list --all                    # Include closed
-shirokuma-docs issues list --status "In Progress"   # Filter by status
+shirokuma-docs items list                            # Open issues
+shirokuma-docs items list --all                      # Include closed
+shirokuma-docs items list --status "In Progress"     # Filter by status
 shirokuma-docs items pull {number}                   # Fetch details and cache (→ Read .shirokuma/github/{number}.md)
 shirokuma-docs items add issue --file /tmp/shirokuma-docs/new-issue.md  # Metadata + body in one file
 shirokuma-docs items push {number}                                       # Update (edit cache frontmatter then push)
 # Add/remove labels: items pull → edit frontmatter labels field → items push {number}
 # Add/remove assignees: items pull → edit frontmatter assignees field → items push {number}
 shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-comment.md
-shirokuma-docs issues comments {number}                 # List comments
+shirokuma-docs items comments {number}                   # List comments
 shirokuma-docs items push {number} {comment-id}         # Edit comment (cache-edit → push)
-shirokuma-docs issues close {number}
-shirokuma-docs issues reopen {number}
+shirokuma-docs items close {number}
+shirokuma-docs items cancel {number}
+shirokuma-docs items reopen {number}
 ```
 
 ### Pull Requests
@@ -113,7 +114,7 @@ shirokuma-docs repo labels
 ### Cross-repo Operations
 
 ```bash
-shirokuma-docs issues list --repo docs
+shirokuma-docs items list --repo docs
 shirokuma-docs items add issue --repo docs --file /tmp/shirokuma-docs/new-issue.md
 ```
 
@@ -139,8 +140,7 @@ gh auth status
 |---------|----------|--------|
 | `items add` recommended | `items add issue`, `items add discussion` | Metadata + body in one file, prevents flag combination errors |
 | `--body-file` kept | `pr reply`, `session end` | Body only, no metadata needed |
-| `items push` recommended | Status/body/title/labels/assignees update | Cache-edit → push consistent workflow |
-| `issues update` continued | title/state/issueType changes | Updates not covered by `items push` (e.g. milestone, issue type) |
+| `items push` recommended | Status/body/title/labels/assignees/state/issue-type/parent update | Cache-edit → push consistent workflow |
 
 ### `--from-file` Frontmatter Format
 
@@ -160,7 +160,7 @@ Safe frontmatter fields vary by command:
 
 | Command | Safe Fields |
 |---------|-------------|
-| `items add issue` / `issues update` | `title`, `type`, `priority`, `size`, `labels` |
+| `items add issue` / `items push` | `title`, `type`, `priority`, `size`, `labels`, `state`, `state_reason`, `parent` |
 | `pr create` | `title`, `base`, `head` |
 | `items add discussion` | `title`, `category` |
 
