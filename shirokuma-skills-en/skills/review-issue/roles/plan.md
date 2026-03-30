@@ -2,21 +2,21 @@
 
 ## Responsibilities
 
-Quality review of the plan (`## Plan` / `## 計画`):
+Quality review of the plan (plan issue or `## Plan` / `## 計画` section):
 - Requirements coverage (all requirements from overview/tasks covered in plan)
 - Changed files validity (no missing or extraneous files)
 - Task granularity (1 task ≈ 1 commit principle)
 - Risk analysis (breaking changes, performance impact oversight)
-- Issue description sufficiency (plan understandable from Issue body alone)
+- Issue description sufficiency (plan understandable from the plan issue body alone)
 
-> **Comment-link pattern**: Plan details may be posted as a comment, with only a summary link (`> Details: {URL}`) in the Issue body. In this case, follow the link to retrieve the detailed plan from the comment for review.
+> **Plan issue approach**: Plans are created as child issues of the parent issue (issues with titles starting with "Plan:" or "計画:"). Identify the plan issue from `subIssuesSummary`, fetch its body via `items pull {plan-issue-number}`, and review. When no plan issue exists but the parent issue body contains a `## Plan` / `## 計画` section (legacy approach), use it as a fallback.
 
 ## Distinction from `plan-issue`
 
 | Aspect | `plan-issue` built-in review | `review-issue` plan role |
 |--------|-------------------------------------|-------------------------------|
 | Timing | Immediate check right after planning | User-initiated at any time |
-| Data retrieval | Issue body embedded in Task agent | Fetched via `shirokuma-docs items pull` by Issue number |
+| Data retrieval | Issue body embedded in Task agent | Plan issue identified from Issue number, fetched via `shirokuma-docs items pull` |
 | Purpose | Initial quality gate for plan | Independent second opinion |
 | Invocation | Auto-executed at `plan-issue` step 4 | `/review-issue plan #N` or Spec Review Issue |
 
@@ -31,9 +31,9 @@ Load these files for context:
 ```
 1. Role selection: "plan review" or Spec Review Issue
 2. Fetch Issue body: shirokuma-docs items pull {number} (→ Read .shirokuma/github/{number}.md)
-3. Fetch plan details: If body contains `> Details:` link, read comment files in .shirokuma/github/{number}/ to find the plan comment
+3. Identify plan issue: Find child issue with title starting with "Plan:" from subIssuesSummary, fetch body via items pull {plan-issue-number} (fallback: ## Plan section in body)
 4. Lint execution: Skip (target is not code files)
-5. Plan analysis: Review plan details (comment or body) against review criteria
+5. Plan analysis: Review plan issue body (or legacy plan section) against review criteria
 6. Report generation: Template format
 7. Report saving: Issue comment
 ```

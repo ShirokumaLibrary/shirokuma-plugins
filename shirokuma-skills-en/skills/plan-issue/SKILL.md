@@ -1,6 +1,6 @@
 ---
 name: plan-issue
-description: "Skill for issue planning. Delegated from prepare-flow via Skill tool, performs codebase investigation, plan creation, and issue body updates. Not intended for direct invocation."
+description: "Skill for issue planning. Delegated from prepare-flow via Skill tool, performs codebase investigation, plan creation, and plan issue creation. Not intended for direct invocation."
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
 ---
 
@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch, WebFetch
 
 # Planning on Issue
 
-Analyze issue requirements, create an implementation plan, and persist it to the issue body. This skill performs the actual planning work — orchestration (status management, review delegation, user interaction) is handled by `prepare-flow`.
+Analyze issue requirements, create an implementation plan, and persist it as a plan issue (child issue). This skill performs the actual planning work — orchestration (status management, review delegation, user interaction) is handled by `prepare-flow`.
 
 ## Plan Depth Levels
 
@@ -63,59 +63,71 @@ Assess the plan depth level from issue content and investigation results, then c
 
 Plan templates for each level (Lightweight/Standard/Detailed/Epic) are in [reference/plan-templates.md](reference/plan-templates.md).
 
-### Step 3.5: Post Thinking Process Comment
+### Step 4: Create Plan Issue
 
-Post the decision rationale, alternatives, and constraints derived from the investigation as a **primary record** in a comment. Record "why this approach was chosen" before writing the plan to the body (Step 4).
+Create a plan issue using `items add issue` with the plan content from Step 3 as the body.
 
-```bash
-shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-reasoning.md
-```
-
-**Template intent**: The comment records "why this approach was chosen". The body's plan section documents "what will be done" in a structured format, so comments and body serve distinct roles.
-
-> Comment language and style must comply with the `output-language` rule and `github-writing-style` rule.
-
-### Step 4: Post Plan as Comment
-
-Post the full plan content as a comment (comment-link pattern). Use the template matching the depth level determined in Step 3.
+Create the plan issue body file:
 
 ```bash
-PLAN_RESULT=$(shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-plan-comment.md)
-PLAN_COMMENT_URL=$(echo "$PLAN_RESULT" | jq -r '.comment_url')
-```
+cat > /tmp/shirokuma-docs/{number}-plan-issue.md <<'EOF'
+---
+title: "Plan: {parent issue title}"
+status: "Spec Review"
+labels: ["area:plan"]
+---
 
-After posting, use the returned `comment_url` in the next step.
-
-> Comment language and style must comply with the `output-language` rule and `github-writing-style` rule.
-
-### Step 4.5: Write Summary Link to Issue Body
-
-Write the plan summary link section to the Issue body. This enables `review-issue` to retrieve the plan link via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{number}.md` to access the detailed comment.
-
-Append a `## Plan` section to the existing issue body. Format:
-
-```markdown
 ## Plan
 
-> Details: {PLAN_COMMENT_URL}
+{Full plan content based on the level-specific template from Step 3}
 
-### Approach
-{1-2 line summary of the approach determined in Step 3}
+## Parent Issue
+
+See #{parent-number} for the task context.
+EOF
+shirokuma-docs items add issue --file /tmp/shirokuma-docs/{number}-plan-issue.md
 ```
+
+After the plan issue is created, record the returned issue number as `PLAN_ISSUE_NUMBER`.
+
+> The plan issue body language and style must comply with the `output-language` rule and `github-writing-style` rule.
+
+### Step 4a: Post Thinking Process Comment to Plan Issue
+
+Post the decision rationale, alternatives, and constraints as a **comment on the plan issue** (not the parent issue).
 
 ```bash
-shirokuma-docs items push {number}
+cat > /tmp/shirokuma-docs/{number}-reasoning.md <<'EOF'
+## Plan Decision Rationale
+
+### Selected Approach
+{The chosen approach and the reason for selecting it}
+
+### Alternatives Considered
+{Alternatives evaluated and why they were rejected. If none: "No alternatives (single clear approach)"}
+
+### Constraints Discovered
+{Technical constraints and dependencies found during codebase investigation. If none: "No constraints"}
+EOF
+shirokuma-docs items add comment {PLAN_ISSUE_NUMBER} --file /tmp/shirokuma-docs/{number}-reasoning.md
 ```
 
-**Important**: Preserve the existing body (overview, tasks, deliverables). **Append** the `## Plan` section. When using `.shirokuma/github/{number}.md` content (from `items pull`) as the base for the existing body, always strip the YAML frontmatter block (metadata enclosed in `---`) before writing.
+> Comment language and style must comply with the `output-language` rule and `github-writing-style` rule.
 
-> Plan section headings and content must comply with the `output-language` rule.
+### Step 4b: Set Parent-Child Relationship
+
+Register the plan issue as a child of the parent issue using the `items parent` command.
+
+```bash
+shirokuma-docs items parent {PLAN_ISSUE_NUMBER} {parent-number}
+```
 
 ## Constraints
 
 - Runs via Skill tool (main context), but progress management and user interaction are handled by the orchestrator (`prepare-flow`)
 - Plan review is handled by `prepare-flow` — this skill only creates the plan
 - **Does not update status** — status transitions (Preparing, Designing, Spec Review) are managed by `prepare-flow`
+- Plan issues are created with status `Spec Review` and label `area:plan`
 
 ## GitHub Writing Rules
 
@@ -145,14 +157,14 @@ Add GitHub writing rule references to each skill...
 
 | Situation | Action |
 |-----------|--------|
-| Issue body is empty | Create body with plan section only |
-| Epic issue (has sub-issues) | Use epic plan template with integration branch and sub-issue structure |
+| Issue body is empty | Create plan issue with plan content only |
+| Epic issue (has sub-issues) | Use epic plan template with integration branch and sub-issue structure (exclude the plan issue itself from sub-issue counts) |
 
 ## Rule References
 
 | Rule | Usage |
 |------|-------|
-| `project-items` | Spec Review status workflow, comment-link body structure |
+| `project-items` | Spec Review status workflow |
 | `branch-workflow` | Branch naming reference (for plan documentation) |
 | `output-language` | Output language for issue comments and body |
 | `github-writing-style` | Bullet-point vs prose guidelines |
@@ -160,5 +172,5 @@ Add GitHub writing rule references to each skill...
 ## Notes
 
 - **Does not implement** — planning only. Implementation is `implement-flow`'s responsibility
-- Plans are persisted in the issue body — available across sessions
+- Plans are persisted as plan issues (child issues) — available across sessions
 - This skill is invoked via Skill tool from `prepare-flow` — orchestration is handled by `prepare-flow`

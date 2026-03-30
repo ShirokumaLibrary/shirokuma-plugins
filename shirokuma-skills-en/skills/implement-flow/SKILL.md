@@ -53,7 +53,7 @@ Use TaskUpdate to set each step to `in_progress` when starting and `completed` w
 
 When `.shirokuma/github/{number}.md` frontmatter contains a `parentIssue` field, the issue is a sub-issue of an epic:
 
-1. Reference the parent issue's `## Plan` section to understand overall context
+1. Identify the plan issue (child issue with a title starting with "Plan:" or "計画:") from the parent's `subIssuesSummary`, fetch it via `items pull {plan-issue-number}`, and use its body as overall context
 2. Set base branch to the parent's integration branch instead of `develop` (Step 3)
 3. `open-pr-issue` will self-detect the sub-issue via the `parentIssue` field, so explicit context passing is not required (if passed, it is used as supplementary; otherwise, self-detection is the fallback)
 
@@ -61,25 +61,34 @@ When `.shirokuma/github/{number}.md` frontmatter contains a `parentIssue` field,
 # Check parent issue
 shirokuma-docs items pull {parent-number}
 # → Read .shirokuma/github/{parent-number}.md
+# Identify child issue with title starting with "Plan:" from subIssuesSummary
+shirokuma-docs items pull {plan-issue-number}
+# → Fetch plan body and use as context
 ```
 
 #### Plan Check (when issue number provided)
 
-Check if issue body contains `## Plan` section (detected by `^## Plan` line prefix).
+Check `subIssuesSummary` for a child issue with a title starting with "Plan:" or "計画:".
 
 | Plan State | Condition | Action |
 |-----------|-----------|--------|
-| No plan | Size XS/S (clear requirements) | → Skip planning, proceed directly to `code-issue` |
-| No plan | Size M+ or ambiguous requirements | → Delegate to `prepare-flow` |
-| Plan exists | — | → Pass `## Plan` section as context to implementation skill |
+| No plan issue | Size XS/S (clear requirements) and not a sub-issue | → Skip planning, proceed directly to `code-issue` |
+| No plan issue | Size M+ or ambiguous requirements | → Delegate to `prepare-flow` |
+| No plan issue | Sub-issue (`parentIssue` present) | → Delegate to `prepare-flow` regardless of size |
+| Plan issue exists | — | → Fetch plan issue body via `items pull {plan-issue-number}` and pass as context to implementation skill |
 
-#### Fetching Plan Detail Comment
+**Backward compatibility**: When no plan issue (child issue) exists but the issue body contains a `## Plan` / `## 計画` section (legacy approach), display a warning and use the legacy plan section as context.
 
-When the `## Plan` section contains a `> Details: {URL}` comment link, the full plan details are in that comment. `items pull` caches both the body and comments, so check `.shirokuma/github/{number}/` directory for comment files. If not yet cached, run the following to fetch explicitly:
+#### Fetching Plan Details
 
-Identify the comment containing the plan details from the retrieved comments and pass it as context to the implementation skill.
+When a plan issue exists (new approach):
 
-**XS/S direct implementation path criteria:** Apply when the Issue Size field is XS or S, and the title and body clearly indicate what needs to be changed (mechanical transformation such as pattern replacement, type fix, rename). If Size is unset, requirements are ambiguous, or the judgment is uncertain, delegate to `prepare-flow`. See the `creating-item` skill "Requirements Clarity Criteria" for the canonical definition.
+```bash
+shirokuma-docs items pull {plan-issue-number}
+# → Read .shirokuma/github/{plan-issue-number}.md to get plan content
+```
+
+**XS/S direct implementation path criteria:** Apply when the Issue Size field is XS or S, and the title and body clearly indicate what needs to be changed (mechanical transformation such as pattern replacement, type fix, rename). Sub-issues (`parentIssue` field present) always require a plan regardless of size. If Size is unset, requirements are ambiguous, the issue is a sub-issue, or judgment is uncertain, delegate to `prepare-flow`. See the `creating-item` skill "Requirements Clarity Criteria" for the canonical definition.
 
 #### Transition from Preparing Status
 
@@ -373,7 +382,7 @@ All of the following must be met to run in headless mode:
 
 1. An **explicit issue number** is provided as an argument
 2. The issue status is **Spec Review** or **Ready**
-3. The issue body contains a `## Plan` (EN) or `## 計画` (JA) section
+3. A plan issue (child issue with title starting with "Plan:" or "計画:") exists, OR the issue body contains a `## Plan` (EN) / `## 計画` (JA) section (backward compatibility)
 
 If any precondition is not met, display an error message and stop (no fallback to normal mode).
 
@@ -419,18 +428,18 @@ claude -p "/implement-flow --headless #42"
 | Wrong branch | AskUserQuestion: switch or continue |
 | Chain failure | Report completed/remaining steps, return control |
 | Sub-issue with no integration branch | Use `develop` as base, warn user |
-| Epic issue selected directly | See "Epic Issue Entry Point" below |
+| Epic issue selected directly | Check for non-plan child issues; see "Epic Issue Entry Point" below |
 | `--headless` + precondition not met | Display error message and stop |
 | `--headless` + wrong branch (W4) | Warn and stop (no auto-switch) |
 | `--headless` + worker UCP (W5) | Skip and record in Issue comment |
 
 ## Epic Issue Entry Point
 
-When an epic issue is directly specified (detected by `subIssuesSummary.total > 0` or a `### Sub-Issue Structure` section in the plan), execute the following flow instead of standard implementation dispatch.
+When an epic issue is directly specified (detected by non-plan child issues existing, or a plan issue whose body contains a `### Sub-Issue Structure` section), execute the following flow instead of standard implementation dispatch.
 
-### Pre-condition: Plan with Sub-Issue Structure
+### Pre-condition: Plan Issue with Sub-Issue Structure
 
-The epic must have a `## Plan` with a `### Sub-Issue Structure` section. If no plan exists, delegate to `prepare-flow` first (standard flow).
+The epic must have a plan issue (child issue with title starting with "Plan:" or "計画:") whose body contains a `### Sub-Issue Structure` section. If no plan issue exists, delegate to `prepare-flow` first (standard flow).
 
 ### Epic Workflow
 
@@ -443,15 +452,15 @@ The epic must have a `## Plan` with a `### Sub-Issue Structure` section. If no p
 
    | Condition | Step 2 |
    |-----------|--------|
-   | `subIssuesSummary.total === 0` | Create sub-issues |
-   | `subIssuesSummary.total > 0` | Skip (already created by `prepare-flow`) |
+   | No non-plan child issues exist | Create sub-issues |
+   | Non-plan child issues already exist | Skip (already created by `prepare-flow`) |
 
-2. **Create sub-issues in batch** (only when `subIssuesSummary.total === 0`): Skip this step if sub-issues were already created by `prepare-flow`. Parse the `### Sub-Issue Structure` table from the plan. For each row, create a sub-issue via CLI:
+2. **Create sub-issues in batch** (only when no non-plan child issues exist): Skip this step if sub-issues were already created by `prepare-flow`. Parse the `### Sub-Issue Structure` table from the plan issue body. For each row, create a sub-issue via CLI:
    ```bash
    shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
    ```
    Body: Minimal stub referencing the parent plan (`See #{epic-number} for full plan`).
-   After creation, update the epic's `### Sub-Issue Structure` table with actual issue numbers.
+   After creation, update the plan issue's `### Sub-Issue Structure` table placeholders (`#{sub1}`, etc.) with actual issue numbers and sync via `items push {plan-issue-number}`.
 
 3. **Present execution order**: Based on the `### Execution Order` section or dependency column, display the recommended order and end. Do NOT propose immediate work start — each sub-issue should be worked on in a separate conversation per the epic pattern in `best-practices-first`:
    ```

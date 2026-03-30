@@ -107,12 +107,22 @@ If research-worker errors, log a warning, skip research, and proceed to Step 3 (
 
 #### Existing Plan Check
 
-Check if issue body contains `## Plan` section (detected by `^## Plan` line prefix).
+Check `subIssuesSummary` to see whether a child issue with a title starting with "Plan:" exists.
 
 | Plan state | Action |
 |-----------|--------|
-| No plan | Proceed to Step 3 (delegate to plan-issue) |
-| Plan exists | Ask whether to overwrite (AskUserQuestion) before proceeding |
+| No plan issue | Proceed to Step 3 (delegate to plan-issue) |
+| Plan issue exists | Ask whether to overwrite (AskUserQuestion) before proceeding |
+
+#### Sub-issue reset path when non-plan sub-issues exist
+
+When child issues with titles that do NOT start with "Plan:" exist (count > 0), ask the user before re-planning (AskUserQuestion):
+
+- **Continue (re-plan keeping existing sub-issues)**: Update the plan document only; keep existing sub-issues.
+- **Reset (cancel all sub-issues and re-plan)**: Execute the following:
+  1. Cancel all non-plan sub-issues via `shirokuma-docs items cancel {sub-numbers}` (set to Not Planned)
+  2. Run `shirokuma-docs items integrity --fix` → parent transitions to Backlog automatically when all sub-issues are Not Planned
+  3. Return to Step 1b to re-transition to Preparing, then proceed to Step 3 (plan-issue delegation)
 
 ### Step 3: Delegate to plan-worker
 
@@ -126,7 +136,7 @@ Agent(
 )
 ```
 
-The plan-issue skill performs codebase investigation, creates the plan, posts a thinking process comment, and writes the plan to the issue body.
+The plan-issue skill performs codebase investigation, creates the plan, creates a plan issue, posts a thinking process comment, and sets up the parent-child relationship.
 
 #### Post-Completion Handling
 
@@ -138,7 +148,7 @@ When research was conducted (Step 2a), include the `## Research Findings (Refere
 
 ### Step 5: Plan Review (Skill Delegation)
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `review-issue` plan role via Agent tool (`review-worker`). Since the plan-issue skill writes a summary link to the Issue body and posts plan details as a comment, the reviewer can access the detailed plan from the link in the body.
+Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `review-issue` plan role via Agent tool (`review-worker`). Since the plan-issue skill creates a plan issue (child issue), the reviewer can identify the child issue with a title starting with "Plan:" from `subIssuesSummary` and fetch its body directly via `items pull {plan-issue-number}`.
 
 #### Skill Availability Check (Fallback)
 
@@ -211,7 +221,9 @@ shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-re
 
 ### Step 5a: Auto-create Sub-issues (Epic Plans Only)
 
-After review PASS, execute this step if the plan contains a `### Sub-Issue Structure` section **and** `subIssuesSummary.total === 0` (no sub-issues created yet). Skip and proceed to Step 6 if the condition is not met.
+After review PASS, execute this step if the plan issue body contains a `### Sub-Issue Structure` section **and** no non-plan child issues exist (count of child issues with titles NOT starting with "Plan:" === 0). Skip and proceed to Step 6 if the condition is not met.
+
+The plan issue number is found by scanning `subIssuesSummary` for a child issue with a title starting with "Plan:". Fetch its body via `items pull {plan-issue-number}` to check for the `### Sub-Issue Structure` section.
 
 #### Sub-issue Creation Procedure
 
@@ -297,6 +309,7 @@ Show a summary matching the plan depth level and design phase assessment. Follow
 - **Target files** and **Tasks** count (Standard/Detailed)
 - **Design phase** indicator when design is needed
 - **Sub-issues** count and **Integration branch** (Epic)
+- **Plan issue:** Number of the created plan issue (all levels)
 - **Created sub-issues:** List of created sub-issue numbers (Epic, when Step 5a executed)
 
 **Next steps guidance** (vary by condition):
@@ -305,8 +318,8 @@ Show a summary matching the plan depth level and design phase assessment. Follow
 |-----------|-----------|
 | Lightweight / Standard without design | `/implement-flow #{number}` |
 | Standard/Detailed with design needed | `/design-flow #{number}` (recommended) or `/implement-flow #{number}` (skip design) |
-| Epic (sub-issues not yet created) | `/implement-flow #{number}` (creates sub-issues, integration branch, proposes order) |
-| Epic (sub-issues already created) | `/implement-flow #{number}` (creates integration branch, proposes order) |
+| Epic (no non-plan sub-issues yet) | `/implement-flow #{number}` (creates sub-issues, integration branch, proposes order) |
+| Epic (non-plan sub-issues already created) | `/implement-flow #{number}` (creates integration branch, proposes order) |
 
 Always ask the user to review the plan and provide feedback if changes are needed.
 
@@ -325,12 +338,12 @@ At the end of the plan completion report, auto-record Evolution signals followin
 
 | Situation | Action |
 |-----------|--------|
-| `## Plan` section already exists | Ask whether to overwrite (AskUserQuestion) before delegating |
+| Child issue with title starting with "Plan:" already exists | Ask whether to overwrite (AskUserQuestion) before delegating |
 | Issue is Done/Released | Show warning |
-| Issue body is empty | Proceed (planning worker will create body with plan) |
+| Issue body is empty | Proceed (planning worker will create the plan issue) |
 | Status is already Preparing | Continue, skip status update |
-| Status is already Spec Review | Update plan, keep status |
-| Epic issue (has sub-issues) | Planning worker uses epic plan template |
+| Status is already Spec Review | Update plan issue, keep status |
+| Epic issue (has non-plan sub-issues) | Planning worker uses epic plan template |
 
 ## Rule References
 
@@ -356,6 +369,6 @@ At the end of the plan completion report, auto-record Evolution signals followin
 
 - This skill is the **orchestrator** — actual plan creation is delegated to `plan-worker` (`plan-issue` skill) via Agent tool
 - **Does not implement** — planning only. Implementation is `implement-flow`'s responsibility
-- Plans are persisted in the issue body — available across sessions
+- Plans are persisted as plan issues (child issues) — available across sessions
 - `Spec Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
 - **Chain autonomous progression**: After the review skill (Step 5) completes, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 6-7 based on the `**Review result:**` string. Check TaskList for remaining pending steps after each skill result

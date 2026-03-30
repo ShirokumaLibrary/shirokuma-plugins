@@ -237,11 +237,15 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 
 **Plan role:**
 
-1. Fetch Issue body via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{number}.md`
-2. Extract `## Plan` / `## 計画` section
-3. Evaluate each item in review checklist (`roles/plan.md`)
-4. Check against anti-patterns
-5. Verify consistency with requirements and deliverables
+1. Fetch the parent Issue via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{number}.md`
+2. Identify the plan issue from `subIssuesSummary` — the child issue with a title starting with "Plan:" or "計画:"
+3. Fetch the plan issue body via `shirokuma-docs items pull {plan-issue-number}` and read `.shirokuma/github/{plan-issue-number}.md`
+4. Extract the `## Plan` / `## 計画` section from the plan issue body as the review target
+5. Evaluate each item in review checklist (`roles/plan.md`)
+6. Check against anti-patterns
+7. Verify consistency with requirements and deliverables
+
+**Backward compatibility**: When no plan issue (child issue) exists but the parent issue body contains a `## Plan` / `## 計画` section (legacy approach), use the parent issue's plan section as the review target.
 
 **Design role:**
 

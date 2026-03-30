@@ -2,44 +2,57 @@
 
 Templates for each plan depth level. Use the template matching the level determined in Step 3.
 
-## Comment-Link Structure
+## Plan Issue Approach
 
-Plan details are posted as a comment, and only a summary link is written to the Issue body (comment-link pattern).
+Plan details are created as a child issue (plan issue) linked to the parent issue.
 
-- **Comment (detailed)**: Full plan content (approach, target files, task breakdown, risks, etc.)
-- **Body (summary link)**: Link to the plan comment + 1-2 line approach summary
+- **Plan Issue (child issue)**: An issue whose body contains the full plan content (approach, target files, task breakdown, risks, etc.)
+- **Title convention**: `Plan: {parent issue title}` format
+- **Status**: `Spec Review`
+- **Labels**: `area:plan`
 
-### Body Summary Link Format
+### Plan Issue Frontmatter Structure
 
 ```markdown
-## Plan
-
-> Details: {comment_url}
-
-### Approach
-{1-2 line description of the approach}
+---
+title: "Plan: {parent issue title}"
+status: "Spec Review"
+labels: ["area:plan"]
+---
 ```
-
-`{comment_url}` is obtained from the `comment_url` field returned by `shirokuma-docs items add comment`.
 
 ---
 
-## Lightweight Plan (Comment Content)
+## Lightweight Plan (Plan Issue Body)
 
 ```markdown
+---
+title: "Plan: {parent issue title}"
+status: "Spec Review"
+labels: ["area:plan"]
+---
+
 ## Plan
 
 ### Approach
 {1-2 line description of the approach}
+
+## Parent Issue
+
+See #{parent-number} for the task context.
 ```
 
-For lightweight plans, posting a comment is also required. The body contains only the summary link (`> Details: {url}`).
-
-## Standard Plan (Comment Content)
+## Standard Plan (Plan Issue Body)
 
 > When tasks have dependencies, include a diagram following the Mermaid guidelines in the `github-writing-style` rule.
 
 ```markdown
+---
+title: "Plan: {parent issue title}"
+status: "Spec Review"
+labels: ["area:plan"]
+---
+
 ## Plan
 
 ### Approach
@@ -51,13 +64,23 @@ For lightweight plans, posting a comment is also required. The body contains onl
 ### Task Breakdown
 - [ ] Task 1
 - [ ] Task 2
+
+## Parent Issue
+
+See #{parent-number} for the task context.
 ```
 
-## Detailed Plan (Comment Content)
+## Detailed Plan (Plan Issue Body)
 
 > Follow the Mermaid guidelines in the `github-writing-style` rule to include diagrams for task dependencies, state transitions, or component interactions.
 
 ```markdown
+---
+title: "Plan: {parent issue title}"
+status: "Spec Review"
+labels: ["area:plan"]
+---
+
 ## Plan
 
 ### Approach
@@ -72,15 +95,25 @@ For lightweight plans, posting a comment is also required. The body contains onl
 
 ### Risks / Concerns
 - {Breaking changes, performance, security, etc.}
+
+## Parent Issue
+
+See #{parent-number} for the task context.
 ```
 
 ## Epic Plan (Issues with Sub-Issues)
 
-For issues where `subIssuesSummary.total > 0`, use the extended template that includes sub-issue structure and integration branch.
+For issues where the target is an epic (intended to have sub-issues for actual work), use the extended template that includes sub-issue structure and integration branch.
 
 > Follow the Mermaid guidelines in the `github-writing-style` rule to visualize sub-issue dependencies and execution order.
 
 ```markdown
+---
+title: "Plan: {parent issue title}"
+status: "Spec Review"
+labels: ["area:plan"]
+---
+
 ## Plan
 
 ### Approach
@@ -107,6 +140,10 @@ For issues where `subIssuesSummary.total > 0`, use the extended template that in
 
 ### Risks / Concerns
 - {Dependency risks between sub-issues}
+
+## Parent Issue
+
+See #{parent-number} for the task context.
 ```
 
 See `epic-workflow` reference for details.

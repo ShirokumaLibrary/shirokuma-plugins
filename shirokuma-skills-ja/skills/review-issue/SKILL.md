@@ -237,11 +237,15 @@ shirokuma-docs lint docs -p . -f terminal
 
 **plan ロール:**
 
-1. `shirokuma-docs items pull {number}` で Issue 本文を取得し、`.shirokuma/github/{number}.md` を Read ツールで読み込む
-2. `## 計画` セクションを抽出
-3. レビューチェックリスト（`roles/plan.md`）の各項目を評価
-4. アンチパターンとの照合
-5. 要件・成果物との整合性を検証
+1. `shirokuma-docs items pull {number}` で親 Issue を取得し、`.shirokuma/github/{number}.md` を Read ツールで読み込む
+2. `subIssuesSummary` からタイトルが「計画:」で始まる計画 Issue を特定する
+3. `shirokuma-docs items pull {plan-issue-number}` で計画 Issue の本文を取得し、`.shirokuma/github/{plan-issue-number}.md` を Read ツールで読み込む
+4. 計画 Issue の `## 計画` セクションを抽出してレビュー対象とする
+5. レビューチェックリスト（`roles/plan.md`）の各項目を評価
+6. アンチパターンとの照合
+7. 要件・成果物との整合性を検証
+
+**後方互換**: 計画 Issue（子 Issue）が存在せず、親 Issue 本文に `## 計画` セクションがある場合は、旧方式として親 Issue の `## 計画` セクションをレビュー対象とする。
 
 **design ロール:**
 

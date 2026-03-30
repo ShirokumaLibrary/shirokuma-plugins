@@ -135,39 +135,29 @@ AI MUST update issue status at these points:
 4. **Pending requires reason** - Add a comment explaining the blocker
 5. **Idempotency** - If status is already correct, skip the update (no error)
 
-## Plan Comment-Link Body Structure
+## Plan Issue Approach
 
-Plan details are posted as a comment, and only a summary link is written to the Issue body (comment-link pattern). This prevents Issue body bloat while keeping the full plan accessible in the comment thread.
+Plans are created as child issues of the parent issue (issues with titles starting with "Plan:" or "計画:"). This allows plans to be managed as independent issues, making phase progress visible on GitHub Projects.
 
-### `## Plan` Section Structure in Issue Body
+### Plan Issue Structure
 
-```markdown
-## Plan
+- **Title**: `Plan: {parent issue title}`
+- **Status**: `Spec Review`
+- **Labels**: `area:plan`
+- **Body**: Full plan content (approach, target files, task breakdown, risks, etc.)
 
-> Details: {comment URL}
+### Referencing a Plan Issue
 
-### Approach
-{1-2 line description of the approach}
-```
-
-### Application Rules
-
-| Plan Level | Body | Comment |
-|-----------|------|---------|
-| Lightweight | Summary link only | Plan details (approach) |
-| Standard | Summary link only | Plan details (approach, target files, task breakdown) |
-| Detailed / Epic | Summary link only | Plan details (approach, target files, task breakdown, risks, etc.) |
-
-> `review-issue` accesses the detailed plan from the link in the body retrieved via `shirokuma-docs items pull {number}` (cached to `.shirokuma/github/{number}.md`).
-
-### Getting the Comment URL
-
-Use the `comment_url` field returned by `shirokuma-docs items add comment`.
+Identify the child issue with a title starting with "Plan:" from `subIssuesSummary`, then fetch its body via `items pull {plan-issue-number}`.
 
 ```bash
-PLAN_RESULT=$(shirokuma-docs items add comment {number} --file /tmp/plan.md)
-PLAN_COMMENT_URL=$(echo "$PLAN_RESULT" | jq -r '.comment_url')
+shirokuma-docs items pull {parent-number}
+# → Identify child issue with title starting with "Plan:" from subIssuesSummary
+shirokuma-docs items pull {plan-issue-number}
+# → Read .shirokuma/github/{plan-issue-number}.md
 ```
+
+> **Backward compatibility**: When no plan issue exists but the Issue body contains a `## Plan` section (legacy approach), use it as a fallback.
 
 ## Plan-Implementation Deviation: Issue Body Update
 
@@ -234,7 +224,7 @@ When AI reviews the content of an Issue/PR/Discussion, **use `shirokuma-docs ite
 
 | Purpose | Include in comment |
 |---------|-------------------|
-| Plan details | Approach, task breakdown, risks (referenced from body via comment-link pattern) |
+| Plan decision rationale | Reasoning for selected approach, alternatives considered, constraints discovered (posted as comment on plan issue) |
 | Direction change during implementation | Reason for change, alternatives considered, "why" as primary record |
 | Blocker notification | Blocker description, scope of impact, resolution conditions |
 | Response to review feedback | What was changed, where, and remaining issues |

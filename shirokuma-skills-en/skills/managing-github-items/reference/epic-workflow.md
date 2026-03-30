@@ -15,7 +15,7 @@ Unified reference for working with epics (parent issue + sub-issue structure) on
 
 ## Identifying Epics
 
-Epics are identified by **structure**, not Issue Type. An issue with `subIssuesSummary.total > 0` is an epic.
+Epics are identified by **structure**, not Issue Type. An issue with non-plan child issues (child issues whose titles do NOT start with "Plan:" or "計画:") in `subIssuesSummary` is an epic. An issue with only a plan issue is not considered an epic.
 
 ```bash
 shirokuma-docs items pull {number}
@@ -143,7 +143,7 @@ In epic structures, PRs and issues can form many-to-many relationships. `pr merg
 
 ## Epic Plan Template
 
-Extended template used by `plan-issue` when `subIssuesSummary.total > 0` is detected:
+Extended template used by `plan-issue` when planning an epic issue (the plan issue itself is excluded from the sub-issue structure count):
 
 ```markdown
 ## Plan

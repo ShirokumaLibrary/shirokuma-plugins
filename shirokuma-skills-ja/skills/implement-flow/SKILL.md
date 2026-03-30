@@ -53,7 +53,7 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 
 `.shirokuma/github/{number}.md` の frontmatter に `parentIssue` フィールドがある場合、サブ Issue モードで動作する:
 
-1. 親 Issue の `## 計画` セクションを参照し、全体コンテキストを把握
+1. 親 Issue の計画 Issue（子 Issue のうちタイトルが「計画:」または「Plan:」で始まるもの）を特定し、`items pull {plan-issue-number}` で取得して全体コンテキストを把握する
 2. ベースブランチを `develop` ではなく親の integration ブランチに設定（ステップ 3 参照）
 3. PR 作成時も integration ブランチをベースにする（`open-pr-issue` が `parentIssue` フィールドで自力検出するため、明示的なコンテキスト渡しは不要。渡せばそれを利用する補助的位置づけ）
 
@@ -61,29 +61,32 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 # 親 Issue の確認
 shirokuma-docs items pull {parent-number}
 # → .shirokuma/github/{parent-number}.md を Read ツールで読み込む
+# subIssuesSummary からタイトルが「計画:」で始まる子 Issue を特定
+shirokuma-docs items pull {plan-issue-number}
+# → 計画の本文を取得してコンテキストとして使用
 ```
 
 #### 計画済み判定（Issue 番号ありの場合）
 
-Issue 本文に `## 計画` セクション（`^## 計画` で前方一致検出）があるか確認する。
+`subIssuesSummary` を確認し、タイトルが「計画:」または「Plan:」で始まる子 Issue が存在するか確認する。
 
 | 計画状態 | 条件 | アクション |
 |---------|------|----------|
-| 計画なし | Size XS/S（明確な要件）かつサブ Issue でない | → 計画をスキップして直接 `code-issue` に進む |
-| 計画なし | Size M 以上または要件に曖昧さあり | → `prepare-flow` に委任して計画を策定 |
-| 計画なし | サブ Issue（`parentIssue` あり） | → サイズに関わらず `prepare-flow` に委任して計画を策定 |
-| 計画あり | — | → 計画を `## 計画` セクションからコンテキストとして実装スキルに渡す |
+| 計画 Issue なし | Size XS/S（明確な要件）かつサブ Issue でない | → 計画をスキップして直接 `code-issue` に進む |
+| 計画 Issue なし | Size M 以上または要件に曖昧さあり | → `prepare-flow` に委任して計画を策定 |
+| 計画 Issue なし | サブ Issue（`parentIssue` あり） | → サイズに関わらず `prepare-flow` に委任して計画を策定 |
+| 計画 Issue あり | — | → `items pull {plan-issue-number}` で計画 Issue の本文を取得し、コンテキストとして実装スキルに渡す |
 
-#### 計画詳細コメントの取得
+**後方互換**: `## 計画` セクション（旧方式）が Issue 本文に存在し、計画 Issue（子 Issue）が存在しない場合は、警告を表示した上で旧方式の計画セクションをコンテキストとして使用する。
 
-`## 計画` セクションに `> 詳細: {URL}` 形式のコメントリンクがある場合、計画の詳細はそのコメントに記載されている。`items pull` では本文とコメントがキャッシュに書き込まれるため、`.shirokuma/github/{number}/` 配下のコメントファイルを直接参照して計画詳細を把握する。コメントが未取得の場合は以下を実行して明示的に取得する:
+#### 計画詳細の取得
+
+計画 Issue が存在する場合（新方式）:
 
 ```bash
-# コメントリンクがある場合のみ実行
-shirokuma-docs items comments {number} --format json
+shirokuma-docs items pull {plan-issue-number}
+# → .shirokuma/github/{plan-issue-number}.md を Read ツールで読み込み計画内容を取得
 ```
-
-取得したコメントの中から計画詳細を含むコメントを特定し、その内容をコンテキストとして実装スキルに渡す。
 
 **XS/S 直接実装パスの判定:** Issue の Size フィールドが XS または S であり、かつタイトルと本文から変更内容が明確に読み取れる場合（パターン置換、型修正、リネーム等の機械的変換）に適用する。ただし、サブ Issue（`parentIssue` フィールドあり）は Size に関わらず計画が必須であるため、このパスの対象外とする。Size が未設定、要件に曖昧さがある、サブ Issue である、または判断が難しい場合は `prepare-flow` に委任する。正規の判定基準は `creating-item` スキルの「要件明確性の判定」セクションを参照。
 
@@ -379,7 +382,7 @@ Status 更新後、ユーザーに次のアクション候補を提示する。`
 
 1. 引数に**明示的な Issue 番号**が指定されている
 2. Issue のステータスが **Spec Review** または **Ready** である
-3. Issue 本文に `## 計画`（JA）または `## Plan`（EN）セクションが存在する
+3. Issue に計画 Issue（タイトルが「計画:」または「Plan:」で始まる子 Issue）が存在する、または Issue 本文に `## 計画`（JA）/ `## Plan`（EN）セクションが存在する（後方互換）
 
 いずれかを満たさない場合、エラーメッセージを表示して停止する（通常モードへのフォールバックは行わない）。
 
@@ -425,18 +428,18 @@ claude -p "/implement-flow --headless #42"
 | 誤ったブランチ | AskUserQuestion: 切り替え or 続行 |
 | チェーン失敗 | 完了/残りステップ報告、制御を返す |
 | サブ Issue で integration ブランチ未検出 | `develop` をベースにし警告表示 |
-| エピック Issue を直接指定 | 下記「エピック Issue エントリーポイント」参照 |
+| エピック Issue を直接指定 | 計画 Issue 以外の子 Issue の有無に基づき下記「エピック Issue エントリーポイント」参照 |
 | `--headless` + 前提条件未達 | エラーメッセージを表示して停止 |
 | `--headless` + 誤ブランチ（W4） | 警告を表示して停止（自動切り替えしない） |
 | `--headless` + worker の UCP（W5） | スキップして Issue コメントに記録 |
 
 ## エピック Issue エントリーポイント
 
-エピック Issue が直接指定された場合（`subIssuesSummary.total > 0` または計画に `### サブ Issue 構成` セクションがある場合）、通常の実装ディスパッチではなく以下のフローを実行する。
+エピック Issue が直接指定された場合（計画 Issue 以外の子 Issue が存在する、または計画 Issue の本文に `### サブ Issue 構成` セクションがある場合）、通常の実装ディスパッチではなく以下のフローを実行する。
 
-### 前提条件: サブ Issue 構成を含む計画
+### 前提条件: サブ Issue 構成を含む計画 Issue
 
-エピックに `## 計画` と `### サブ Issue 構成` セクションが必要。計画がなければ `prepare-flow` に先に委任（通常フロー）。
+エピックに計画 Issue（子 Issue のうちタイトルが「計画:」または「Plan:」で始まるもの）があり、その本文に `### サブ Issue 構成` セクションが必要。計画 Issue がなければ `prepare-flow` に先に委任（通常フロー）。
 
 ### エピックワークフロー
 
@@ -449,16 +452,16 @@ claude -p "/implement-flow --headless #42"
 
    | 条件 | ステップ 2 |
    |------|-----------|
-   | `subIssuesSummary.total === 0` | サブ Issue を作成 |
-   | `subIssuesSummary.total > 0` | スキップ（`prepare-flow` で作成済み） |
+   | 計画 Issue 以外の子 Issue が存在しない | サブ Issue を作成 |
+   | 計画 Issue 以外の子 Issue が既に存在する | スキップ（`prepare-flow` で作成済み） |
 
-2. **サブ Issue の一括作成**（`subIssuesSummary.total === 0` の場合のみ）: `prepare-flow` で既にサブ Issue が作成済みの場合はこのステップをスキップする。計画の `### サブ Issue 構成` テーブルを解析し、各行についてサブ Issue を CLI で作成:
+2. **サブ Issue の一括作成**（計画 Issue 以外の子 Issue が存在しない場合のみ）: `prepare-flow` で既にサブ Issue が作成済みの場合はこのステップをスキップする。計画 Issue の `### サブ Issue 構成` テーブルを解析し、各行についてサブ Issue を CLI で作成:
    ```bash
    shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
    ```
    本文ファイルの frontmatter に `title`、`status: "Backlog"` を設定し、本文には親計画への参照（`#{epic-number} の計画を参照`）を記述する。
    作成後、`shirokuma-docs items parent {sub-number} {epic-number}` でサブ Issue の親を設定する。
-   作成後、エピックの `### サブ Issue 構成` テーブルを実際の Issue 番号で更新する。
+   作成後、計画 Issue の `### サブ Issue 構成` テーブルのプレースホルダー（`#{sub1}` 等）を実際の Issue 番号で更新し、`items push {plan-issue-number}` で計画 Issue 本文を同期する。
 
 3. **実行順序の案内**: `### 実行順序` セクションまたは依存列に基づき、推奨順序を表示して終了する。即時作業開始は提案しない — `best-practices-first` ルールのエピックパターンに従い、各サブ Issue は別の会話で作業する:
    ```

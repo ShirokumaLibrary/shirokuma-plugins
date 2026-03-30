@@ -2,21 +2,21 @@
 
 ## 責務
 
-Issue の計画（`## 計画`）の品質レビュー:
+Issue の計画（計画 Issue または `## 計画` セクション）の品質レビュー:
 - 要件カバレッジ（概要・タスクの全要件が計画で漏れなくカバーされているか）
 - 変更ファイルの妥当性（漏れや余分なファイルはないか）
 - タスク粒度（1タスク ≈ 1コミットの原則）
 - リスク分析（破壊的変更、パフォーマンス影響の見落とし）
-- Issue 記述の十分性（Issue 本文だけで計画を理解・評価できるか）
+- Issue 記述の十分性（計画 Issue の本文だけで計画を理解・評価できるか）
 
-> **comment-link 方式**: 計画詳細がコメントに投稿され、Issue 本文にはサマリーリンク（`> 詳細: {URL}`）のみ記載される場合がある。この場合、本文のリンクからコメントの詳細計画を取得してレビューする。
+> **計画 Issue 方式**: 計画は親 Issue の子 Issue（タイトルが「計画:」で始まる Issue）として作成される。`subIssuesSummary` から計画 Issue を特定し、`items pull {plan-issue-number}` で本文を取得してレビューする。旧方式（Issue 本文の `## 計画` セクション）が存在する場合はフォールバックとして使用する。
 
 ## `plan-issue` との使い分け
 
 | 観点 | `plan-issue` 内蔵レビュー | `review-issue` plan ロール |
 |------|--------------------------------|--------------------------------|
 | タイミング | 計画策定直後の即時チェック | ユーザーが任意タイミングで依頼 |
-| データ取得 | Task エージェントに Issue 本文を埋め込み | Issue 番号から `shirokuma-docs items pull` で取得 |
+| データ取得 | Task エージェントに Issue 本文を埋め込み | Issue 番号から計画 Issue を特定し `shirokuma-docs items pull` で取得 |
 | 目的 | 計画の初期品質ゲート | 独立したセカンドオピニオン |
 | 起動方法 | `plan-issue` のステップ 4 で自動実行 | `/review-issue plan #N` または Spec Review Issue 指定 |
 
@@ -31,9 +31,9 @@ Issue の計画（`## 計画`）の品質レビュー:
 ```
 1. ロール選択: "plan review" or Spec Review Issue
 2. Issue 本文取得: shirokuma-docs items pull {number}（→ .shirokuma/github/{number}.md を Read ツールで読み込む）
-3. 計画詳細取得: 本文に `> 詳細:` リンクがある場合、.shirokuma/github/{number}/ 配下のコメントファイルを Read ツールで参照して計画コメントを取得
+3. 計画 Issue 特定: subIssuesSummary からタイトルが「計画:」で始まる子 Issue を特定し、items pull {plan-issue-number} で本文を取得（フォールバック: 本文の ## 計画 セクション）
 4. Lint 実行: スキップ（対象がコードファイルではないため）
-5. 計画分析: 計画詳細（コメントまたは本文）をレビュー観点で分析
+5. 計画分析: 計画 Issue の本文（または旧方式の計画セクション）をレビュー観点で分析
 6. レポート生成: テンプレート形式
 7. レポート保存: Issue コメント
 ```
