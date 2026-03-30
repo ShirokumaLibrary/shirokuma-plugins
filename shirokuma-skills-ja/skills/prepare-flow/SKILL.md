@@ -23,10 +23,11 @@ Issue の計画フェーズを統括する: Issue の取得、ステータス遷
 | 3 | 計画を作成する | 計画を作成中 | `plan-issue` (subagent: `plan-worker`) |
 | 4 | 計画をレビューする | 計画をレビュー中 | `review-issue` (subagent: `review-worker`) |
 | 5 | [条件付き] レビュー指摘を修正し再レビューする | レビュー指摘を修正し再レビュー中 | `plan-issue` (subagent: `plan-worker`) + `review-issue` (subagent: `review-worker`) |
+| 5a | [条件付き] エピック計画のサブ Issue を作成する | サブ Issue を作成中 | マネージャー直接: `shirokuma-docs items add issue/parent/push` |
 | 6 | デザインフェーズ要否を判定しステータスを更新する | デザインフェーズ要否を判定しステータスを更新中 | マネージャー直接: `shirokuma-docs items push` |
 | 7 | 計画サマリーをユーザーに返す | 計画サマリーをユーザーに返却中 | マネージャー直接 |
 
-Dependencies: step 2 blockedBy 1 (条件付き: リサーチトリガー該当時のみ), step 3 blockedBy 1 or 2, step 4 blockedBy 3, step 5 blockedBy 4 (条件付き: NEEDS_REVISION 時のみ), step 6 blockedBy 4 or 5, step 7 blockedBy 6.
+Dependencies: step 2 blockedBy 1 (条件付き: リサーチトリガー該当時のみ), step 3 blockedBy 1 or 2, step 4 blockedBy 3, step 5 blockedBy 4 (条件付き: NEEDS_REVISION 時のみ), step 5a blockedBy 4 or 5 (条件付き: エピック計画の場合), step 6 blockedBy 4 or 5 or 5a, step 7 blockedBy 6.
 
 TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に `completed` に更新する。ステップ 2 はトリガー不該当時にスキップ。ステップ 5 は PASS 時にスキップ（タスクリストから除外してよい）。
 
@@ -228,6 +229,35 @@ EOF
 shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-review-pass.md
 ```
 
+→ ステップ 5a（エピック計画の場合）またはステップ 6 へ進む。
+
+### ステップ 5a: サブ Issue 自動生成（エピック計画の場合）
+
+レビュー PASS 後、計画に `### サブ Issue 構成` セクションが含まれ、かつ `subIssuesSummary.total === 0`（サブ Issue 未作成）の場合に実行する。条件を満たさない場合はスキップしてステップ 6 へ進む。
+
+#### サブ Issue 作成手順
+
+1. `### サブ Issue 構成` テーブルを解析し、各行についてサブ Issue を作成:
+   ```bash
+   # 各サブ Issue の本文ファイルを作成
+   cat > /tmp/shirokuma-docs/{parent-number}-sub-{n}.md <<'EOF'
+   ---
+   title: "{サブ Issue タイトル}"
+   status: "Backlog"
+   ---
+
+   #{parent-number} の計画を参照。
+   EOF
+
+   # サブ Issue を作成
+   shirokuma-docs items add issue --file /tmp/shirokuma-docs/{parent-number}-sub-{n}.md
+
+   # 親子関係を設定
+   shirokuma-docs items parent {sub-number} {parent-number}
+   ```
+
+2. 全サブ Issue 作成後、エピックの `### サブ Issue 構成` テーブルのプレースホルダー（`#{sub1}` 等）を実際の Issue 番号で更新し、`items push {parent-number}` で Issue 本文を同期する。
+
 #### 不合格時の動作
 
 NEEDS_REVISION が返された場合:
@@ -291,6 +321,7 @@ shirokuma-docs items push {number}
 - **変更ファイル数** と **タスク数**（標準/詳細）
 - **設計フェーズ** の要否（設計が必要な場合）
 - **サブ Issue 数** と **Integration ブランチ**（エピック）
+- **作成済みサブ Issue:** 作成されたサブ Issue の番号リスト（エピック・ステップ 5a 実行時）
 
 **次のステップ案内**（条件別）:
 
@@ -298,7 +329,8 @@ shirokuma-docs items push {number}
 |------|------------|
 | 軽量 / 設計不要の標準 | `/implement-flow #{number}` |
 | 設計が必要な標準/詳細 | `/design-flow #{number}`（推奨）または `/implement-flow #{number}`（設計スキップ） |
-| エピック | `/implement-flow #{number}`（サブ Issue 作成、Integration ブランチ作成、実行順序提案を自動実行） |
+| エピック（サブ Issue 未作成） | `/implement-flow #{number}`（サブ Issue 作成、Integration ブランチ作成、実行順序提案を自動実行） |
+| エピック（サブ Issue 作成済み） | `/implement-flow #{number}`（Integration ブランチ作成、実行順序提案を自動実行） |
 
 計画を確認しフィードバックが必要な場合は修正を依頼するよう、必ずユーザーに案内する。
 

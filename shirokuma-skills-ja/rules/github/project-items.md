@@ -52,19 +52,16 @@ graph LR
 | 全サブ Issue が Done | 親を Done に自動遷移 |
 | 一部が In Progress / Review | 親を In Progress に維持 |
 | 一部が Done + 残りが Backlog / Preparing | 親を In Progress に維持（進行中とみなす） |
-| 全サブ Issue が Not Planned | 親を Backlog に自動戻し（`items integrity --fix` が処理） |
+| 全サブ Issue が Not Planned | 親を Backlog に自動戻し |
 
-**整合性チェック**: `items integrity --fix` を実行すると、全 Issue の親子ステータス整合性を検証し自動修正する。
+**リアクティブ自動導出**: CLI が `items push`、`items close`（`items cancel` 含む）、`items update-status`、`items pr merge` 実行時にサブ Issue のステータス変更を検出し、親のステータスを自動的に導出・更新する。明示的な `items integrity --fix` の実行は不要（バッチ整合性チェックとしては引き続き利用可能）。
 
 ### 計画リセットフロー
 
 エピックの計画を白紙に戻す場合（サブ Issue が作成済みの場合）:
 
-1. 全サブ Issue を `items cancel {sub-numbers}` で Not Planned に変更
-2. `items integrity --fix` を実行 → 全サブが Not Planned のため親が Backlog に自動遷移
-3. `prepare-flow` で再計画
-
-> `items integrity` に `--parent` フラグは存在しない。`--fix` のみで全体チェックを実行する。
+1. 全サブ Issue を `items cancel {sub-numbers}` で Not Planned に変更（CLI が自動的に親を Backlog に遷移）
+2. `prepare-flow` で再計画
 
 ### アイデア → Issue フロー
 

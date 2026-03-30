@@ -23,10 +23,11 @@ Register all chain steps via TaskCreate **before starting work**.
 | 3 | Create the plan | Creating the plan | `plan-issue` (subagent: `plan-worker`) |
 | 4 | Review the plan | Reviewing the plan | `review-issue` (subagent: `review-worker`) |
 | 5 | [Conditional] Fix review issues and re-review | Fixing review issues and re-reviewing | `plan-issue` (subagent: `plan-worker`) + `review-issue` (subagent: `review-worker`) |
+| 5a | [Conditional] Create sub-issues for epic plan | Creating sub-issues | Manager direct: `shirokuma-docs items add issue/parent/push` |
 | 6 | Assess design phase need and update status | Assessing design phase need and updating status | Manager direct: `shirokuma-docs items push` |
 | 7 | Return plan summary to user | Returning plan summary to user | Manager direct |
 
-Dependencies: step 2 blockedBy 1 (conditional: only when research trigger applies), step 3 blockedBy 1 or 2, step 4 blockedBy 3, step 5 blockedBy 4 (conditional: only on NEEDS_REVISION), step 6 blockedBy 4 or 5, step 7 blockedBy 6.
+Dependencies: step 2 blockedBy 1 (conditional: only when research trigger applies), step 3 blockedBy 1 or 2, step 4 blockedBy 3, step 5 blockedBy 4 (conditional: only on NEEDS_REVISION), step 5a blockedBy 4 or 5 (conditional: only for epic plans), step 6 blockedBy 4 or 5 or 5a, step 7 blockedBy 6.
 
 Update each step to `in_progress` at start and `completed` on finish via TaskUpdate. Step 2 is skipped when no trigger applies. Step 5 is skipped on PASS (may be omitted from the task list).
 
@@ -206,6 +207,35 @@ If PASS was reached after NEEDS_REVISION cycles, include revision details in the
 shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-review-pass.md
 ```
 
+→ Proceed to Step 5a (if epic plan) or Step 6.
+
+### Step 5a: Auto-create Sub-issues (Epic Plans Only)
+
+After review PASS, execute this step if the plan contains a `### Sub-Issue Structure` section **and** `subIssuesSummary.total === 0` (no sub-issues created yet). Skip and proceed to Step 6 if the condition is not met.
+
+#### Sub-issue Creation Procedure
+
+1. Parse the `### Sub-Issue Structure` table and create each sub-issue:
+   ```bash
+   # Create the body file for each sub-issue
+   cat > /tmp/shirokuma-docs/{parent-number}-sub-{n}.md <<'EOF'
+   ---
+   title: "{sub-issue title}"
+   status: "Backlog"
+   ---
+
+   See #{parent-number} for full plan.
+   EOF
+
+   # Create the sub-issue
+   shirokuma-docs items add issue --file /tmp/shirokuma-docs/{parent-number}-sub-{n}.md
+
+   # Set parent-child relationship
+   shirokuma-docs items parent {sub-number} {parent-number}
+   ```
+
+2. After all sub-issues are created, update the placeholders (`#{sub1}`, etc.) in the epic's `### Sub-Issue Structure` table with actual issue numbers and sync via `items push {parent-number}`.
+
 #### On Failure
 
 When NEEDS_REVISION is returned:
@@ -267,6 +297,7 @@ Show a summary matching the plan depth level and design phase assessment. Follow
 - **Target files** and **Tasks** count (Standard/Detailed)
 - **Design phase** indicator when design is needed
 - **Sub-issues** count and **Integration branch** (Epic)
+- **Created sub-issues:** List of created sub-issue numbers (Epic, when Step 5a executed)
 
 **Next steps guidance** (vary by condition):
 
@@ -274,7 +305,8 @@ Show a summary matching the plan depth level and design phase assessment. Follow
 |-----------|-----------|
 | Lightweight / Standard without design | `/implement-flow #{number}` |
 | Standard/Detailed with design needed | `/design-flow #{number}` (recommended) or `/implement-flow #{number}` (skip design) |
-| Epic | `/implement-flow #{number}` (creates sub-issues, integration branch, proposes order) |
+| Epic (sub-issues not yet created) | `/implement-flow #{number}` (creates sub-issues, integration branch, proposes order) |
+| Epic (sub-issues already created) | `/implement-flow #{number}` (creates integration branch, proposes order) |
 
 Always ask the user to review the plan and provide feedback if changes are needed.
 

@@ -23,9 +23,7 @@ allowed-tools: Bash, Read, Grep, Glob, TaskCreate, TaskUpdate, TaskGet, TaskList
 | 3 | 完了レポートを出力する | 完了レポートを出力中 | ステップ 3 |
 | 4 | PR チェーンを実行する | PR チェーンを実行中 | ステップ 4（条件付き） |
 | 5 | マージチェーンを実行する | マージチェーンを実行中 | ステップ 5（条件付き） |
-| 6 | 親 Issue 整合性チェックを実行する | 親 Issue 整合性チェック中 | ステップ 5 後（サブ Issue 時のみ） |
-
-Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5.
+Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4.
 
 TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に `completed` に更新する。条件付きステップ（ステップ 4, 5）はキーワード検出時のみ登録する。
 
@@ -236,15 +234,9 @@ PR #{pr-number} を {base-branch} にマージ、ブランチ削除済み
 
 ステップ 1-3 → ステップ 4（PR チェーン）→ ステップ 5（マージチェーン）を順次実行。
 
-#### サブ Issue の親 Issue 整合性チェック
+#### サブ Issue の親 Issue 整合性チェック（CLI 自動処理）
 
-マージ完了後、現在の Issue がサブ Issue（frontmatter に `parentIssue` フィールドがある）の場合、親 Issue の整合性チェックを実行する:
-
-```bash
-shirokuma-docs items integrity --fix
-```
-
-このコマンドが全サブ Issue の完了を検出した場合、親 Issue を自動的に Done に遷移させる。`--fix` フラグのみ使用すること（`--parent` フラグは存在しない）。
+親 Issue のステータス自動導出は CLI が `items push`、`items close`、`items update-status`、`items pr merge` 実行時にリアクティブに処理する。スキル側での明示的な `items integrity --fix` 呼び出しは不要。
 
 ## バッチモード
 

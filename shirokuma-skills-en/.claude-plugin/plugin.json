@@ -1,7 +1,7 @@
 {
   "name": "shirokuma-skills-en",
   "description": "Reusable AI skills and rules for Claude Code following Agent Skills standard",
-  "version": "0.3.0-alpha.71",
+  "version": "0.3.0-alpha.75",
   "author": {
     "name": "ShirokumaLibrary"
   },

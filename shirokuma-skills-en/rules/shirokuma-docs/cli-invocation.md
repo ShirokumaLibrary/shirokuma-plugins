@@ -32,7 +32,7 @@ The following commands are handled internally by the `shirokuma-docs` CLI. Direc
 | `gh issue close` | `shirokuma-docs items close {number}` |
 | `gh pr create`, `gh pr view`, `gh pr list` | `shirokuma-docs items pr create`, `items pr show`, `items pr list` |
 | `gh pr review`, `gh api .../pulls/.../comments` | `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve` |
-| `gh project item-list`, `gh project field-list` | `shirokuma-docs items projects list`, `items projects fields` |
+| `gh project item-list`, `gh project field-list` | `shirokuma-docs items list`, `items fields` (`items projects list/fields` deprecated) |
 | `gh api .../discussions` | `shirokuma-docs items discussions list`, `items discussions search` |
 | `gh search issues` | `shirokuma-docs items search` |
 | `gh search issues --include-prs` | `shirokuma-docs items search --type issues` |

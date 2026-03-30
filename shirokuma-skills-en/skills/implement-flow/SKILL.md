@@ -441,7 +441,12 @@ The epic must have a `## Plan` with a `### Sub-Issue Structure` section. If no p
    git push -u origin epic/{number}-{slug}
    ```
 
-2. **Create sub-issues in batch**: Parse the `### Sub-Issue Structure` table from the plan. For each row, create a sub-issue via CLI:
+   | Condition | Step 2 |
+   |-----------|--------|
+   | `subIssuesSummary.total === 0` | Create sub-issues |
+   | `subIssuesSummary.total > 0` | Skip (already created by `prepare-flow`) |
+
+2. **Create sub-issues in batch** (only when `subIssuesSummary.total === 0`): Skip this step if sub-issues were already created by `prepare-flow`. Parse the `### Sub-Issue Structure` table from the plan. For each row, create a sub-issue via CLI:
    ```bash
    shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
    ```

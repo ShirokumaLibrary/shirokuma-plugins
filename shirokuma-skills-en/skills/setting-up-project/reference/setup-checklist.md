@@ -9,7 +9,7 @@
 | 3 | `shirokuma-docs.config.yaml` | File existence check | Automated |
 | 4 | Plugin installation | `claude plugin list` | Automated |
 | 5 | `.claude/rules/shirokuma/` deploy | Directory existence check | Automated |
-| 6 | GitHub Projects V2 | `shirokuma-docs items projects list` | Automated |
+| 6 | GitHub Projects V2 | `shirokuma-docs items list` | Automated |
 | 7 | Status/Priority/Size fields | `session check --setup` | Automated |
 | 8 | Discussion categories | `session check --setup` | Manual |
 | 9 | Issue Types | Check in GitHub UI | Manual |

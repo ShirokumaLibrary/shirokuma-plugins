@@ -39,7 +39,6 @@ Project naming convention: Project name = repository name (e.g., `blogcms` repo 
 | `#number` | No | Yes (`#123`) |
 | External reference | No | Yes |
 | Comments | No | Yes |
-| Create command | `projects create` | `items add issue` |
 | Use case | Lightweight memo | Full task |
 
 **Recommendation**: Use `items add issue` by default for `#number` support.
@@ -86,14 +85,9 @@ shirokuma-docs items pr resolve {number} --thread-id {id}        # Resolve threa
 ### Projects (Item Operations)
 
 ```bash
-shirokuma-docs items projects list                  # Project items
-shirokuma-docs items projects fields                # Show field options
-shirokuma-docs items projects add-issue {number}    # Add issue to project
-shirokuma-docs items projects create \
-  --title "Title" --body-file /tmp/shirokuma-docs/body.md \
-  --field-status "Backlog" --priority "Medium"               # DraftIssue
-shirokuma-docs items projects get PVTI_xxx          # By item ID
-shirokuma-docs items projects update {number} --field-status "Done"
+shirokuma-docs items projects update {number} --field-status "Done"  # Field update (only way)
+shirokuma-docs items projects add-issue {number}                     # Add issue to project
+shirokuma-docs items projects delete PVTI_xxx                        # Delete item
 ```
 
 ### Discussions

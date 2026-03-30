@@ -100,7 +100,7 @@
     {
       "id": "gh-project",
       "pattern": "gh project (item-list|field-list)",
-      "reason": "Use `shirokuma-docs items projects list` or `items projects fields` instead of `gh project`.",
+      "reason": "Use `shirokuma-docs items list` or `items fields` instead of `gh project`.",
       "enabled": true
     },
     {

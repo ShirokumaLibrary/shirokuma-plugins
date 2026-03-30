@@ -447,7 +447,12 @@ claude -p "/implement-flow --headless #42"
    git push -u origin epic/{number}-{slug}
    ```
 
-2. **サブ Issue の一括作成**: 計画の `### サブ Issue 構成` テーブルを解析し、各行についてサブ Issue を CLI で作成:
+   | 条件 | ステップ 2 |
+   |------|-----------|
+   | `subIssuesSummary.total === 0` | サブ Issue を作成 |
+   | `subIssuesSummary.total > 0` | スキップ（`prepare-flow` で作成済み） |
+
+2. **サブ Issue の一括作成**（`subIssuesSummary.total === 0` の場合のみ）: `prepare-flow` で既にサブ Issue が作成済みの場合はこのステップをスキップする。計画の `### サブ Issue 構成` テーブルを解析し、各行についてサブ Issue を CLI で作成:
    ```bash
    shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
    ```

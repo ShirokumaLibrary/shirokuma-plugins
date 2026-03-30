@@ -216,10 +216,6 @@ shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
 # Sub-Issue (frontmatter includes parent field)
 shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
 
-# DraftIssue (lightweight)
-shirokuma-docs items projects create \
-  --title "Title" --body-file /tmp/shirokuma-docs/add-format-option-body.md \
-  --field-status "Backlog" --priority "Medium"
 ```
 
 ### Sub-Issue Creation Guidance
