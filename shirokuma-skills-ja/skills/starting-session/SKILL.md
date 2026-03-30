@@ -15,7 +15,7 @@ allowed-tools: Bash, Read, Grep
 ### ステップ 1: プロジェクト状態取得
 
 ```bash
-shirokuma-docs session start
+shirokuma-docs items dashboard
 ```
 
 返される JSON: `repository`, `git`（ブランチ、未コミット変更）, `lastHandover`, `backups`（PreCompact バックアップ）, `issues`（アクティブ Issue + フィールド）, `total_issues`, `openPRs`（オープン PR + レビューステータス）
@@ -64,7 +64,7 @@ Args: #{N}
 
 ### 検出
 
-1. `session start` 出力から Issue をフィルタ: Status = Backlog, Size = XS or S
+1. `items dashboard` 出力から Issue をフィルタ: Status = Backlog, Size = XS or S
 2. `area:*` ラベル（第1優先）またはタイトルキーワード類似度（フォールバック: 共通名詞2語以上）でグルーピング
 3. 3 Issue 以上のグループを表示、最大3グループ
 
@@ -101,24 +101,16 @@ shirokuma-docs items list --issue-type Evolution --limit 1
 
 ## マルチ開発者モード
 
-チーム開発では `session start` に以下のオプションを追加できる：
+チーム開発では `items dashboard` に以下のオプションを追加できる：
 
 ```bash
-# 特定ユーザーの引き継ぎを表示
-shirokuma-docs session start --user {username}
-
-# 全メンバーの引き継ぎを表示（フィルタなし）
-shirokuma-docs session start --all
-
 # チームダッシュボード（メンバー別にグループ化）
-shirokuma-docs session start --team
+shirokuma-docs items dashboard --team
 ```
 
 | オプション | 動作 |
 |-----------|------|
 | （デフォルト）| 現在の GitHub ユーザーの引き継ぎのみ取得 |
-| `--user {username}` | 特定ユーザーの引き継ぎを取得 |
-| `--all` | 全メンバーの引き継ぎを取得（フィルタなし） |
 | `--team` | メンバー別にハンドオーバー + Issue をグループ化して表示 |
 
 ## エッジケース
@@ -144,5 +136,5 @@ shirokuma-docs session start --team
 
 - セッションヘッダーに現在時刻を表示
 - 優先度順に表示
-- `shirokuma-docs session start` を使用する（直接 `gh` コマンドではなく）— CLI がハンドオーバー・Issues・PR を 1 回で集約し、コンテキストウィンドウを節約する
-- ハンドオーバー保存・復元は本スキルの責務外。コンテキスト保存は `session end` CLI で行い、スキルが直接管理しない
+- `shirokuma-docs items dashboard` を使用する（直接 `gh` コマンドではなく）— CLI がハンドオーバー・Issues・PR を 1 回で集約し、コンテキストウィンドウを節約する
+- ハンドオーバー保存・復元は本スキルの責務外。コンテキスト保存は CLI で行い、スキルが直接管理しない

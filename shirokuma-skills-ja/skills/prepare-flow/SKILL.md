@@ -114,6 +114,16 @@ Issue 本文に `## 計画` セクション（`^## 計画` で前方一致検出
 | 計画なし | ステップ 3（plan-issue に委任）へ進む |
 | 計画あり | 上書きするか確認（AskUserQuestion）してから進む |
 
+#### サブ Issue がある場合の計画リセットパス
+
+`subIssuesSummary.total > 0`（エピックで既にサブ Issue が作成済み）の場合、再計画前にユーザーへ確認する（AskUserQuestion）:
+
+- **続行（既存サブ Issue のまま再計画）**: 計画の文書のみ更新し、既存サブ Issue は維持する
+- **リセット（全サブ Issue をキャンセルして再計画）**: 以下の手順で実行:
+  1. 全サブ Issue を `shirokuma-docs items cancel {sub-numbers}` で Not Planned に変更
+  2. `shirokuma-docs items integrity --fix` を実行 → 全サブが Not Planned のため親が Backlog に自動遷移
+  3. ステップ 1b に戻り Preparing に再遷移してから ステップ 3（plan-issue 委任）へ進む
+
 ### ステップ 3: plan-issue を plan-worker に委任
 
 Agent ツールで `plan-worker` を起動し、`plan-issue` スキルに計画作成を委任する。

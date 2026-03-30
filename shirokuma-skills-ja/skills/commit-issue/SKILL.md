@@ -23,8 +23,9 @@ allowed-tools: Bash, Read, Grep, Glob, TaskCreate, TaskUpdate, TaskGet, TaskList
 | 3 | 完了レポートを出力する | 完了レポートを出力中 | ステップ 3 |
 | 4 | PR チェーンを実行する | PR チェーンを実行中 | ステップ 4（条件付き） |
 | 5 | マージチェーンを実行する | マージチェーンを実行中 | ステップ 5（条件付き） |
+| 6 | 親 Issue 整合性チェックを実行する | 親 Issue 整合性チェック中 | ステップ 5 後（サブ Issue 時のみ） |
 
-Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4.
+Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5.
 
 TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に `completed` に更新する。条件付きステップ（ステップ 4, 5）はキーワード検出時のみ登録する。
 
@@ -183,7 +184,7 @@ shirokuma-docs items pr merge --head {current-branch}
 
 この 1 コマンドでブランチから PR 特定、squash マージ、PR 本文から関連 Issue 抽出（`Closes/Fixes/Resolves #N`）、Project Status を "Done" に更新、ブランチ削除を処理する。
 
-**Status 更新の冪等性**: `items pr merge` CLI が関連 Issue の Project Status を自動で Done に更新する。`session end --done` が同じ Issue に対して実行されても冪等に動作する（既に Done なら no-op）。
+**Status 更新の冪等性**: `items pr merge` CLI が関連 Issue の Project Status を自動で Done に更新する。`items update-status --done` が同じ Issue に対して実行されても冪等に動作する（既に Done なら no-op）。
 
 **PR-Issue リンクグラフ検証**: `items pr merge` は PR 本文の `Closes/Fixes/Resolves #N` からリンクグラフを構築し、複雑さに応じて振る舞いを分ける:
 
@@ -234,6 +235,16 @@ PR #{pr-number} を {base-branch} にマージ、ブランチ削除済み
 **コミットフローとの連携**（例: "コミットしてマージして"）:
 
 ステップ 1-3 → ステップ 4（PR チェーン）→ ステップ 5（マージチェーン）を順次実行。
+
+#### サブ Issue の親 Issue 整合性チェック
+
+マージ完了後、現在の Issue がサブ Issue（frontmatter に `parentIssue` フィールドがある）の場合、親 Issue の整合性チェックを実行する:
+
+```bash
+shirokuma-docs items integrity --fix
+```
+
+このコマンドが全サブ Issue の完了を検出した場合、親 Issue を自動的に Done に遷移させる。`--fix` フラグのみ使用すること（`--parent` フラグは存在しない）。
 
 ## バッチモード
 
