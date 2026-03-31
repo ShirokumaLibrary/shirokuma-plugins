@@ -105,9 +105,15 @@ When no review has been submitted yet, invoke `review-issue` via the Agent tool 
    ```bash
    shirokuma-docs items pr comments {PR#}
    ```
-   - Unresolved threads exist (`unresolved_threads > 0`) → proceed to Step 2b (review result confirmation)
-   - No unresolved threads but `issue_comments` contains a review comment → proceed to Step 2b (review result confirmation). This occurs when `review-issue` posts improvement suggestions as an issue comment
-   - No unresolved threads and no review comment in `issue_comments` → display completion report and exit
+   Branch based on the following condition table:
+
+   | Unresolved threads | Review comment in `issue_comments` | Branch target |
+   |-------------------|-----------------------------------|---------------|
+   | Present | — | Proceed to Step 2b (review result confirmation) |
+   | None | Present | Proceed to Step 2b (review result confirmation) |
+   | None | None | Display completion report and exit |
+
+   > **Important**: Even with a PASS judgment, if `issue_comments` contains a review comment (recommendations), the Step 2b UCP must be triggered. PASS means "no blocking issues found" but the user still needs to decide whether to address recommendations. The `issue_comments` check must be evaluated before the PASS/FAIL judgment.
 
 ### Step 2b: Review Result Confirmation (User Control Point)
 
@@ -118,13 +124,20 @@ After `review-issue` completes in Step 2a and unresolved threads or review issue
 Scan the Agent tool (`review-worker`) output body for the `**Review result:**` string to obtain the PASS / FAIL judgment.
 
 1. Display a summary of review results (number of issues, breakdown by type) to the user
-2. Confirm via `AskUserQuestion`:
+2. Confirm via `AskUserQuestion` (options vary by PASS/FAIL):
+
+   **FAIL judgment or unresolved threads present:**
    - "Please review the results. Would you like to start addressing them?"
    - Options: "Start addressing" / "No fixes needed (complete as-is)" / "Address selected threads only"
+
+   **PASS judgment with no unresolved threads (recommendations only):**
+   - "PASS judgment, but there are recommendations. Would you like to address them?"
+   - Options: "Address" / "Complete as-is" (simplified to 2 choices)
+
 3. Branch based on user response:
-   - **Start addressing** → proceed to thread response flow (Step 3 onwards)
-   - **No fixes needed** → display completion report and exit
-   - **Selected threads only** → display numbered thread list and confirm which threads to address via `AskUserQuestion`, then process selected threads only (Step 3 onwards)
+   - **Start addressing / Address** → proceed to thread response flow (Step 3 onwards)
+   - **No fixes needed / Complete as-is** → display completion report and exit
+   - **Address selected threads only** (FAIL only) → display numbered thread list and confirm which threads to address via `AskUserQuestion`, then process selected threads only (Step 3 onwards)
 
 ### Step 3: Thread Classification
 
@@ -298,6 +311,7 @@ Addressed {N} threads.
 | Code fix affects other threads | Check impact and address together |
 | User decides no fixes needed (UCP) | Display completion report and exit. Skip thread resolution |
 | User selects partial addressing (UCP) | Process only specified threads, leave the rest unresolved |
+| PASS + recommendations only, user chose to address (no review threads) | Skip Step 3 (thread classification), apply code fixes based on issue comment recommendations → commit. Thread reply/resolve steps are not needed |
 
 ## Tool Usage
 

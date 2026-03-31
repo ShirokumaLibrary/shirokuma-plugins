@@ -72,12 +72,25 @@ Check `subIssuesSummary` for a child issue with a title starting with "Plan:" or
 
 | Plan State | Condition | Action |
 |-----------|-----------|--------|
-| No plan issue | Size XS/S (clear requirements) and not a sub-issue | → Skip planning, proceed directly to `code-issue` |
+| — | Spec Review / Ready status | → Status priority path (follow flow below) |
+| No plan issue | Size XS/S (clear requirements) and not a sub-issue, and not Spec Review / Ready | → Skip planning, proceed directly to `code-issue` |
 | No plan issue | Size M+ or ambiguous requirements | → Delegate to `prepare-flow` |
 | No plan issue | Sub-issue (`parentIssue` present) | → Delegate to `prepare-flow` regardless of size |
 | Plan issue exists | — | → Fetch plan issue body via `items pull {plan-issue-number}` and pass as context to implementation skill |
 
-**Backward compatibility**: When no plan issue (child issue) exists but the issue body contains a `## Plan` / `## 計画` section (legacy approach), display a warning and use the legacy plan section as context.
+#### Spec Review / Ready Status Priority Path
+
+Spec Review / Ready status is an explicit signal that planning is complete. It takes priority over Size-based determination regardless of issue size. Decision flow:
+
+```
+Spec Review / Ready status
+  → Check for plan issue (child issue with title starting "Plan:" in subIssuesSummary)
+    exists → Fetch plan issue body and use as context (same as normal path)
+    none → Anomaly: status is Spec Review/Ready but no plan found
+           → Display warning message, fall back to Size-based determination
+```
+
+Warning message example for anomaly fallback: "⚠️ Status is Spec Review but no plan issue was found. Falling back to Size-based determination."
 
 #### Fetching Plan Details
 
@@ -88,7 +101,7 @@ shirokuma-docs items pull {plan-issue-number}
 # → Read .shirokuma/github/{plan-issue-number}.md to get plan content
 ```
 
-**XS/S direct implementation path criteria:** Apply when the Issue Size field is XS or S, and the title and body clearly indicate what needs to be changed (mechanical transformation such as pattern replacement, type fix, rename). Sub-issues (`parentIssue` field present) always require a plan regardless of size. If Size is unset, requirements are ambiguous, the issue is a sub-issue, or judgment is uncertain, delegate to `prepare-flow`. See the `creating-item` skill "Requirements Clarity Criteria" for the canonical definition.
+**XS/S direct implementation path criteria:** Apply when the Issue Size field is XS or S, and the title and body clearly indicate what needs to be changed (mechanical transformation such as pattern replacement, type fix, rename). Sub-issues (`parentIssue` field present) always require a plan regardless of size. Additionally, issues with Spec Review or Ready status are excluded from this path (the status priority path is evaluated first). If Size is unset, requirements are ambiguous, the issue is a sub-issue, or judgment is uncertain, delegate to `prepare-flow`. See the `creating-item` skill "Requirements Clarity Criteria" for the canonical definition.
 
 #### Transition from Preparing Status
 
@@ -382,7 +395,7 @@ All of the following must be met to run in headless mode:
 
 1. An **explicit issue number** is provided as an argument
 2. The issue status is **Spec Review** or **Ready**
-3. A plan issue (child issue with title starting with "Plan:" or "計画:") exists, OR the issue body contains a `## Plan` (EN) / `## 計画` (JA) section (backward compatibility)
+3. A plan issue (child issue with title starting with "Plan:" or "計画:") exists
 
 If any precondition is not met, display an error message and stop (no fallback to normal mode).
 

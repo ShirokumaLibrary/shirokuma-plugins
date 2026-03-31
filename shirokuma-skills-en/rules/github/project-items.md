@@ -45,6 +45,20 @@ graph LR
 | Not Planned | Explicitly not planned (set by `items cancel`) |
 | Released | Deployed to production |
 
+### PR Status Workflow
+
+PRs use the same Status field as Issues, operating on a subset of the Issue workflow. Detailed review state is managed by GitHub's native PR `review_decision` (APPROVED / CHANGES_REQUESTED / REVIEW_REQUIRED).
+
+| Status | Description | Transition Trigger |
+|--------|-------------|-------------------|
+| In Progress | Immediately after PR creation | Set by `open-pr-issue` when adding PR to Projects |
+| Review | After review is requested | Set by `implement-flow` at chain end, together with Issue |
+| Done | After merge | Auto-set by `items pr merge` |
+
+**Unused statuses**: Backlog, Preparing, Designing, Spec Review, Ready, Icebox, Testing, Released, Pending, and Not Planned do not apply to PRs.
+
+> **Note**: PR status inconsistency detection by `items integrity` is not yet implemented. This will be addressed in a separate issue.
+
 ### Idea → Issue Flow
 
 Ideas and proposals start as **Discussions** (Research or Knowledge category), not Issues.
@@ -100,6 +114,7 @@ AI MUST update issue status at these points:
 | Blocked by dependency | → Pending | Manual | frontmatter `status: "Pending"` → `items push {n}` + comment |
 | Complete (no PR needed) | → Done | Manual | `items update-status --done {n}` |
 | Cancelled | → Not Planned | `items cancel` | `items cancel {n}` |
+| Plan approved | → Done (plan issue) | `implement-flow` | frontmatter `status: "Done"` → `items push {plan-n}` |
 
 > **GitHub Projects built-in automation**: When the `Pull request linked to issue` workflow is enabled, linking a PR to an Issue automatically adds both to the Project. Date fields (Start DATE / Review Start DATE / End DATE) on the PR are set automatically by `items integrity`. See the "GitHub Projects Workflow Configuration" section in `github-commands.md` for setup instructions.
 
@@ -145,6 +160,19 @@ Plans are created as child issues of the parent issue (issues with titles starti
 - **Status**: `Spec Review`
 - **Labels**: `area:plan`
 - **Body**: Full plan content (approach, target files, task breakdown, risks, etc.)
+
+### Plan Issue Status Transitions
+
+Plan issues represent the lifecycle of the plan itself and do not participate in work progress tracking.
+
+| Status | Description | Transition Trigger |
+|--------|-------------|-------------------|
+| Spec Review | Plan created, awaiting review | Set by `prepare-flow` after plan creation |
+| Done | Plan approved | Set when `implement-flow` starts implementation, or on manual approval |
+
+**`items integrity` aggregation exclusion**: When auto-deriving parent Issue status, plan issues with the `area:plan` label are excluded from sub-issue status aggregation. This prevents a plan issue remaining in Spec Review from affecting the parent's In Progress derivation.
+
+> **Note**: The `area:plan` exclusion logic in `classifyParentStatusInconsistencies` is not yet implemented. This will be addressed in a separate issue.
 
 ### Referencing a Plan Issue
 
