@@ -19,7 +19,7 @@
 
 ```bash
 shirokuma-docs items pull {number}
-# → .shirokuma/github/{number}.md を Read ツールで読み込む
+# → .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む
 # → frontmatter の subIssuesSummary: { total: 3, completed: 1 } を確認
 ```
 
@@ -56,7 +56,7 @@ develop
 
 ## ベースブランチ自動判定
 
-子 Issue が親を持つ場合（`.shirokuma/github/{number}.md` の frontmatter の `parentIssue` フィールドで検出）、以下の順序で integration ブランチを検出する:
+子 Issue が親を持つ場合（`.shirokuma/github/{org}/{repo}/issues/{number}/body.md` の frontmatter の `parentIssue` フィールドで検出）、以下の順序で integration ブランチを検出する:
 
 1. **親 Issue の本文から抽出**: `### Integration ブランチ`（JA）/ `### Integration Branch`（EN）ヘッディングを探し、直後のバッククォート内のブランチ名を採用。プレフィックスは `epic/`, `chore/`, `feat/` 等任意
 2. **フォールバック（リモートブランチ検索）**: `git branch -r --list "origin/*/{parent-number}-*"` で検索
@@ -68,7 +68,7 @@ develop
 ```bash
 # 親 Issue の計画からブランチ名を取得
 shirokuma-docs items pull {parent-number}
-# → .shirokuma/github/{parent-number}.md を Read ツールで読み込む
+# → .shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md を Read ツールで読み込む
 # → 本文の「### Integration ブランチ」セクション直後の `chore/958-octokit-migration` を抽出
 
 # フォールバック

@@ -85,7 +85,7 @@ shirokuma-docs items adr create "ADR-{NNN}: {タイトル}"
 
 ```bash
 shirokuma-docs items pull {discussion-number}
-# .shirokuma/github/{discussion-number}.md の body を更新してから push
+# .shirokuma/github/{org}/{repo}/issues/{discussion-number}/body.md の body を更新してから push
 shirokuma-docs items push {discussion-number}
 ```
 
@@ -109,7 +109,7 @@ shirokuma-docs items push {discussion-number}
 
 ```bash
 shirokuma-docs items pull {number}
-# .shirokuma/github/{number}.md のキャッシュ本文を更新してから push
+# .shirokuma/github/{org}/{repo}/issues/{number}/body.md のキャッシュ本文を更新してから push
 shirokuma-docs items push {number}
 ```
 

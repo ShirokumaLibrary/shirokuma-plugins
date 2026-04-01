@@ -30,7 +30,7 @@
 `reviewing-security` 完了後は、サブエージェントではなくマネージャーが直接実行する。レビューが完了した時点でチェーンが終わったように見えるが、**TaskList には pending ステップが残っている**。停止せずに**同じレスポンス内で**以下を Bash ツールで順次実行する:
 
 1. **Work Summary**: Issue コメントとして作業サマリーを投稿（Bash: `shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md`）
-2. **Status Update**: キャッシュ `.shirokuma/github/{number}.md` の frontmatter `status` を `Review` に書き換えてから `shirokuma-docs items push {number}`（Bash）
+2. **Status Update**: キャッシュ `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` の frontmatter `status` を `Review` に書き換えてから `shirokuma-docs items push {number}`（Bash）
 3. **Evolution**: シグナル自動記録（ステップ 6 参照）
 
 > **なぜここで断絶するのか**: PR 作成とセキュリティレビューは視覚的な「完了感」が強く、LLM がサマリーを出力して停止しやすい。しかし TaskList の pending ステップが 0 になるまではチェーン途中である。

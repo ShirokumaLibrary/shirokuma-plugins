@@ -85,7 +85,7 @@ Then update the body with the generated content:
 
 ```bash
 shirokuma-docs items pull {discussion-number}
-# Edit the body in .shirokuma/github/{discussion-number}.md then push
+# Edit the body in .shirokuma/github/{org}/{repo}/issues/{discussion-number}/body.md then push
 shirokuma-docs items push {discussion-number}
 ```
 
@@ -109,7 +109,7 @@ Status is tracked in the ADR body header. Update with:
 
 ```bash
 shirokuma-docs items pull {number}
-# Edit the body in .shirokuma/github/{number}.md then push
+# Edit the body in .shirokuma/github/{org}/{repo}/issues/{number}/body.md then push
 shirokuma-docs items push {number}
 ```
 

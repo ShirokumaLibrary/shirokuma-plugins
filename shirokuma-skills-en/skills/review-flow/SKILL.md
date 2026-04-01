@@ -41,7 +41,7 @@ Takes a PR number and performs code review execution (via `review-issue` Agent /
 2. If a related Issue exists, reference its plan for context:
    ```bash
    shirokuma-docs items pull {issue-number}
-   # → Read .shirokuma/github/{issue-number}.md
+   # → Read .shirokuma/github/{org}/{repo}/issues/{issue-number}/body.md
    ```
 3. Review the PR diff:
    ```bash
@@ -56,7 +56,7 @@ Takes a PR number and performs code review execution (via `review-issue` Agent /
    - Exclude references matching `Closes #N` / `Fixes #N` / `Refs #N` / `References #N` patterns as linked issues
    - The remaining `#N` references in the `## Summary` / `## 概要` section, or any `#N` references in the `## Artifacts` / `## 成果物` section, become artifact candidates
    - If 0 artifact candidates → skip artifact review (diff-only review as before)
-   - If artifact candidates exist → use `shirokuma-docs items pull {N}` to cache and read `.shirokuma/github/{N}.md` frontmatter `type` field to identify Discussion / Issue / PR type, and include only Discussions and Issues as review targets
+   - If artifact candidates exist → use `shirokuma-docs items pull {N}` to cache and read `.shirokuma/github/{org}/{repo}/issues/{N}/body.md` frontmatter `type` field to identify Discussion / Issue / PR type, and include only Discussions and Issues as review targets
    - **Limit**: Up to 10 artifacts maximum. If exceeded, review only the first 10 and output a warning
 
    Record as **artifact candidate list** (format: `#N (Discussion)`, `#N (Issue)`, etc.)

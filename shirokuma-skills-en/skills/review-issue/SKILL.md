@@ -239,9 +239,9 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 
 **Plan role:**
 
-1. Fetch the parent Issue via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{number}.md`
+1. Fetch the parent Issue via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
 2. Identify the plan issue from `subIssuesSummary` — the child issue with a title starting with "Plan:" or "計画:"
-3. Fetch the plan issue body via `shirokuma-docs items pull {plan-issue-number}` and read `.shirokuma/github/{plan-issue-number}.md`
+3. Fetch the plan issue body via `shirokuma-docs items pull {plan-issue-number}` and read `.shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md`
 4. Extract the `## Plan` / `## 計画` section from the plan issue body as the review target
 5. Evaluate each item in review checklist (`roles/plan.md`)
 6. Check against anti-patterns
@@ -251,7 +251,7 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 
 **Design role:**
 
-1. Fetch Issue body via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{number}.md`
+1. Fetch Issue body via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
 2. Extract Design Brief, Aesthetic Direction, and UI implementation results
 3. Evaluate each item in review checklist (`roles/design.md`)
 4. Check against review criteria (`criteria/design.md`)
@@ -271,7 +271,7 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 
 For each `#N` listed in the "Artifact review targets:" / "成果物レビュー対象:" section of the prompt:
 
-1. Fetch the Discussion or Issue body via `shirokuma-docs items pull {N}` and read `.shirokuma/github/{N}.md`
+1. Fetch the Discussion or Issue body via `shirokuma-docs items pull {N}` and read `.shirokuma/github/{org}/{repo}/issues/{N}/body.md`
 2. Apply the "GitHub Document Review Perspectives" from `roles/code.md`:
    - Format compliance (format appropriate for the Discussion category)
    - YAML frontmatter leakage check (metadata starting with `---` must not appear in the body)

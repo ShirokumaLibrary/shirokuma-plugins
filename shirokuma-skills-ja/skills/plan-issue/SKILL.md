@@ -39,7 +39,7 @@ AI が Issue の title/body/type/comments から以下を判断:
 
 ```bash
 shirokuma-docs items pull {number}
-# → .shirokuma/github/{number}.md を Read ツールで読み込む
+# → .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む
 ```
 
 title, body, type, priority, size, labels, コメントを確認。

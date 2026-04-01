@@ -53,7 +53,7 @@ Prefer shirokuma-docs CLI over direct `gh` commands. Config in `shirokuma-docs.c
 shirokuma-docs items list                          # Open issues
 shirokuma-docs items list --all                    # Include closed
 shirokuma-docs items list --status "In Progress"   # Filter by status
-shirokuma-docs items pull {number}                   # Fetch details and cache (→ Read .shirokuma/github/{number}.md)
+shirokuma-docs items pull {number}                   # Fetch details and cache (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
 shirokuma-docs items add issue --file /tmp/shirokuma-docs/new-issue.md  # Metadata + body in one file
 shirokuma-docs items push {number}                                       # Update (edit cache frontmatter then push)
 # Add/remove labels: items pull → edit frontmatter labels field → items push {number}
@@ -97,7 +97,7 @@ shirokuma-docs items projects delete PVTI_xxx                        # Delete it
 shirokuma-docs items discussions list --category Handovers --limit 5
 shirokuma-docs items discussions search "keyword"            # Discussion search
 shirokuma-docs items search --type discussions "keyword"     # Via items search
-shirokuma-docs items pull {number}   # Fetch details and cache (→ Read .shirokuma/github/{number}.md)
+shirokuma-docs items pull {number}   # Fetch details and cache (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
 shirokuma-docs items add discussion --file /tmp/shirokuma-docs/discussion.md  # Metadata + body in one file
 ```
 

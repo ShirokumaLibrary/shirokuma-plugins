@@ -41,7 +41,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 2. 関連 Issue がある場合、Issue の計画を参照してコンテキストを把握:
    ```bash
    shirokuma-docs items pull {issue-number}
-   # → .shirokuma/github/{issue-number}.md を Read ツールで読み込む
+   # → .shirokuma/github/{org}/{repo}/issues/{issue-number}/body.md を Read ツールで読み込む
    ```
 3. PR の diff を確認:
    ```bash
@@ -56,7 +56,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
    - `Closes #N` / `Fixes #N` / `Refs #N` / `References #N` パターンに一致するものは linked issues として除外する
    - `## Summary` / `## 概要` セクション内の残りの `#N` 参照、または `## Artifacts` / `## 成果物` セクション内の `#N` 参照を成果物候補とする
    - 成果物候補が 0 件の場合 → 成果物レビューをスキップ（従来通り diff のみレビュー）
-   - 成果物候補がある場合 → `shirokuma-docs items pull {N}` でキャッシュし、`.shirokuma/github/{N}.md` の frontmatter `type` フィールドで Discussion / Issue / PR を判別し、Discussion と Issue のみをレビュー対象とする
+   - 成果物候補がある場合 → `shirokuma-docs items pull {N}` でキャッシュし、`.shirokuma/github/{org}/{repo}/issues/{N}/body.md` の frontmatter `type` フィールドで Discussion / Issue / PR を判別し、Discussion と Issue のみをレビュー対象とする
    - **上限**: 成果物は最大 10 件まで。超過時は最初の 10 件のみレビューし、警告を出力する
 
    **成果物候補リスト** として記録する（形式: `#N (Discussion)`, `#N (Issue)` 等）

@@ -30,7 +30,7 @@ Load these files for context:
 
 ```
 1. Role selection: "plan review" or Spec Review Issue
-2. Fetch Issue body: shirokuma-docs items pull {number} (→ Read .shirokuma/github/{number}.md)
+2. Fetch Issue body: shirokuma-docs items pull {number} (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
 3. Identify plan issue: Find child issue with title starting with "Plan:" from subIssuesSummary, fetch body via items pull {plan-issue-number} (fallback: ## Plan section in body)
 4. Lint execution: Skip (target is not code files)
 5. Plan analysis: Review plan issue body (or legacy plan section) against review criteria

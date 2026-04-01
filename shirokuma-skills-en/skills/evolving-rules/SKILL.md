@@ -29,7 +29,7 @@ If an Issue is found, fetch details including comments:
 
 ```bash
 shirokuma-docs items pull {number}
-# → Read .shirokuma/github/{number}.md and comment files in .shirokuma/github/{number}/
+# → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md and comment files in .shirokuma/github/{org}/{repo}/issues/{number}/
 ```
 
 **If no signals**: Report "No Evolution signals accumulated yet. Record signals during daily work." and exit.

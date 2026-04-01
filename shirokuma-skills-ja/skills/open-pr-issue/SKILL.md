@@ -56,7 +56,7 @@ git push -u origin {branch-name}
 
 #### サブ Issue の自動検出
 
-`.shirokuma/github/{number}.md` の frontmatter に `parentIssue` フィールドがあれば、その Issue はサブ Issue:
+`.shirokuma/github/{org}/{repo}/issues/{number}/body.md` の frontmatter に `parentIssue` フィールドがあれば、その Issue はサブ Issue:
 
 ```yaml
 parentIssue:
@@ -70,7 +70,7 @@ parentIssue:
 
 サブ Issue を検出した場合、以下の順序で integration ブランチを決定する:
 
-1. **親 Issue の本文から抽出**: `shirokuma-docs items pull {parent-number}` で親 Issue を取得し `.shirokuma/github/{parent-number}.md` を Read ツールで読み込む。`### Integration ブランチ`（JA）/ `### Integration Branch`（EN）ヘッディングを探す。直後のバッククォート内のブランチ名を採用（プレフィックスは `epic/`, `chore/`, `feat/` 等任意）
+1. **親 Issue の本文から抽出**: `shirokuma-docs items pull {parent-number}` で親 Issue を取得し `.shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md` を Read ツールで読み込む。`### Integration ブランチ`（JA）/ `### Integration Branch`（EN）ヘッディングを探す。直後のバッククォート内のブランチ名を採用（プレフィックスは `epic/`, `chore/`, `feat/` 等任意）
 2. **フォールバック（リモートブランチ検索）**: `git branch -r --list "origin/*/{parent-number}-*"` で検索
    - 1件マッチ → 自動採用
    - 複数マッチ → 最初のマッチを採用し、結果に代替候補を記載
@@ -94,6 +94,8 @@ base_branch="develop"
 ### ステップ 4: PR作成
 
 PR 本文をファイルに書き出してから PR を作成する。変更内容が `github-writing-style` ルールの Mermaid 使用条件を満たす場合、PR 本文に図を含める。
+
+> **CLI テンプレート**: `shirokuma-docs items template pr --output <file>` で PR 本文テンプレートを生成できます。
 
 ```markdown
 <!-- /tmp/shirokuma-docs/{number}-pr.md -->

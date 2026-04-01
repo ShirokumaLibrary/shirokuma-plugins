@@ -202,7 +202,7 @@ Identify the child issue with a title starting with "Plan:" from `subIssuesSumma
 shirokuma-docs items pull {parent-number}
 # → Identify child issue with title starting with "Plan:" from subIssuesSummary
 shirokuma-docs items pull {plan-issue-number}
-# → Read .shirokuma/github/{plan-issue-number}.md
+# → Read .shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md
 ```
 
 > **Backward compatibility**: When no plan issue exists but the Issue body contains a `## Plan` section (legacy approach), use it as a fallback.
@@ -262,7 +262,7 @@ Epic status management, built-in automations, label details, item body maintenan
 
 ### Workflow That Assumes Full Comment Loading
 
-When AI reviews the content of an Issue/PR/Discussion, **use `shirokuma-docs items pull {number}` to cache comments, then read `.shirokuma/github/{number}.md` with the Read tool**. This gives you:
+When AI reviews the content of an Issue/PR/Discussion, **use `shirokuma-docs items pull {number}` to cache comments, then read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` with the Read tool**. This gives you:
 
 - Issue: body + all comments (plan details, discussion history, blocker information)
 - PR: body + review comments + review threads + regular comments

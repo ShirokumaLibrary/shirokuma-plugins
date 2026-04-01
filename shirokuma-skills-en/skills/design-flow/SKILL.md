@@ -35,7 +35,7 @@ Confirm issue number via `AskUserQuestion` or obtain from arguments. Fetch the i
 
 ```bash
 shirokuma-docs items pull {number}
-# → Read .shirokuma/github/{number}.md
+# → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 ```
 
 | Field | Required | Content |

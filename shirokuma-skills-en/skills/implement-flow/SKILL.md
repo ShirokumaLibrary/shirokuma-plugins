@@ -47,11 +47,11 @@ Use TaskUpdate to set each step to `in_progress` when starting and `completed` w
 
 ### Step 1: Analyze Work
 
-**Issue number provided**: `shirokuma-docs items pull {number}` to fetch and cache, then read `.shirokuma/github/{number}.md` to extract title/body/labels/status/priority/size.
+**Issue number provided**: `shirokuma-docs items pull {number}` to fetch and cache, then read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` to extract title/body/labels/status/priority/size.
 
 #### Sub-Issue Detection
 
-When `.shirokuma/github/{number}.md` frontmatter contains a `parentIssue` field, the issue is a sub-issue of an epic:
+When `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` frontmatter contains a `parentIssue` field, the issue is a sub-issue of an epic:
 
 1. Identify the plan issue (child issue with a title starting with "Plan:" or "計画:") from the parent's `subIssuesSummary`, fetch it via `items pull {plan-issue-number}`, and use its body as overall context
 2. Set base branch to the parent's integration branch instead of `develop` (Step 3)
@@ -60,7 +60,7 @@ When `.shirokuma/github/{number}.md` frontmatter contains a `parentIssue` field,
 ```bash
 # Check parent issue
 shirokuma-docs items pull {parent-number}
-# → Read .shirokuma/github/{parent-number}.md
+# → Read .shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md
 # Identify child issue with title starting with "Plan:" from subIssuesSummary
 shirokuma-docs items pull {plan-issue-number}
 # → Fetch plan body and use as context
@@ -98,7 +98,7 @@ When a plan issue exists (new approach):
 
 ```bash
 shirokuma-docs items pull {plan-issue-number}
-# → Read .shirokuma/github/{plan-issue-number}.md to get plan content
+# → Read .shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md to get plan content
 ```
 
 **XS/S direct implementation path criteria:** Apply when the Issue Size field is XS or S, and the title and body clearly indicate what needs to be changed (mechanical transformation such as pattern replacement, type fix, rename). Sub-issues (`parentIssue` field present) always require a plan regardless of size. Additionally, issues with Spec Review or Ready status are excluded from this path (the status priority path is evaluated first). If Size is unset, requirements are ambiguous, the issue is a sub-issue, or judgment is uncertain, delegate to `prepare-flow`. See the `creating-item` skill "Requirements Clarity Criteria" for the canonical definition.
@@ -336,7 +336,7 @@ shirokuma-docs items push {number}
 
 (Cache frontmatter `status` should be set to `"Review"` before push.)
 
-**Status fallback verification**: After chain completion, read `.shirokuma/github/{number}.md` frontmatter to check status. If still In Progress → edit cache frontmatter `status: "Review"` and `shirokuma-docs items push {number}` (idempotent: re-updating to Review when already Review is harmless).
+**Status fallback verification**: After chain completion, read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` frontmatter to check status. If still In Progress → edit cache frontmatter `status: "Review"` and `shirokuma-docs items push {number}` (idempotent: re-updating to Review when already Review is harmless).
 
 #### Next Steps Suggestion (End of Chain)
 

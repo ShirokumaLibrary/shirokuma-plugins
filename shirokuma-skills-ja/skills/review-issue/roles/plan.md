@@ -30,7 +30,7 @@ Issue の計画（計画 Issue または `## 計画` セクション）の品質
 
 ```
 1. ロール選択: "plan review" or Spec Review Issue
-2. Issue 本文取得: shirokuma-docs items pull {number}（→ .shirokuma/github/{number}.md を Read ツールで読み込む）
+2. Issue 本文取得: shirokuma-docs items pull {number}（→ .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む）
 3. 計画 Issue 特定: subIssuesSummary からタイトルが「計画:」で始まる子 Issue を特定し、items pull {plan-issue-number} で本文を取得（フォールバック: 本文の ## 計画 セクション）
 4. Lint 実行: スキップ（対象がコードファイルではないため）
 5. 計画分析: 計画 Issue の本文（または旧方式の計画セクション）をレビュー観点で分析

@@ -19,7 +19,7 @@ Epics are identified by **structure**, not Issue Type. An issue with non-plan ch
 
 ```bash
 shirokuma-docs items pull {number}
-# → Read .shirokuma/github/{number}.md
+# → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 # → Check frontmatter subIssuesSummary: { total: 3, completed: 1 }
 ```
 
@@ -56,7 +56,7 @@ develop
 
 ## Base Branch Auto-Detection
 
-When a child issue has a parent (detected via the `parentIssue` field in `.shirokuma/github/{number}.md` frontmatter), detect the integration branch in this order:
+When a child issue has a parent (detected via the `parentIssue` field in `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` frontmatter), detect the integration branch in this order:
 
 1. **Extract from parent issue body**: Look for a `### Integration Branch` (EN) / `### Integration ブランチ` (JA) heading and extract the branch name from the backtick block immediately following. Any prefix is accepted: `epic/`, `chore/`, `feat/`, etc.
 2. **Fallback (remote branch search)**: `git branch -r --list "origin/*/{parent-number}-*"`
@@ -68,7 +68,7 @@ When a child issue has a parent (detected via the `parentIssue` field in `.shiro
 ```bash
 # Get branch name from parent issue body
 shirokuma-docs items pull {parent-number}
-# → Read .shirokuma/github/{parent-number}.md
+# → Read .shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md
 # → Extract `chore/958-octokit-migration` from "### Integration Branch" section
 
 # Fallback

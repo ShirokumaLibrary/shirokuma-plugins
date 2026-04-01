@@ -239,9 +239,9 @@ shirokuma-docs lint docs -p . -f terminal
 
 **plan ロール:**
 
-1. `shirokuma-docs items pull {number}` で親 Issue を取得し、`.shirokuma/github/{number}.md` を Read ツールで読み込む
+1. `shirokuma-docs items pull {number}` で親 Issue を取得し、`.shirokuma/github/{org}/{repo}/issues/{number}/body.md` を Read ツールで読み込む
 2. `subIssuesSummary` からタイトルが「計画:」で始まる計画 Issue を特定する
-3. `shirokuma-docs items pull {plan-issue-number}` で計画 Issue の本文を取得し、`.shirokuma/github/{plan-issue-number}.md` を Read ツールで読み込む
+3. `shirokuma-docs items pull {plan-issue-number}` で計画 Issue の本文を取得し、`.shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md` を Read ツールで読み込む
 4. 計画 Issue の `## 計画` セクションを抽出してレビュー対象とする
 5. レビューチェックリスト（`roles/plan.md`）の各項目を評価
 6. アンチパターンとの照合
@@ -251,7 +251,7 @@ shirokuma-docs lint docs -p . -f terminal
 
 **design ロール:**
 
-1. `shirokuma-docs items pull {number}` で Issue 本文を取得し、`.shirokuma/github/{number}.md` を Read ツールで読み込む
+1. `shirokuma-docs items pull {number}` で Issue 本文を取得し、`.shirokuma/github/{org}/{repo}/issues/{number}/body.md` を Read ツールで読み込む
 2. Design Brief、Aesthetic Direction、UI 実装結果を抽出
 3. レビューチェックリスト（`roles/design.md`）の各項目を評価
 4. レビュー基準（`criteria/design.md`）と照合
@@ -271,7 +271,7 @@ shirokuma-docs lint docs -p . -f terminal
 
 prompt 内の「成果物レビュー対象:」/「Artifact review targets:」セクションに記載された各 `#N` に対して:
 
-1. `shirokuma-docs items pull {N}` で Discussion または Issue の内容を取得し、`.shirokuma/github/{N}.md` を Read ツールで読み込む
+1. `shirokuma-docs items pull {N}` で Discussion または Issue の内容を取得し、`.shirokuma/github/{org}/{repo}/issues/{N}/body.md` を Read ツールで読み込む
 2. `roles/code.md` の「GitHub ドキュメントレビュー観点」を適用してレビュー:
    - フォーマット準拠（Discussion カテゴリに適したフォーマット）
    - YAML フロントマター混入チェック（`---` で始まるメタデータが本文に漏れていないか）

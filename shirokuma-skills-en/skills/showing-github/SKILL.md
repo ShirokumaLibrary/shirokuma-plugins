@@ -239,7 +239,7 @@ shirokuma-docs items discussions list --category Handovers --limit {count}
 
 # Get specific handover
 shirokuma-docs items pull {number}
-# → Read .shirokuma/github/{number}.md
+# → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 
 # From local files (fallback)
 ls -t .claude/sessions/*-handover.md 2>/dev/null | head -{count}

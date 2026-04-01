@@ -239,7 +239,7 @@ shirokuma-docs items discussions list --category Handovers --limit {count}
 
 # 特定の引き継ぎを取得
 shirokuma-docs items pull {number}
-# → .shirokuma/github/{number}.md を Read ツールで読み込む
+# → .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む
 
 # ローカルファイル（フォールバック）
 ls -t .claude/sessions/*-handover.md 2>/dev/null | head -{count}

@@ -39,7 +39,7 @@ If any criterion matches a higher level, use that level.
 
 ```bash
 shirokuma-docs items pull {number}
-# → Read .shirokuma/github/{number}.md
+# → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 ```
 
 Review title, body, type, priority, size, labels, and comments.

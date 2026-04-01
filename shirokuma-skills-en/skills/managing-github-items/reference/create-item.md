@@ -89,6 +89,8 @@ Label options (for impact scope classification — area labels):
 
 ## Step 2: Generate Body
 
+> **CLI Template**: Use `shirokuma-docs items template issue --output <file>` to generate an Issue template skeleton. The AI reads this template to understand the structure, then fills it in based on context.
+
 Use the type-specific template. All types require a `## Purpose` section.
 
 > Template headings and placeholder content must be written in the language specified by the `output-language` rule. Follow `github-writing-style` rule bullet-point guidelines.
