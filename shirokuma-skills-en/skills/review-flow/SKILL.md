@@ -150,6 +150,18 @@ Classify each unresolved thread into one of 4 types:
 | Question | Asks for explanation or rationale | Reply → resolve |
 | Disagreement | Reviewer and AI differ in judgment | Reply (do NOT resolve) |
 
+#### Scope Re-evaluation (Prevent Unnecessary Follow-up Issues)
+
+When review findings are classified as "out of PR scope" or "address in follow-up issue", re-evaluate whether they can be fixed in the same PR using the following criteria:
+
+**Decision flow** (fix in same PR only when BOTH conditions are met):
+1. Check if the finding belongs to the same conceptual change category as the PR diff (e.g., remaining files in an old→new migration)
+2. Identify affected files and verify ≤ 5 files are impacted
+3. Both met → reclassify as "Code fix" and address in the same PR
+4. Either not met → record as follow-up issue (existing behavior)
+
+This re-evaluation is autonomous — no user confirmation needed. When reclassifying, include "Addressed in same PR via scope re-evaluation" in the thread reply during Step 5.
+
 ### Step 4: Task Registration (Required)
 
 > **TaskCreate registration is mandatory.** Cannot be skipped. Proceeding to Step 5 without task registration is prohibited. To prevent the LLM from halting mid-chain during long processing sequences, all thread processing steps must be pre-registered via TaskCreate and progress tracked via TaskUpdate.
@@ -309,6 +321,7 @@ Addressed {N} threads.
 | Unresolved threads present and review comment present | `unresolved_threads > 0` takes priority. Proceed to Step 2b (review result confirmation) |
 | No unresolved threads but review comment present | `review-issue` posted improvement suggestions as issue comment. Identified via `pr comments` `issue_comments`. Trigger Step 2b UCP |
 | Code fix affects other threads | Check impact and address together |
+| "Out of PR scope" finding is conceptually same change and ≤5 files | Reclassify as "Code fix" via scope re-evaluation and address in same PR |
 | User decides no fixes needed (UCP) | Display completion report and exit. Skip thread resolution |
 | User selects partial addressing (UCP) | Process only specified threads, leave the rest unresolved |
 | PASS + recommendations only, user chose to address (no review threads) | Skip Step 3 (thread classification), apply code fixes based on issue comment recommendations → commit. Thread reply/resolve steps are not needed |

@@ -57,7 +57,27 @@ PRs use the same Status field as Issues, operating on a subset of the Issue work
 
 **Unused statuses**: Backlog, Preparing, Designing, Spec Review, Ready, Icebox, Testing, Released, Pending, and Not Planned do not apply to PRs.
 
-> **Note**: PR status inconsistency detection by `items integrity` is not yet implemented. This will be addressed in a separate issue.
+> `items integrity` detects PR status inconsistencies (OPEN PR with Done status, MERGED/CLOSED PR with active status, issue-only statuses on PRs).
+
+### Two-Layer Status Model (Epics / Sub-Issues)
+
+Epic Issue status is **auto-derived** from sub-issue states. Manual updates are generally unnecessary.
+
+| Sub-Issue State | Effect on Parent Issue |
+|----------------|----------------------|
+| All sub-issues Done | Parent auto-transitions to Done |
+| Some In Progress / Review | Parent stays In Progress |
+| Some Done + rest Backlog / Preparing | Parent stays In Progress (treated as in-progress) |
+| All sub-issues Not Planned | Parent auto-reverts to Backlog |
+
+**Reactive auto-derivation**: The CLI detects sub-issue status changes during `items push`, `items close` (including `items cancel`), `items update-status`, and `items pr merge`, then auto-derives and updates the parent status. Explicit `items integrity --fix` is not required (still available for batch consistency checks).
+
+### Plan Reset Flow
+
+To reset an epic's plan from scratch (when sub-issues already exist):
+
+1. Set all sub-issues to Not Planned via `items cancel {sub-numbers}` (CLI auto-transitions parent to Backlog)
+2. Re-plan with `prepare-flow`
 
 ### Idea → Issue Flow
 
@@ -172,7 +192,7 @@ Plan issues represent the lifecycle of the plan itself and do not participate in
 
 **`items integrity` aggregation exclusion**: When auto-deriving parent Issue status, plan issues with the `area:plan` label are excluded from sub-issue status aggregation. This prevents a plan issue remaining in Spec Review from affecting the parent's In Progress derivation.
 
-> **Note**: The `area:plan` exclusion logic in `classifyParentStatusInconsistencies` is not yet implemented. This will be addressed in a separate issue.
+> `classifyParentStatusInconsistencies` excludes plan issues with the `area:plan` label from sub-issue status aggregation. `syncParentStatus` (reactive derivation) applies the same exclusion.
 
 ### Referencing a Plan Issue
 

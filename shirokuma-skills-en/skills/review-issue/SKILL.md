@@ -156,6 +156,8 @@ shirokuma-docs docs search "<tech keyword>" --source <source-name> --section --l
 
 Skip this substep if no local documentation is available (no `ready` sources).
 
+> **Note**: The `--limit 3` here is optimized for review context and takes precedence over the `local-docs-lookup` rule's default (`--limit 5`).
+
 ### 3. Run shirokuma-docs Lints (REQUIRED)
 
 **Execute automated checks before manual review. Lint commands vary by role:**
