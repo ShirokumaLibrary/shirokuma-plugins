@@ -38,12 +38,12 @@ GitHub Projects V2 のビルトイン自動化ワークフローが、CLI ベー
 
 | CLI 機能 | 自動化との共存 |
 |---------|--------------|
-| `session end --review` | Review を設定。PR マージ時に自動化が Done に移行 |
-| `session end --review`（PR マージ済み） | `findMergedPrForIssue()` で Done に自動昇格 — 自動化と冪等 |
-| `session end --done` | Done を直接設定 — 自動化と冪等 |
-| `session check` | 無効化されている推奨自動化を警告として報告 |
-| `session check --fix` | 不整合を修正 — 自動化と互換 |
-| `items cancel` | close 後に Not Planned を設定。「Item closed → Done」自動化と競合の可能性あり — 通常は CLI の更新が優先。`session check --fix` で検出・修正可能 |
+| `items update-status --review` | Review を設定。PR マージ時に自動化が Done に移行 |
+| `items update-status --review`（PR マージ済み） | `findMergedPrForIssue()` で Done に自動昇格 — 自動化と冪等 |
+| `items update-status --done` | Done を直接設定 — 自動化と冪等 |
+| `items integrity` | 無効化されている推奨自動化を警告として報告 |
+| `items integrity --fix` | 不整合を修正 — 自動化と互換 |
+| `items cancel` | close 後に Not Planned を設定。「Item closed → Done」自動化と競合の可能性あり — 通常は CLI の更新が優先。`items integrity --fix` で検出・修正可能 |
 
 ### 自動化状態の確認
 
@@ -107,4 +107,4 @@ shirokuma-docs projects workflows
 | デフォルト（計画済み作業） | Backlog |
 | すぐに開始 | In Progress |
 | 低優先度 / 将来のアイデア | Icebox |
-| 要件レビューが必要 | Spec Review |
+| 要件レビューが必要 | Review |

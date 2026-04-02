@@ -12,12 +12,12 @@ priority: required
 
 ```bash
 # 正しい
-shirokuma-docs session start
+shirokuma-docs items dashboard
 shirokuma-docs items list
 shirokuma-docs lint tests -p .
 
 # 間違い - 不要なオーバーヘッド
-npx shirokuma-docs session start
+npx shirokuma-docs items dashboard
 ```
 
 ## 禁止コマンド（CLI でカバー済み）

@@ -38,12 +38,12 @@ Built-in automations are configured via the GitHub UI (not API):
 
 | CLI Feature | Behavior with Automations |
 |-------------|--------------------------|
-| `session end --review` | Sets Review. When PR merges, automation moves to Done |
-| `session end --review` (PR already merged) | Auto-promotes to Done via `findMergedPrForIssue()` — idempotent with automation |
-| `session end --done` | Sets Done directly — idempotent with automation |
-| `session check` | Reports disabled recommended automations as warnings |
-| `session check --fix` | Fixes inconsistencies — compatible with automation |
-| `items cancel` | Sets Not Planned after close. May race with "Item closed → Done" automation — CLI update usually wins. Use `session check --fix` to detect/correct. |
+| `items update-status --review` | Sets Review. When PR merges, automation moves to Done |
+| `items update-status --review` (PR already merged) | Auto-promotes to Done via `findMergedPrForIssue()` — idempotent with automation |
+| `items update-status --done` | Sets Done directly — idempotent with automation |
+| `items integrity` | Reports disabled recommended automations as warnings |
+| `items integrity --fix` | Fixes inconsistencies — compatible with automation |
+| `items cancel` | Sets Not Planned after close. May race with "Item closed → Done" automation — CLI update usually wins. Use `items integrity --fix` to detect/correct. |
 
 ### Checking Automation Status
 
@@ -107,4 +107,4 @@ When creating new items:
 | Default (planned work) | Backlog |
 | Starting immediately | In Progress |
 | Low priority / future idea | Icebox |
-| Needs requirements review | Spec Review |
+| Needs requirements review | Review |

@@ -12,12 +12,12 @@ priority: required
 
 ```bash
 # Correct
-shirokuma-docs session start
+shirokuma-docs items dashboard
 shirokuma-docs items list
 shirokuma-docs lint tests -p .
 
 # Wrong - unnecessary overhead
-npx shirokuma-docs session start
+npx shirokuma-docs items dashboard
 ```
 
 ## Prohibited Commands (Covered by CLI)

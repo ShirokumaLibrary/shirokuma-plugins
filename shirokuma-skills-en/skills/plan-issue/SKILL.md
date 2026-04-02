@@ -73,7 +73,7 @@ Create the plan issue body file:
 cat > /tmp/shirokuma-docs/{number}-plan-issue.md <<'EOF'
 ---
 title: "Plan: {parent issue title}"
-status: "Spec Review"
+status: "Review"
 labels: ["area:plan"]
 ---
 
@@ -126,8 +126,8 @@ shirokuma-docs items parent {PLAN_ISSUE_NUMBER} {parent-number}
 
 - Runs via Skill tool (main context), but progress management and user interaction are handled by the orchestrator (`prepare-flow`)
 - Plan review is handled by `prepare-flow` — this skill only creates the plan
-- **Does not update status** — status transitions (Preparing, Designing, Spec Review) are managed by `prepare-flow`
-- Plan issues are created with status `Spec Review` and label `area:plan`
+- **Does not update status** — status transitions (Preparing, Designing, Review) are managed by `prepare-flow`
+- Plan issues are created with status `Review` and label `area:plan`
 
 ## GitHub Writing Rules
 
@@ -164,7 +164,7 @@ Add GitHub writing rule references to each skill...
 
 | Rule | Usage |
 |------|-------|
-| `project-items` | Spec Review status workflow |
+| `project-items` | Review status workflow |
 | `branch-workflow` | Branch naming reference (for plan documentation) |
 | `output-language` | Output language for issue comments and body |
 | `github-writing-style` | Bullet-point vs prose guidelines |

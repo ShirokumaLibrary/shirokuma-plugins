@@ -137,4 +137,4 @@ shirokuma-docs items dashboard --team
 - セッションヘッダーに現在時刻を表示
 - 優先度順に表示
 - `shirokuma-docs items dashboard` を使用する（直接 `gh` コマンドではなく）— CLI がハンドオーバー・Issues・PR を 1 回で集約し、コンテキストウィンドウを節約する
-- ハンドオーバー保存・復元は本スキルの責務外。コンテキスト保存は CLI で行い、スキルが直接管理しない
+- ハンドオーバー保存・復元は本スキルの責務外。ステータス更新は `items update-status` CLI で行い、スキルが直接管理しない

@@ -21,8 +21,8 @@ Every project item MUST have:
 
 ```mermaid
 graph LR
-  Icebox --> Backlog --> Preparing --> Designing --> SpecReview[Spec Review]
-  SpecReview --> Ready --> InProgress[In Progress] --> Review --> Testing --> Done --> Released
+  Icebox --> Backlog --> Preparing --> Designing --> Review
+  Review --> Ready --> InProgress[In Progress] --> Review --> Testing --> Done --> Released
   InProgress <--> Pending
   Review <--> Pending
   Backlog <--> Pending
@@ -35,11 +35,10 @@ graph LR
 | Backlog | Planned work. Requirements may still need refinement |
 | Preparing | Plan is being created by `prepare-flow` (pre-work status) |
 | Designing | Design is being created by `design-flow` (pre-work status) |
-| Spec Review | Gate for requirements review before work begins |
 | Ready | Ready to start. Plan approved, awaiting implementation |
 | In Progress | Currently working on |
 | Pending | Blocked (document reason) |
-| Review | Code review |
+| Review | AI work complete, human review possible (plan approval gate or code review pending) |
 | Testing | QA testing |
 | Done | Completed |
 | Not Planned | Explicitly not planned (set by `items cancel`) |
@@ -55,7 +54,7 @@ PRs use the same Status field as Issues, operating on a subset of the Issue work
 | Review | After review is requested | Set by `implement-flow` at chain end, together with Issue |
 | Done | After merge | Auto-set by `items pr merge` |
 
-**Unused statuses**: Backlog, Preparing, Designing, Spec Review, Ready, Icebox, Testing, Released, Pending, and Not Planned do not apply to PRs.
+**Unused statuses**: Backlog, Preparing, Designing, Ready, Icebox, Testing, Released, Pending, and Not Planned do not apply to PRs.
 
 > `items integrity` detects PR status inconsistencies (OPEN PR with Done status, MERGED/CLOSED PR with active status, issue-only statuses on PRs).
 
@@ -87,7 +86,7 @@ Ideas and proposals start as **Discussions** (Research or Knowledge category), n
 |-------|----------|--------------|
 | Idea / exploration | Discussion | When the idea is first raised |
 | Decided to do | Issue (Backlog) | When the team agrees to implement |
-| Requirements firm | Issue (Spec Review) | When requirements need formal review |
+| Requirements firm | Issue (Review) | When requirements need formal review |
 
 ## Size Estimation
 
@@ -127,9 +126,9 @@ AI MUST update issue status at these points:
 | Trigger | Action | Owner | Command |
 |---------|--------|-------|---------|
 | Preparing started | → Preparing + assign | `prepare-flow` | `items pull {n}` → edit frontmatter `status` + `assignees` → `items push {n}` |
-| Plan created | → Spec Review | `prepare-flow` | frontmatter `status: "Spec Review"` → `items push {n}` |
+| Plan created | → Review | `prepare-flow` | frontmatter `status: "Review"` → `items push {n}` |
 | User approves plan, starts work | → In Progress + branch | `implement-flow` | frontmatter `status: "In Progress"` → `items push {n}` |
-| PR creation complete | → Review | `open-pr-issue` | frontmatter `status: "Review"` → `items push {n}` |
+| implement-flow chain complete | → Review | `implement-flow` | frontmatter `status: "Review"` → `items push {n}` (after PR creation, simplify, security-review, work summary) |
 | PR merged | → Done | `commit-issue` (via `pr merge`) | Automatic |
 | Blocked by dependency | → Pending | Manual | frontmatter `status: "Pending"` → `items push {n}` + comment |
 | Complete (no PR needed) | → Done | Manual | `items update-status --done {n}` |
@@ -142,24 +141,32 @@ AI MUST update issue status at these points:
 
 - **Purpose**: Visibility that planning is in progress; records planning start timestamp
 - **Entry**: `prepare-flow` sets this status before delegating to `plan-issue`
-- **Exit**: Plan complete → Designing (if design needed) or Spec Review
+- **Exit**: Plan complete → Designing (if design needed) or Review
 
 ### Designing Usage
 
 - **Purpose**: Visibility that design work is in progress
 - **Entry**: `prepare-flow` sets this status when design phase is needed
-- **Exit**: Design complete → Spec Review
+- **Exit**: Design complete → Review
 
-### Spec Review Usage
+### Review Usage (AI Work Complete, Human Review Possible)
 
-- **Purpose**: User approval gate before implementation
+Review means "AI work is complete and human review is possible". Used in two contexts:
+
+**1. Plan Approval Gate (plan issues / regular issues)**
 - **Entry**: `prepare-flow` sets this status after plan review passes
 - **Exit**: User approves → `implement-flow` starts implementation → In Progress
+
+**2. Code Review Pending (after implementation)**
+- **Entry**: Set by `implement-flow` after entire chain completes (implementation, tests, PR creation, simplify, security-review, work summary)
+- **Exit**: Review complete → Testing or Done
+
+> **Important**: Review is NOT set at PR creation time. AI work steps (`/simplify`, security review) remain after PR creation, so the transition happens only after all steps complete.
 
 ### Ready Usage
 
 - **Purpose**: Visibility that the issue is ready to start, plan approved
-- **Entry**: User approves plan in Spec Review, or manual setting
+- **Entry**: User approves plan in Review, or manual setting
 - **Exit**: `implement-flow` starts implementation → In Progress
 
 ### Rules
@@ -177,7 +184,7 @@ Plans are created as child issues of the parent issue (issues with titles starti
 ### Plan Issue Structure
 
 - **Title**: `Plan: {parent issue title}`
-- **Status**: `Spec Review`
+- **Status**: `Review`
 - **Labels**: `area:plan`
 - **Body**: Full plan content (approach, target files, task breakdown, risks, etc.)
 
@@ -187,10 +194,10 @@ Plan issues represent the lifecycle of the plan itself and do not participate in
 
 | Status | Description | Transition Trigger |
 |--------|-------------|-------------------|
-| Spec Review | Plan created, awaiting review | Set by `prepare-flow` after plan creation |
+| Review | Plan created, awaiting review / code review | Set by `prepare-flow` after plan creation (plan issue) or `implement-flow` chain end (PR) |
 | Done | Plan approved | Set when `implement-flow` starts implementation, or on manual approval |
 
-**`items integrity` aggregation exclusion**: When auto-deriving parent Issue status, plan issues with the `area:plan` label are excluded from sub-issue status aggregation. This prevents a plan issue remaining in Spec Review from affecting the parent's In Progress derivation.
+**`items integrity` aggregation exclusion**: When auto-deriving parent Issue status, plan issues with the `area:plan` label are excluded from sub-issue status aggregation. This prevents a plan issue remaining in Review from affecting the parent's In Progress derivation.
 
 > `classifyParentStatusInconsistencies` excludes plan issues with the `area:plan` label from sub-issue status aggregation. `syncParentStatus` (reactive derivation) applies the same exclusion.
 

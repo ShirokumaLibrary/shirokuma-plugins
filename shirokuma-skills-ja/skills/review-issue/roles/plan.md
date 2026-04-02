@@ -18,7 +18,7 @@ Issue の計画（計画 Issue または `## 計画` セクション）の品質
 | タイミング | 計画策定直後の即時チェック | ユーザーが任意タイミングで依頼 |
 | データ取得 | Task エージェントに Issue 本文を埋め込み | Issue 番号から計画 Issue を特定し `shirokuma-docs items pull` で取得 |
 | 目的 | 計画の初期品質ゲート | 独立したセカンドオピニオン |
-| 起動方法 | `plan-issue` のステップ 4 で自動実行 | `/review-issue plan #N` または Spec Review Issue 指定 |
+| 起動方法 | `plan-issue` のステップ 4 で自動実行 | `/review-issue plan #N` または Review Issue 指定 |
 
 ## 必要な知識
 
@@ -29,7 +29,7 @@ Issue の計画（計画 Issue または `## 計画` セクション）の品質
 ## plan ロール固有ワークフロー
 
 ```
-1. ロール選択: "plan review" or Spec Review Issue
+1. ロール選択: "plan review" or Review Issue
 2. Issue 本文取得: shirokuma-docs items pull {number}（→ .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む）
 3. 計画 Issue 特定: subIssuesSummary からタイトルが「計画:」で始まる子 Issue を特定し、items pull {plan-issue-number} で本文を取得（フォールバック: 本文の ## 計画 セクション）
 4. Lint 実行: スキップ（対象がコードファイルではないため）

@@ -26,7 +26,7 @@ priority: required
 
 ```
 **ブランチ:** feat/42-xxx
-**ステータス:** Spec Review
+**ステータス:** Review
 **場所:** .claude/rules/my-rule.md
 ```
 

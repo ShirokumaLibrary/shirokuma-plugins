@@ -53,16 +53,17 @@ Item created: #{number}
 → Or keep in Backlog
 ```
 
-**When Size M+ or requirements are ambiguous (default: plan first):**
+**When Size M+ or requirements are ambiguous (default: review then plan):**
 
 ```markdown
 Item created: #{number}
-→ `/prepare-flow #{number}` to start planning (recommended)
+→ `/review-issue plan #{number}` to review requirements and spec impact (recommended)
+→ `/prepare-flow #{number}` to start planning
 → `/implement-flow #{number}` to start implementation directly
 → Or keep in Backlog
 ```
 
-See [reference/chain-rules.md](reference/chain-rules.md) for chain decision details.
+See [reference/chain-rules.md](reference/chain-rules.md) "Review Execution Conditions" section for review recommendation details.
 
 ## Reference Documents
 
@@ -73,7 +74,7 @@ See [reference/chain-rules.md](reference/chain-rules.md) for chain decision deta
 
 ## Next Steps
 
-Based on chain-rules.md: recommend `/implement-flow` for Size XS/S with clear requirements, `/prepare-flow` for Size M+. See Step 3 for details.
+Based on chain-rules.md: recommend `/implement-flow` for Size XS/S with clear requirements, `/review-issue plan` then `/prepare-flow` for Size M+ or ambiguous requirements. See Step 3 for details.
 
 ## Evolution Signal Auto-Recording
 

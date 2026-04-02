@@ -72,25 +72,25 @@ shirokuma-docs items pull {plan-issue-number}
 
 | 計画状態 | 条件 | アクション |
 |---------|------|----------|
-| — | Spec Review / Ready ステータス | → ステータス優先パス（下記フローに従う） |
-| 計画 Issue なし | Size XS/S（明確な要件）かつサブ Issue でない、かつ Spec Review / Ready でない | → 計画をスキップして直接 `code-issue` に進む |
+| — | Review / Ready ステータス | → ステータス優先パス（下記フローに従う） |
+| 計画 Issue なし | Size XS/S（明確な要件）かつサブ Issue でない、かつ Review / Ready でない | → 計画をスキップして直接 `code-issue` に進む |
 | 計画 Issue なし | Size M 以上または要件に曖昧さあり | → `prepare-flow` に委任して計画を策定 |
 | 計画 Issue なし | サブ Issue（`parentIssue` あり） | → サイズに関わらず `prepare-flow` に委任して計画を策定 |
 | 計画 Issue あり | — | → `items pull {plan-issue-number}` で計画 Issue の本文を取得し、コンテキストとして実装スキルに渡す |
 
-#### Spec Review / Ready ステータス優先パス
+#### Review / Ready ステータス優先パス
 
-Spec Review / Ready ステータスは「計画済み」の明示的シグナルであり、Size に関わらず計画の存在確認を優先する。判定フロー:
+Review / Ready ステータスは「計画済み」の明示的シグナルであり、Size に関わらず計画の存在確認を優先する。判定フロー:
 
 ```
-Spec Review / Ready ステータス
+Review / Ready ステータス
   → 計画 Issue（subIssuesSummary でタイトル「計画:」で始まる子 Issue）の存在を確認
     あり → 計画 Issue の本文を取得してコンテキストとして使用（通常パスと同じ）
-    なし → 異常系: ステータスが Spec Review/Ready にもかかわらず計画が見つからない
+    なし → 異常系: ステータスが Review/Ready にもかかわらず計画が見つからない
            → 警告メッセージを表示し、Size に応じた通常判定にフォールバック
 ```
 
-異常系フォールバックの警告メッセージ例: 「⚠️ Spec Review ステータスですが、計画 Issue が見つかりません。通常の Size ベース判定にフォールバックします。」
+異常系フォールバックの警告メッセージ例: 「⚠️ Review ステータスですが、計画 Issue が見つかりません。通常の Size ベース判定にフォールバックします。」
 
 #### 計画詳細の取得
 
@@ -101,14 +101,14 @@ shirokuma-docs items pull {plan-issue-number}
 # → .shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md を Read ツールで読み込み計画内容を取得
 ```
 
-**XS/S 直接実装パスの判定:** Issue の Size フィールドが XS または S であり、かつタイトルと本文から変更内容が明確に読み取れる場合（パターン置換、型修正、リネーム等の機械的変換）に適用する。ただし、サブ Issue（`parentIssue` フィールドあり）は Size に関わらず計画が必須であるため、このパスの対象外とする。また、Spec Review または Ready ステータスの場合はこのパスの対象外（ステータス優先パスが先に評価される）。Size が未設定、要件に曖昧さがある、サブ Issue である、または判断が難しい場合は `prepare-flow` に委任する。正規の判定基準は `creating-item` スキルの「要件明確性の判定」セクションを参照。
+**XS/S 直接実装パスの判定:** Issue の Size フィールドが XS または S であり、かつタイトルと本文から変更内容が明確に読み取れる場合（パターン置換、型修正、リネーム等の機械的変換）に適用する。ただし、サブ Issue（`parentIssue` フィールドあり）は Size に関わらず計画が必須であるため、このパスの対象外とする。また、Review または Ready ステータスの場合はこのパスの対象外（ステータス優先パスが先に評価される）。Size が未設定、要件に曖昧さがある、サブ Issue である、または判断が難しい場合は `prepare-flow` に委任する。正規の判定基準は `creating-item` スキルの「要件明確性の判定」セクションを参照。
 
 #### Preparing ステータスからの遷移
 
 | 計画状態 | アクション |
 |---------|----------|
 | Preparing + 計画なし | → `prepare-flow` に委任 |
-| Preparing + 計画あり | → Spec Review に遷移し、ユーザーに承認を求める |
+| Preparing + 計画あり | → Review に遷移し、ユーザーに承認を求める |
 
 **テキスト説明のみ**: ディスパッチ条件テーブル（ステップ 4）のキーワードから分類。
 
@@ -124,7 +124,7 @@ shirokuma-docs items pull {plan-issue-number}
 
 Issue が In Progress でなければ: キャッシュの `status` フィールドを `"In Progress"` に書き換えてから `shirokuma-docs items push {number}` を実行
 
-**Spec Review / Ready からの遷移（暗黙承認モデル）**: Spec Review または Ready から `/implement-flow` を呼び出した行為自体が計画の承認を意味する。追加確認なしに In Progress に遷移。
+**Review / Ready からの遷移（暗黙承認モデル）**: Review または Ready から `/implement-flow` を呼び出した行為自体が計画の承認を意味する。追加確認なしに In Progress に遷移。
 
 ### ステップ 3: フィーチャーブランチの確保
 
@@ -394,12 +394,12 @@ Status 更新後、ユーザーに次のアクション候補を提示する。`
 ヘッドレスモードで実行するには以下を**全て**満たす必要がある:
 
 1. 引数に**明示的な Issue 番号**が指定されている
-2. Issue のステータスが **Spec Review** または **Ready** である
+2. Issue のステータスが **Review** または **Ready** である
 3. Issue に計画 Issue（タイトルが「計画:」または「Plan:」で始まる子 Issue）が存在する
 
 いずれかを満たさない場合、エラーメッセージを表示して停止する（通常モードへのフォールバックは行わない）。
 
-> **注意:** Spec Review / Ready 以外のステータス（In Progress, Preparing, Backlog 等）の Issue に `--headless` を指定した場合も前提条件エラーで停止する。Preparing ステータスの Issue は `prepare-flow` による対話的な計画策定が必要なため、ヘッドレスモードの対象外。
+> **注意:** Review / Ready 以外のステータス（In Progress, Preparing, Backlog 等）の Issue に `--headless` を指定した場合も前提条件エラーで停止する。Preparing ステータスの Issue は `prepare-flow` による対話的な計画策定が必要なため、ヘッドレスモードの対象外。
 
 ### UCP デフォルト動作
 

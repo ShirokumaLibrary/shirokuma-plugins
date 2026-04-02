@@ -15,7 +15,7 @@ A simple entry point that loads rules and displays project state for a new conve
 ### Step 1: Fetch Project State
 
 ```bash
-shirokuma-docs session start
+shirokuma-docs items dashboard
 ```
 
 This returns JSON with:
@@ -83,7 +83,7 @@ After displaying active issues (Step 2), check for batch candidates among Backlo
 
 ### Detection
 
-1. Filter issues from `session start` output: Status = Backlog, Size = XS or S
+1. Filter issues from `items dashboard` output: Status = Backlog, Size = XS or S
 2. Group by `area:*` label (primary) or title keyword similarity (fallback: 2+ common nouns)
 3. Show groups with 3+ issues, max 3 groups
 
@@ -120,17 +120,17 @@ If signals are accumulated, show a single line after the Active Issues section:
 
 ## Multi-Developer Mode
 
-In team development, add options to `session start`:
+In team development, add options to `items dashboard`:
 
 ```bash
 # Show handovers from a specific user
-shirokuma-docs session start --user {username}
+shirokuma-docs items dashboard --user {username}
 
 # Show handovers from all members (no filter)
-shirokuma-docs session start --all
+shirokuma-docs items dashboard --all
 
 # Team dashboard (grouped by member)
-shirokuma-docs session start --team
+shirokuma-docs items dashboard --team
 ```
 
 | Option | Behavior |
@@ -149,6 +149,7 @@ shirokuma-docs session start --team
 | `not logged in` | Run: `gh auth login` |
 | issues is empty | Show "No active issues" |
 | git pull fails | Warn and continue with local base branch |
+| `items dashboard: command not found` | Upgrade shirokuma-docs: `shirokuma-docs update` |
 
 ## Next Steps
 
@@ -163,6 +164,6 @@ After displaying state, the user selects the next action:
 
 - Always show current time in session header
 - Show items in priority order within each status
-- Done/Released items are automatically excluded by `session start`
-- Use `shirokuma-docs session start` instead of raw `gh` commands — the CLI aggregates handover, issues, and PRs in one call, saving context window
-- Handover save/restore is not this skill's responsibility. Context saving is done via `session end` CLI, not managed directly by this skill
+- Done/Released items are automatically excluded by `items dashboard`
+- Use `shirokuma-docs items dashboard` instead of raw `gh` commands — the CLI aggregates handover, issues, and PRs in one call, saving context window
+- Handover save/restore is not this skill's responsibility. Issue status updates are managed via `items update-status` CLI, not directly by this skill

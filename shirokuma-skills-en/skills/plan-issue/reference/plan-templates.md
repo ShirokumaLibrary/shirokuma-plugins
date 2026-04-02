@@ -10,7 +10,7 @@ Plan details are created as a child issue (plan issue) linked to the parent issu
 
 - **Plan Issue (child issue)**: An issue whose body contains the full plan content (approach, target files, task breakdown, risks, etc.)
 - **Title convention**: `Plan: {parent issue title}` format
-- **Status**: `Spec Review`
+- **Status**: `Review`
 - **Labels**: `area:plan`
 
 ### Plan Issue Frontmatter Structure
@@ -18,7 +18,7 @@ Plan details are created as a child issue (plan issue) linked to the parent issu
 ```markdown
 ---
 title: "Plan: {parent issue title}"
-status: "Spec Review"
+status: "Review"
 labels: ["area:plan"]
 ---
 ```
@@ -30,7 +30,7 @@ labels: ["area:plan"]
 ```markdown
 ---
 title: "Plan: {parent issue title}"
-status: "Spec Review"
+status: "Review"
 labels: ["area:plan"]
 ---
 
@@ -51,7 +51,7 @@ See #{parent-number} for the task context.
 ```markdown
 ---
 title: "Plan: {parent issue title}"
-status: "Spec Review"
+status: "Review"
 labels: ["area:plan"]
 ---
 
@@ -79,7 +79,7 @@ See #{parent-number} for the task context.
 ```markdown
 ---
 title: "Plan: {parent issue title}"
-status: "Spec Review"
+status: "Review"
 labels: ["area:plan"]
 ---
 
@@ -112,7 +112,7 @@ For issues where the target is an epic (intended to have sub-issues for actual w
 ```markdown
 ---
 title: "Plan: {parent issue title}"
-status: "Spec Review"
+status: "Review"
 labels: ["area:plan"]
 ---
 

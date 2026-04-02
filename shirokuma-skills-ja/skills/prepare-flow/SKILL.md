@@ -10,7 +10,7 @@ allowed-tools: Skill, Agent, Bash, AskUserQuestion, TaskCreate, TaskUpdate, Task
 
 > **チェーン自律進行**: 計画レビュースキル（レビューステップ）が完了した後、即座にステータス更新とユーザーへの返却に進んでください。レビュースキルの完了後に停止するとユーザーが手動で継続を促す必要が生じ、計画ワークフローが中断します。`**レビュー結果:**` の判定文字列でレビュー結果を判定し、ユーザー入力を待たずに進行してください。
 
-Issue の計画フェーズを統括する: Issue の取得、ステータス遷移の管理、Skill ツール経由での `plan-issue` への計画作成委任、計画レビューの実施、Spec Review 承認ゲートでのユーザーへの返却。**実装には進まない。**
+Issue の計画フェーズを統括する: Issue の取得、ステータス遷移の管理、Skill ツール経由での `plan-issue` への計画作成委任、計画レビューの実施、Review 承認ゲートでのユーザーへの返却。**実装には進まない。**
 
 ## タスク登録（必須）
 
@@ -53,7 +53,7 @@ shirokuma-docs items pull {number}
 shirokuma-docs items push {number}
 ```
 
-既に Preparing / Spec Review の場合はステータス更新をスキップ。アサインは冪等なので常に実行する。
+既に Preparing / Review の場合はステータス更新をスキップ。アサインは冪等なので常に実行する。
 
 ### ステップ 2: リサーチトリガー判定（条件付き）
 
@@ -295,12 +295,12 @@ plan-issue → 本文に計画書き込み
 
 | 判定結果 | ステータス遷移 | 根拠 |
 |---------|-------------|------|
-| 設計フェーズ不要 | → Spec Review | 直接実装可能 |
+| 設計フェーズ不要 | → Review | 直接実装可能 |
 | 設計フェーズ必要 | → Designing | `design-flow` の実行を案内 |
 
 ```bash
-# 設計フェーズ不要の場合: キャッシュの status を "Spec Review" に書き換えて push
-# .shirokuma/github/{org}/{repo}/issues/{number}/body.md の status: フィールドを "Spec Review" に変更
+# 設計フェーズ不要の場合: キャッシュの status を "Review" に書き換えて push
+# .shirokuma/github/{org}/{repo}/issues/{number}/body.md の status: フィールドを "Review" に変更
 shirokuma-docs items push {number}
 
 # 設計フェーズ必要の場合: キャッシュの status を "Designing" に書き換えて push
@@ -315,7 +315,7 @@ shirokuma-docs items push {number}
 計画レベルとデザインフェーズ判定に応じたサマリーを表示する。フォーマットは `completion-report-style` ルールに従う。
 
 **必須フィールド**（全レベル共通）:
-- **ステータス:** 現在のステータス（Spec Review または Designing）
+- **ステータス:** 現在のステータス（Review または Designing）
 - **レベル:** 計画の深さ（軽量 / 標準 / 詳細 / エピック）
 - **アプローチ:** 1行要約
 
@@ -356,14 +356,14 @@ shirokuma-docs items push {number}
 | Issue が Done/Released | 警告を表示 |
 | Issue の body が空 | 続行（Planning Worker が計画 Issue を作成） |
 | ステータスが既に Preparing | 続行、ステータス更新をスキップ |
-| ステータスが既に Spec Review | 計画 Issue を更新し、ステータスはそのまま |
+| ステータスが既に Review | 計画 Issue を更新し、ステータスはそのまま |
 | エピック Issue（実作業サブ Issue あり） | Planning Worker がエピック計画テンプレートを使用 |
 
 ## ルール参照
 
 | 参照元 | 用途 |
 |--------|------|
-| `project-items` ルール | Preparing/Designing/Spec Review ステータスの運用 |
+| `project-items` ルール | Preparing/Designing/Review ステータスの運用 |
 | `output-language` ルール | Issue コメント・本文の出力言語 |
 | `github-writing-style` ルール | 箇条書き vs 散文のガイドライン |
 | `implement-flow` スキル | Worker 完了後の統一パターン、UCP チェック |
@@ -384,5 +384,5 @@ shirokuma-docs items push {number}
 - このスキルは**オーケストレーター**であり、実際の計画作成は Agent ツール経由で `plan-worker`（`plan-issue` スキル）に委任する
 - **実装には進まない** — 計画のみ。実装は `implement-flow` の責務
 - 計画は計画 Issue（子 Issue）として永続化される — セッションをまたいでも参照可能
-- `Spec Review` はユーザー承認のゲート — 自己承認はヒューマンチェックを迂回し、認識のズレを早期に検出できなくなる
+- `Review` はユーザー承認のゲート — 自己承認はヒューマンチェックを迂回し、認識のズレを早期に検出できなくなる
 - **チェーン自律進行**: レビュースキル（ステップ 5）が完了した後、停止するとユーザーが手動で継続を促す必要が生じる。`**レビュー結果:**` の判定文字列に基づき即座にステップ 6-7 に進む

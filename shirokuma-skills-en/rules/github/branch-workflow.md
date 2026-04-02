@@ -145,7 +145,7 @@ shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md
 
 1. **Always branch from develop** - Ensure `develop` is up to date before branching (exception: sub-issues branch from the integration branch)
 2. **One branch per issue** - Do not mix unrelated changes (exception: batch mode per `batch-workflow` rule, epics per `epic-workflow` reference)
-3. **Push before session end** - Unpushed work risks being lost
+3. **Push before ending work** - Unpushed work risks being lost
 4. **PR required for merge** - No direct pushes to `develop` or `main`
 5. **Never merge without user approval** - Enforced by PreToolUse hook
 6. **Delete branch after merge** - Keep repository clean

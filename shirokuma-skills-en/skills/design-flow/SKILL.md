@@ -174,13 +174,13 @@ Visual evaluation loop is limited to **3 iterations maximum**. On reaching the l
 
 ### Phase 5: Completion
 
-Design work is complete once approved. If the Issue Status is Designing, transition to Spec Review:
+Design work is complete once approved. If the Issue Status is Designing, transition to Review:
 
 ```bash
 shirokuma-docs items push {number}
 ```
 
-> **Status transition**: When `prepare-flow` determines a design phase is needed, Status is set to Designing. Transitioning to Spec Review on `design-flow` completion completes the `Preparing → Designing → Spec Review` flow. Skip the update if Status is already Spec Review or another state (idempotent).
+> **Status transition**: When `prepare-flow` determines a design phase is needed, Status is set to Designing. Transitioning to Review on `design-flow` completion completes the `Preparing → Designing → Review` flow. Skip the update if Status is already Review or another state (idempotent).
 
 ## Next Steps
 

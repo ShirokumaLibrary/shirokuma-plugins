@@ -18,7 +18,7 @@ Quality review of the plan (plan issue or `## Plan` / `## 計画` section):
 | Timing | Immediate check right after planning | User-initiated at any time |
 | Data retrieval | Issue body embedded in Task agent | Plan issue identified from Issue number, fetched via `shirokuma-docs items pull` |
 | Purpose | Initial quality gate for plan | Independent second opinion |
-| Invocation | Auto-executed at `plan-issue` step 4 | `/review-issue plan #N` or Spec Review Issue |
+| Invocation | Auto-executed at `plan-issue` step 4 | `/review-issue plan #N` or Review Issue |
 
 ## Required Knowledge
 
@@ -29,7 +29,7 @@ Load these files for context:
 ## Plan Role Specific Workflow
 
 ```
-1. Role selection: "plan review" or Spec Review Issue
+1. Role selection: "plan review" or Review Issue
 2. Fetch Issue body: shirokuma-docs items pull {number} (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
 3. Identify plan issue: Find child issue with title starting with "Plan:" from subIssuesSummary, fetch body via items pull {plan-issue-number} (fallback: ## Plan section in body)
 4. Lint execution: Skip (target is not code files)

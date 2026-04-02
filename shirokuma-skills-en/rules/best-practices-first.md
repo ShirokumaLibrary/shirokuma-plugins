@@ -118,5 +118,5 @@ Not "I'll be careful next time" — propose concrete changes to config files.
 
 ## GitHub Operations
 
-- Use `shirokuma-docs gh-*` CLI (direct `gh` is prohibited)
+- Use `shirokuma-docs items` CLI (direct `gh` is prohibited)
 - Cross-repository: Use `--repo {alias}`

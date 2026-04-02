@@ -84,7 +84,7 @@ Skill: project-config-generator
 Verify all steps complete:
 
 ```bash
-shirokuma-docs session check --setup
+shirokuma-docs items integrity --setup
 ```
 
 ## Re-run Support

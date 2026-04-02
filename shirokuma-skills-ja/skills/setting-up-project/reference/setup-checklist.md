@@ -10,8 +10,8 @@
 | 4 | プラグインインストール | `claude plugin list` | 自動 |
 | 5 | `.claude/rules/shirokuma/` デプロイ | ディレクトリ存在確認 | 自動 |
 | 6 | GitHub Projects V2 | `shirokuma-docs items list` | 自動 |
-| 7 | Status/Priority/Size フィールド | `session check --setup` | 自動 |
-| 8 | Discussion カテゴリ | `session check --setup` | 手動 |
+| 7 | Status/Priority/Size フィールド | `items integrity --setup` | 自動 |
+| 8 | Discussion カテゴリ | `items integrity --setup` | 手動 |
 | 9 | Issue Types | GitHub UI で確認 | 手動 |
 | 10 | ビルトイン自動化 | `projects workflows` | 手動 |
 
@@ -19,7 +19,7 @@
 
 ```bash
 # 一括検証
-shirokuma-docs session check --setup
+shirokuma-docs items integrity --setup
 ```
 
 ## よくある問題

@@ -91,7 +91,7 @@ gh api repos/{owner}/{repo}/pulls/{pr-number} --method PATCH -f base="correct-br
 
 | Event | Epic Action |
 |-------|-------------|
-| Preparing complete | Epic → Spec Review (standard flow) |
+| Preparing complete | Epic → Review (standard flow) |
 | First sub-issue becomes In Progress | Epic → In Progress |
 | Sub-issue PR merged | Epic remains In Progress (check `subIssuesSummary` but do not transition) |
 | Final PR: integration → develop merged | Epic → Done |
@@ -101,14 +101,14 @@ gh api repos/{owner}/{repo}/pulls/{pr-number} --method PATCH -f base="correct-br
 
 Sub-issues follow the standard `project-items` rule. The only difference is that their PR base branch is the integration branch.
 
-### `session end` Operational Guidance
+### Status Update Operational Guidance
 
-The `session end` CLI is not epic-aware. Using `--done` on an epic issue while sub-issues are incomplete risks prematurely transitioning the epic to Done.
+The `items update-status` CLI is not epic-aware. Using `--done` on an epic issue while sub-issues are incomplete risks prematurely transitioning the epic to Done.
 
 | Situation | Recommended Action |
 |-----------|--------------------|
-| Session end while working on a sub-issue | `session end --review {sub-issue-number}` to update only the sub-issue |
-| All sub-issues complete, final PR merged | `session end --done {epic-number}` to set epic to Done |
+| Sub-issue work complete (awaiting review) | `items update-status --review {sub-issue-number}` to update only the sub-issue |
+| All sub-issues complete, final PR merged | `items update-status --done {epic-number}` to set epic to Done |
 | Sub-issues still remaining | Do NOT use `--done` on the epic issue. Manually maintain In Progress |
 
 ## `Closes #N` Behavior and Base Branch
@@ -207,4 +207,4 @@ Sub-issue creation in the epic kickoff uses `shirokuma-docs items add issue` dir
 The following are out of scope for now and will be addressed in separate issues:
 
 - Epic progress display in `starting-session` / `showing-github` (sub-issue summary visualization)
-- Epic awareness in `session end` CLI (automated epic status protection when sub-issues are incomplete)
+- Epic awareness in `items update-status` CLI (automated epic status protection when sub-issues are incomplete)

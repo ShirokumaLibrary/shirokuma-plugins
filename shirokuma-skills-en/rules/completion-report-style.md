@@ -26,7 +26,7 @@ Use `**{Label}:** {value}` format.
 
 ```
 **Branch:** feat/42-xxx
-**Status:** Spec Review
+**Status:** Review
 **Location:** .claude/rules/my-rule.md
 ```
 

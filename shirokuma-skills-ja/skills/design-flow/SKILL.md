@@ -174,15 +174,15 @@ lsof -i :3000 2>/dev/null || echo "dev server not running"
 
 ### Phase 5: 完了
 
-デザイン作業が承認されたら完了。Issue の Status が Designing の場合、Spec Review に遷移する:
+デザイン作業が承認されたら完了。Issue の Status が Designing の場合、Review に遷移する:
 
 ```bash
-# キャッシュの status を "Spec Review" に書き換えてから push
-# .shirokuma/github/{org}/{repo}/issues/{number}/body.md の status: フィールドを "Spec Review" に変更
+# キャッシュの status を "Review" に書き換えてから push
+# .shirokuma/github/{org}/{repo}/issues/{number}/body.md の status: フィールドを "Review" に変更
 shirokuma-docs items push {number}
 ```
 
-> **ステータス遷移**: `prepare-flow` がデザインフェーズ必要と判定した場合、Status は Designing に設定される。`design-flow` の完了時に Spec Review に遷移することで、`Preparing → Designing → Spec Review` のフローが完成する。Status が既に Spec Review または他の状態の場合は更新をスキップ（冪等）。
+> **ステータス遷移**: `prepare-flow` がデザインフェーズ必要と判定した場合、Status は Designing に設定される。`design-flow` の完了時に Review に遷移することで、`Preparing → Designing → Review` のフローが完成する。Status が既に Review または他の状態の場合は更新をスキップ（冪等）。
 
 ## 次のステップ
 

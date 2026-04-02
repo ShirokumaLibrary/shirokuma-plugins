@@ -82,7 +82,7 @@ Skill: project-config-generator
 全ステップの完了を検証:
 
 ```bash
-shirokuma-docs session check --setup
+shirokuma-docs items integrity --setup
 ```
 
 ## 再実行対応

@@ -16,8 +16,8 @@ graph TD
 
     C1 -->|"Backlog → ユーザー判断"| C2
     C2 -->|"設計が必要"| C2D
-    C2 -->|"設計不要（Spec Review → ユーザー承認）"| C3
-    C2D -->|"Spec Review → ユーザー承認"| C3
+    C2 -->|"設計不要（Review → ユーザー承認）"| C3
+    C2D -->|"Review → ユーザー承認"| C3
     C3 -->|"コンテキスト溢れ"| C4
     C3 -->|"完結"| Done["PR → Review → Done"]
     C4 --> Done
@@ -35,7 +35,7 @@ graph TD
     E2["会話 2: エピック開始<br/>/implement-flow #N<br/>（サブ Issue + integration ブランチを自動作成）"]
     E3["会話 3+: サブ Issue 作業<br/>/implement-flow #sub（スタンドアロン）<br/>or /starting-session #sub"]
 
-    E1 -->|"Spec Review → ユーザー承認"| E2
+    E1 -->|"Review → ユーザー承認"| E2
     E2 -->|"サブ Issue 作成完了"| E3
     E3 -->|"全サブ Issue 完了"| Final["最終 PR: integration → develop"]
 ```
@@ -83,5 +83,5 @@ graph TD
 | スタンドアロン作業の規模 | アクション |
 |------------------------|----------|
 | 単一スキルの簡易起動（タイポ修正、アイテム作成） | 不要 |
-| 複数コミットまたは大幅なコード変更 | `session end` CLI で Issue ステータスを手動更新 |
+| 複数コミットまたは大幅なコード変更 | `items update-status` CLI で Issue ステータスを手動更新 |
 | 調査結果やアーキテクチャ検討 | Discussion の作成を推奨 |

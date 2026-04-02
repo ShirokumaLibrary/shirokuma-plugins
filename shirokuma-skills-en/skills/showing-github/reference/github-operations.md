@@ -141,7 +141,7 @@ gh auth status
 | Pattern | Commands | Reason |
 |---------|----------|--------|
 | `items add` recommended | `items add issue`, `items add discussion` | Metadata + body in one file, prevents flag combination errors |
-| `--body-file` kept | `items pr reply`, `session end` | Body only, no metadata needed |
+| `--body-file` kept | `items pr reply`, `items update-status` | Body only, no metadata needed |
 | `items push` recommended | Status/body/title/labels/assignees/state/issue-type/parent update | Cache-edit → push consistent workflow |
 
 ### `--from-file` Frontmatter Format
@@ -181,7 +181,7 @@ Use `<<'EOF'` as heredoc delimiter (single quotes prevent variable expansion). W
 
 ```mermaid
 graph LR
-  Icebox --> Backlog --> Preparing --> Designing --> SpecReview[Spec Review] --> InProgress[In Progress]
+  Icebox --> Backlog --> Preparing --> Designing --> Review --> InProgress[In Progress]
   InProgress --> Review --> Testing --> Done --> Released
   InProgress <--> Pending["Pending (blocked)"]
 ```
@@ -192,7 +192,6 @@ graph LR
 | Backlog | Planned for future work |
 | Preparing | Plan being created |
 | Designing | Design being created |
-| Spec Review | Requirements being reviewed |
 | In Progress | Currently working on |
 | Pending | Blocked (document reason) |
 | Review | Code review |

@@ -10,7 +10,7 @@ allowed-tools: Skill, Agent, Bash, AskUserQuestion, TaskCreate, TaskUpdate, Task
 
 > **Chain Autonomous Progression**: After the plan review skill (review step) completes, immediately proceed to status update and user return. Stopping after the review skill forces the user to manually prompt continuation, breaking the planning workflow. Use the `**Review result:**` string to determine the review outcome and act without waiting for user input.
 
-Orchestrate the planning phase for an issue: fetch the issue, manage status transitions, delegate plan creation to `plan-issue` (via Agent tool / `plan-worker`), conduct plan review, and return control to the user with a Spec Review approval gate. **Does not proceed to implementation.**
+Orchestrate the planning phase for an issue: fetch the issue, manage status transitions, delegate plan creation to `plan-issue` (via Agent tool / `plan-worker`), conduct plan review, and return control to the user with a Review approval gate. **Does not proceed to implementation.**
 
 ## Task Registration (Required)
 
@@ -52,7 +52,7 @@ shirokuma-docs items pull {number}
 shirokuma-docs items push {number}
 ```
 
-Skip status update if already Preparing or Spec Review. Assignee is idempotent, so always execute.
+Skip status update if already Preparing or Review. Assignee is idempotent, so always execute.
 
 ### Step 2: Research Trigger Assessment (Conditional)
 
@@ -283,11 +283,11 @@ Analyze the plan content to determine whether a design phase is needed. The asse
 
 | Assessment Result | Status Transition | Rationale |
 |-------------------|------------------|-----------|
-| No design phase needed | → Spec Review | Ready for direct implementation |
+| No design phase needed | → Review | Ready for direct implementation |
 | Design phase needed | → Designing | Guide user to run `design-flow` |
 
 ```bash
-# When no design phase needed: edit cache frontmatter status: "Spec Review"
+# When no design phase needed: edit cache frontmatter status: "Review"
 shirokuma-docs items push {number}
 
 # When design phase needed: edit cache frontmatter status: "Designing"
@@ -301,7 +301,7 @@ Display a plan summary and request approval. The plan is a contract with the use
 Show a summary matching the plan depth level and design phase assessment. Follow the `completion-report-style` rule for formatting.
 
 **Required fields** (all levels):
-- **Status:** current status (Spec Review or Designing)
+- **Status:** current status (Review or Designing)
 - **Level:** plan depth (Lightweight / Standard / Detailed / Epic)
 - **Approach:** one-line summary
 
@@ -342,14 +342,14 @@ At the end of the plan completion report, auto-record Evolution signals followin
 | Issue is Done/Released | Show warning |
 | Issue body is empty | Proceed (planning worker will create the plan issue) |
 | Status is already Preparing | Continue, skip status update |
-| Status is already Spec Review | Update plan issue, keep status |
+| Status is already Review | Update plan issue, keep status |
 | Epic issue (has non-plan sub-issues) | Planning worker uses epic plan template |
 
 ## Rule References
 
 | Reference | Usage |
 |-----------|-------|
-| `project-items` rule | Preparing/Designing/Spec Review status workflow |
+| `project-items` rule | Preparing/Designing/Review status workflow |
 | `output-language` rule | Output language for issue comments and body |
 | `github-writing-style` rule | Bullet-point vs prose guidelines |
 | `implement-flow` skill | Worker completion unified pattern, UCP check |
@@ -370,5 +370,5 @@ At the end of the plan completion report, auto-record Evolution signals followin
 - This skill is the **orchestrator** — actual plan creation is delegated to `plan-worker` (`plan-issue` skill) via Agent tool
 - **Does not implement** — planning only. Implementation is `implement-flow`'s responsibility
 - Plans are persisted as plan issues (child issues) — available across sessions
-- `Spec Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
+- `Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
 - **Chain autonomous progression**: After the review skill (Step 5) completes, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 6-7 based on the `**Review result:**` string. Check TaskList for remaining pending steps after each skill result

@@ -16,8 +16,8 @@ graph TD
 
     C1 -->|"Backlog → user decision"| C2
     C2 -->|"design needed"| C2D
-    C2 -->|"no design needed (Spec Review → user approval)"| C3
-    C2D -->|"Spec Review → user approval"| C3
+    C2 -->|"no design needed (Review → user approval)"| C3
+    C2D -->|"Review → user approval"| C3
     C3 -->|"context overflow"| C4
     C3 -->|"completed"| Done["PR → Review → Done"]
     C4 --> Done
@@ -35,7 +35,7 @@ graph TD
     E2["Conversation 2: Epic kickoff<br/>/implement-flow #N<br/>(auto-creates sub-issues + integration branch)"]
     E3["Conversation 3+: Sub-issue work<br/>/implement-flow #sub (standalone)<br/>or /starting-session #sub"]
 
-    E1 -->|"Spec Review → user approval"| E2
+    E1 -->|"Review → user approval"| E2
     E2 -->|"sub-issues created"| E3
     E3 -->|"all sub-issues done"| Final["Final PR: integration → develop"]
 ```
@@ -83,5 +83,5 @@ For substantial standalone work without `implement-flow`:
 | Standalone Scope | Action |
 |-----------------|--------|
 | Quick single-skill invocation (typo fix, item creation) | Not needed |
-| Multiple commits or significant code changes | Update issue status manually via `session end` CLI |
+| Multiple commits or significant code changes | Update issue status manually via `items update-status` CLI |
 | Research findings or architecture investigation | Recommend creating a Discussion |
