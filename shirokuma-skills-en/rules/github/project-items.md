@@ -136,7 +136,7 @@ AI MUST update issue status at these points:
 | Blocked by dependency | → Pending | Manual | frontmatter `status: "Pending"` → `items push {n}` + comment |
 | Complete (no PR needed) | → Done | Manual | `items update-status --done {n}` |
 | Cancelled | → Not Planned | `items cancel` | `items cancel {n}` |
-| Plan approved | → Done (plan issue) | `implement-flow` | frontmatter `status: "Done"` → `items push {plan-n}` |
+| Plan approved | → Done (plan issue) | `implement-flow` | Identify plan issue from `subIssuesSummary` → `items pull {plan-n}` → frontmatter `status: "Done"` → `items push {plan-n}` (for epics: only after all work sub-issues are Done) |
 
 > **GitHub Projects built-in automation**: When the `Pull request linked to issue` workflow is enabled, linking a PR to an Issue automatically adds both to the Project. Date fields (Start At / Review At / End At) on the PR are set automatically by `items integrity`. See the "GitHub Projects Workflow Configuration" section in `github-commands.md` for setup instructions.
 
@@ -214,7 +214,7 @@ Plan issues represent the lifecycle of the plan itself and do not participate in
 | Status | Description | Transition Trigger |
 |--------|-------------|-------------------|
 | Review | Plan created, awaiting review / code review | Set by `prepare-flow` after plan creation (plan issue) or `implement-flow` chain end (PR) |
-| Done | Plan approved | Set when `implement-flow` starts implementation, or on manual approval |
+| Done | Plan approved | Auto-updated at `implement-flow` chain end, or on manual approval |
 
 **`items integrity` aggregation exclusion**: When auto-deriving parent Issue status, plan issues with the `area:plan` label are excluded from sub-issue status aggregation. This prevents a plan issue remaining in Review from affecting the parent's In Progress derivation.
 

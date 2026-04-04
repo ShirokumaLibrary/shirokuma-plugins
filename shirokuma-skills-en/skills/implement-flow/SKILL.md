@@ -338,6 +338,36 @@ shirokuma-docs items push {number}
 
 **Status fallback verification**: After chain completion, read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` frontmatter to check status. If still In Progress → edit cache frontmatter `status: "Review"` and `shirokuma-docs items push {number}` (idempotent: re-updating to Review when already Review is harmless).
 
+#### Plan Issue Done Update (End of Chain)
+
+After the Status update, update the plan issue to Done if one exists.
+
+**Top-level issue case** (no parent issue):
+Identify the plan issue from the `subIssuesSummary` of the issue fetched in Step 1 — look for a child issue whose title starts with "Plan:" or "計画:".
+
+**Sub-issue case** (has a parent issue):
+Re-run `shirokuma-docs items pull {parent-number}` at the end of the chain to get the latest `subIssuesSummary` (other sub-issue statuses may have changed during chain execution). Look for a sibling issue whose title starts with "Plan:" or "計画:".
+
+**Epic case** (parent issue has multiple work sub-issues):
+Similarly, re-fetch the parent issue at the end of the chain to use the latest `subIssuesSummary`. Only update the plan issue to Done if all work sub-issues (excluding the plan issue itself) have a status of Done or Not Planned. If any work sub-issue remains in another status, skip the update.
+
+**Plan issue update procedure**:
+
+```bash
+# 1. Pull plan issue cache (skip if already cached from Step 1)
+shirokuma-docs items pull {plan-number}
+
+# 2. Edit frontmatter status to "Done" in the cache file
+# .shirokuma/github/{org}/{repo}/issues/{plan-number}/body.md — use Edit tool
+
+# 3. Push to reflect on GitHub
+shirokuma-docs items push {plan-number}
+```
+
+- **Skip pull when already cached**: In the top-level case, the plan issue was already fetched in Step 1 — go directly to step 2 (edit frontmatter) and step 3 (push). The sub-issue/epic cases require the pull since the plan issue was not fetched earlier.
+- **Plan issue not found**: Silent skip (no warning). Covers cases like XS/S direct implementation path where no plan issue exists.
+- **Idempotent**: Re-updating to Done when already Done is harmless.
+
 #### Next Steps Suggestion (End of Chain)
 
 After Status update, present next action candidates to the user. Extract the PR number from `open-pr-issue`'s output to provide specific guidance. If the PR number is unavailable (e.g., PR not created), omit the `/review-flow` line.
