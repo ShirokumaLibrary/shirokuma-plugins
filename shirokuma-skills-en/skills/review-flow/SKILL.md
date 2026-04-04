@@ -24,6 +24,18 @@ Takes a PR number and performs code review execution (via `review-issue` Agent /
 
 ## Workflow
 
+### Issue Status Transitions
+
+Update the status of Issues in `linked_issues` at the following points:
+
+| Timing | Action | Command |
+|--------|--------|---------|
+| `review-flow` starts | → In Progress | `items pull {n}` → frontmatter `status: "In Progress"` → `items push {n}` |
+| After review response complete | → Review | frontmatter `status: "Review"` → `items push {n}` |
+
+- Skip status transitions when `linked_issues` is empty
+- Skip update if status is already correct (idempotent)
+
 ### Step 1: Context Restoration (Required — Must Run First)
 
 > **This step must always run first.** Cannot be skipped.

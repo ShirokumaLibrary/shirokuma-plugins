@@ -130,13 +130,15 @@ AI MUST update issue status at these points:
 | Plan created | → Review | `prepare-flow` | frontmatter `status: "Review"` → `items push {n}` |
 | User approves plan, starts work | → In Progress + branch | `implement-flow` | frontmatter `status: "In Progress"` → `items push {n}` |
 | implement-flow chain complete | → Review | `implement-flow` | frontmatter `status: "Review"` → `items push {n}` (after PR creation, simplify, security-review, work summary) |
+| review-flow starts | → In Progress | `review-flow` | frontmatter `status: "In Progress"` → `items push {n}` |
+| review-flow response complete | → Review | `review-flow` | frontmatter `status: "Review"` → `items push {n}` |
 | PR merged | → Done | `commit-issue` (via `pr merge`) | Automatic |
 | Blocked by dependency | → Pending | Manual | frontmatter `status: "Pending"` → `items push {n}` + comment |
 | Complete (no PR needed) | → Done | Manual | `items update-status --done {n}` |
 | Cancelled | → Not Planned | `items cancel` | `items cancel {n}` |
 | Plan approved | → Done (plan issue) | `implement-flow` | frontmatter `status: "Done"` → `items push {plan-n}` |
 
-> **GitHub Projects built-in automation**: When the `Pull request linked to issue` workflow is enabled, linking a PR to an Issue automatically adds both to the Project. Date fields (Start DATE / Review Start DATE / End DATE) on the PR are set automatically by `items integrity`. See the "GitHub Projects Workflow Configuration" section in `github-commands.md` for setup instructions.
+> **GitHub Projects built-in automation**: When the `Pull request linked to issue` workflow is enabled, linking a PR to an Issue automatically adds both to the Project. Date fields (Start At / Review At / End At) on the PR are set automatically by `items integrity`. See the "GitHub Projects Workflow Configuration" section in `github-commands.md` for setup instructions.
 
 ### Preparing Usage
 

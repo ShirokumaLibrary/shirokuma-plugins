@@ -24,6 +24,18 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 
 ## ワークフロー
 
+### Issue ステータス遷移
+
+`linked_issues` に含まれる Issue のステータスを以下のタイミングで更新する:
+
+| タイミング | アクション | コマンド |
+|-----------|----------|---------|
+| `review-flow` 開始時 | → In Progress | `items pull {n}` → frontmatter `status: "In Progress"` → `items push {n}` |
+| レビュー対応完了後 | → Review | frontmatter `status: "Review"` → `items push {n}` |
+
+- `linked_issues` が空の場合はステータス遷移をスキップする
+- 既に正しいステータスの場合は更新をスキップする（冪等）
+
 ### ステップ 1: コンテキスト復元（必須・最初に実行）
 
 > **このステップは必ず最初に実行する。** スキップ不可。
