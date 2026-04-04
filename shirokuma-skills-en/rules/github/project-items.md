@@ -38,6 +38,7 @@ graph LR
 | Ready | Ready to start. Plan approved, awaiting implementation |
 | In Progress | Currently working on |
 | Pending | Blocked (document reason) |
+| Completed | Implementation done on issue side, PR created. Reverts to In Progress if PR is closed |
 | Review | AI work complete, human review possible (plan approval gate or code review pending) |
 | Testing | QA testing |
 | Done | Completed |
@@ -50,11 +51,10 @@ PRs use the same Status field as Issues, operating on a subset of the Issue work
 
 | Status | Description | Transition Trigger |
 |--------|-------------|-------------------|
-| In Progress | Immediately after PR creation | Set by `open-pr-issue` when adding PR to Projects |
-| Review | After review is requested | Set by `implement-flow` at chain end, together with Issue |
+| Review | Immediately after PR creation | Auto-set by `items pr create` when adding PR to Projects |
 | Done | After merge | Auto-set by `items pr merge` |
 
-**Unused statuses**: Backlog, Preparing, Designing, Ready, Icebox, Testing, Released, Pending, and Not Planned do not apply to PRs.
+**Unused statuses**: Backlog, Preparing, Designing, Ready, Icebox, In Progress, Testing, Released, Pending, and Not Planned do not apply to PRs.
 
 > `items integrity` detects PR status inconsistencies (OPEN PR with Done status, MERGED/CLOSED PR with active status, issue-only statuses on PRs).
 
@@ -65,7 +65,8 @@ Epic Issue status is **auto-derived** from sub-issue states. Manual updates are 
 | Sub-Issue State | Effect on Parent Issue |
 |----------------|----------------------|
 | All sub-issues Done | Parent auto-transitions to Done |
-| Some In Progress / Review | Parent stays In Progress |
+| All sub-issues Completed or Done/Released | Parent auto-transitions to Review |
+| Some In Progress / Review / Completed | Parent stays In Progress |
 | Some Done + rest Backlog / Preparing | Parent stays In Progress (treated as in-progress) |
 | All sub-issues Not Planned | Parent auto-reverts to Backlog |
 
@@ -176,6 +177,22 @@ Review means "AI work is complete and human review is possible". Used in two con
 3. **Event-driven**: Status changes happen immediately when events occur
 4. **Pending requires reason** - Add a comment explaining the blocker
 5. **Idempotency** - If status is already correct, skip the update (no error)
+
+### CLI and GitHub Projects Workflows Responsibility Division
+
+GitHub Projects has built-in Workflows (e.g., `Item closed` → set Status to Done), and the CLI's `items close` also sets Status to Done. This can result in the same Status update being executed twice.
+
+| Operation | CLI Responsibility | Workflows Responsibility | Duplicate Execution |
+|-----------|-------------------|--------------------------|---------------------|
+| Issue close | `items close` sets Status → Done | `Item closed` sets Status → Done | Yes (idempotent) |
+| PR merge | `items pr merge` sets Status → Done | `Pull request merged` sets Status → Done | Yes (idempotent) |
+| Issue reopen | `items reopen` restores Status | `Item reopened` sets Status → Backlog | Potential conflict |
+
+**Principles:**
+- CLI performs **authoritative Status updates** (including timestamp updates and parent issue derivation)
+- Workflows act as a **backstop** (covering manual operations that bypass the CLI)
+- Duplicate execution is harmless due to idempotency
+- On reopen, CLI's Status restore and Workflows' Backlog setting may conflict; Workflows may overwrite after CLI execution. If conflicted, correct with `shirokuma-docs items update-status {number} --status {correct-status}`
 
 ## Plan Issue Approach
 

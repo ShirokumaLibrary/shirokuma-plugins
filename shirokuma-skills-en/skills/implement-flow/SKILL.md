@@ -439,12 +439,39 @@ claude -p "/implement-flow --headless #42"
 | Issue Done/Released | Warn, confirm reopen |
 | Already In Progress | Continue without status change |
 | Wrong branch | AskUserQuestion: switch or continue |
-| Chain failure | Report completed/remaining steps, return control |
+| Chain failure | Report completed/remaining steps, return control. See "Chain Recovery Procedure" below |
+| Issue was reverted (after PR revert) | After merging revert PR, move original issue back to Backlog and re-implement on a new branch. See "Recovery after PR Revert" below |
 | Sub-issue with no integration branch | Use `develop` as base, warn user |
 | Epic issue selected directly | Check for non-plan child issues; see "Epic Issue Entry Point" below |
 | `--headless` + precondition not met | Display error message and stop |
 | `--headless` + wrong branch (W4) | Warn and stop (no auto-switch) |
 | `--headless` + worker UCP (W5) | Skip and record in Issue comment |
+
+### Recovery after PR Revert
+
+When a revert is required after a PR has been merged (issue is Done):
+
+1. Create and merge a revert PR (via GitHub UI or `git revert`)
+2. Manually update the original issue status to `Backlog` (re-implement) or `Not Planned` (cancelled)
+3. If re-implementing, run `/implement-flow #{number}` in a new conversation (a new branch will be created)
+
+> Revert is a manual operation and is not part of the `implement-flow` chain.
+
+### Chain Recovery Procedure
+
+If the `implement-flow` chain stops mid-way (network error, session disconnect, etc.), run the same `/implement-flow #{number}` again in a new conversation. The following idempotency guarantees allow safe resumption:
+
+| State | Behavior |
+|-------|----------|
+| Branch already exists | Switch to existing branch via `git checkout {branch}` (no re-creation) |
+| Status already In Progress | Skip status change |
+| Already committed and pushed | `commit-worker` detects no diff and skips |
+| PR already exists | `pr-worker` detects existing PR and skips |
+| `/simplify` already done | Safe to re-run (idempotent) |
+| Security review already done | Safe to re-run (idempotent) |
+| Work summary already posted | Duplicate comment is posted (manually delete) |
+
+> Only the work summary lacks idempotency. If duplicated, delete the extra manually.
 
 ## Epic Issue Entry Point
 

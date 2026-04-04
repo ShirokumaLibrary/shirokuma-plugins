@@ -439,12 +439,39 @@ claude -p "/implement-flow --headless #42"
 | Issue が Done/Released | 警告、再オープン確認 |
 | 既に In Progress | ステータス変更なしで続行 |
 | 誤ったブランチ | AskUserQuestion: 切り替え or 続行 |
-| チェーン失敗 | 完了/残りステップ報告、制御を返す |
+| チェーン失敗 | 完了/残りステップ報告、制御を返す。下記「チェーン復旧手順」参照 |
+| Issue が revert された（PR revert 後） | revert PR をマージ後、元 Issue を Backlog に戻し新ブランチで再実装。下記「PR revert 後のリカバリー」参照 |
 | サブ Issue で integration ブランチ未検出 | `develop` をベースにし警告表示 |
 | エピック Issue を直接指定 | 計画 Issue 以外の子 Issue の有無に基づき下記「エピック Issue エントリーポイント」参照 |
 | `--headless` + 前提条件未達 | エラーメッセージを表示して停止 |
 | `--headless` + 誤ブランチ（W4） | 警告を表示して停止（自動切り替えしない） |
 | `--headless` + worker の UCP（W5） | スキップして Issue コメントに記録 |
+
+### PR revert 後のリカバリー
+
+PR がマージ済み（Issue が Done）の状態で revert が必要な場合:
+
+1. revert PR を作成してマージする（GitHub UI または `git revert`）
+2. 元 Issue のステータスを `Backlog`（再実装予定）または `Not Planned`（見送り）に手動更新
+3. 再実装する場合は新しい会話で `/implement-flow #{number}` を実行（新しいブランチが作成される）
+
+> revert は手動操作。`implement-flow` のチェーンには含まれない。
+
+### チェーン復旧手順
+
+`implement-flow` のチェーンが途中で停止した場合（ネットワークエラー、セッション切断等）、新しい会話で同じ `/implement-flow #{number}` を再実行する。以下の冪等性保証により安全に再開できる:
+
+| 状態 | 動作 |
+|------|------|
+| ブランチが既に存在する | `git checkout {branch}` で既存ブランチに切り替え（再作成しない） |
+| ステータスが既に In Progress | ステータス変更をスキップ |
+| コミット済み・プッシュ済み | `commit-worker` が差分なしを検出しスキップ |
+| PR が既に存在する | `pr-worker` が既存 PR を検出しスキップ |
+| `/simplify` 済み | 再実行しても無害（冪等） |
+| セキュリティレビュー済み | 再実行しても無害（冪等） |
+| 作業サマリー投稿済み | 重複コメントが投稿される（手動削除で対応） |
+
+> 作業サマリーのみ冪等性が保証されない。重複した場合は手動で削除する。
 
 ## エピック Issue エントリーポイント
 

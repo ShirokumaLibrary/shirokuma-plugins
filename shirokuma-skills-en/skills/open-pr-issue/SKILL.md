@@ -272,7 +272,6 @@ Only when invoked standalone:
 ```text
 PR created. Next steps:
 → Run `/review-flow #{pr-number}` to respond to reviewer feedback
-→ `shirokuma-docs items update-status --review {issue-number}` to update issue status
 ```
 
 ## Notes
