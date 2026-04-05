@@ -57,7 +57,7 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 
 ```markdown
 アイテム作成完了: #{number}
-→ `/review-issue plan #{number}` で要件・仕様への影響をレビュー（推奨）
+→ `/review-issue requirements #{number}` で要件・仕様の品質をレビュー（推奨）
 → `/prepare-flow #{number}` で計画から開始
 → `/implement-flow #{number}` で直接実装を開始
 → またはそのまま Backlog に配置
@@ -74,7 +74,7 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 
 ## 次のステップ
 
-chain-rules.md の判定に基づき、Size XS/S かつ要件明確な場合は `/implement-flow` を推奨、Size M 以上または要件曖昧な場合は `/review-issue plan` でレビュー後に `/prepare-flow` を推奨する。詳細はステップ 3 参照。
+chain-rules.md の判定に基づき、Size XS/S かつ要件明確な場合は `/implement-flow` を推奨、Size M 以上または要件曖昧な場合は `/review-issue requirements` でレビュー後に `/prepare-flow` を推奨する。詳細はステップ 3 参照。
 
 ## Evolution シグナル自動記録
 

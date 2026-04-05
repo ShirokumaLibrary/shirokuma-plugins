@@ -1,6 +1,6 @@
 ---
 name: review-issue
-description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, documentation, plan quality, design quality, and research quality. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "design review", "research review", "code review", "config review".
+description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, documentation, plan quality, requirements quality, design quality, and research quality. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "requirements review", "design review", "research review", "code review", "config review".
 allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---
 
@@ -24,6 +24,7 @@ Comprehensive review workflow with specialized roles for different review types.
 | **nextjs** | Framework, patterns (delegates to `reviewing-nextjs` with fallback) | "Next.js review", "プロジェクト" |
 | **docs** | Markdown structure, links, terminology | "docs review", "ドキュメントレビュー" |
 | **plan** | Requirements coverage, task granularity, risks | "plan review", "計画レビュー" |
+| **requirements** | Issue body completeness, clarity, implementability | "requirements review", "要件レビュー", "要件確認" |
 | **design** | Design Brief, Aesthetic Direction, UI implementation | "design review", "設計レビュー" |
 | **research** | Requirement alignment, research quality, implementability | "research review", "リサーチレビュー" |
 
@@ -49,6 +50,7 @@ Based on user request, select appropriate role:
 | "Next.js", "nextjs" | nextjs | Discover `reviewing-nextjs` via `skills routing reviewing`; fall back to ALL knowledge files if not installed |
 | "docs", "ドキュメント" | docs | roles/docs.md |
 | "plan", "計画レビュー" | plan | roles/plan.md |
+| "requirements", "要件レビュー", "要件確認" | requirements | roles/requirements.md |
 | "design", "設計レビュー", "デザイン" | design | criteria/design, roles/design |
 | "research", "リサーチレビュー" | research | roles/research, criteria/research |
 
@@ -95,7 +97,7 @@ User request
 | 5 | docs | Document analysis is independent of code analysis |
 | 6 | code+annotation | Special mode of code |
 
-**Excluded roles:** plan / design / research are excluded from multi-role auto-detection (they are issue analysis roles, and mixing with code review roles is unnatural).
+**Excluded roles:** plan / requirements / design / research are excluded from multi-role auto-detection (they are issue analysis roles, and mixing with code review roles is unnatural).
 
 **Exclusion rules:**
 - `code` and `config` are subject to auto-switching, so when both match, the existing `config` auto-detection logic takes priority (no multi-role).
@@ -170,6 +172,7 @@ Skip this substep if no local documentation is available (no `ready` sources).
 | docs | lint docs (document structure only) |
 | config | Skip (config files are analyzed using `reviewing-claude-config` validation logic) |
 | plan | Skip (target is Issue body, not code/document files) |
+| requirements | Skip (target is Issue body, not code/document files) |
 | design | Skip (target is Issue body / design artifacts, not code/document files) |
 | research | Skip (target is research findings, not code/document files) |
 
@@ -236,6 +239,14 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 6. `plugin.json` version consistency (match against `package.json`)
 7. Manual date stamps
 8. ASCII art diagrams
+
+**Requirements role:**
+
+1. Fetch Issue body via `shirokuma-docs items pull {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
+2. Analyze each section (purpose, overview, reproduction steps, deliverables, considerations) for presence and content
+3. Evaluate each item in review checklist (`roles/requirements.md`)
+4. Check against anti-patterns
+5. Assess completeness, clarity, implementability, and consistency
 
 **Plan role:**
 
@@ -342,6 +353,7 @@ Report the Discussion URL to the user.
 | PR number specified | PR comment (summary) | Discussion only if 5+ errors |
 | File/directory | Discussion (Reports) | — |
 | Issue number specified (plan role) | Issue comment | — |
+| Issue number specified (requirements role) | Issue comment | — |
 | Issue number specified (design role) | Issue comment | — |
 | Issue number specified (research role) | Issue comment | — |
 
@@ -383,6 +395,7 @@ For token efficiency:
 "test review"                      # Testing
 "Next.js review"                   # Next.js project
 "plan review #42"                  # Plan review
+"requirements review #42"          # Requirements review
 "design review #42"                # Design review
 "research review #42"              # Research review
 "security + code review src/"      # Multi-role
@@ -468,6 +481,15 @@ When invoked from `prepare-flow` with plan role, post the plan review result as 
 
 On NEEDS_REVISION, classify issues into `[Plan]` and `[Issue description]`. `plan-issue` uses this classification to perform fixes.
 
+### Requirements Review Mode (requirements role)
+
+When invoked with requirements role, post the requirements review result as an Issue comment and include the following verdict.
+
+- **PASS**: `**Review result:** PASS` — No critical issues in the Issue body (improvement suggestions may still be present)
+- **NEEDS_REVISION**: `**Review result:** NEEDS_REVISION` — Missing required sections, fatal ambiguities, or unimplementable requirements
+
+On NEEDS_REVISION, classify issues into `[Completeness]`, `[Clarity]`, and `[Implementability]`.
+
 ### Design Review Mode (design role)
 
 When invoked with design role, post the design review result as an Issue comment and include the following verdict.
@@ -505,7 +527,7 @@ Review reports (PR comments, Discussions) must follow the language specified in 
 | `criteria/` | [code-quality](criteria/code-quality.md), [coding-conventions](criteria/coding-conventions.md), [security](criteria/security.md), [testing](criteria/testing.md), [design](criteria/design.md), [research](criteria/research.md) |
 | `patterns/` | [server-actions](patterns/server-actions.md), [server-actions-structure](patterns/server-actions-structure.md), [drizzle-orm](patterns/drizzle-orm.md), [better-auth](patterns/better-auth.md), [e2e-testing](patterns/e2e-testing.md), [tailwind-v4](patterns/tailwind-v4.md), [radix-ui-hydration](patterns/radix-ui-hydration.md), [jsdoc](patterns/jsdoc.md), [nextjs-patterns](patterns/nextjs-patterns.md), [i18n](patterns/i18n.md), [code-quality](patterns/code-quality.md), [account-lockout](patterns/account-lockout.md), [audit-logging](patterns/audit-logging.md), [docs-management](patterns/docs-management.md) |
 | `reference/` | [tech-stack](reference/tech-stack.md), [progress-report-examples](reference/progress-report-examples.md) |
-| `roles/` | [code](roles/code.md), [security](roles/security.md), [testing](roles/testing.md), [nextjs](roles/nextjs.md), [docs](roles/docs.md), [plan](roles/plan.md), [design](roles/design.md), [research](roles/research.md) |
+| `roles/` | [code](roles/code.md), [security](roles/security.md), [testing](roles/testing.md), [nextjs](roles/nextjs.md), [docs](roles/docs.md), [plan](roles/plan.md), [requirements](roles/requirements.md), [design](roles/design.md), [research](roles/research.md) |
 | `templates/` | [report](templates/report.md) |
 | `docs/setup/` | [auth-setup](docs/setup/auth-setup.md), [database-setup](docs/setup/database-setup.md), [infra-setup](docs/setup/infra-setup.md), [project-init](docs/setup/project-init.md), [styling-setup](docs/setup/styling-setup.md) |
 | `docs/workflows/` | [annotation-consistency](docs/workflows/annotation-consistency.md), [shirokuma-docs-verification](docs/workflows/shirokuma-docs-verification.md) |

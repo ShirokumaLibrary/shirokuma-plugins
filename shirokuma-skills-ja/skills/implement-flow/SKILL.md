@@ -47,6 +47,16 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 
 ### ステップ 1: 作業の分析
 
+#### 計画 Issue 自動解決（ステップ 1 前処理）
+
+受け取った Issue のタイトルが「計画: 」または「Plan: 」で始まる場合、計画 Issue として扱い親 Issue に自動リダイレクトする:
+
+1. キャッシュの frontmatter から `parent` フィールドを確認
+2. `parent` が設定されている場合 → 親 Issue 番号で `items pull` を実行し、以降のフローは親 Issue 番号で実行（計画 Issue の番号は計画コンテキスト参照にのみ使用）
+3. `parent` が未設定の場合 → `items pull {number}` で再取得して `parent` を確認
+4. それでも `parent` が不明な場合 → エラーメッセージを表示して停止:
+   「計画 Issue #{number} の親 Issue が特定できません。親 Issue 番号を直接指定してください。」
+
 **Issue 番号あり**: `shirokuma-docs items pull {number}` で取得し、`.shirokuma/github/{org}/{repo}/issues/{number}/body.md` を Read ツールで読み込んで title/body/labels/status/priority/size を抽出。
 
 #### サブ Issue 検出

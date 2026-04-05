@@ -57,7 +57,7 @@ Item created: #{number}
 
 ```markdown
 Item created: #{number}
-→ `/review-issue plan #{number}` to review requirements and spec impact (recommended)
+→ `/review-issue requirements #{number}` to review requirements and spec quality (recommended)
 → `/prepare-flow #{number}` to start planning
 → `/implement-flow #{number}` to start implementation directly
 → Or keep in Backlog
@@ -74,7 +74,7 @@ See [reference/chain-rules.md](reference/chain-rules.md) "Review Execution Condi
 
 ## Next Steps
 
-Based on chain-rules.md: recommend `/implement-flow` for Size XS/S with clear requirements, `/review-issue plan` then `/prepare-flow` for Size M+ or ambiguous requirements. See Step 3 for details.
+Based on chain-rules.md: recommend `/implement-flow` for Size XS/S with clear requirements, `/review-issue requirements` then `/prepare-flow` for Size M+ or ambiguous requirements. See Step 3 for details.
 
 ## Evolution Signal Auto-Recording
 

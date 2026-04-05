@@ -47,6 +47,16 @@ Use TaskUpdate to set each step to `in_progress` when starting and `completed` w
 
 ### Step 1: Analyze Work
 
+#### Plan Issue Auto-Resolution (Step 1 Pre-processing)
+
+When the received issue title starts with "Plan: " or "計画: ", treat it as a plan issue and auto-redirect to the parent issue:
+
+1. Check the `parent` field from the cache frontmatter
+2. If `parent` is set → run `items pull` with the parent issue number, and continue the flow using the parent issue number (the plan issue number is only used for plan context reference)
+3. If `parent` is not set → re-fetch via `items pull {number}` to check for `parent`
+4. If `parent` is still unknown → display error message and stop:
+   "Cannot determine parent issue for plan issue #{number}. Please specify the parent issue number directly."
+
 **Issue number provided**: `shirokuma-docs items pull {number}` to fetch and cache, then read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` to extract title/body/labels/status/priority/size.
 
 #### Sub-Issue Detection
