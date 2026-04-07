@@ -196,7 +196,7 @@ Closing due to: <reason>
 Work in progress. Can be resumed from branch feat/N-slug.
 EOF
 
-# 2. Cancel the issue (set status to Not Planned)
+# 2. Cancel the issue (set status to Cancelled)
 shirokuma-docs items cancel <issue-number> --body-file - <<'EOF'
 <cancellation reason>
 EOF

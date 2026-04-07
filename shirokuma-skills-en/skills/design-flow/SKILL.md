@@ -34,7 +34,7 @@ Update each step to `in_progress` at start and `completed` on finish via TaskUpd
 Confirm issue number via `AskUserQuestion` or obtain from arguments. Fetch the issue to understand the plan section and design requirements.
 
 ```bash
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 ```
 
@@ -174,13 +174,13 @@ Visual evaluation loop is limited to **3 iterations maximum**. On reaching the l
 
 ### Phase 5: Completion
 
-Design work is complete once approved. If the Issue Status is Designing, transition to Review:
+Design work is complete once approved. If the Issue Status is In Progress, transition to Review:
 
 ```bash
-shirokuma-docs items push {number}
+shirokuma-docs items transition {number} --to Review
 ```
 
-> **Status transition**: When `prepare-flow` determines a design phase is needed, Status is set to Designing. Transitioning to Review on `design-flow` completion completes the `Preparing → Designing → Review` flow. Skip the update if Status is already Review or another state (idempotent).
+> **Status transition**: When `prepare-flow` determines a design phase is needed, the Issue stays In Progress. Transitioning to Review on `design-flow` completion signals readiness for implementation. Skip the update if Status is already Review or another state (idempotent).
 
 ## Next Steps
 

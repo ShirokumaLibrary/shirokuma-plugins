@@ -26,9 +26,9 @@ npx shirokuma-docs items dashboard
 
 | 禁止コマンド | 代替 CLI |
 |-------------|---------|
-| `gh issue list`, `gh issue view`, `gh issue create` | `shirokuma-docs items list`, `items pull {number}`, `items add issue` |
+| `gh issue list`, `gh issue view`, `gh issue create` | `shirokuma-docs items list`, `items context {number}`, `items add issue` |
 | `gh issue comment` | `shirokuma-docs items add comment {number} --file {file}` |
-| `gh issue edit` | `shirokuma-docs items push {number}` |
+| `gh issue edit` | `shirokuma-docs items update {number}` / `items transition {number} --to <status>` |
 | `gh issue close` | `shirokuma-docs items close {number}` |
 | `gh pr create`, `gh pr view`, `gh pr list` | `shirokuma-docs items pr create`, `items pr show`, `items pr list` |
 | `gh pr review`, `gh api .../pulls/.../comments` | `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve` |
@@ -47,7 +47,7 @@ gh issue view 42
 gh pr create --base develop --title "..."
 
 # OK: shirokuma-docs CLI
-shirokuma-docs items pull 42
+shirokuma-docs items context 42
 shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md
 ```
 

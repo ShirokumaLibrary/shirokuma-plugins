@@ -30,8 +30,8 @@ Update the status of Issues in `linked_issues` at the following points:
 
 | Timing | Action | Command |
 |--------|--------|---------|
-| `review-flow` starts | → In Progress | `items pull {n}` → frontmatter `status: "In Progress"` → `items push {n}` |
-| After review response complete | → Review | frontmatter `status: "Review"` → `items push {n}` |
+| `review-flow` starts | → In Progress | `items transition {n} --to "In Progress"` |
+| After review response complete | → Review | `items transition {n} --to Review` |
 
 - Skip status transitions when `linked_issues` is empty
 - Skip update if status is already correct (idempotent)
@@ -52,7 +52,7 @@ Update the status of Issues in `linked_issues` at the following points:
 
 2. If a related Issue exists, reference its plan for context:
    ```bash
-   shirokuma-docs items pull {issue-number}
+   shirokuma-docs items context {issue-number}
    # → Read .shirokuma/github/{org}/{repo}/issues/{issue-number}/body.md
    ```
 3. Review the PR diff:
@@ -68,7 +68,7 @@ Update the status of Issues in `linked_issues` at the following points:
    - Exclude references matching `Closes #N` / `Fixes #N` / `Refs #N` / `References #N` patterns as linked issues
    - The remaining `#N` references in the `## Summary` / `## 概要` section, or any `#N` references in the `## Artifacts` / `## 成果物` section, become artifact candidates
    - If 0 artifact candidates → skip artifact review (diff-only review as before)
-   - If artifact candidates exist → use `shirokuma-docs items pull {N}` to cache and read `.shirokuma/github/{org}/{repo}/issues/{N}/body.md` frontmatter `type` field to identify Discussion / Issue / PR type, and include only Discussions and Issues as review targets
+   - If artifact candidates exist → use `shirokuma-docs items context {N}` to cache and read `.shirokuma/github/{org}/{repo}/issues/{N}/body.md` frontmatter `type` field to identify Discussion / Issue / PR type, and include only Discussions and Issues as review targets
    - **Limit**: Up to 10 artifacts maximum. If exceeded, review only the first 10 and output a warning
 
    Record as **artifact candidate list** (format: `#N (Discussion)`, `#N (Issue)`, etc.)
@@ -268,7 +268,7 @@ Process code fix threads together. Delegate fixes to `code-issue` via Skill tool
 
 1. **Edit comment**: Fix the erroneous comment
    ```bash
-   shirokuma-docs items push {number} {comment-id}
+   shirokuma-docs items update {number} --comment-id {comment-id} --body /tmp/shirokuma-docs/{number}-comment-fix.md
    ```
 2. **Reply**: Reply noting the correction
 3. **Resolve**: Resolve the thread

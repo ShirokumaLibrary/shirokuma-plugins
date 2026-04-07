@@ -84,9 +84,8 @@ shirokuma-docs items adr create "ADR-{NNN}: {タイトル}"
 生成したコンテンツで本文を更新する:
 
 ```bash
-shirokuma-docs items pull {discussion-number}
-# .shirokuma/github/{org}/{repo}/issues/{discussion-number}/body.md の body を更新してから push
-shirokuma-docs items push {discussion-number}
+# 更新したコンテンツをファイルに書き出してから update
+shirokuma-docs items update {discussion-number} --body /tmp/shirokuma-docs/{discussion-number}-body.md
 ```
 
 ### ステップ 6: 関連 ADR のリンク
@@ -108,9 +107,8 @@ shirokuma-docs items push {discussion-number}
 ステータスは ADR 本文のヘッダーで管理する。更新:
 
 ```bash
-shirokuma-docs items pull {number}
-# .shirokuma/github/{org}/{repo}/issues/{number}/body.md のキャッシュ本文を更新してから push
-shirokuma-docs items push {number}
+# 更新したコンテンツをファイルに書き出してから update
+shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 ## 完了レポート
@@ -141,7 +139,7 @@ shirokuma-docs items push {number}
 
 このスキルは ADR Discussion の作成のみを担う。以下は対象外:
 - コードや設定ファイルの変更
-- 既存 ADR コンテンツの更新（`items pull` → キャッシュ編集 → `items push` で更新）
+- 既存 ADR コンテンツの更新（`items context` → ファイル編集 → `items update` で更新）
 - 初回作成と置換リンク以外の ADR ライフサイクル管理
 
 ## ルール

@@ -34,7 +34,7 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 Issue 番号を `AskUserQuestion` で確認するか、引数から取得する。Issue を取得して計画セクションとデザイン要件を把握する。
 
 ```bash
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む
 ```
 
@@ -174,15 +174,13 @@ lsof -i :3000 2>/dev/null || echo "dev server not running"
 
 ### Phase 5: 完了
 
-デザイン作業が承認されたら完了。Issue の Status が Designing の場合、Review に遷移する:
+デザイン作業が承認されたら完了。Issue の Status が In Progress の場合、Review に遷移する:
 
 ```bash
-# キャッシュの status を "Review" に書き換えてから push
-# .shirokuma/github/{org}/{repo}/issues/{number}/body.md の status: フィールドを "Review" に変更
-shirokuma-docs items push {number}
+shirokuma-docs items transition {number} --to Review
 ```
 
-> **ステータス遷移**: `prepare-flow` がデザインフェーズ必要と判定した場合、Status は Designing に設定される。`design-flow` の完了時に Review に遷移することで、`Preparing → Designing → Review` のフローが完成する。Status が既に Review または他の状態の場合は更新をスキップ（冪等）。
+> **ステータス遷移**: `prepare-flow` がデザインフェーズ必要と判定した場合、Issue は In Progress のまま維持される。`design-flow` の完了時に Review に遷移することで実装準備完了を示す。Status が既に Review または他の状態の場合は更新をスキップ（冪等）。
 
 ## 次のステップ
 

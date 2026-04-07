@@ -30,7 +30,7 @@ The `Testing` status is NOT automatically set by `implement-flow`. It is transit
 After `reviewing-security` completes, the next steps are manager-direct, not subagent. The review completion gives a visual "done" feeling, but **TaskList still has pending steps**. Do NOT stop — execute the following via Bash tools **in the same response**:
 
 1. **Work Summary**: Post work summary as Issue comment (Bash: `shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md`)
-2. **Status Update**: edit cache frontmatter `status: "Review"` then `shirokuma-docs items push {number}` (Bash)
+2. **Status Update**: `shirokuma-docs items transition {number} --to Review` (Bash)
 3. **Evolution**: Auto-record signals (Step 6)
 
 > **Why breaks happen here**: PR creation and security review have strong visual "completion" cues that cause the LLM to output a summary and stop. But the chain is not done until TaskList pending count reaches 0.
@@ -71,7 +71,7 @@ TaskUpdate("security_review", "completed")
 // Steps 6-7: work_summary, status_update (manager direct execution)
 post_work_summary()  // shirokuma-docs items add comment {N} --file /tmp/...
 TaskUpdate("work_summary", "completed")
-update_status_to_review()  // (edit cache frontmatter) shirokuma-docs items push {N}
+update_status_to_review()  // shirokuma-docs items transition {N} --to Review
 TaskUpdate("status_update", "completed")
 ```
 

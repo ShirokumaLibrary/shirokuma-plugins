@@ -18,7 +18,7 @@
 エピックは Issue Type ではなく**構造**で判定する。`subIssuesSummary` に計画 Issue（タイトルが「計画:」で始まる子 Issue）以外の子 Issue が存在する Issue がエピック。計画 Issue のみの場合はエピックとは判定しない。
 
 ```bash
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む
 # → frontmatter の subIssuesSummary: { total: 3, completed: 1 } を確認
 ```
@@ -67,7 +67,7 @@ develop
 
 ```bash
 # 親 Issue の計画からブランチ名を取得
-shirokuma-docs items pull {parent-number}
+shirokuma-docs items context {parent-number}
 # → .shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md を Read ツールで読み込む
 # → 本文の「### Integration ブランチ」セクション直後の `chore/958-octokit-migration` を抽出
 

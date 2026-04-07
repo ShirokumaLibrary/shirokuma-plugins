@@ -191,7 +191,7 @@ shirokuma-docs items pr merge --head {current-branch}
 | 1:1 / 1:N / N:1 | 自動処理（Status → Done） |
 | N:N（複雑なリンクグラフ） | エラーで停止、構造化出力で AI にフォールバック |
 
-N:N が検出された場合、CLI は関連 PR/Issue のリストを構造化出力する。AI はリストを確認し、個別に `items push` で Status を更新する。リンクグラフ検証をスキップするには `--skip-link-check` を使用する。
+N:N が検出された場合、CLI は関連 PR/Issue のリストを構造化出力する。AI はリストを確認し、個別に `items transition {number} --to Done` で Status を更新する。リンクグラフ検証をスキップするには `--skip-link-check` を使用する。
 
 **Integration ブランチへのマージ（重要）**: サブ Issue の PR が integration ブランチにマージされる場合、GitHub のネイティブ自動クローズは動作しない（デフォルトブランチへのマージでのみ有効）。そのため `shirokuma-docs items pr merge` の使用が**必須**であり、`gh pr merge` や GitHub UI からのマージでは Issue ステータスが更新されない。PR 本文には必ず `Closes #N` を含めること（`Refs` では `parseLinkedIssues()` が解析不可）。
 
@@ -236,7 +236,7 @@ PR #{pr-number} を {base-branch} にマージ、ブランチ削除済み
 
 #### サブ Issue の親 Issue 整合性チェック（CLI 自動処理）
 
-親 Issue のステータス自動導出は CLI が `items push`、`items close`、`items update-status`、`items pr merge` 実行時にリアクティブに処理する。スキル側での明示的な `items integrity --fix` 呼び出しは不要。
+親 Issue のステータス自動導出は CLI が `items transition`、`items close`、`items update-status`、`items pr merge` 実行時にリアクティブに処理する。スキル側での明示的な `items integrity --fix` 呼び出しは不要。
 
 ## バッチモード
 

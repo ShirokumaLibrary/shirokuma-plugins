@@ -31,7 +31,7 @@ graph LR
 
 | Phase | Orchestrator | Responsibility | Delegates to |
 |-------|-------------|----------------|-------------|
-| Preparing | `prepare-flow` | Planning + plan review | `plan-issue` (Skill), `review-worker` (Agent) |
+| Planning | `prepare-flow` | Planning + plan review | `plan-issue` (Skill), `review-worker` (Agent) |
 | Designing | `design-flow` | Design routing + design review | Framework-specific design skills (dynamically discovered), `review-worker` (Agent) |
 | Working | `implement-flow` | Implementation, commit, PR | `coding-worker` (Agent), `commit-worker`, `pr-worker` |
 

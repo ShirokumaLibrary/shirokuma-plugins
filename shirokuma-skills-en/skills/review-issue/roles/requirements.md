@@ -27,7 +27,7 @@ Load these files for context:
 
 ```
 1. Role selection: "requirements review" or "要件レビュー"
-2. Fetch Issue body: shirokuma-docs items pull {number} (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
+2. Fetch Issue body: shirokuma-docs items context {number} (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
 3. Lint execution: Skip (target is not code files)
 4. Issue body analysis: Analyze each section against review criteria
 5. Report generation: Template format

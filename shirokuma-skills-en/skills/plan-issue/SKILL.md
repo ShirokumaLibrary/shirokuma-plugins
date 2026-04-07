@@ -38,7 +38,7 @@ If any criterion matches a higher level, use that level.
 ### Step 1: Fetch Issue
 
 ```bash
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 ```
 
@@ -126,7 +126,7 @@ shirokuma-docs items parent {PLAN_ISSUE_NUMBER} {parent-number}
 
 - Runs via Skill tool (main context), but progress management and user interaction are handled by the orchestrator (`prepare-flow`)
 - Plan review is handled by `prepare-flow` — this skill only creates the plan
-- **Does not update status** — status transitions (Preparing, Designing, Review) are managed by `prepare-flow`
+- **Does not update status** — status transitions (In Progress, Review) are managed by `prepare-flow`
 - Plan issues are created with status `Review` and label `area:plan`
 
 ## GitHub Writing Rules

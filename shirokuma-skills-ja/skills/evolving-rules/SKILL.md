@@ -28,7 +28,7 @@ shirokuma-docs items list --issue-type Evolution --limit 10
 Issue が見つかったら、コメントを含む詳細を取得:
 
 ```bash
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → .shirokuma/github/{org}/{repo}/issues/{number}/body.md と .shirokuma/github/{org}/{repo}/issues/{number}/ 配下のコメントファイルを Read ツールで読み込む
 ```
 
@@ -175,8 +175,8 @@ shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-an
 ```
 
 ```bash
-# キャッシュファイルの本文を更新してから push
-shirokuma-docs items push {number}
+# 本文をファイルに書き出してから update
+shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 #### 7c: Issue クローズ

@@ -84,9 +84,8 @@ shirokuma-docs items adr create "ADR-{NNN}: {title}"
 Then update the body with the generated content:
 
 ```bash
-shirokuma-docs items pull {discussion-number}
-# Edit the body in .shirokuma/github/{org}/{repo}/issues/{discussion-number}/body.md then push
-shirokuma-docs items push {discussion-number}
+# Write updated content to temp file, then update
+shirokuma-docs items update {discussion-number} --body /tmp/shirokuma-docs/{discussion-number}-body.md
 ```
 
 ### Step 6: Link Related ADRs
@@ -108,9 +107,8 @@ If this ADR supersedes another:
 Status is tracked in the ADR body header. Update with:
 
 ```bash
-shirokuma-docs items pull {number}
-# Edit the body in .shirokuma/github/{org}/{repo}/issues/{number}/body.md then push
-shirokuma-docs items push {number}
+# Write updated body to temp file, then update
+shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 ## Completion Report
@@ -141,7 +139,7 @@ shirokuma-docs items push {number}
 
 This skill creates ADR Discussions only. It does not:
 - Modify code or configuration files
-- Update existing ADR content (use `items pull` → edit cache body → `items push`)
+- Update existing ADR content (use `items context` → edit temp file → `items update`)
 - Manage ADR lifecycle beyond initial creation and superseding links
 
 ## Rules

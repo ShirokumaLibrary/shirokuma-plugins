@@ -18,13 +18,13 @@ Register all chain steps via TaskCreate **before starting work**.
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Fetch issue and update status | Fetching issue and updating status | Manager direct: `shirokuma-docs items pull/push` |
+| 1 | Fetch issue and update status | Fetching issue and updating status | Manager direct: `shirokuma-docs items context/transition` |
 | 2 | [Conditional] Conduct research | Conducting research | `researching-best-practices` (subagent: `research-worker`) |
 | 3 | Create the plan | Creating the plan | `plan-issue` (subagent: `plan-worker`) |
 | 4 | Review the plan | Reviewing the plan | `review-issue` (subagent: `review-worker`) |
 | 5 | [Conditional] Fix review issues and re-review | Fixing review issues and re-reviewing | `plan-issue` (subagent: `plan-worker`) + `review-issue` (subagent: `review-worker`) |
-| 5a | [Conditional] Create sub-issues for epic plan | Creating sub-issues | Manager direct: `shirokuma-docs items add issue/parent/push` |
-| 6 | Assess design phase need and update status | Assessing design phase need and updating status | Manager direct: `shirokuma-docs items push` |
+| 5a | [Conditional] Create sub-issues for epic plan | Creating sub-issues | Manager direct: `shirokuma-docs items add issue/parent/update` |
+| 6 | Assess design phase need and update status | Assessing design phase need and updating status | Manager direct: `shirokuma-docs items transition` |
 | 7 | Return plan summary to user | Returning plan summary to user | Manager direct |
 
 Dependencies: step 2 blockedBy 1 (conditional: only when research trigger applies), step 3 blockedBy 1 or 2, step 4 blockedBy 3, step 5 blockedBy 4 (conditional: only on NEEDS_REVISION), step 5a blockedBy 4 or 5 (conditional: only for epic plans), step 6 blockedBy 4 or 5 or 5a, step 7 blockedBy 6.
@@ -36,23 +36,21 @@ Update each step to `in_progress` at start and `completed` on finish via TaskUpd
 ### Step 1: Fetch Issue
 
 ```bash
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 ```
 
 Review title, body, type, priority, size, labels, and comments.
 
-### Step 1b: Set Status to Preparing + Assign
+### Step 1b: Set Status to In Progress + Assign
 
-If the issue status is Backlog, transition to Preparing to record the planning start. Also auto-assign the user.
+If the issue status is Backlog or Ready, transition to In Progress to record the planning start. Also auto-assign the user.
 
 ```bash
-shirokuma-docs items pull {number}
-# Edit cache frontmatter: status: "Preparing"
-shirokuma-docs items push {number}
+shirokuma-docs items transition {number} --to "In Progress"
 ```
 
-Skip status update if already Preparing or Review. Assignee is idempotent, so always execute.
+Skip status update if already In Progress or Review. Assignee is idempotent, so always execute.
 
 ### Step 2: Research Trigger Assessment (Conditional)
 
@@ -120,9 +118,9 @@ When child issues with titles that do NOT start with "Plan:" exist (count > 0), 
 
 - **Continue (re-plan keeping existing sub-issues)**: Update the plan document only; keep existing sub-issues.
 - **Reset (cancel all sub-issues and re-plan)**: Execute the following:
-  1. Cancel all non-plan sub-issues via `shirokuma-docs items cancel {sub-numbers}` (set to Not Planned)
-  2. Run `shirokuma-docs items integrity --fix` → parent transitions to Backlog automatically when all sub-issues are Not Planned
-  3. Return to Step 1b to re-transition to Preparing, then proceed to Step 3 (plan-issue delegation)
+  1. Cancel all non-plan sub-issues via `shirokuma-docs items transition {sub-number} --to Cancelled` for each
+  2. Run `shirokuma-docs items integrity --fix` → parent transitions to Backlog automatically when all sub-issues are Cancelled
+  3. Return to Step 1b to re-transition to In Progress, then proceed to Step 3 (plan-issue delegation)
 
 ### Step 3: Delegate to plan-worker
 
@@ -148,7 +146,7 @@ When research was conducted (Step 2a), include the `## Research Findings (Refere
 
 ### Step 5: Plan Review (Skill Delegation)
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `review-issue` plan role via Agent tool (`review-worker`). Since the plan-issue skill creates a plan issue (child issue), the reviewer can identify the child issue with a title starting with "Plan:" from `subIssuesSummary` and fetch its body directly via `items pull {plan-issue-number}`.
+Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `review-issue` plan role via Agent tool (`review-worker`). Since the plan-issue skill creates a plan issue (child issue), the reviewer can identify the child issue with a title starting with "Plan:" from `subIssuesSummary` and fetch its body directly via `items context {plan-issue-number}`.
 
 #### Skill Availability Check (Fallback)
 
@@ -169,7 +167,7 @@ If all checks pass, proceed to Step 6.
 
 #### Invoke the Reviewer
 
-Invoke `review-worker` with plan role via the Agent tool. `review-issue` will fetch the Issue body itself via `shirokuma-docs items pull {number}`.
+Invoke `review-worker` with plan role via the Agent tool. `review-issue` will fetch the Issue body itself via `shirokuma-docs items context {number}`.
 
 ```text
 Agent(
@@ -223,7 +221,7 @@ shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-re
 
 After review PASS, execute this step if the plan issue body contains a `### Sub-Issue Structure` section **and** no non-plan child issues exist (count of child issues with titles NOT starting with "Plan:" === 0). Skip and proceed to Step 6 if the condition is not met.
 
-The plan issue number is found by scanning `subIssuesSummary` for a child issue with a title starting with "Plan:". Fetch its body via `items pull {plan-issue-number}` to check for the `### Sub-Issue Structure` section.
+The plan issue number is found by scanning `subIssuesSummary` for a child issue with a title starting with "Plan:". Fetch its body via `items context {plan-issue-number}` to check for the `### Sub-Issue Structure` section.
 
 #### Sub-issue Creation Procedure
 
@@ -246,7 +244,7 @@ The plan issue number is found by scanning `subIssuesSummary` for a child issue 
    shirokuma-docs items parent {sub-number} {parent-number}
    ```
 
-2. After all sub-issues are created, update the placeholders (`#{sub1}`, etc.) in the epic's `### Sub-Issue Structure` table with actual issue numbers and sync via `items push {parent-number}`.
+2. After all sub-issues are created, update the placeholders (`#{sub1}`, etc.) in the epic's `### Sub-Issue Structure` table with actual issue numbers and sync via `items update {parent-number} --body /tmp/shirokuma-docs/{parent-number}-body.md`.
 
 #### On Failure
 
@@ -284,14 +282,14 @@ Analyze the plan content to determine whether a design phase is needed. The asse
 | Assessment Result | Status Transition | Rationale |
 |-------------------|------------------|-----------|
 | No design phase needed | → Review | Ready for direct implementation |
-| Design phase needed | → Designing | Guide user to run `design-flow` |
+| Design phase needed | → In Progress | Guide user to run `design-flow` |
 
 ```bash
-# When no design phase needed: edit cache frontmatter status: "Review"
-shirokuma-docs items push {number}
+# When no design phase needed:
+shirokuma-docs items transition {number} --to Review
 
-# When design phase needed: edit cache frontmatter status: "Designing"
-shirokuma-docs items push {number}
+# When design phase needed:
+shirokuma-docs items transition {number} --to "In Progress"
 ```
 
 ### Step 7: Return to User
@@ -301,7 +299,7 @@ Display a plan summary and request approval. The plan is a contract with the use
 Show a summary matching the plan depth level and design phase assessment. Follow the `completion-report-style` rule for formatting.
 
 **Required fields** (all levels):
-- **Status:** current status (Review or Designing)
+- **Status:** current status (Review or In Progress)
 - **Level:** plan depth (Lightweight / Standard / Detailed / Epic)
 - **Approach:** one-line summary
 
@@ -321,6 +319,8 @@ Show a summary matching the plan depth level and design phase assessment. Follow
 | Epic (no non-plan sub-issues yet) | `/implement-flow #{number}` (creates sub-issues, integration branch, proposes order) |
 | Epic (non-plan sub-issues already created) | `/implement-flow #{number}` (creates integration branch, proposes order) |
 
+> **Note on "Designing" status**: The 9-status workflow does not include a separate Designing status. Issues in the design phase remain In Progress. The design phase is tracked by plan content and user flow, not by a dedicated status.
+
 Always ask the user to review the plan and provide feedback if changes are needed.
 
 #### Evolution Signal Auto-Recording
@@ -339,9 +339,9 @@ At the end of the plan completion report, auto-record Evolution signals followin
 | Situation | Action |
 |-----------|--------|
 | Child issue with title starting with "Plan:" already exists | Ask whether to overwrite (AskUserQuestion) before delegating |
-| Issue is Done/Released | Show warning |
+| Issue is Done | Show warning |
 | Issue body is empty | Proceed (planning worker will create the plan issue) |
-| Status is already Preparing | Continue, skip status update |
+| Status is already In Progress | Continue, skip status update |
 | Status is already Review | Update plan issue, keep status |
 | Epic issue (has non-plan sub-issues) | Planning worker uses epic plan template |
 
@@ -349,7 +349,7 @@ At the end of the plan completion report, auto-record Evolution signals followin
 
 | Reference | Usage |
 |-----------|-------|
-| `project-items` rule | Preparing/Designing/Review status workflow |
+| `project-items` rule | In Progress/Review status workflow |
 | `output-language` rule | Output language for issue comments and body |
 | `github-writing-style` rule | Bullet-point vs prose guidelines |
 | `implement-flow` skill | Worker completion unified pattern, UCP check |
@@ -358,7 +358,7 @@ At the end of the plan completion report, auto-record Evolution signals followin
 
 | Tool | When |
 |------|------|
-| Bash | `shirokuma-docs items pull/push/add comment` |
+| Bash | `shirokuma-docs items context/transition/update/add comment` |
 | Agent (research-worker) | Step 2a: Conduct research (conditional, subagent, context isolation) |
 | Agent (plan-worker) | Step 3: Delegate plan creation (sub-agent, context isolation) |
 | Agent (review-worker) | Step 5: Plan review (subagent, context isolation) |

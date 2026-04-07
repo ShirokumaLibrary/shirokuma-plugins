@@ -23,7 +23,7 @@ This returns JSON with:
 - `git` - Git state (`currentBranch`, `uncommittedChanges`, `hasUncommittedChanges`)
 - `lastHandover` - Latest handover (null if none)
 - `backups` - PreCompact session backups (if any exist from interrupted sessions)
-- `issues` - Active issues with project fields (Done/Released excluded)
+- `issues` - Active issues with project fields (Done excluded)
 - `total_issues` - Count of active issues
 - `openPRs` - Open pull requests with review status
 
@@ -62,7 +62,7 @@ Parse the JSON output and display:
 - #{number} {title}
 ```
 
-Group issues by status: In Progress → Ready → Backlog → Icebox → (no status)
+Group issues by status: In Progress → Ready → Backlog → Pending → (no status)
 
 If there are uncommitted changes (`git.hasUncommittedChanges`), inform the user before proceeding.
 
@@ -164,6 +164,6 @@ After displaying state, the user selects the next action:
 
 - Always show current time in session header
 - Show items in priority order within each status
-- Done/Released items are automatically excluded by `items dashboard`
+- Done items are automatically excluded by `items dashboard`
 - Use `shirokuma-docs items dashboard` instead of raw `gh` commands — the CLI aggregates handover, issues, and PRs in one call, saving context window
 - Handover save/restore is not this skill's responsibility. Issue status updates are managed via `items update-status` CLI, not directly by this skill

@@ -24,8 +24,8 @@ For Issues / Discussions / PRs. Supplements the overview in the `project-items` 
 ## How to Update
 
 ```bash
-# Issues / Discussions (edit cache file then push)
-shirokuma-docs items push {number}
+# Issues / Discussions (write body to file then update)
+shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 ## File-Based Body Editing

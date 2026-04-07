@@ -19,7 +19,7 @@ Normally, `/implement-flow` implicitly approves plan Issues when starting work (
 
 ## Workflow
 
-1. **Fetch Issue**: `shirokuma-docs items pull {number}` to cache the Issue
+1. **Fetch Issue**: `shirokuma-docs items context {number}` to cache the Issue
 2. **Check status**: Read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` and check frontmatter `status`
    - If not Review, warn and exit ("Issue #{number} is not in Review status (current: {status})")
 3. **Execute approval**: `shirokuma-docs items close {number}` to set Done + close

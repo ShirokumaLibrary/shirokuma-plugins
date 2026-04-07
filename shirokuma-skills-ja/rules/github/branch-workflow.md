@@ -196,7 +196,7 @@ shirokuma-docs items pr close <pr-number> --body-file - <<'EOF'
 作業途中です。feat/N-slug ブランチから再開可能です。
 EOF
 
-# 2. Issue をキャンセル（ステータスを Not Planned に設定）
+# 2. Issue をキャンセル（ステータスを Cancelled に設定）
 shirokuma-docs items cancel <issue-number> --body-file - <<'EOF'
 <見送り理由>
 EOF

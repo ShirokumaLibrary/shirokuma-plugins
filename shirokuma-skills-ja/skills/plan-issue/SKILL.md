@@ -38,7 +38,7 @@ AI が Issue の title/body/type/comments から以下を判断:
 ### ステップ 1: Issue 取得
 
 ```bash
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む
 ```
 
@@ -138,7 +138,7 @@ shirokuma-docs items parent {PLAN_ISSUE_NUMBER} {parent-number}
 
 - Skill ツール（メインコンテキスト）で実行されるが、進捗管理とユーザーとのやりとりはオーケストレーター（`prepare-flow`）が担当
 - 計画レビューは `prepare-flow` が担当 — このスキルは計画の作成のみ
-- **ステータスは更新しない** — ステータス遷移（Preparing, Designing, Review）は `prepare-flow` が管理
+- **ステータスは更新しない** — ステータス遷移（In Progress, Review）は `prepare-flow` が管理
 - 計画 Issue のステータスは `Review`、ラベルは `area:plan` で作成する
 
 ## GitHub 書き込みルール

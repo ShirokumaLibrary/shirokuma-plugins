@@ -73,7 +73,7 @@ allowed-tools: Bash, Read, Glob
 GitHub Project アイテムをステータスフィルター付きで表示。
 
 ```
-/show-items              # アクティブなアイテム（Done/Released 除く）
+/show-items              # アクティブなアイテム（Done 除く）
 /show-items all          # Done 含む全アイテム
 /show-items ready        # "Ready" ステータスのアイテム
 /show-items in-progress  # "In Progress" ステータスのアイテム
@@ -102,7 +102,7 @@ shirokuma-docs items list --status "In Progress" --status Ready
 **Backlog (2):**
 - #10 Feature A (M, High)
 
-**Icebox (1):**
+**Backlog (1):**
 - #8 Future enhancement (L, Low)
 
 ---
@@ -238,7 +238,7 @@ shirokuma-docs items pr show {number}
 shirokuma-docs items discussions list --category Handovers --limit {count}
 
 # 特定の引き継ぎを取得
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む
 
 # ローカルファイル（フォールバック）

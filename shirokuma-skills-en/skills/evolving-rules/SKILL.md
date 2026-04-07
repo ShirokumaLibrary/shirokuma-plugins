@@ -28,7 +28,7 @@ shirokuma-docs items list --issue-type Evolution --limit 10
 If an Issue is found, fetch details including comments:
 
 ```bash
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md and comment files in .shirokuma/github/{org}/{repo}/issues/{number}/
 ```
 
@@ -155,7 +155,8 @@ Structure the comment content and consolidate into the body. The body records re
 ```
 
 ```bash
-shirokuma-docs items push {number}
+# Write body to temp file, then update
+shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 #### 7c: Close Issue

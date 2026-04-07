@@ -73,7 +73,7 @@ Full project dashboard aggregating GitHub data.
 GitHub Project items with Status filter.
 
 ```
-/show-items              # Active items (excludes Done/Released)
+/show-items              # Active items (excludes Done)
 /show-items all          # All items including Done
 /show-items ready        # Items with "Ready" status
 /show-items in-progress  # Items with "In Progress" status
@@ -102,7 +102,7 @@ shirokuma-docs items list --status "In Progress" --status Ready
 **Backlog (2):**
 - #10 Feature A (M, High)
 
-**Icebox (1):**
+**Backlog (1):**
 - #8 Future enhancement (L, Low)
 
 ---
@@ -238,7 +238,7 @@ Past session handover information.
 shirokuma-docs items discussions list --category Handovers --limit {count}
 
 # Get specific handover
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 
 # From local files (fallback)

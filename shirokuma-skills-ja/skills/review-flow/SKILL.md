@@ -30,8 +30,8 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 
 | タイミング | アクション | コマンド |
 |-----------|----------|---------|
-| `review-flow` 開始時 | → In Progress | `items pull {n}` → frontmatter `status: "In Progress"` → `items push {n}` |
-| レビュー対応完了後 | → Review | frontmatter `status: "Review"` → `items push {n}` |
+| `review-flow` 開始時 | → In Progress | `items transition {n} --to "In Progress"` |
+| レビュー対応完了後 | → Review | `items transition {n} --to Review` |
 
 - `linked_issues` が空の場合はステータス遷移をスキップする
 - 既に正しいステータスの場合は更新をスキップする（冪等）
@@ -52,7 +52,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 
 2. 関連 Issue がある場合、Issue の計画を参照してコンテキストを把握:
    ```bash
-   shirokuma-docs items pull {issue-number}
+   shirokuma-docs items context {issue-number}
    # → .shirokuma/github/{org}/{repo}/issues/{issue-number}/body.md を Read ツールで読み込む
    ```
 3. PR の diff を確認:
@@ -68,7 +68,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
    - `Closes #N` / `Fixes #N` / `Refs #N` / `References #N` パターンに一致するものは linked issues として除外する
    - `## Summary` / `## 概要` セクション内の残りの `#N` 参照、または `## Artifacts` / `## 成果物` セクション内の `#N` 参照を成果物候補とする
    - 成果物候補が 0 件の場合 → 成果物レビューをスキップ（従来通り diff のみレビュー）
-   - 成果物候補がある場合 → `shirokuma-docs items pull {N}` でキャッシュし、`.shirokuma/github/{org}/{repo}/issues/{N}/body.md` の frontmatter `type` フィールドで Discussion / Issue / PR を判別し、Discussion と Issue のみをレビュー対象とする
+   - 成果物候補がある場合 → `shirokuma-docs items context {N}` でキャッシュし、`.shirokuma/github/{org}/{repo}/issues/{N}/body.md` の frontmatter `type` フィールドで Discussion / Issue / PR を判別し、Discussion と Issue のみをレビュー対象とする
    - **上限**: 成果物は最大 10 件まで。超過時は最初の 10 件のみレビューし、警告を出力する
 
    **成果物候補リスト** として記録する（形式: `#N (Discussion)`, `#N (Issue)` 等）
@@ -268,7 +268,7 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
 
 1. **コメント編集**: 誤りのあるコメントを修正
    ```bash
-   shirokuma-docs items push {number} {comment-id}
+   shirokuma-docs items update {number} --comment-id {comment-id} --body /tmp/shirokuma-docs/{number}-comment-fix.md
    ```
 2. **返信**: 修正した旨をスレッドに返信
 3. **解決**: スレッドを解決

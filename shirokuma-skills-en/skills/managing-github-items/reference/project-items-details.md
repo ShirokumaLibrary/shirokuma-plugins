@@ -43,7 +43,7 @@ Built-in automations are configured via the GitHub UI (not API):
 | `items update-status --done` | Sets Done directly — idempotent with automation |
 | `items integrity` | Reports disabled recommended automations as warnings |
 | `items integrity --fix` | Fixes inconsistencies — compatible with automation |
-| `items cancel` | Sets Not Planned after close. May race with "Item closed → Done" automation — CLI update usually wins. Use `items integrity --fix` to detect/correct. |
+| `items cancel` | Sets Cancelled after close. May race with "Item closed → Done" automation — CLI update usually wins. Use `items integrity --fix` to detect/correct. |
 
 ### Checking Automation Status
 
@@ -87,7 +87,7 @@ Comment operation CLI commands:
 |-----------|---------|-------|
 | Add comment | `items add comment {number} --file {file}` | Works for Issues and PRs/Discussions, auto-saves to cache |
 | List comments | `items comments {number}` | JSON output |
-| Edit comment | `items push {number} {comment-id}` | Cache-edit → push workflow |
+| Edit comment | `items update {number} --comment-id {comment-id} --body {file}` | Write file → update workflow |
 
 ## Creating Items
 
@@ -106,5 +106,5 @@ When creating new items:
 |----------|--------|
 | Default (planned work) | Backlog |
 | Starting immediately | In Progress |
-| Low priority / future idea | Icebox |
+| Low priority / future idea | Backlog |
 | Needs requirements review | Review |

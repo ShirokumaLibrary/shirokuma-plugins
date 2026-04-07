@@ -50,17 +50,19 @@ Prefer shirokuma-docs CLI over direct `gh` commands. Config in `shirokuma-docs.c
 ### Issues (Primary Interface)
 
 ```bash
-shirokuma-docs items list                          # Open issues
-shirokuma-docs items list --all                    # Include closed
-shirokuma-docs items list --status "In Progress"   # Filter by status
-shirokuma-docs items pull {number}                   # Fetch details and cache (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
+shirokuma-docs items list                            # Open issues
+shirokuma-docs items list --all                      # Include closed
+shirokuma-docs items list --status "In Progress"     # Filter by status
+shirokuma-docs items context {number}                # Fetch details and cache (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
 shirokuma-docs items add issue --file /tmp/shirokuma-docs/new-issue.md  # Metadata + body in one file
-shirokuma-docs items push {number}                                       # Update (edit cache frontmatter then push)
-# Add/remove labels: items pull → edit frontmatter labels field → items push {number}
-# Add/remove assignees: items pull → edit frontmatter assignees field → items push {number}
+shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md  # Update body
+shirokuma-docs items update {number} --title "New title"                           # Update title
+shirokuma-docs items update {number} --labels "area:cli,area:plugin"               # Update labels
+shirokuma-docs items update {number} --assignees "@me"                             # Update assignees
+shirokuma-docs items transition {number} --to "In Progress"                        # Status transition
 shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-comment.md
-shirokuma-docs items comments {number}                 # List comments
-shirokuma-docs items push {number} {comment-id}         # Edit comment (cache-edit → push)
+shirokuma-docs items comments {number}                   # List comments
+shirokuma-docs items update {number} --comment-id {comment-id} --body /tmp/shirokuma-docs/{number}-comment-fix.md  # Edit comment
 shirokuma-docs items close {number}
 shirokuma-docs items cancel {number}
 shirokuma-docs items reopen {number}
@@ -73,7 +75,6 @@ shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md            
 shirokuma-docs items pr create --base main --head develop --title "release: v0.2.0"  # Release workflow (metadata only)
 shirokuma-docs items pr list                                      # PR list (default: open)
 shirokuma-docs items pr list --state merged --limit 5            # Filtering
-shirokuma-docs items pr list --head {branch-name}                # Resolve PR from branch name
 shirokuma-docs items pr show {number}                             # PR details (body, diff stats, linked issues)
 shirokuma-docs items pr comments {number}                         # Review comments and threads
 shirokuma-docs items pr merge {number} --squash                   # Merge + status update
@@ -97,7 +98,7 @@ shirokuma-docs items projects delete PVTI_xxx                        # Delete it
 shirokuma-docs items discussions list --category Handovers --limit 5
 shirokuma-docs items discussions search "keyword"            # Discussion search
 shirokuma-docs items search --type discussions "keyword"     # Via items search
-shirokuma-docs items pull {number}   # Fetch details and cache (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
+shirokuma-docs items context {number}   # Fetch details and cache (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
 shirokuma-docs items add discussion --file /tmp/shirokuma-docs/discussion.md  # Metadata + body in one file
 ```
 
@@ -130,6 +131,9 @@ shirokuma-docs items add issue --repo docs --file /tmp/shirokuma-docs/new-issue.
 gh label list
 gh label create "name" --color "0E8A16" --description "Desc"
 
+# Repository info
+gh repo view --json nameWithOwner -q '.nameWithOwner'
+
 # Authentication
 gh auth login
 gh auth status
@@ -142,7 +146,7 @@ gh auth status
 |---------|----------|--------|
 | `items add` recommended | `items add issue`, `items add discussion` | Metadata + body in one file, prevents flag combination errors |
 | `--body-file` kept | `items pr reply`, `items update-status` | Body only, no metadata needed |
-| `items push` recommended | Status/body/title/labels/assignees/state/issue-type/parent update | Cache-edit → push consistent workflow |
+| `items update` / `items transition` | Status/body/title/labels/assignees update | Direct update without cache-edit workflow |
 
 ### `--from-file` Frontmatter Format
 
@@ -162,7 +166,7 @@ Safe frontmatter fields vary by command:
 
 | Command | Safe Fields |
 |---------|-------------|
-| `items add issue` / `items push` | `title`, `type`, `priority`, `size`, `labels`, `state`, `state_reason`, `parent` |
+| `items add issue` | `title`, `type`, `priority`, `size`, `labels`, `state`, `state_reason`, `parent` |
 | `items pr create` | `title`, `base`, `head` |
 | `items add discussion` | `title`, `category` |
 
@@ -181,23 +185,26 @@ Use `<<'EOF'` as heredoc delimiter (single quotes prevent variable expansion). W
 
 ```mermaid
 graph LR
-  Icebox --> Backlog --> Preparing --> Designing --> Review --> InProgress[In Progress]
-  InProgress --> Review --> Testing --> Done --> Released
-  InProgress <--> Pending["Pending (blocked)"]
+  Pending2[Pending] --> Backlog --> Ready --> InProgress[In Progress]
+  InProgress --> Review --> Done
+  InProgress <--> OnHold["On Hold (blocked)"]
+  InProgress --> Cancelled
+  Backlog --> Cancelled
+  Ready --> Cancelled
+  Done --> Completed
 ```
 
 | Status | Description |
 |--------|-------------|
-| Icebox | Low priority, not yet planned |
+| Pending | Not yet triaged |
 | Backlog | Planned for future work |
-| Preparing | Plan being created |
-| Designing | Design being created |
+| Ready | Ready to start implementation |
 | In Progress | Currently working on |
-| Pending | Blocked (document reason) |
-| Review | Code review |
-| Testing | QA testing |
-| Done | Completed |
-| Released | Deployed to production |
+| On Hold | Blocked (document reason) |
+| Review | Code review / plan review |
+| Completed | Merged and closed (system-set) |
+| Done | Approved and complete |
+| Cancelled | Will not be implemented |
 
 ## Labels Convention
 

@@ -43,7 +43,7 @@ GitHub Projects V2 のビルトイン自動化ワークフローが、CLI ベー
 | `items update-status --done` | Done を直接設定 — 自動化と冪等 |
 | `items integrity` | 無効化されている推奨自動化を警告として報告 |
 | `items integrity --fix` | 不整合を修正 — 自動化と互換 |
-| `items cancel` | close 後に Not Planned を設定。「Item closed → Done」自動化と競合の可能性あり — 通常は CLI の更新が優先。`items integrity --fix` で検出・修正可能 |
+| `items cancel` | close 後に Cancelled を設定。「Item closed → Done」自動化と競合の可能性あり — 通常は CLI の更新が優先。`items integrity --fix` で検出・修正可能 |
 
 ### 自動化状態の確認
 
@@ -87,7 +87,7 @@ shirokuma-docs projects workflows
 |------|---------|------|
 | コメント追加 | `items add comment {number} --file {file}` | Issue/Discussion 両対応、キャッシュ自動保存 |
 | コメント一覧 | `items comments {number}` | JSON 出力 |
-| コメント編集 | `items push {number} {comment-id}` | キャッシュ編集 → push のワークフロー |
+| コメント編集 | `items update {number} --comment-id {comment-id} --body {file}` | ファイル書き出し → update のワークフロー |
 
 ## アイテム作成
 
@@ -106,5 +106,5 @@ shirokuma-docs projects workflows
 |---------|----------|
 | デフォルト（計画済み作業） | Backlog |
 | すぐに開始 | In Progress |
-| 低優先度 / 将来のアイデア | Icebox |
+| 低優先度 / 将来のアイデア | Backlog |
 | 要件レビューが必要 | Review |

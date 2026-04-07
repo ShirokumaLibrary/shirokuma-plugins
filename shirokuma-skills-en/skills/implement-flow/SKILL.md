@@ -28,7 +28,7 @@ Register **all chain steps** via TaskCreate **before starting work**.
 | 4 | Simplify and improve code | Improving code | `/simplify` (Skill tool) |
 | 5 | Run security review | Running security review | `reviewing-security` (Skill tool) |
 | 6 | Post work summary | Posting work summary | Manager direct: `items add comment` |
-| 7 | Update Status to Review | Updating Status to Review | Manager direct: `items push` |
+| 7 | Update Status to Review | Updating Status to Review | Manager direct: `items transition {number} --to Review` |
 
 Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5, step 7 blockedBy 6.
 
@@ -52,27 +52,27 @@ Use TaskUpdate to set each step to `in_progress` when starting and `completed` w
 When the received issue title starts with "Plan: " or "計画: ", treat it as a plan issue and auto-redirect to the parent issue:
 
 1. Check the `parent` field from the cache frontmatter
-2. If `parent` is set → run `items pull` with the parent issue number, and continue the flow using the parent issue number (the plan issue number is only used for plan context reference)
-3. If `parent` is not set → re-fetch via `items pull {number}` to check for `parent`
+2. If `parent` is set → run `items context` with the parent issue number, and continue the flow using the parent issue number (the plan issue number is only used for plan context reference)
+3. If `parent` is not set → re-fetch via `items context {number}` to check for `parent`
 4. If `parent` is still unknown → display error message and stop:
    "Cannot determine parent issue for plan issue #{number}. Please specify the parent issue number directly."
 
-**Issue number provided**: `shirokuma-docs items pull {number}` to fetch and cache, then read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` to extract title/body/labels/status/priority/size.
+**Issue number provided**: `shirokuma-docs items context {number}` to fetch and cache, then read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` to extract title/body/labels/status/priority/size.
 
 #### Sub-Issue Detection
 
 When `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` frontmatter contains a `parentIssue` field, the issue is a sub-issue of an epic:
 
-1. Identify the plan issue (child issue with a title starting with "Plan:" or "計画:") from the parent's `subIssuesSummary`, fetch it via `items pull {plan-issue-number}`, and use its body as overall context
+1. Identify the plan issue (child issue with a title starting with "Plan:" or "計画:") from the parent's `subIssuesSummary`, fetch it via `items context {plan-issue-number}`, and use its body as overall context
 2. Set base branch to the parent's integration branch instead of `develop` (Step 3)
 3. `open-pr-issue` will self-detect the sub-issue via the `parentIssue` field, so explicit context passing is not required (if passed, it is used as supplementary; otherwise, self-detection is the fallback)
 
 ```bash
 # Check parent issue
-shirokuma-docs items pull {parent-number}
+shirokuma-docs items context {parent-number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md
 # Identify child issue with title starting with "Plan:" from subIssuesSummary
-shirokuma-docs items pull {plan-issue-number}
+shirokuma-docs items context {plan-issue-number}
 # → Fetch plan body and use as context
 ```
 
@@ -86,7 +86,7 @@ Check `subIssuesSummary` for a child issue with a title starting with "Plan:" or
 | No plan issue | Size XS/S (clear requirements) and not a sub-issue, and not Review / Ready | → Skip planning, proceed directly to `code-issue` |
 | No plan issue | Size M+ or ambiguous requirements | → Delegate to `prepare-flow` |
 | No plan issue | Sub-issue (`parentIssue` present) | → Delegate to `prepare-flow` regardless of size |
-| Plan issue exists | — | → Fetch plan issue body via `items pull {plan-issue-number}` and pass as context to implementation skill |
+| Plan issue exists | — | → Fetch plan issue body via `items context {plan-issue-number}` and pass as context to implementation skill |
 
 #### Review / Ready Status Priority Path
 
@@ -107,18 +107,18 @@ Warning message example for anomaly fallback: "⚠️ Status is Review but no pl
 When a plan issue exists (new approach):
 
 ```bash
-shirokuma-docs items pull {plan-issue-number}
+shirokuma-docs items context {plan-issue-number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md to get plan content
 ```
 
 **XS/S direct implementation path criteria:** Apply when the Issue Size field is XS or S, and the title and body clearly indicate what needs to be changed (mechanical transformation such as pattern replacement, type fix, rename). Sub-issues (`parentIssue` field present) always require a plan regardless of size. Additionally, issues with Review or Ready status are excluded from this path (the status priority path is evaluated first). If Size is unset, requirements are ambiguous, the issue is a sub-issue, or judgment is uncertain, delegate to `prepare-flow`. See the `creating-item` skill "Requirements Clarity Criteria" for the canonical definition.
 
-#### Transition from Preparing Status
+#### Transition from In Progress Status (Planning Phase)
 
 | Plan state | Action |
 |-----------|--------|
-| Preparing + no plan | → Delegate to `prepare-flow` |
-| Preparing + plan exists | → Transition to Review, ask user approval |
+| In Progress + no plan | → Delegate to `prepare-flow` |
+| In Progress + plan exists | → Transition to Review, ask user approval |
 
 **Text description only**: Classify using dispatch condition table (Step 4) keywords.
 
@@ -132,7 +132,7 @@ Text description → creating-item → Issue number → Join Step 1
 
 ### Step 2: Update Status
 
-If issue is not already In Progress: edit cache frontmatter `status: "In Progress"` then `shirokuma-docs items push {number}`
+If issue is not already In Progress: run `shirokuma-docs items transition {number} --to "In Progress"`
 
 **Review / Ready implicit approval**: Invoking `/implement-flow` from Review or Ready is implicit plan approval. Transition to In Progress without confirmation.
 
@@ -341,12 +341,10 @@ Skip this step if no issue number is associated with the work.
 Update Status to Review for issues with a number:
 
 ```bash
-shirokuma-docs items push {number}
+shirokuma-docs items transition {number} --to Review
 ```
 
-(Cache frontmatter `status` should be set to `"Review"` before push.)
-
-**Status fallback verification**: After chain completion, read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` frontmatter to check status. If still In Progress → edit cache frontmatter `status: "Review"` and `shirokuma-docs items push {number}` (idempotent: re-updating to Review when already Review is harmless).
+**Status fallback verification**: After chain completion, if the transition was skipped or failed, run `shirokuma-docs items transition {number} --to Review` again (idempotent: re-updating to Review when already Review is harmless).
 
 #### Plan Issue Done Update (End of Chain)
 
@@ -356,25 +354,17 @@ After the Status update, update the plan issue to Done if one exists.
 Identify the plan issue from the `subIssuesSummary` of the issue fetched in Step 1 — look for a child issue whose title starts with "Plan:" or "計画:".
 
 **Sub-issue case** (has a parent issue):
-Re-run `shirokuma-docs items pull {parent-number}` at the end of the chain to get the latest `subIssuesSummary` (other sub-issue statuses may have changed during chain execution). Look for a sibling issue whose title starts with "Plan:" or "計画:".
+Re-run `shirokuma-docs items context {parent-number}` at the end of the chain to get the latest `subIssuesSummary` (other sub-issue statuses may have changed during chain execution). Look for a sibling issue whose title starts with "Plan:" or "計画:".
 
 **Epic case** (parent issue has multiple work sub-issues):
-Similarly, re-fetch the parent issue at the end of the chain to use the latest `subIssuesSummary`. Only update the plan issue to Done if all work sub-issues (excluding the plan issue itself) have a status of Done or Not Planned. If any work sub-issue remains in another status, skip the update.
+Similarly, re-fetch the parent issue at the end of the chain to use the latest `subIssuesSummary`. Only update the plan issue to Done if all work sub-issues (excluding the plan issue itself) have a status of Done or Cancelled. If any work sub-issue remains in another status, skip the update.
 
 **Plan issue update procedure**:
 
 ```bash
-# 1. Pull plan issue cache (skip if already cached from Step 1)
-shirokuma-docs items pull {plan-number}
-
-# 2. Edit frontmatter status to "Done" in the cache file
-# .shirokuma/github/{org}/{repo}/issues/{plan-number}/body.md — use Edit tool
-
-# 3. Push to reflect on GitHub
-shirokuma-docs items push {plan-number}
+shirokuma-docs items transition {plan-number} --to Done
 ```
 
-- **Skip pull when already cached**: In the top-level case, the plan issue was already fetched in Step 1 — go directly to step 2 (edit frontmatter) and step 3 (push). The sub-issue/epic cases require the pull since the plan issue was not fetched earlier.
 - **Plan issue not found**: Silent skip (no warning). Covers cases like XS/S direct implementation path where no plan issue exists.
 - **Idempotent**: Re-updating to Done when already Done is harmless.
 
@@ -439,14 +429,14 @@ All of the following must be met to run in headless mode:
 
 If any precondition is not met, display an error message and stop (no fallback to normal mode).
 
-> **Note:** Issues with statuses other than Review / Ready (e.g., In Progress, Preparing, Backlog) will also stop with a precondition error when `--headless` is specified. Issues in Preparing status require interactive planning via `prepare-flow` and are therefore excluded from headless mode.
+> **Note:** Issues with statuses other than Review / Ready (e.g., In Progress, Backlog, Pending) will also stop with a precondition error when `--headless` is specified. Issues in In Progress status (planning phase) require interactive planning via `prepare-flow` and are therefore excluded from headless mode.
 
 ### UCP Default Behaviors
 
 | UCP ID | Location | Normal Mode | Headless Mode Default |
 |--------|----------|-------------|----------------------|
 | W1 | No-argument invocation | AskUserQuestion for number | Stop with precondition error |
-| W2 | Issue is Done/Released | Confirm reopen | Warn and stop (prevent accidental execution) |
+| W2 | Issue is Done | Confirm reopen | Warn and stop (prevent accidental execution) |
 | W3 | ADR proposal (Feature M+) | AskUserQuestion for confirmation | Skip (continue without ADR) |
 | W4 | Wrong branch detected | AskUserQuestion for switch | Warn and stop (highest risk) |
 | W5 | Worker's ucp_required flag | AskUserQuestion with suggestions | Skip and record in Issue comment |
@@ -476,7 +466,7 @@ claude -p "/implement-flow --headless #42"
 | Situation | Action |
 |-----------|--------|
 | Issue not found | AskUserQuestion for number |
-| Issue Done/Released | Warn, confirm reopen |
+| Issue Done | Warn, confirm reopen |
 | Already In Progress | Continue without status change |
 | Wrong branch | AskUserQuestion: switch or continue |
 | Chain failure | Report completed/remaining steps, return control. See "Chain Recovery Procedure" below |
@@ -492,7 +482,7 @@ claude -p "/implement-flow --headless #42"
 When a revert is required after a PR has been merged (issue is Done):
 
 1. Create and merge a revert PR (via GitHub UI or `git revert`)
-2. Manually update the original issue status to `Backlog` (re-implement) or `Not Planned` (cancelled)
+2. Manually update the original issue status to `Backlog` (re-implement) or `Cancelled` (cancelled)
 3. If re-implementing, run `/implement-flow #{number}` in a new conversation (a new branch will be created)
 
 > Revert is a manual operation and is not part of the `implement-flow` chain.
@@ -540,7 +530,7 @@ The epic must have a plan issue (child issue with title starting with "Plan:" or
    shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
    ```
    Body: Minimal stub referencing the parent plan (`See #{epic-number} for full plan`).
-   After creation, update the plan issue's `### Sub-Issue Structure` table placeholders (`#{sub1}`, etc.) with actual issue numbers and sync via `items push {plan-issue-number}`.
+   After creation, update the plan issue's `### Sub-Issue Structure` table placeholders (`#{sub1}`, etc.) with actual issue numbers and sync via `items update {plan-issue-number} --body /tmp/shirokuma-docs/{plan-issue-number}-body.md`.
 
 3. **Present execution order**: Based on the `### Execution Order` section or dependency column, display the recommended order and end. Do NOT propose immediate work start — each sub-issue should be worked on in a separate conversation per the epic pattern in `best-practices-first`:
    ```

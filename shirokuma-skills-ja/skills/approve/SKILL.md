@@ -19,7 +19,7 @@ Review 状態の Issue を明示的に承認し Done に遷移する。「計画
 
 ## ワークフロー
 
-1. **Issue 取得**: `shirokuma-docs items pull {number}` で Issue をキャッシュに取得
+1. **Issue 取得**: `shirokuma-docs items context {number}` で Issue をキャッシュに取得
 2. **ステータス確認**: `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` を Read ツールで読み込み、frontmatter の `status` を確認
    - Review でなければ警告を表示して終了（「Issue #{number} は Review ステータスではありません（現在: {status}）」）
 3. **承認実行**: `shirokuma-docs items close {number}` で Done + close を実行

@@ -18,7 +18,7 @@ Unified reference for working with epics (parent issue + sub-issue structure) on
 Epics are identified by **structure**, not Issue Type. An issue with non-plan child issues (child issues whose titles do NOT start with "Plan:" or "計画:") in `subIssuesSummary` is an epic. An issue with only a plan issue is not considered an epic.
 
 ```bash
-shirokuma-docs items pull {number}
+shirokuma-docs items context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 # → Check frontmatter subIssuesSummary: { total: 3, completed: 1 }
 ```
@@ -67,7 +67,7 @@ When a child issue has a parent (detected via the `parentIssue` field in `.shiro
 
 ```bash
 # Get branch name from parent issue body
-shirokuma-docs items pull {parent-number}
+shirokuma-docs items context {parent-number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md
 # → Extract `chore/958-octokit-migration` from "### Integration Branch" section
 
@@ -91,7 +91,7 @@ gh api repos/{owner}/{repo}/pulls/{pr-number} --method PATCH -f base="correct-br
 
 | Event | Epic Action |
 |-------|-------------|
-| Preparing complete | Epic → Review (standard flow) |
+| Planning complete | Epic → Review (standard flow) |
 | First sub-issue becomes In Progress | Epic → In Progress |
 | Sub-issue PR merged | Epic remains In Progress (check `subIssuesSummary` but do not transition) |
 | Final PR: integration → develop merged | Epic → Done |
