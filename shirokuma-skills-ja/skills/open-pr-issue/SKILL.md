@@ -35,14 +35,14 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 shirokuma-docs git check
 ```
 
-1コマンドで branch, baseBranch, isFeatureBranch, uncommittedChanges, unpushedCommits, recentCommits, diffStat, warnings を JSON で取得。
+1コマンドで branch, base_branch, is_feature_branch, uncommitted_changes, unpushed_commits, recent_commits, diff_stat, warnings を JSON で取得。
 
 **事前チェック（JSON の値で判定）:**
-- `isFeatureBranch` が `true`（`develop` や `main` ではない）
-- `hasUncommittedChanges` が `false`（変更がコミット済み）
-- `recentCommits` に `baseBranch` より先のコミットあり
+- `is_feature_branch` が `true`（`develop` や `main` ではない）
+- `has_uncommitted_changes` が `false`（変更がコミット済み）
+- `recent_commits` に `base_branch` より先のコミットあり
 
-`isFeatureBranch` が `false` の場合、エラーを返す。
+`is_feature_branch` が `false` の場合、エラーを返す。
 
 ### ステップ 2: プッシュ
 
@@ -89,7 +89,7 @@ base_branch="develop"
 
 ### ステップ 3: 変更分析
 
-ステップ 1 の `shirokuma-docs git check` の JSON 出力から `recentCommits` と `diffStat` を使用。最新コミットだけでなく全コミットを把握。
+ステップ 1 の `shirokuma-docs git check` の JSON 出力から `recent_commits` と `diff_stat` を使用。最新コミットだけでなく全コミットを把握。
 
 ### ステップ 4: PR作成
 

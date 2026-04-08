@@ -37,14 +37,14 @@ PRs target `develop` for daily work (see `branch-workflow` rule):
 shirokuma-docs git check
 ```
 
-Single command returns branch, baseBranch, isFeatureBranch, uncommittedChanges, unpushedCommits, recentCommits, diffStat, and warnings as JSON.
+Single command returns branch, base_branch, is_feature_branch, uncommitted_changes, unpushed_commits, recent_commits, diff_stat, and warnings as JSON.
 
 **Pre-checks (use JSON values):**
-- `isFeatureBranch` is `true` (not `develop` or `main`)
-- `hasUncommittedChanges` is `false` (all changes committed)
-- `recentCommits` has commits ahead of `baseBranch`
+- `is_feature_branch` is `true` (not `develop` or `main`)
+- `has_uncommitted_changes` is `false` (all changes committed)
+- `recent_commits` has commits ahead of `base_branch`
 
-If `isFeatureBranch` is `false`, return an error.
+If `is_feature_branch` is `false`, return an error.
 
 ### Step 2: Push Branch
 
@@ -93,7 +93,7 @@ base_branch="develop"
 
 ### Step 3: Analyze Changes
 
-Use `recentCommits` and `diffStat` from the Step 1 `shirokuma-docs git check` JSON output. Understand the full scope of changes, not just the latest commit.
+Use `recent_commits` and `diff_stat` from the Step 1 `shirokuma-docs git check` JSON output. Understand the full scope of changes, not just the latest commit.
 
 ### Step 4: Create PR
 

@@ -18,7 +18,7 @@ allowed-tools: Bash, Read, Grep
 shirokuma-docs items dashboard
 ```
 
-返される JSON: `repository`, `git`（ブランチ、未コミット変更）, `lastHandover`, `backups`（PreCompact バックアップ）, `issues`（アクティブ Issue + フィールド）, `total_issues`, `openPRs`（オープン PR + レビューステータス）
+返される JSON: `repository`, `git`（`branch`, `uncommitted_changes`, `unpushed_commits` 等）, `backups`（PreCompact バックアップ）, `issues`（アクティブ Issue + フィールド）, `total_issues`, `openPRs`（オープン PR + レビューステータス）
 
 ### ステップ 1b: バックアップ検出
 
@@ -32,7 +32,7 @@ shirokuma-docs items dashboard
 
 **リポジトリ:** {repository}
 **時刻:** {current time}
-**ブランチ:** {currentBranch} {hasUncommittedChanges ? "(未コミットあり)" : "(クリーン)"}
+**ブランチ:** {branch} {uncommitted_changes > 0 ? "(未コミットあり)" : "(クリーン)"}
 
 ### オープン PR
 | # | タイトル | レビュー | スレッド |
@@ -45,7 +45,7 @@ shirokuma-docs items dashboard
 {ステータスでグループ化: 作業中 → 準備完了 → バックログ → アイスボックス}
 ```
 
-未コミット変更がある場合、ユーザーに通知。
+未コミット変更がある場合（`uncommitted_changes > 0`）、ユーザーに通知。
 
 ## Issue バウンドモード（`#N` 指定時）
 

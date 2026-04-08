@@ -35,7 +35,7 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 shirokuma-docs git check
 ```
 
-1コマンドで branch, baseBranch, uncommittedChanges, unpushedCommits, recentCommits, diffStat, warnings を JSON で取得。変更のサマリーを出力に含める。
+1コマンドで branch, base_branch, uncommitted_changes, unpushed_commits, recent_commits, diff_stat, warnings を JSON で取得。変更のサマリーを出力に含める。
 
 ### ステップ 2: コミットメッセージを組み立て、ステージ・コミット・プッシュを1操作で実行
 

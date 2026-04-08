@@ -36,7 +36,7 @@ Update each step to `in_progress` at start and `completed` on finish via TaskUpd
 shirokuma-docs git check
 ```
 
-Single command returns branch, baseBranch, uncommittedChanges, unpushedCommits, recentCommits, diffStat, and warnings as JSON. Include a summary of changes in the output.
+Single command returns branch, base_branch, uncommitted_changes, unpushed_commits, recent_commits, diff_stat, and warnings as JSON. Include a summary of changes in the output.
 
 ### Step 2: Build commit message and stage, commit, push in one operation
 

@@ -20,7 +20,7 @@ shirokuma-docs items dashboard
 
 This returns JSON with:
 - `repository` - Current repository
-- `git` - Git state (`currentBranch`, `uncommittedChanges`, `hasUncommittedChanges`)
+- `git` - Git state (`branch`, `uncommitted_changes`, `unpushed_commits`, etc.)
 - `lastHandover` - Latest handover (null if none)
 - `backups` - PreCompact session backups (if any exist from interrupted sessions)
 - `issues` - Active issues with project fields (Done excluded)
@@ -41,7 +41,7 @@ Parse the JSON output and display:
 
 **Repository:** {repository}
 **Time:** {current time}
-**Branch:** {git.currentBranch} {git.hasUncommittedChanges ? "(uncommitted changes)" : "(clean)"}
+**Branch:** {git.branch} {git.uncommitted_changes > 0 ? "(uncommitted changes)" : "(clean)"}
 
 ### Open PRs
 | # | Title | Review | Threads |
@@ -64,7 +64,7 @@ Parse the JSON output and display:
 
 Group issues by status: In Progress → Ready → Backlog → Pending → (no status)
 
-If there are uncommitted changes (`git.hasUncommittedChanges`), inform the user before proceeding.
+If there are uncommitted changes (`git.uncommitted_changes > 0`), inform the user before proceeding.
 
 ## Issue-Bound Mode (when `#N` provided)
 
