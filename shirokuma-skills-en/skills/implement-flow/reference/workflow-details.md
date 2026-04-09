@@ -8,7 +8,7 @@ Each phase typically runs in a separate Claude Code conversation. Context flows 
 
 ```mermaid
 graph TD
-    C1["Conversation 1: Issue creation<br/>/creating-item (standalone)"]
+    C1["Conversation 1: Issue creation<br/>/create-item-flow (standalone)"]
     C2["Conversation 2: Planning<br/>/prepare-flow #N (standalone)"]
     C2D["Conversation 2.5: Design (optional)<br/>/design-flow #N (standalone)"]
     C3["Conversation 3: Implementation<br/>Small: /implement-flow #N (standalone)<br/>Large: /starting-session #N"]
@@ -68,7 +68,7 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 | code-issue | Yes | — | Via Skill tool (from implement-flow) |
 | Framework-specific skills | Yes | Yes | Via code-issue / design-flow or standalone (dynamically discovered) |
 | design-flow | — | Yes | Currently standalone (invoked from prepare-flow completion report) |
-| creating-item | — | Yes | Always standalone-capable |
+| create-item-flow | — | Yes | Always standalone-capable |
 | commit-issue | Yes | Yes | Subagent (standalone also runs as subagent) |
 | open-pr-issue | Yes | Yes | Subagent (via chain or standalone) |
 | review-flow | — | Yes | PR review response (new conversation entry point) |

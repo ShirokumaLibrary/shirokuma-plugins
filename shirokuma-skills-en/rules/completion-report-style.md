@@ -63,7 +63,7 @@ For detailed bullets vs prose guidelines in GitHub content (Issues, PRs, Discuss
 | Config Management | Required (strict) | coding-claude-config |
 | Analysis | Required (with tables) | evolving-rules, prepare-flow |
 | Display / Orchestrator | Not required | showing-github, implement-flow |
-| Delegator | Deferred to caller | review-issue, creating-item |
+| Delegator | Deferred to caller | review-issue, create-item-flow |
 
 Skills that do not require templates may omit the completion report section entirely.
 

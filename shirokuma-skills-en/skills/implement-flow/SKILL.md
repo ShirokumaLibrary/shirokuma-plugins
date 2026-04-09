@@ -111,7 +111,7 @@ shirokuma-docs items context {plan-issue-number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md to get plan content
 ```
 
-**XS/S direct implementation path criteria:** Apply when the Issue Size field is XS or S, and the title and body clearly indicate what needs to be changed (mechanical transformation such as pattern replacement, type fix, rename). Sub-issues (`parentIssue` field present) always require a plan regardless of size. Additionally, issues with Review or Ready status are excluded from this path (the status priority path is evaluated first). If Size is unset, requirements are ambiguous, the issue is a sub-issue, or judgment is uncertain, delegate to `prepare-flow`. See the `creating-item` skill "Requirements Clarity Criteria" for the canonical definition.
+**XS/S direct implementation path criteria:** Apply when the Issue Size field is XS or S, and the title and body clearly indicate what needs to be changed (mechanical transformation such as pattern replacement, type fix, rename). Sub-issues (`parentIssue` field present) always require a plan regardless of size. Additionally, issues with Review or Ready status are excluded from this path (the status priority path is evaluated first). If Size is unset, requirements are ambiguous, the issue is a sub-issue, or judgment is uncertain, delegate to `prepare-flow`. See the `create-item-flow` skill "Requirements Clarity Criteria" for the canonical definition.
 
 #### Transition from In Progress Status (Planning Phase)
 
@@ -124,10 +124,10 @@ shirokuma-docs items context {plan-issue-number}
 
 ### Step 1a: Issue Resolution (text description only)
 
-When called with text only, delegate to `creating-item` skill to ensure an issue exists.
+When called with text only, delegate to `create-item-flow` skill to ensure an issue exists.
 
 ```text
-Text description → creating-item → Issue number → Join Step 1
+Text description → create-item-flow → Issue number → Join Step 1
 ```
 
 ### Step 2: Update Status
@@ -400,7 +400,7 @@ Process issues that share common files sequentially in a single branch and PR. S
 |--------|---------|----------|
 | Issue number | `#42` | Fetch issue, analyze type |
 | Multiple issues | `#101 #102 #103` | Sequential batch mode |
-| Description | `implement dashboard` | Text classification → `creating-item` |
+| Description | `implement dashboard` | Text classification → `create-item-flow` |
 | No argument | — | AskUserQuestion |
 
 ### Flags
@@ -549,7 +549,7 @@ The epic must have a plan issue (child issue with title starting with "Plan:" or
 
 ### Responsibility Note
 
-Sub-issue creation in this flow uses `shirokuma-docs items add issue` directly (not `creating-item`). The plan already specifies sub-issue details, so `creating-item`'s inference logic is unnecessary.
+Sub-issue creation in this flow uses `shirokuma-docs items add issue` directly (not `create-item-flow`). The plan already specifies sub-issue details, so `create-item-flow`'s inference logic is unnecessary.
 
 ## Rule References
 

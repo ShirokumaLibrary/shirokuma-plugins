@@ -47,7 +47,7 @@ graph LR
 | レビュー | `review-issue` | Agent (`review-worker`) |
 | Claude 設定の実装 | `code-issue` → `coding-claude-config` | Skill（code-issue 経由） |
 | Claude 設定のレビュー | `reviewing-claude-config` | Skill |
-| Issue / Discussion 作成 | `creating-item` | Skill |
+| Issue / Discussion 作成 | `create-item-flow` | Skill |
 | GitHub データ表示 | `showing-github` | Skill |
 | プロジェクトセットアップ | `setting-up-project` | Skill |
 | 探索 | `Explore` | Task (ビルトイン) |

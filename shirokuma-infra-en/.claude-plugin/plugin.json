@@ -1,7 +1,7 @@
 {
   "name": "shirokuma-infra-en",
   "description": "Local development infrastructure (docker-compose, scripts) skills for Claude Code",
-  "version": "0.3.0-alpha.103",
+  "version": "0.3.0-alpha.104",
   "author": {
     "name": "ShirokumaLibrary"
   },

@@ -8,7 +8,7 @@
 
 ```mermaid
 graph TD
-    C1["会話 1: Issue 作成<br/>/creating-item（スタンドアロン）"]
+    C1["会話 1: Issue 作成<br/>/create-item-flow（スタンドアロン）"]
     C2["会話 2: 計画策定<br/>/prepare-flow #N（スタンドアロン）"]
     C2D["会話 2.5: 設計（任意）<br/>/design-flow #N（スタンドアロン）"]
     C3["会話 3: 製造<br/>小規模: /implement-flow #N（スタンドアロン）<br/>大規模: /starting-session #N"]
@@ -68,7 +68,7 @@ graph TD
 | code-issue | 対応 | — | Skill ツール経由（implement-flow から） |
 | フレームワーク固有スキル | 対応 | 対応 | code-issue / design-flow 経由またはスタンドアロン（動的発見） |
 | design-flow | — | 対応 | 現時点ではスタンドアロン起動（prepare-flow の完了レポートから起動） |
-| creating-item | — | 対応 | 常にスタンドアロン対応 |
+| create-item-flow | — | 対応 | 常にスタンドアロン対応 |
 | commit-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | open-pr-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | review-flow | — | 対応 | PR レビュー対応（新会話のエントリーポイント） |

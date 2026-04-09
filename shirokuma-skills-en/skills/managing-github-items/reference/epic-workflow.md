@@ -198,9 +198,9 @@ This single command triggers the full epic kickoff:
 | Parent issue bound session (`/starting-session #{epic}`) + sub-issue standalone | Multiple sub-issues across days; parent session tracks cross-cutting context |
 | Standalone per sub-issue | Independent sub-issues completable in single conversations |
 
-### Relationship to `creating-item`
+### Relationship to `create-item-flow`
 
-Sub-issue creation in the epic kickoff uses `shirokuma-docs items add issue` directly, not `creating-item`. The plan already specifies all sub-issue metadata, making `creating-item`'s inference logic unnecessary.
+Sub-issue creation in the epic kickoff uses `shirokuma-docs items add issue` directly, not `create-item-flow`. The plan already specifies all sub-issue metadata, making `create-item-flow`'s inference logic unnecessary.
 
 ## Out of Scope (Follow-up)
 

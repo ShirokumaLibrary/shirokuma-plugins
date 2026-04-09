@@ -1,18 +1,18 @@
 ---
-name: creating-item
-description: Creates GitHub Issues or Discussions with auto-inferred metadata from conversation context and provides auto-chaining to implement-flow. Triggers: "create issue", "make this an issue", "follow-up issue", "create spec", "new issue", "file an issue".
+name: create-item-flow
+description: Creates GitHub Issues or Discussions with auto-inferred metadata from conversation context and presents next action candidates. Triggers: "create issue", "make this an issue", "follow-up issue", "create spec", "new issue", "file an issue".
 allowed-tools: Bash, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Creating Items
 
-Auto-infer Issue metadata from conversation context, delegate to `managing-github-items` for creation, and provide auto-chaining to `implement-flow`.
+Auto-infer Issue metadata from conversation context, delegate to `managing-github-items` for creation, and present next action candidates (`/review-issue requirements`, `/implement-flow`, etc.).
 
 ## Responsibility Split
 
 | Layer | Responsibility |
 |-------|---------------|
-| `creating-item` | User interface. Context analysis, metadata inference, chain control |
+| `create-item-flow` | User interface. Context analysis, metadata inference, chain control |
 | `managing-github-items` | Internal engine. CLI command execution, field setting, validation |
 
 ## Workflow
@@ -31,6 +31,18 @@ Infer from conversation context:
 
 **Purpose Clarity Check (required)**: If the user's message only describes a "means" (what to do) without a clear "purpose" (who / what / why), present inferred purpose candidates and confirm via `AskUserQuestion`. See [reference/purpose-criteria.md](reference/purpose-criteria.md) for criteria.
 
+### Step 1b: Search for Similar Issues and Suggest Linking
+
+After context analysis, search for similar existing Issues/Discussions before creation to identify duplicates or linking opportunities.
+
+```bash
+shirokuma-docs items search "<keyword>" --limit 5
+```
+
+- If similar Issues found: present to user and ask whether to create a new issue or consolidate into an existing one (`AskUserQuestion`)
+- If related Issues found: suggest setting parent-child relationship with `items parent` after creation
+- If nothing found: proceed to the next step
+
 ### Step 2: Delegate to `managing-github-items`
 
 After context analysis, invoke via Skill tool immediately (no pre-creation confirmation):
@@ -44,12 +56,12 @@ Args: create-item --title "{Title}" --issue-type "{Type}" --labels "{area:label}
 
 After creation, display next action guidance based on the default recommendation from [reference/chain-rules.md](reference/chain-rules.md):
 
-**When Size XS/S and requirements are clear (default: start immediately):**
+**When Size XS/S and requirements are clear (default: review first):**
 
 ```markdown
 Item created: #{number}
-→ `/implement-flow #{number}` to start implementation directly (recommended)
-→ `/prepare-flow #{number}` to start planning
+→ `/review-issue requirements #{number}` to review requirements and spec quality (recommended)
+→ `/implement-flow #{number}` to start implementation directly
 → Or keep in Backlog
 ```
 

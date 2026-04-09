@@ -53,7 +53,7 @@ Accumulate signals as comments in Evolution Issues.
 | Preventive | Pattern recognized during signal recording | Include proposal in comment |
 | Periodic | User explicitly invokes `evolving-rules` | Analyze all accumulated signals |
 | Session start | `starting-session` detects accumulated signals | Recommend `evolving-rules` invocation (no auto-execution) |
-| Skill completion | `implement-flow`, `prepare-flow`, `creating-item`, `design-flow`, `review-flow` complete | Auto-record via detection checklist. Display reminder as fallback when no signals detected |
+| Skill completion | `implement-flow`, `prepare-flow`, `create-item-flow`, `design-flow`, `review-flow` complete | Auto-record via detection checklist. Display reminder as fallback when no signals detected |
 | Eval failure | `skill eval` or `skill optimize` shows failures | Record eval result pattern as evolution signal. Propose description improvement via `evolving-rules` |
 
 ## Responsibility Boundaries

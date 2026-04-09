@@ -156,7 +156,7 @@ shirokuma-docs items dashboard --team
 After displaying state, the user selects the next action:
 
 - Work on a specific issue: `/implement-flow #N`
-- Create a new issue: `/creating-item`
+- Create a new issue: `/create-item-flow`
 - Start planning: `/prepare-flow #N`
 - Batch processing: `/implement-flow #N1 #N2 #N3`
 

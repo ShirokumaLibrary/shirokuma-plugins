@@ -88,7 +88,7 @@ Accumulate improvement signals for rules and skills, serving as input for `/evol
 
 ## Auto-Recording Procedure at Skill Completion
 
-At the completion of major skills (`implement-flow`, `prepare-flow`, `creating-item`, `design-flow`, `review-flow`), auto-record Evolution signals detected during the session using the following procedure. Each skill references this section to perform auto-recording.
+At the completion of major skills (`implement-flow`, `prepare-flow`, `create-item-flow`, `design-flow`, `review-flow`), auto-record Evolution signals detected during the session using the following procedure. Each skill references this section to perform auto-recording.
 
 ### Signal Detection Checklist
 
@@ -105,7 +105,7 @@ Self-check the following at skill completion. When in doubt, do not record (avoi
 
 #### Environment Checks (`implement-flow`, `review-flow` only)
 
-At the completion of skills involving code changes, verify the project's objective state. `prepare-flow` / `creating-item` / `design-flow` do not involve code changes and are excluded.
+At the completion of skills involving code changes, verify the project's objective state. `prepare-flow` / `create-item-flow` / `design-flow` do not involve code changes and are excluded.
 
 | Check Item | Signal Type | Detection Condition | Do NOT Record |
 |-----------|------------|-------------------|---------------|
@@ -156,7 +156,7 @@ Use the "Standard Search & Creation Flow" search command to check for accumulate
 - Do not register as a task (non-blocking processing)
 - Self-review uses concise checklist format to minimize context consumption
 - When no signals detected, minimize CLI command execution (`items list` once only)
-- When `creating-item` creates an item with Issue Type Evolution, skip the entire signal recording (the Evolution Issue itself is an improvement proposal, preventing duplicate recording)
+- When `create-item-flow` creates an item with Issue Type Evolution, skip the entire signal recording (the Evolution Issue itself is an improvement proposal, preventing duplicate recording)
 
 ## Standalone Signal Recording
 
@@ -168,7 +168,7 @@ Signals can be recorded even without a session (standalone skill invocations, di
 |----------|------------|-----------------|
 | Standalone `/implement-flow` | Rule friction, redo instruction | Recording template + reminder. Include Issue number in **Context** |
 | Standalone `/prepare-flow` | Rule friction, skill improvement | Recording template + reminder. Include rule/skill name in **Target** |
-| Standalone `/creating-item` | Skill improvement | Recording template + reminder. Include improvement idea in **Proposal** |
+| Standalone `/create-item-flow` | Skill improvement | Recording template + reminder. Include improvement idea in **Proposal** |
 | Direct file editing & commit | Rule friction | See recording template. Include rule name in **Target** |
 | Review-only short sessions | Review pattern | Reports accumulation (existing). Include pattern improvement in **Proposal** |
 | Lint result review | Lint violation trend | See recording template. Include violation count trends in **Context** |

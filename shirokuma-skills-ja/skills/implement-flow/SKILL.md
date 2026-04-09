@@ -111,7 +111,7 @@ shirokuma-docs items context {plan-issue-number}
 # → .shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md を Read ツールで読み込み計画内容を取得
 ```
 
-**XS/S 直接実装パスの判定:** Issue の Size フィールドが XS または S であり、かつタイトルと本文から変更内容が明確に読み取れる場合（パターン置換、型修正、リネーム等の機械的変換）に適用する。ただし、サブ Issue（`parentIssue` フィールドあり）は Size に関わらず計画が必須であるため、このパスの対象外とする。また、Review または Ready ステータスの場合はこのパスの対象外（ステータス優先パスが先に評価される）。Size が未設定、要件に曖昧さがある、サブ Issue である、または判断が難しい場合は `prepare-flow` に委任する。正規の判定基準は `creating-item` スキルの「要件明確性の判定」セクションを参照。
+**XS/S 直接実装パスの判定:** Issue の Size フィールドが XS または S であり、かつタイトルと本文から変更内容が明確に読み取れる場合（パターン置換、型修正、リネーム等の機械的変換）に適用する。ただし、サブ Issue（`parentIssue` フィールドあり）は Size に関わらず計画が必須であるため、このパスの対象外とする。また、Review または Ready ステータスの場合はこのパスの対象外（ステータス優先パスが先に評価される）。Size が未設定、要件に曖昧さがある、サブ Issue である、または判断が難しい場合は `prepare-flow` に委任する。正規の判定基準は `create-item-flow` スキルの「要件明確性の判定」セクションを参照。
 
 #### In Progress ステータス（計画フェーズ）からの遷移
 
@@ -124,10 +124,10 @@ shirokuma-docs items context {plan-issue-number}
 
 ### ステップ 1a: Issue 解決（テキスト説明のみの場合）
 
-テキスト説明のみで呼ばれた場合、`creating-item` スキルに委任して Issue を確保する。
+テキスト説明のみで呼ばれた場合、`create-item-flow` スキルに委任して Issue を確保する。
 
 ```text
-テキスト説明のみ → creating-item → Issue 番号取得 → ステップ 1 に合流
+テキスト説明のみ → create-item-flow → Issue 番号取得 → ステップ 1 に合流
 ```
 
 ### ステップ 2: ステータス更新
@@ -402,7 +402,7 @@ Status 更新後、ユーザーに次のアクション候補を提示する。`
 |------|---|------|
 | Issue 番号 | `#42` | Issue 取得、タイプ分析 |
 | 複数 Issue | `#101 #102 #103` | 逐次バッチモード |
-| 説明文 | `implement dashboard` | テキスト分類 → `creating-item` 経由 |
+| 説明文 | `implement dashboard` | テキスト分類 → `create-item-flow` 経由 |
 | 引数なし | — | AskUserQuestion で確認 |
 
 ### フラグ
@@ -552,7 +552,7 @@ PR がマージ済み（Issue が Done）の状態で revert が必要な場合:
 
 ### 責務に関する注記
 
-このフローでのサブ Issue 作成は `shirokuma-docs items add issue` を直接使用する（`creating-item` ではない）。計画でサブ Issue の詳細が確定済みのため、`creating-item` の推論ロジックは不要。
+このフローでのサブ Issue 作成は `shirokuma-docs items add issue` を直接使用する（`create-item-flow` ではない）。計画でサブ Issue の詳細が確定済みのため、`create-item-flow` の推論ロジックは不要。
 
 ## ルール参照
 

@@ -17,6 +17,8 @@ Create a GitHub Project item (Issue or DraftIssue). When called without argument
 
 ## Step 1: Gather Details + Type Classification
 
+When called via `create-item-flow`, title/type/fields are passed as arguments — inference below is not needed.
+
 With arguments: Use the provided title.
 Without arguments: Infer from conversation context:
 
@@ -43,7 +45,7 @@ Without arguments: Infer from conversation context:
 
 ### Purpose Clarity Check
 
-When creating an issue, detect cases where the user's message only describes a "means" (what to do) without including a "purpose" (who / what / why). See the `creating-item` skill for detailed criteria.
+When creating an issue, detect cases where the user's message only describes a "means" (what to do) without including a "purpose" (who / what / why). See the `create-item-flow` skill for detailed criteria.
 
 #### Detecting Means Patterns
 

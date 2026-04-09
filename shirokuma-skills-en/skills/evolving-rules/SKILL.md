@@ -11,7 +11,7 @@ Analyze feedback signals accumulated in Evolution Issues and propose improvement
 ## Scope
 
 - **Category:** Orchestrator
-- **Scope:** Collect and analyze signals from Evolution Issues, record improvement proposals as Issues. Handles user confirmation (AskUserQuestion), delegation to `creating-item` skill, and closing Evolution Issues.
+- **Scope:** Collect and analyze signals from Evolution Issues, record improvement proposals as Issues. Handles user confirmation (AskUserQuestion), delegation to `create-item-flow` skill, and closing Evolution Issues.
 - **Out of scope:** Directly modifying rule/skill files (proposals are recorded as Issues; implementation is delegated to the `implement-flow` workflow)
 
 ## Workflow
@@ -98,9 +98,9 @@ Record this improvement proposal as an Issue?
 
 ### Step 6: Create Proposal Issue
 
-Delegate to the `creating-item` skill to record approved proposals as Issues.
+Delegate to the `create-item-flow` skill to record approved proposals as Issues.
 
-Context to pass to `creating-item`:
+Context to pass to `create-item-flow`:
 - **Title**: `{type}: Improve {target name} (Evolution #{evolution-number})`
 - **Type**: chore (rule/skill improvement)
 - **Background**: Improvement proposal based on signals accumulated in Evolution Issue #{evolution-number}

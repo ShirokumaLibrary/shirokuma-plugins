@@ -1,7 +1,7 @@
 {
   "name": "shirokuma-hooks",
   "description": "Safety hooks for destructive git/GitHub operations",
-  "version": "0.3.0-alpha.103",
+  "version": "0.3.0-alpha.104",
   "author": {
     "name": "ShirokumaLibrary"
   },

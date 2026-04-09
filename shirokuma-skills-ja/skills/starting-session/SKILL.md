@@ -128,7 +128,7 @@ shirokuma-docs items dashboard --team
 状態表示後、ユーザーが次のアクションを選択する:
 
 - 特定の Issue に着手: `/implement-flow #N`
-- 新しい Issue を作成: `/creating-item`
+- 新しい Issue を作成: `/create-item-flow`
 - 計画を立てる: `/prepare-flow #N`
 - バッチ処理: `/implement-flow #N1 #N2 #N3`
 

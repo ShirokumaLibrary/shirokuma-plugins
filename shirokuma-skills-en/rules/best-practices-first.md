@@ -47,7 +47,7 @@ Conversation flow, epic pattern, and session vs standalone details are auto-load
 | Review | `review-issue` | Agent (`review-worker`) |
 | Claude Config implementation | `code-issue` → `coding-claude-config` | Skill (via code-issue) |
 | Claude Config review | `reviewing-claude-config` | Skill |
-| Issue / Discussion creation | `creating-item` | Skill |
+| Issue / Discussion creation | `create-item-flow` | Skill |
 | GitHub data display | `showing-github` | Skill |
 | Project setup | `setting-up-project` | Skill |
 | Exploration | `Explore` | Task (Built-in) |

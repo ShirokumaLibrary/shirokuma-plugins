@@ -1,18 +1,18 @@
 ---
-name: creating-item
-description: 会話コンテキストからGitHub Issue/Discussionを自動推定して作成し、implement-flowへの自動チェーンを提供します。トリガー: 「Issue にして」「Issue 作って」「フォローアップ Issue」「仕様作成して」「新規 Issue」。
+name: create-item-flow
+description: 会話コンテキストからGitHub Issue/Discussionを自動推定して作成し、次のアクション候補を提示します。トリガー: 「Issue にして」「Issue 作って」「フォローアップ Issue」「仕様作成して」「新規 Issue」。
 allowed-tools: Bash, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # アイテム作成
 
-会話コンテキストから Issue メタデータを自動推定し、`managing-github-items` に委任して作成。作成後は `implement-flow` への自動チェーンを提供する。
+会話コンテキストから Issue メタデータを自動推定し、`managing-github-items` に委任して作成。作成後は次のアクション候補（`/review-issue requirements`、`/implement-flow` 等）を提示する。
 
 ## 責務分担
 
 | レイヤー | 責務 |
 |---------|------|
-| `creating-item` | ユーザーインターフェース。コンテキスト分析、メタデータ推定、チェーン制御 |
+| `create-item-flow` | ユーザーインターフェース。コンテキスト分析、メタデータ推定、チェーン制御 |
 | `managing-github-items` | 内部エンジン。CLI コマンド実行、フィールド設定、バリデーション |
 
 ## ワークフロー
@@ -31,6 +31,18 @@ allowed-tools: Bash, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate, TaskG
 
 **目的明確性チェック（必須）**: ユーザーの発話が「手段（何をするか）」のみで「目的（誰が・何を・なぜ）」が不明確な場合、推定した目的を提示して `AskUserQuestion` で確認する。判定基準は [reference/purpose-criteria.md](reference/purpose-criteria.md) 参照。
 
+### ステップ 1b: 類似課題の検索・関連付け提案
+
+コンテキスト分析後、作成前に類似する既存 Issue / Discussion を検索し、重複や関連付けの機会を提示する。
+
+```bash
+shirokuma-docs items search "<キーワード>" --limit 5
+```
+
+- 類似 Issue が見つかった場合: ユーザーに提示し、新規作成するか既存 Issue にまとめるかを確認する（`AskUserQuestion`）
+- 関連 Issue が見つかった場合: 作成後に `items parent` で親子関係を設定することを提案する
+- 何も見つからない場合: そのまま次のステップへ進む
+
 ### ステップ 2: `managing-github-items` に委任
 
 コンテキスト分析後、事前確認なしで即座に Skill ツールで `managing-github-items` を起動:
@@ -44,12 +56,12 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 
 作成完了後、[reference/chain-rules.md](reference/chain-rules.md) の判定ロジックに基づくデフォルト推奨を表示する:
 
-**Size XS/S かつ要件明確な場合（デフォルト推奨: すぐに着手する）:**
+**Size XS/S かつ要件明確な場合（デフォルト推奨: レビュー後に着手する）:**
 
 ```markdown
 アイテム作成完了: #{number}
-→ `/implement-flow #{number}` で直接実装を開始（推奨）
-→ `/prepare-flow #{number}` で計画から開始
+→ `/review-issue requirements #{number}` で要件・仕様の品質をレビュー（推奨）
+→ `/implement-flow #{number}` で直接実装を開始
 → またはそのまま Backlog に配置
 ```
 
