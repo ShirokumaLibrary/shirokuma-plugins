@@ -19,17 +19,16 @@ Follow `managing-github-items`'s `reference/create-item.md`.
 
 ## Chain Decision
 
-Default recommended chain target after creation:
+Default recommended chain target after creation (3-way branching based on `review-issue requirements` result):
 
 | Condition | Default Recommendation | Reason |
 |-----------|----------------------|--------|
-| Normal (regardless of Size or requirements) | `/review-issue requirements` (review first) | Always verify requirements and spec quality |
-| User explicitly says "work on it now" | `/implement-flow` | Explicit intent |
-| User explicitly says "plan this" | `/prepare-flow` | Explicit intent |
-| Issue created from in-conversation problem | `/review-issue requirements` (default) | Verify quality while context is warm |
+| `review-issue requirements` result is `**Design assessment:** NEEDED` | `/design-flow #{issue-number}` | Design phase is required before planning |
+| Design NOT_NEEDED + Size M+ or requirements ambiguous | `/prepare-flow #{issue-number}` | Go to planning phase |
+| Design NOT_NEEDED + Size XS/S and requirements clear | `/implement-flow #{issue-number}` | Implement directly |
+| User explicitly skips | `/implement-flow` or `/prepare-flow` | Explicit intent |
 | Batch creation (multiple issues in sequence) | Place in Backlog | Individual work is inefficient |
 | Priority: Low | Place in Backlog | Not urgent |
-| Priority: Critical/High | `/review-issue requirements` → `/implement-flow` | Verify requirements even for urgent tasks |
 
 ### Requirements Clarity Criteria
 
@@ -47,17 +46,21 @@ Default recommended chain target after creation:
 
 ## Review Execution Conditions
 
-Cases where review (`/review-issue requirements`) is recommended after item creation, before proceeding to `prepare-flow` / `implement-flow`:
+After Issue creation, `create-item-flow` Step 2b **automatically runs** `review-issue requirements` (skipped for Discussion).
 
-| Condition | Recommend Review | Reason |
-|-----------|-----------------|--------|
-| Normal (regardless of Size or requirements) | **Always yes** | Verifying requirements immediately after creation is best practice |
-| User explicitly skips | No | Respect user intent |
+| Condition | Auto-execute | Reason |
+|-----------|--------------|--------|
+| Issue creation (regardless of Size or requirements) | **Always yes** | Verify requirement quality immediately after creation and determine design assessment at the same time |
+| Discussion creation | No | Discussions are out of scope; only next action candidates are presented |
 | During batch creation | No | Prioritize Backlog placement over individual reviews during bulk creation |
 
-**Purpose of review**: A gate before planning (`prepare-flow`) to verify the quality of the Issue body's requirements and specs. The `review-issue` requirements role evaluates completeness, clarity, and implementability.
+**Purpose of review**: A quality gate for Issue body requirements, specs, and design necessity before planning (prepare-flow) or design (design-flow). The `review-issue` requirements role evaluates completeness, clarity, implementability, and design assessment.
 
-**Post-review flow**: After `/review-issue requirements #{number}` completes, the user proceeds to `/prepare-flow #{number}` or `/implement-flow #{number}` based on the review findings. The chain does not auto-execute — the user selects the next action.
+**Post-review flow (3-way branching)**: After `review-issue requirements` completes, Step 2b results (`**Design assessment:**` and `**Review result:**`) automatically branch in 3 directions:
+
+- Design needed (`**Design assessment:** NEEDED`) → `/design-flow #{issue-number}`
+- Design not needed + planning needed (`**Design assessment:** NOT_NEEDED` and Size M+ or ambiguous) → `/prepare-flow #{issue-number}`
+- Design not needed + planning not needed (`**Design assessment:** NOT_NEEDED` and Size XS/S and clear) → `/implement-flow #{issue-number}`
 
 ## Backlog-Only Path
 
@@ -71,4 +74,4 @@ Keep in Backlog without chaining when:
 
 When `implement-flow` is invoked with text description only (no issue number), Step 1a calls `create-item-flow`. `create-item-flow` creates the Issue and returns the number, and `implement-flow` continues. In this case, chain decision is not needed (as `implement-flow` automatically continues).
 
-> **Note:** The chain from `create-item-flow` delegates to `implement-flow`. `implement-flow` evaluates the issue size and plan state — XS/S without planning proceeds directly to `code-issue`, while M+ delegates to `prepare-flow`. For M+ or ambiguous requirements, `create-item-flow` recommends `/review-issue requirements` before proceeding to planning/implementation.
+> **Note:** When design assessment (`review-issue requirements`) returns NEEDED, `create-item-flow` guides to `/design-flow` first. After design completion, the chain proceeds to `/prepare-flow` → `/implement-flow`.

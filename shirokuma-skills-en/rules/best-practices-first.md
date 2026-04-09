@@ -42,7 +42,7 @@ Conversation flow, epic pattern, and session vs standalone details are auto-load
 | Task Type | Route To | Method |
 |-----------|----------|--------|
 | General Coding | `code-issue` | Agent (`coding-worker`, via `implement-flow`) |
-| UI Design | `design-flow` | Skill (currently standalone; invoked when recommended by `prepare-flow` completion report) |
+| UI Design | `design-flow` | Skill (invoked when `create-item-flow` completion report indicates design is needed) |
 | Research | `researching-best-practices` | Agent (`research-worker`) |
 | Review | `review-issue` | Agent (`review-worker`) |
 | Claude Config implementation | `code-issue` → `coding-claude-config` | Skill (via code-issue) |

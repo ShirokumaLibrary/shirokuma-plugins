@@ -174,19 +174,19 @@ Visual evaluation loop is limited to **3 iterations maximum**. On reaching the l
 
 ### Phase 5: Completion
 
-Design work is complete once approved. If the Issue Status is In Progress, transition to Review:
+Design work is complete once approved. Transition the Issue Status to Review:
 
 ```bash
 shirokuma-docs items transition {number} --to Review
 ```
 
-> **Status transition**: When `prepare-flow` determines a design phase is needed, the Issue stays In Progress. Transitioning to Review on `design-flow` completion signals readiness for implementation. Skip the update if Status is already Review or another state (idempotent).
+> **Status transition**: When `create-item-flow` determines a design phase is needed via design assessment (`review-issue requirements`), the Issue is handed off from Backlog to `design-flow`. Transitioning unconditionally to Review on `design-flow` completion signals design completion. Skip the update if Status is already Review (idempotent).
 
 ## Next Steps
 
 ```
 Design complete. Next steps:
-→ `/implement-flow #{number}` to start implementation
+→ `/prepare-flow #{issue number}` to move to the planning phase (always plan after design)
 → Use `/commit-issue` to commit changes only
 ```
 
@@ -208,7 +208,7 @@ Design skills are discovered dynamically via `shirokuma-docs skills routing desi
 
 ## Notes
 
-- Currently standalone (invoked via `/design-flow` from `prepare-flow` completion report)
+- Invoked via `/design-flow` from `create-item-flow` completion report (recommended chain after design assessment by `review-issue requirements`)
 - Confirm design direction with user before implementation — implementing without alignment risks extensive rework
 - Visual evaluation loop limited to 3 iterations maximum
 - The delegated design skill handles build verification (not needed in this skill)

@@ -67,7 +67,7 @@ graph TD
 | plan-issue | 対応 | — | Skill ツール経由（prepare-flow から） |
 | code-issue | 対応 | — | Skill ツール経由（implement-flow から） |
 | フレームワーク固有スキル | 対応 | 対応 | code-issue / design-flow 経由またはスタンドアロン（動的発見） |
-| design-flow | — | 対応 | 現時点ではスタンドアロン起動（prepare-flow の完了レポートから起動） |
+| design-flow | — | 対応 | create-item-flow の完了レポート（review-issue requirements の設計要否判定後）から起動 |
 | create-item-flow | — | 対応 | 常にスタンドアロン対応 |
 | commit-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |
 | open-pr-issue | 対応 | 対応 | subagent（スタンドアロンも subagent で動作） |

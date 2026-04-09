@@ -23,13 +23,12 @@ Register all chain steps via TaskCreate **before starting work**.
 | 3 | Create the plan | Creating the plan | `plan-issue` (subagent: `plan-worker`) |
 | 4 | Review the plan | Reviewing the plan | `review-issue` (subagent: `review-worker`) |
 | 5 | [Conditional] Fix review issues and re-review | Fixing review issues and re-reviewing | `plan-issue` (subagent: `plan-worker`) + `review-issue` (subagent: `review-worker`) |
-| 5a | [Conditional] Create sub-issues for epic plan | Creating sub-issues | Manager direct: `shirokuma-docs items add issue/parent/update` |
-| 6 | Assess design phase need and update status | Assessing design phase need and updating status | Manager direct: `shirokuma-docs items transition` |
-| 7 | Return plan summary to user | Returning plan summary to user | Manager direct |
+| 4a | [Conditional] Create sub-issues for epic plan | Creating sub-issues | Manager direct: `shirokuma-docs items add issue/parent/update` |
+| 6 | Update status and return plan summary to user | Updating status and returning plan summary to user | Manager direct: `shirokuma-docs items transition` |
 
-Dependencies: step 2 blockedBy 1 (conditional: only when research trigger applies), step 3 blockedBy 1 or 2, step 4 blockedBy 3, step 5 blockedBy 4 (conditional: only on NEEDS_REVISION), step 5a blockedBy 4 or 5 (conditional: only for epic plans), step 6 blockedBy 4 or 5 or 5a, step 7 blockedBy 6.
+Dependencies: step 2 blockedBy 1 (conditional: only when research trigger applies), step 3 blockedBy 1 or 2, step 4 blockedBy 3, step 5 blockedBy 4 (conditional: only on NEEDS_REVISION), step 4a blockedBy 4 or 5 (conditional: only for epic plans), step 6 blockedBy 4 or 5 or 4a.
 
-Update each step to `in_progress` at start and `completed` on finish via TaskUpdate. Step 2 is skipped when no trigger applies. Step 5 is skipped on PASS (may be omitted from the task list).
+Update each step to `in_progress` at start and `completed` on finish via TaskUpdate. Step 2 is skipped when no trigger applies. Task 5 (revision loop) is skipped on PASS (may be omitted from the task list).
 
 ## Workflow
 
@@ -44,10 +43,12 @@ Review title, body, type, priority, size, labels, and comments.
 
 ### Step 1b: Set Status to In Progress + Assign
 
-If the issue status is Backlog or Ready, transition to In Progress to record the planning start. Also auto-assign the user.
+If the issue status is Backlog, transition to In Progress to record the planning start. Also auto-assign the user.
 
 ```bash
 shirokuma-docs items transition {number} --to "In Progress"
+# Assign the user
+shirokuma-docs items update {number} --assign "@me"
 ```
 
 Skip status update if already In Progress or Review. Assignee is idempotent, so always execute.
@@ -138,13 +139,13 @@ The plan-issue skill performs codebase investigation, creates the plan, creates 
 
 #### Post-Completion Handling
 
-If plan-worker completes successfully, proceed to Step 5 (plan review). If an error occurs, stop and report to the user.
+If plan-worker completes successfully, proceed to Step 4 (plan review). If an error occurs, stop and report to the user.
 
 ### Step 3 delegation prompt note
 
 When research was conducted (Step 2a), include the `## Research Findings (Reference)` section in the delegation prompt. When research was skipped, use the standard prompt (`Create a plan for #{number}.`).
 
-### Step 5: Plan Review (Skill Delegation)
+### Step 4: Plan Review (Skill Delegation)
 
 Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `review-issue` plan role via Agent tool (`review-worker`). Since the plan-issue skill creates a plan issue (child issue), the reviewer can identify the child issue with a title starting with "Plan:" from `subIssuesSummary` and fetch its body directly via `items context {plan-issue-number}`.
 
@@ -163,7 +164,7 @@ Before launching the review, verify that `review-issue` is available in the skil
 - [ ] Is the deliverable (definition of done) clearly defined?
 - [ ] Are risks/concerns identified (for complex Issues)?
 
-If all checks pass, proceed to Step 6.
+If all checks pass, proceed to Step 5.
 
 #### Invoke the Reviewer
 
@@ -195,11 +196,11 @@ Determine the result from the `**Review result:**` string in review-worker's out
 | `**Review result:** PASS` | Follow "On PASS" below |
 | `**Review result:** NEEDS_REVISION` | Follow "On Failure" below |
 
-> **Immediate Progression (Required)**: On PASS, **do NOT stop here** — proceed immediately to "On PASS" below → Step 6 → Step 7. Update the TodoList "plan review" task to `completed` before moving on. Ending with text-only output is a chain break error.
+> **Immediate Progression (Required)**: On PASS, **do NOT stop here** — proceed immediately to "On PASS" below → Step 5 → Step 6. Update the TodoList "plan review" task to `completed` before moving on. Ending with text-only output is a chain break error.
 
 #### On PASS
 
-> **Chain Autonomous Progression**: Once you reach this section, execute all actions (post comment → Step 6 → Step 7) **within the same response** without stopping. Do not pause for user input.
+> **Chain Autonomous Progression**: Once you reach this section, execute all actions (post comment → Step 5 → Step 6) **within the same response** without stopping. Do not pause for user input.
 
 1. Post a **plan review response comment** (evidence that the review passed):
 
@@ -215,11 +216,11 @@ If PASS was reached after NEEDS_REVISION cycles, include revision details in the
 shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-review-pass.md
 ```
 
-→ Proceed to Step 5a (if epic plan) or Step 6.
+→ Proceed to Step 4a (if epic plan) or Step 5.
 
-### Step 5a: Auto-create Sub-issues (Epic Plans Only)
+### Step 4a: Auto-create Sub-issues (Epic Plans Only)
 
-After review PASS, execute this step if the plan issue body contains a `### Sub-Issue Structure` section **and** no non-plan child issues exist (count of child issues with titles NOT starting with "Plan:" === 0). Skip and proceed to Step 6 if the condition is not met.
+After review PASS, execute this step if the plan issue body contains a `### Sub-Issue Structure` section **and** no non-plan child issues exist (count of child issues with titles NOT starting with "Plan:" === 0). Skip and proceed to Step 5 if the condition is not met.
 
 The plan issue number is found by scanning `subIssuesSummary` for a child issue with a title starting with "Plan:". Fetch its body via `items context {plan-issue-number}` to check for the `### Sub-Issue Structure` section.
 
@@ -266,60 +267,38 @@ plan-issue → Plan written to body
     → PASS → Response comment
 ```
 
-### Step 6: Design Phase Assessment (Before Status Transition)
-
-Analyze the plan content to determine whether a design phase is needed. The assessment result determines the target status.
-
-| Condition | Decision |
-|-----------|----------|
-| Plan contains UI/frontend design section | Design phase needed |
-| Issue has `area:frontend` label | Design phase needed |
-| Plan contains keywords: `UI design`, `screen design`, `schema design`, `data model design` | Design phase needed |
-| None of the above | No design phase needed |
-
-### Step 6a: Update Status (Based on Assessment)
-
-| Assessment Result | Status Transition | Rationale |
-|-------------------|------------------|-----------|
-| No design phase needed | → Review | Ready for direct implementation |
-| Design phase needed | → In Progress | Guide user to run `design-flow` |
+### Step 5: Update Status (Issue → Review)
 
 ```bash
-# When no design phase needed:
 shirokuma-docs items transition {number} --to Review
-
-# When design phase needed:
-shirokuma-docs items transition {number} --to "In Progress"
 ```
 
-### Step 7: Return to User
+### Step 6: Return to User
 
 Display a plan summary and request approval. The plan is a contract with the user — proceeding without approval risks wasted work on a misaligned approach.
 
-Show a summary matching the plan depth level and design phase assessment. Follow the `completion-report-style` rule for formatting.
+Show a summary matching the plan depth level. Follow the `completion-report-style` rule for formatting.
 
 **Required fields** (all levels):
-- **Status:** current status (Review or In Progress)
+- **Status:** Review
 - **Level:** plan depth (Lightweight / Standard / Detailed / Epic)
 - **Approach:** one-line summary
 
 **Additional fields** (Standard/Detailed/Epic):
 - **Target files** and **Tasks** count (Standard/Detailed)
-- **Design phase** indicator when design is needed
 - **Sub-issues** count and **Integration branch** (Epic)
 - **Plan issue:** Number of the created plan issue (all levels)
-- **Created sub-issues:** List of created sub-issue numbers (Epic, when Step 5a executed)
+- **Created sub-issues:** List of created sub-issue numbers (Epic, when Step 4a executed)
 
 **Next steps guidance** (vary by condition):
 
 | Condition | Next steps |
 |-----------|-----------|
-| Lightweight / Standard without design | `/implement-flow #{number}` |
-| Standard/Detailed with design needed | `/design-flow #{number}` (recommended) or `/implement-flow #{number}` (skip design) |
-| Epic (no non-plan sub-issues yet) | `/implement-flow #{number}` (creates sub-issues, integration branch, proposes order) |
-| Epic (non-plan sub-issues already created) | `/implement-flow #{number}` (creates integration branch, proposes order) |
+| Normal (Lightweight / Standard / Detailed) | `/implement-flow #{plan number}` |
+| Epic (non-plan sub-issues already created) | Guide each sub-issue number with `/implement-flow #{sub-number}` (creates integration branch, proposes order) |
+| Epic (no non-plan sub-issues yet) | Guide each sub-issue number with `/implement-flow #{sub-number}` (creates sub-issues, integration branch, proposes order) |
 
-> **Note on "Designing" status**: The 9-status workflow does not include a separate Designing status. Issues in the design phase remain In Progress. The design phase is tracked by plan content and user flow, not by a dedicated status.
+> **Unified rule**: Always create a plan Issue regardless of plan level, and present `#{plan number}`. The Lightweight-without-plan-issue path is removed. Design guidance (`/design-flow`) is `create-item-flow`'s responsibility and must not appear in `prepare-flow` next steps.
 
 Always ask the user to review the plan and provide feedback if changes are needed.
 
@@ -361,7 +340,7 @@ At the end of the plan completion report, auto-record Evolution signals followin
 | Bash | `shirokuma-docs items context/transition/update/add comment` |
 | Agent (research-worker) | Step 2a: Conduct research (conditional, subagent, context isolation) |
 | Agent (plan-worker) | Step 3: Delegate plan creation (sub-agent, context isolation) |
-| Agent (review-worker) | Step 5: Plan review (subagent, context isolation) |
+| Agent (review-worker) | Step 4: Plan review (subagent, context isolation) |
 | AskUserQuestion | Overwrite confirmation, issue number prompt |
 | TaskCreate, TaskUpdate | Planning orchestration step progress tracking |
 
@@ -371,4 +350,4 @@ At the end of the plan completion report, auto-record Evolution signals followin
 - **Does not implement** — planning only. Implementation is `implement-flow`'s responsibility
 - Plans are persisted as plan issues (child issues) — available across sessions
 - `Review` is the user approval gate — self-approving would bypass the human quality check that catches misaligned assumptions early
-- **Chain autonomous progression**: After the review skill (Step 5) completes, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 6-7 based on the `**Review result:**` string. Check TaskList for remaining pending steps after each skill result
+- **Chain autonomous progression**: After the review skill (Step 4) completes, stopping forces the user to manually prompt continuation. Immediately proceed to Steps 5-6 based on the `**Review result:**` string. Check TaskList for remaining pending steps after each skill result

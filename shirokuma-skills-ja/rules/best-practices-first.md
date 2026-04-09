@@ -42,7 +42,7 @@ graph LR
 | タスクタイプ | 委任先 | メソッド |
 |-------------|--------|----------|
 | コーディング全般 | `code-issue` | Agent (`coding-worker`, via `implement-flow`) |
-| UI デザイン | `design-flow` | Skill（現時点ではスタンドアロン。`prepare-flow` の完了レポートで推奨時に起動） |
+| UI デザイン | `design-flow` | Skill（`create-item-flow` の完了レポートで設計必要と判定時に起動） |
 | リサーチ | `researching-best-practices` | Agent (`research-worker`) |
 | レビュー | `review-issue` | Agent (`review-worker`) |
 | Claude 設定の実装 | `code-issue` → `coding-claude-config` | Skill（code-issue 経由） |

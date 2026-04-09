@@ -96,6 +96,29 @@ Load these files for context:
 - [ ] Requirements include technically infeasible items
 - [ ] Dependencies are unresolved
 
+## Design Assessment
+
+During the requirements review process, assess whether the issue requires a design phase and output `**Design assessment:** NEEDED / NOT_NEEDED` as structured output.
+
+### Assessment Criteria
+
+| Criterion | Assessment |
+|-----------|-----------|
+| Requirements have novelty that existing patterns cannot address | NEEDED |
+| New creation or major changes to UI / screens | NEEDED |
+| Addition or modification of data model / schema | NEEDED |
+| New external API or integration | NEEDED |
+| `area:frontend` / `area:ui` label present | NEEDED |
+| `area:database` label present | NEEDED |
+| Body keywords: `UI`, `screen`, `schema`, `data model` | NEEDED (when used in new creation / modification context) |
+| Refactoring of existing code or minor modifications | NOT_NEEDED |
+| Configuration changes, documentation additions, bug fixes | NOT_NEEDED |
+| None of the above NEEDED criteria apply | NOT_NEEDED |
+
+### Assessment Priority
+
+If any single NEEDED criterion applies, the result is `NEEDED` (OR, not AND). Keyword-based assessment is weaker supplementary to label-based assessment; if a keyword appears in the context of "modifying existing functionality", it does not trigger NEEDED.
+
 ## Report Format
 
 Use template from `templates/report.md`:

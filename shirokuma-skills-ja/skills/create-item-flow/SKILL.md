@@ -1,12 +1,12 @@
 ---
 name: create-item-flow
-description: 会話コンテキストからGitHub Issue/Discussionを自動推定して作成し、次のアクション候補を提示します。トリガー: 「Issue にして」「Issue 作って」「フォローアップ Issue」「仕様作成して」「新規 Issue」。
-allowed-tools: Bash, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate, TaskGet, TaskList
+description: 会話コンテキストからGitHub Issue/Discussionを自動推定して作成し、要件レビューを自動実行して次フローに誘導します。トリガー: 「Issue にして」「Issue 作って」「フォローアップ Issue」「仕様作成して」「新規 Issue」。
+allowed-tools: Bash, Skill, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # アイテム作成
 
-会話コンテキストから Issue メタデータを自動推定し、`managing-github-items` に委任して作成。作成後は次のアクション候補（`/review-issue requirements`、`/implement-flow` 等）を提示する。
+会話コンテキストから Issue メタデータを自動推定し、`managing-github-items` に委任して作成。Issue の場合は作成後に `review-issue requirements` を自動実行し、レビュー結果（`**レビュー結果:**`）と設計要否判定（`**設計要否:**`）に基づき次フロー（`/design-flow`, `/prepare-flow`, `/implement-flow`）に誘導する。Discussion の場合はレビューをスキップして次のアクション候補を提示する。
 
 ## 責務分担
 
@@ -14,6 +14,22 @@ allowed-tools: Bash, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate, TaskG
 |---------|------|
 | `create-item-flow` | ユーザーインターフェース。コンテキスト分析、メタデータ推定、チェーン制御 |
 | `managing-github-items` | 内部エンジン。CLI コマンド実行、フィールド設定、バリデーション |
+
+## タスク登録（必須）
+
+**作業開始前**にチェーン全ステップを TaskCreate で登録する。
+
+| # | content | activeForm | スキル |
+|---|---------|------------|--------|
+| 1 | コンテキストを分析しメタデータを推定する | コンテキストを分析中 | マネージャー直接 |
+| 1b | 類似課題を検索し関連付けを提案する | 類似課題を検索中 | マネージャー直接: `shirokuma-docs items search` |
+| 2 | managing-github-items に委任して作成する | アイテムを作成中 | `managing-github-items` (Skill) |
+| 2b | [Issue のみ] 要件レビューと設計要否判定を実行する | 要件レビュー中 | `review-issue` (Skill, requirements ロール) |
+| 3 | ユーザーに次のアクション候補を返す | 次のアクションを提示中 | マネージャー直接 |
+
+Dependencies: step 1b blockedBy 1, step 2 blockedBy 1b, step 2b blockedBy 2 (条件付き: Issue 作成時のみ), step 3 blockedBy 2 or 2b.
+
+TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に `completed` に更新する。ステップ 2b は Discussion 作成時にスキップ（タスクリストから除外してよい）。
 
 ## ワークフロー
 
@@ -52,30 +68,65 @@ Skill: managing-github-items
 Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area:ラベル}" --priority "{Priority}" --size "{Size}"
 ```
 
+### ステップ 2b: 要件レビューと設計要否判定（review-issue requirements 呼び出し）
+
+**適用範囲**: 作成したアイテムの type が `issue` の場合のみ実行する。`discussion` の場合はスキップし、ステップ 3 で従来通り次のアクション候補を提示する。
+
+Issue 作成直後のコンテキストを活かし、Skill ツールで `review-issue requirements #{issue-number}` を呼び出す。
+
+```
+Skill: review-issue
+Args: requirements #{issue-number}
+```
+
+`review-issue` が Issue コメントに投稿した結果から以下の 2 つの文字列を走査する:
+- `**レビュー結果:**` — PASS または NEEDS_REVISION
+- `**設計要否:**` — NEEDED または NOT_NEEDED
+
+**NEEDS_REVISION の場合（修正ループ）**: 問題点をユーザーに提示し、Issue 本文の修正を依頼する。修正後に再度 `review-issue requirements` を呼び出す（修正ループは最大 2 回。3 回目の NEEDS_REVISION はユーザーに判断を委ねる）。
+
 ### ステップ 3: ユーザーに返す
 
-作成完了後、[reference/chain-rules.md](reference/chain-rules.md) の判定ロジックに基づくデフォルト推奨を表示する:
+**Discussion の場合**: ステップ 2b をスキップしたため、作成完了の旨と次のアクション候補を提示する。
 
-**Size XS/S かつ要件明確な場合（デフォルト推奨: レビュー後に着手する）:**
+```markdown
+Discussion 作成完了: #{number}
+→ 続編の議論や関連 Issue があれば案内
+```
+
+**Issue の場合**: ステップ 2b の `**レビュー結果:**` が PASS の場合、`**設計要否:**` に基づき以下の 3 方向に分岐する。
+
+**設計要否 NEEDED の場合（設計フェーズへ）:**
 
 ```markdown
 アイテム作成完了: #{number}
-→ `/review-issue requirements #{number}` で要件・仕様の品質をレビュー（推奨）
-→ `/implement-flow #{number}` で直接実装を開始
+**レビュー結果:** PASS / **設計要否:** NEEDED
+→ `/design-flow #{課題番号}` で設計を開始（推奨）
 → またはそのまま Backlog に配置
 ```
 
-**Size M 以上または要件に曖昧さがある場合（デフォルト推奨: レビューしてから計画を立てる）:**
+**設計要否 NOT_NEEDED かつ Size M 以上または要件に曖昧さがある場合（計画フェーズへ）:**
 
 ```markdown
 アイテム作成完了: #{number}
-→ `/review-issue requirements #{number}` で要件・仕様の品質をレビュー（推奨）
-→ `/prepare-flow #{number}` で計画から開始
-→ `/implement-flow #{number}` で直接実装を開始
+**レビュー結果:** PASS / **設計要否:** NOT_NEEDED
+→ `/prepare-flow #{課題番号}` で計画を立てる（推奨）
+→ `/implement-flow #{課題番号}` で直接実装
 → またはそのまま Backlog に配置
 ```
 
-レビュー推奨条件の詳細は [reference/chain-rules.md](reference/chain-rules.md) の「レビュー実行条件」セクション参照。
+**設計要否 NOT_NEEDED かつ Size XS/S かつ要件明確の場合（直接実装へ）:**
+
+```markdown
+アイテム作成完了: #{number}
+**レビュー結果:** PASS / **設計要否:** NOT_NEEDED
+→ `/implement-flow #{課題番号}` で直接実装（推奨）
+→ またはそのまま Backlog に配置
+```
+
+設計判定（NEEDED / NOT_NEEDED）を Size 判定より優先する。設計が NEEDED であれば Size にかかわらず `/design-flow` を案内する。
+
+チェーン判定の詳細は [reference/chain-rules.md](reference/chain-rules.md) 参照。
 
 ## スキル内ドキュメント
 
@@ -86,7 +137,7 @@ Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area
 
 ## 次のステップ
 
-chain-rules.md の判定に基づき、Size XS/S かつ要件明確な場合は `/implement-flow` を推奨、Size M 以上または要件曖昧な場合は `/review-issue requirements` でレビュー後に `/prepare-flow` を推奨する。詳細はステップ 3 参照。
+ステップ 2b の `review-issue requirements` 結果に基づき 3 方向に分岐する: 設計 NEEDED → `/design-flow`、設計 NOT_NEEDED + M+ → `/prepare-flow`、設計 NOT_NEEDED + XS/S + 要件明確 → `/implement-flow`。詳細はステップ 3 参照。
 
 ## Evolution シグナル自動記録
 

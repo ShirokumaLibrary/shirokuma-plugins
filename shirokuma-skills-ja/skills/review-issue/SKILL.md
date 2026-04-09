@@ -247,6 +247,7 @@ shirokuma-docs lint docs -p . -f terminal
 3. レビューチェックリスト（`roles/requirements.md`）の各項目を評価
 4. アンチパターンとの照合
 5. 完全性・明確性・実行可能性・整合性を判定
+6. 設計要否判定を実施し `**設計要否:** NEEDED / NOT_NEEDED` をレポートに追記（`roles/requirements.md` の設計要否判定セクション参照）
 
 **plan ロール:**
 
@@ -490,6 +491,13 @@ requirements ロールで起動された場合、要件レビュー結果を Iss
 - **NEEDS_REVISION**: `**レビュー結果:** NEEDS_REVISION` — 必須セクションの欠落、致命的な曖昧さ、実装困難な要件の存在
 
 NEEDS_REVISION 時は、問題点を `[完全性]`、`[明確性]`、`[実行可能性]` に分類して記載する。
+
+レビュー結果が PASS の場合も NEEDS_REVISION の場合も、設計要否判定（`roles/requirements.md` の「設計要否判定」セクション参照）を実施し、必ず以下を追記する:
+
+- **設計要否 NEEDED**: `**設計要否:** NEEDED` — 設計フェーズが必要
+- **設計要否 NOT_NEEDED**: `**設計要否:** NOT_NEEDED` — 設計フェーズ不要
+
+`create-item-flow` が `**設計要否:**` 文字列を走査して次フローを自動分岐するため、この構造化出力は必須。
 
 ### 設計レビューモード（design ロール）
 

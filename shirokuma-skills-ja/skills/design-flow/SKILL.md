@@ -174,19 +174,19 @@ lsof -i :3000 2>/dev/null || echo "dev server not running"
 
 ### Phase 5: 完了
 
-デザイン作業が承認されたら完了。Issue の Status が In Progress の場合、Review に遷移する:
+デザイン作業が承認されたら完了。Issue の Status を Review に遷移する:
 
 ```bash
 shirokuma-docs items transition {number} --to Review
 ```
 
-> **ステータス遷移**: `prepare-flow` がデザインフェーズ必要と判定した場合、Issue は In Progress のまま維持される。`design-flow` の完了時に Review に遷移することで実装準備完了を示す。Status が既に Review または他の状態の場合は更新をスキップ（冪等）。
+> **ステータス遷移**: `create-item-flow` が `review-issue requirements` による設計要否判定で「NEEDED」と判定した場合、Issue は Backlog のまま `design-flow` に引き渡される。`design-flow` の完了時に無条件で Review に遷移することで設計完了を示す。Status が既に Review の場合は更新をスキップ（冪等）。
 
 ## 次のステップ
 
 ```
 デザイン完了。次のステップ:
-→ `/implement-flow #{number}` で実装を開始
+→ `/prepare-flow #{課題番号}` で計画フェーズへ（設計後は必ず計画を立てる）
 → 変更のみコミットする場合は `/commit-issue` を使用
 ```
 
@@ -208,7 +208,7 @@ shirokuma-docs items transition {number} --to Review
 
 ## 注意事項
 
-- 現時点ではスタンドアロン起動（`prepare-flow` の完了レポートから `/design-flow` で起動）
+- `create-item-flow` の完了レポートから `/design-flow` で起動（`review-issue requirements` による設計要否判定後の推奨チェーン）
 - 実装前にデザイン方向性をユーザーに確認する — 合意なく実装すると大幅な手戻りリスクがある
 - 視覚評価ループは最大 3 イテレーション
 - 委任先の設計スキルがビルド検証を実施（このスキルでは不要）

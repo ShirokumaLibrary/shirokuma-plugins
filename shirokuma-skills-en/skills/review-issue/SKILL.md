@@ -247,6 +247,7 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 3. Evaluate each item in review checklist (`roles/requirements.md`)
 4. Check against anti-patterns
 5. Assess completeness, clarity, implementability, and consistency
+6. Perform the design assessment and append `**Design assessment:** NEEDED / NOT_NEEDED` to the report (see the Design Assessment section in `roles/requirements.md`)
 
 **Plan role:**
 
@@ -489,6 +490,13 @@ When invoked with requirements role, post the requirements review result as an I
 - **NEEDS_REVISION**: `**Review result:** NEEDS_REVISION` — Missing required sections, fatal ambiguities, or unimplementable requirements
 
 On NEEDS_REVISION, classify issues into `[Completeness]`, `[Clarity]`, and `[Implementability]`.
+
+Regardless of whether the result is PASS or NEEDS_REVISION, perform the design assessment (see `roles/requirements.md` "Design Assessment" section) and always append:
+
+- **Assessment NEEDED**: `**Design assessment:** NEEDED` — Design phase is required
+- **Assessment NOT_NEEDED**: `**Design assessment:** NOT_NEEDED` — Design phase is not required
+
+This structured output is mandatory because `create-item-flow` scans for the `**Design assessment:**` string to automatically branch to the next flow.
 
 ### Design Review Mode (design role)
 
