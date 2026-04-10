@@ -95,7 +95,7 @@ When `Review result` is `NEEDS_REVISION` (revision loop): Present the issues to 
 
 When `Project Requirement Consistency` is `NEEDS_REVISION`: Present the conflicting ADR numbers and conflict details. Use AskUserQuestion to let the user choose:
 - "Modify the Issue body to make it consistent" → run requirements review again after modification
-- "Review existing ADRs first (using `writing-adr` update flow)" → guide to `/writing-adr` and suspend this step
+- "Review existing ADRs first (using `write-adr` update flow)" → guide to `/write-adr` and suspend this step
 
 ### Step 3: Return to User
 

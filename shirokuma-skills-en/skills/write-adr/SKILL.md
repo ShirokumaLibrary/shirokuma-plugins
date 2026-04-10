@@ -1,5 +1,5 @@
 ---
-name: writing-adr
+name: write-adr
 description: Creates, updates, and supersedes Architecture Decision Records (ADRs) as GitHub Discussions following Michael Nygard's format and MADR best practices. Supports three modes (create / update / supersede). Triggers: "ADR", "architecture decision", "create ADR", "write ADR", "record decision", "update ADR", "mark ADR as Deprecated", "change ADR status", "supersede ADR", "replace with new ADR".
 allowed-tools: Bash, Read, AskUserQuestion
 ---

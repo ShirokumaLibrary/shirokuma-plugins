@@ -95,7 +95,7 @@ Args: requirements #{issue-number}
 
 `プロジェクト要件整合性` が `NEEDS_REVISION` の場合: 矛盾する ADR 番号と矛盾内容を提示する。AskUserQuestion でユーザーに以下のいずれかを選択させる:
 - 「Issue 本文を修正して整合させる」→ 修正後に再度 requirements レビューを実行
-- 「既存 ADR の見直し（`writing-adr` 更新フロー）を先に実施する」→ `/writing-adr` に誘導してステップを中断
+- 「既存 ADR の見直し（`write-adr` 更新フロー）を先に実施する」→ `/write-adr` に誘導してステップを中断
 
 ### ステップ 3: ユーザーに返す
 

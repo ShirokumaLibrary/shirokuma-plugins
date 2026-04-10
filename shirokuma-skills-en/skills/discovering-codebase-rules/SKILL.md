@@ -228,7 +228,7 @@ When ADR lifecycle management patterns are detected, record the following signal
 ```bash
 cat > /tmp/shirokuma-docs/{evolution-number}-adr-signal.md <<'EOF'
 **Type:** ADR lifecycle management pattern
-**Target:** writing-adr skill / review-issue requirements role
+**Target:** write-adr skill / review-issue requirements role
 **Context:** {specific situation of the discovered pattern}
 **Proposal:** {applicability to other codebases or improvement suggestions}
 **Signal type:** {"ADR lifecycle management pattern"|"Naming convention conflict detection pattern"|"Reusable check item pattern"}

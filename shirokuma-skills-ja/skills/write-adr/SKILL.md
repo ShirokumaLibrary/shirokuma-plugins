@@ -1,5 +1,5 @@
 ---
-name: writing-adr
+name: write-adr
 description: Michael Nygard のフォーマットと MADR ベストプラクティスに基づき、GitHub Discussions で ADR（Architecture Decision Record）を作成・更新・置換します。3 モード対応（create / update / supersede）。トリガー: 「ADR」「アーキテクチャ決定」「ADR作成」「決定記録」「意思決定を記録」「ADR を更新して」「ADR を Deprecated にして」「ADR のステータスを変更して」「ADR を Superseded にして」「新しい ADR で置き換えて」。
 allowed-tools: Bash, Read, AskUserQuestion
 ---
