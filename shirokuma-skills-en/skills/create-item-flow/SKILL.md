@@ -79,11 +79,23 @@ Skill: review-issue
 Args: requirements #{issue-number}
 ```
 
-Scan the Issue comment posted by `review-issue` for two strings:
-- `**Review result:**` — PASS or NEEDS_REVISION
-- `**Design assessment:**` — NEEDED or NOT_NEEDED
+`review-issue requirements` may additionally perform a Project Requirement Consistency check (ADR reference) based on Issue keywords and labels. See [../review-issue/roles/requirements.md](../review-issue/roles/requirements.md#project-requirement-consistency) for trigger conditions and output fields.
 
-**On NEEDS_REVISION (revision loop)**: Present the issues to the user and request corrections to the Issue body. Invoke `review-issue requirements` again after corrections (maximum 2 revision loops; on the 3rd NEEDS_REVISION, defer to the user).
+#### Expected Output Fields
+
+Scan the Issue comment posted by `review-issue` for the following strings:
+- `**Review result:**` — PASS or NEEDS_REVISION (always output)
+- `**Design assessment:**` — NEEDED or NOT_NEEDED (always output)
+- `**Project Requirement Consistency:**` — PASS or NEEDS_REVISION (only when ADR check is performed)
+- `**Referenced ADRs:**` — ADR number list (only when ADR check is performed)
+
+#### Handling on Check Failure
+
+When `Review result` is `NEEDS_REVISION` (revision loop): Present the issues to the user and request corrections to the Issue body. Invoke `review-issue requirements` again after corrections (maximum 2 revision loops; on the 3rd NEEDS_REVISION, defer to the user).
+
+When `Project Requirement Consistency` is `NEEDS_REVISION`: Present the conflicting ADR numbers and conflict details. Use AskUserQuestion to let the user choose:
+- "Modify the Issue body to make it consistent" → run requirements review again after modification
+- "Review existing ADRs first (using `writing-adr` update flow)" → guide to `/writing-adr` and suspend this step
 
 ### Step 3: Return to User
 

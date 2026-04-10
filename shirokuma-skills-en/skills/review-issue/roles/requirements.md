@@ -74,6 +74,29 @@ Load these files for context:
 - [ ] Not overly dependent on external context (other issues, PRs, conversations, etc.)
 - [ ] Priority and urgency are appropriately set
 
+### Project Requirement Consistency
+
+ADR reference trigger conditions (perform when any of the following apply):
+- Issue title or body contains keywords such as "ADR", "architecture", "design decision", "technology selection"
+- Labels include structural area labels such as `area:plugin`, `area:workflow`, `area:cli`, and the body co-contains the above keywords
+
+For the ADR filtering logic, see [docs/adr-filter-logic.md](../docs/adr-filter-logic.md).
+
+Check items:
+
+1. - [ ] Does a related ADR in Accepted status exist, and does it not conflict with the direction of this Issue? (check via `items adr list` + top 5 details)
+2. - [ ] Does this comply with past naming convention/constraint Issues? (search with keywords like "naming convention", "convention", "naming" including Closed issues via `items search`)
+3. - [ ] Does the technology selection or architecture approach proposed in this Issue avoid re-adopting options that existing ADRs have marked as Deprecated/Superseded?
+4. - [ ] Does the scope and responsibility boundary align with boundaries explicitly stated in existing ADRs (e.g., ADR for CLI ↔ skill responsibility separation)?
+5. - [ ] Does the proposed change not conflict with other in-progress Issues (In Progress / Review status)? (check via `items list --status "In Progress"`)
+6. - [ ] Does the report explicitly state the basis for the "no conflict" determination in the ADR consistency check (referenced ADR numbers)?
+7. - [ ] For new skill/rule additions, are there no trigger keyword overlaps with existing skills? (see `skill-authoring.md`)
+8. - [ ] If this Issue is an epic, are there no inconsistencies between sub-Issues (conflicting deliverables, competing scopes)?
+
+**Structured output (only when consistency check is performed):**
+- `**Project Requirement Consistency:**` PASS / NEEDS_REVISION
+- `**Referenced ADRs:**` ADR-{NNN}, ADR-{NNN}, ... (list of referenced ADR numbers)
+
 ## Anti-patterns to Detect
 
 ### Missing Purpose
@@ -135,3 +158,6 @@ Use template from `templates/report.md`:
 - "要件レビュー"
 - "requirements check"
 - "要件確認"
+- "requirement consistency"
+- "ADR check"
+- "verify past decisions"

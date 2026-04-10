@@ -498,6 +498,8 @@ Regardless of whether the result is PASS or NEEDS_REVISION, perform the design a
 
 This structured output is mandatory because `create-item-flow` scans for the `**Design assessment:**` string to automatically branch to the next flow.
 
+The trigger conditions, check items, and structured output fields (`**Project Requirement Consistency:**` / `**Referenced ADRs:**`) for the Project Requirement Consistency check are authoritatively defined in [`roles/requirements.md` "Project Requirement Consistency"](roles/requirements.md#project-requirement-consistency). `create-item-flow` Step 2b scans these fields to branch downstream processing.
+
 ### Design Review Mode (design role)
 
 When invoked with design role, post the design review result as an Issue comment and include the following verdict.

@@ -79,11 +79,23 @@ Skill: review-issue
 Args: requirements #{issue-number}
 ```
 
-`review-issue` が Issue コメントに投稿した結果から以下の 2 つの文字列を走査する:
-- `**レビュー結果:**` — PASS または NEEDS_REVISION
-- `**設計要否:**` — NEEDED または NOT_NEEDED
+`review-issue requirements` は Issue のキーワード・ラベルに応じてプロジェクト要件整合性チェック（ADR 参照）を追加実行する場合がある。トリガー条件と出力フィールドは [../review-issue/roles/requirements.md](../review-issue/roles/requirements.md#プロジェクト要件整合性) を参照。
 
-**NEEDS_REVISION の場合（修正ループ）**: 問題点をユーザーに提示し、Issue 本文の修正を依頼する。修正後に再度 `review-issue requirements` を呼び出す（修正ループは最大 2 回。3 回目の NEEDS_REVISION はユーザーに判断を委ねる）。
+#### 期待出力フィールド
+
+`review-issue` が Issue コメントに投稿した結果から以下の文字列を走査する:
+- `**レビュー結果:**` — PASS または NEEDS_REVISION（常に出力）
+- `**設計要否:**` — NEEDED または NOT_NEEDED（常に出力）
+- `**プロジェクト要件整合性:**` — PASS または NEEDS_REVISION（ADR チェック実施時のみ）
+- `**参照 ADR:**` — ADR 番号リスト（ADR チェック実施時のみ）
+
+#### チェック失敗時のハンドリング
+
+`レビュー結果` が `NEEDS_REVISION` の場合（修正ループ）: 問題点をユーザーに提示し、Issue 本文の修正を依頼する。修正後に再度 `review-issue requirements` を呼び出す（修正ループは最大 2 回。3 回目の NEEDS_REVISION はユーザーに判断を委ねる）。
+
+`プロジェクト要件整合性` が `NEEDS_REVISION` の場合: 矛盾する ADR 番号と矛盾内容を提示する。AskUserQuestion でユーザーに以下のいずれかを選択させる:
+- 「Issue 本文を修正して整合させる」→ 修正後に再度 requirements レビューを実行
+- 「既存 ADR の見直し（`writing-adr` 更新フロー）を先に実施する」→ `/writing-adr` に誘導してステップを中断
 
 ### ステップ 3: ユーザーに返す
 

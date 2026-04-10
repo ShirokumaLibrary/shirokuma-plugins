@@ -170,6 +170,72 @@ When a pattern is recorded as Knowledge (confirmed), propose a Rule for AI consu
 
 Check `shirokuma-docs/src/lint/rules/` for current implementations.
 
+## ADR Lifecycle Management Pattern Detection
+
+### Patterns to Detect
+
+When analyzing codebases or GitHub Discussions, detect the following as ADR lifecycle management patterns:
+
+| Pattern Type | Detection Method | Evolution Signal Type |
+|-------------|-----------------|----------------------|
+| Consistent management of ADR status transitions (Proposed/Accepted/Deprecated/Superseded) | Analyze status description patterns in Discussion titles and bodies | "ADR lifecycle management pattern" |
+| Conflicts between naming convention Issues/ADRs and new Issues/code | Detect naming convention violations via `items search` + code analysis | "Naming convention conflict detection pattern" |
+| `review-issue requirements` check items that are reusable in other codebases | Evaluate generalizability of consistency check patterns | "Reusable check item pattern" |
+
+### Detection Logic
+
+#### ADR Status Management Pattern
+
+```bash
+# Check status distribution in ADR list
+shirokuma-docs items adr list
+
+# Check consistency of status descriptions
+shirokuma-docs items discussions search "Status: Accepted"
+shirokuma-docs items discussions search "Status: Deprecated"
+shirokuma-docs items discussions search "Status: Superseded"
+```
+
+**Pattern confirmation (2+ observations):**
+- `**Status:** Accepted/Deprecated/Superseded` descriptions exist in multiple ADR Discussions → Knowledge
+- Change history section consistently exists at the end of ADR bodies → Knowledge
+
+#### Naming Convention Issue Conflict Detection
+
+```bash
+# Search for naming convention/rule Issues/ADRs
+shirokuma-docs items search "naming convention rule" --limit 10
+shirokuma-docs items discussions search "naming convention"
+```
+
+**Conflict detection judgment:**
+- A naming convention defined in a Closed Issue or Accepted ADR exists
+- AND current implementation code or new Issues do not comply with the naming convention
+
+#### Re-adoption Check Pattern
+
+```bash
+# Check for overlap between Deprecated/Superseded ADRs and new proposals
+shirokuma-docs items discussions search "Deprecated Superseded"
+```
+
+**Detection condition:** Detect patterns where technology selections or architecture approaches rejected in Deprecated/Superseded ADRs are being re-proposed in new Issues or current code.
+
+### Recording Evolution Signals
+
+When ADR lifecycle management patterns are detected, record the following signals in the Evolution Issue:
+
+```bash
+cat > /tmp/shirokuma-docs/{evolution-number}-adr-signal.md <<'EOF'
+**Type:** ADR lifecycle management pattern
+**Target:** writing-adr skill / review-issue requirements role
+**Context:** {specific situation of the discovered pattern}
+**Proposal:** {applicability to other codebases or improvement suggestions}
+**Signal type:** {"ADR lifecycle management pattern"|"Naming convention conflict detection pattern"|"Reusable check item pattern"}
+EOF
+shirokuma-docs items add comment {evolution-number} --file /tmp/shirokuma-docs/{evolution-number}-adr-signal.md
+```
+
 ## Existing Rule Deficiency Detection
 
 When discovering patterns reveals deficiencies in existing rules (coverage gaps, ambiguous descriptions, divergence from practice), record them as comments in an Evolution Issue.

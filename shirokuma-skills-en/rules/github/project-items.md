@@ -137,7 +137,7 @@ AI MUST update issue status at these points:
 | Cancelled | → Cancelled | `items cancel` | `items cancel {n}` |
 | Plan approved | → Done (plan issue) | `implement-flow` | `items transition {plan-n} --to Done` (for epics: only after all work sub-issues are Done) |
 
-> **GitHub Projects built-in automation**: When the `Pull request linked to issue` workflow is enabled, linking a PR to an Issue automatically adds both to the Project. Date fields (Start At / Review At / End At) on the PR are set automatically by `items integrity`. See the "GitHub Projects Workflow Configuration" section in `github-commands.md` for setup instructions.
+> **GitHub Projects built-in automation**: When the `Pull request linked to issue` workflow is enabled, linking a PR to an Issue automatically adds both to the Project. Date fields (Start at / Review at / End at) on the PR are set automatically by `items integrity`. See the "GitHub Projects Workflow Configuration" section in `github-commands.md` for setup instructions.
 
 ### In Progress Usage (Planning and Implementation)
 
