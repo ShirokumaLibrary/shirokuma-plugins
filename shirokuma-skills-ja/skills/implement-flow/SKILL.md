@@ -300,83 +300,7 @@ Agent(
 
 > **重要 — Skill ツール / Agent ツール復帰後のチェーン継続**: Skill ツール（`finalize-changes` 等）またはサブエージェント（`pr-worker`, `commit-worker` 等）が完了した時点で、**TaskList の残り `pending` ステップを確認する**。pending ステップが残っている場合（コミット、PR 作成、作業サマリー、ステータス更新）、**同じレスポンス内で即座に次の pending ステップを実行すること**。停止・サマリー表示・ユーザーへの確認は禁止。Skill ツール / Agent ツールの復帰はチェーンの中間地点であり、完了シグナルではない。特に PR → `finalize-changes` の遷移で断絶しやすいため注意。
 
-#### 作業サマリー（Issue コメント）
-
-PR 作成後、技術的な作業サマリーを Issue コメントとして投稿する。これは将来の会話で Issue のコンテキストとして参照されるプライマリ記録。
-
-作業サマリーは**技術的な作業詳細**に焦点を当てる — 変更内容、変更ファイル、技術的判断。
-
-```bash
-shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md
-```
-
-`/tmp/shirokuma-docs/{number}-work-summary.md` の内容:
-
-```markdown
-## 作業サマリー
-
-### 変更内容
-{実装または修正した内容 — 技術的な詳細}
-
-### 変更ファイル
-- `path/file.ts` - {変更内容}
-
-### プルリクエスト
-PR #{pr-number}
-
-### 技術的判断
-- {判断と根拠}
-```
-
-Issue 番号が関連付けられていない作業の場合、このステップをスキップ。
-
-**スタンドアロン完了**: `implement-flow` がチェーンを完了した場合（スタンドアロンでもセッション内でも）、作業サマリーは自動投稿される。
-
-#### Status 更新（チェーン末尾）
-
-**注意**: PR 作成時点では Status を Review に変更しない。`finalize-changes` の後処理ステップが完了した後、Work Summary 投稿後に更新する。
-
-Issue 番号ありの場合に Status を Review に更新:
-
-```bash
-shirokuma-docs items transition {number} --to Review
-```
-
-**Status フォールバック検証**: チェーン完了後、`items context {number}` の JSON 出力で status を確認。status が In Progress のまま → `items transition {number} --to Review` で再更新（冪等: 既に Review なら再更新は無害）。
-
-#### 計画 Issue の Done 更新（チェーン末尾）
-
-Status 更新後、計画 Issue が存在する場合は Done に更新する。
-
-**トップレベル Issue のケース**（親 Issue がない場合）:
-`items context {number}` の JSON 出力の `children` フィールドからタイトルが「計画:」または「Plan:」で始まる子 Issue を計画 Issue として特定する。
-
-**サブ Issue のケース**（親 Issue がある場合）:
-チェーン末尾時点で `shirokuma-docs items context {parent-number}` を再実行し、最新の `children` 情報を取得する。タイトルが「計画:」または「Plan:」で始まる兄弟 Issue を計画 Issue として特定する。
-
-**エピックのケース**（親 Issue に複数の実作業サブ Issue がある場合）:
-上記と同様にチェーン末尾時点で親 Issue を再取得し、最新の `children` を使用する。全実作業サブ Issue（計画 Issue 以外）のステータスが全て Done または Cancelled の場合のみ、計画 Issue を Done に更新する。1 つでも Done / Cancelled 以外のサブ Issue が残っている場合はスキップ。
-
-**計画 Issue の更新手順**:
-
-```bash
-# 計画 Issue を Done に遷移（バリデーション付き）
-shirokuma-docs items transition {plan-number} --to Done
-```
-
-- **pull スキップ条件**: トップレベル Issue のケースではステップ 1 で計画 Issue を既に取得済み — 手順 2（frontmatter 編集）と手順 3（push）に直接進む。サブ Issue / エピックのケースでは計画 Issue を事前取得していないため pull が必要。
-- **計画 Issue が見つからない場合**: サイレントスキップ（警告なし）。XS/S の直接実装パス等で計画 Issue がない場合を想定
-- **冪等性**: 既に Done なら再更新は無害
-
-#### 次のステップ提案（チェーン末尾）
-
-Status 更新後、ユーザーに次のアクション候補を提示する。`open-pr-issue` の出力から PR 番号を取得して具体的に案内する。PR 番号が取得できない場合（PR 未作成等）は `/review-flow` の行を省略する。
-
-```
-## 次のステップ
-
-- `/review-flow #{pr-number}` — PR のセルフレビューを実行
-```
+チェーン末尾のステップ（作業サマリー投稿・Status 更新・計画 Issue の Done 更新・次のステップ提案）の詳細は [reference/chain-end-steps.md](reference/chain-end-steps.md) を参照。
 
 ### ステップ 6: Evolution シグナル自動記録
 
@@ -469,39 +393,15 @@ claude -p "/implement-flow --headless #42"
 | Issue が Done | 警告、再オープン確認 |
 | 既に In Progress | ステータス変更なしで続行 |
 | 誤ったブランチ | AskUserQuestion: 切り替え or 続行 |
-| チェーン失敗 | 完了/残りステップ報告、制御を返す。下記「チェーン復旧手順」参照 |
-| Issue が revert された（PR revert 後） | revert PR をマージ後、元 Issue を Backlog に戻し新ブランチで再実装。下記「PR revert 後のリカバリー」参照 |
+| チェーン失敗 | 完了/残りステップ報告、制御を返す。[reference/chain-recovery.md](reference/chain-recovery.md) 参照 |
+| Issue が revert された（PR revert 後） | revert PR をマージ後、元 Issue を Backlog に戻し新ブランチで再実装。[reference/chain-recovery.md](reference/chain-recovery.md) 参照 |
 | サブ Issue で integration ブランチ未検出 | `develop` をベースにし警告表示 |
 | エピック Issue を直接指定 | 計画 Issue 以外の子 Issue の有無に基づき下記「エピック Issue エントリーポイント」参照 |
 | `--headless` + 前提条件未達 | エラーメッセージを表示して停止 |
 | `--headless` + 誤ブランチ（W4） | 警告を表示して停止（自動切り替えしない） |
 | `--headless` + worker の UCP（W5） | スキップして Issue コメントに記録 |
 
-### PR revert 後のリカバリー
-
-PR がマージ済み（Issue が Done）の状態で revert が必要な場合:
-
-1. revert PR を作成してマージする（GitHub UI または `git revert`）
-2. 元 Issue のステータスを `Backlog`（再実装予定）または `Cancelled`（見送り）に手動更新
-3. 再実装する場合は新しい会話で `/implement-flow #{number}` を実行（新しいブランチが作成される）
-
-> revert は手動操作。`implement-flow` のチェーンには含まれない。
-
-### チェーン復旧手順
-
-`implement-flow` のチェーンが途中で停止した場合（ネットワークエラー、セッション切断等）、新しい会話で同じ `/implement-flow #{number}` を再実行する。以下の冪等性保証により安全に再開できる:
-
-| 状態 | 動作 |
-|------|------|
-| ブランチが既に存在する | `git checkout {branch}` で既存ブランチに切り替え（再作成しない） |
-| ステータスが既に In Progress | ステータス変更をスキップ |
-| コミット済み・プッシュ済み | `commit-worker` が差分なしを検出しスキップ |
-| PR が既に存在する | `pr-worker` が既存 PR を検出しスキップ |
-| `/simplify` 済み | 再実行しても無害（冪等） |
-| セキュリティレビュー済み | 再実行しても無害（冪等） |
-| 作業サマリー投稿済み | 重複コメントが投稿される（手動削除で対応） |
-
-> 作業サマリーのみ冪等性が保証されない。重複した場合は手動で削除する。
+PR revert 後のリカバリーおよびチェーン復旧手順の詳細は [reference/chain-recovery.md](reference/chain-recovery.md) を参照。
 
 ## エピック Issue エントリーポイント
 

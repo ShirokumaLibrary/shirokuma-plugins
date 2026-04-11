@@ -82,3 +82,29 @@ Example: If "commit" is pending and "implement" is completed
 - If recovery fails repeatedly, stop and report to user with current state
 - For `/simplify` failures, re-invoke via Skill tool (not Agent)
 - For `reviewing-security` failures, re-invoke via Skill tool (not Agent)
+
+## Recovery after PR Revert
+
+When a revert is required after a PR has been merged (issue is Done):
+
+1. Create and merge a revert PR (via GitHub UI or `git revert`)
+2. Manually update the original issue status to `Backlog` (re-implement) or `Cancelled` (cancelled)
+3. If re-implementing, run `/implement-flow #{number}` in a new conversation (a new branch will be created)
+
+> Revert is a manual operation and is not part of the `implement-flow` chain.
+
+## Idempotency Guarantees
+
+If the `implement-flow` chain stops mid-way (network error, session disconnect, etc.), run the same `/implement-flow #{number}` again in a new conversation. The following idempotency guarantees allow safe resumption (supplement to "General Recovery Flow" above):
+
+| State | Behavior |
+|-------|----------|
+| Branch already exists | Switch to existing branch via `git checkout {branch}` (no re-creation) |
+| Status already In Progress | Skip status change |
+| Already committed and pushed | `commit-worker` detects no diff and skips |
+| PR already exists | `pr-worker` detects existing PR and skips |
+| `/simplify` already done | Safe to re-run (idempotent) |
+| Security review already done | Safe to re-run (idempotent) |
+| Work summary already posted | Duplicate comment is posted (manually delete) |
+
+> Only the work summary lacks idempotency. If duplicated, delete the extra manually.

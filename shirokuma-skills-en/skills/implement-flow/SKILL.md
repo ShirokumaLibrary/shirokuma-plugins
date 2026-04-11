@@ -300,81 +300,7 @@ Agent(
 
 > **CRITICAL — Chain continuation after Skill tool / Agent tool returns**: When a Skill tool (`finalize-changes`, etc.) or sub-agent (`pr-worker`, `commit-worker`, etc.) completes, **check TaskList for remaining `pending` steps**. If pending steps remain (commit, PR creation, work summary, status update), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. A Skill tool or Agent tool returning is a chain mid-point, not a completion signal. The PR → `finalize-changes` transition is particularly prone to chain breaks — pay extra attention.
 
-#### Work Summary (Issue Comment)
-
-After PR creation, post a technical work summary to the Issue as a comment. This is the primary context record referenced in future conversations for Issue context.
-
-The work summary focuses on **technical work details** — what was changed, which files were modified, and technical decisions made.
-
-```bash
-shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md
-```
-
-Where `/tmp/shirokuma-docs/{number}-work-summary.md` contains:
-
-```markdown
-## Work Summary
-
-### Changes
-{What was implemented or fixed — technical details}
-
-### Modified Files
-- `path/file.ts` - {Change description}
-
-### Pull Request
-PR #{pr-number}
-
-### Technical Decisions
-- {Decision and rationale}
-```
-
-Skip this step if no issue number is associated with the work.
-
-**Standalone completion**: When `implement-flow` completes its chain (standalone or within a session), the Work Summary is automatically posted.
-
-#### Status Update (End of Chain)
-
-**IMPORTANT**: Do NOT update Status to Review at PR creation time. The `finalize-changes` post-processing step must complete first. Update Status only after work summary is posted.
-
-Update Status to Review for issues with a number:
-
-```bash
-shirokuma-docs items transition {number} --to Review
-```
-
-**Status fallback verification**: After chain completion, if the transition was skipped or failed, run `shirokuma-docs items transition {number} --to Review` again (idempotent: re-updating to Review when already Review is harmless).
-
-#### Plan Issue Done Update (End of Chain)
-
-After the Status update, update the plan issue to Done if one exists.
-
-**Top-level issue case** (no parent issue):
-Identify the plan issue from the `subIssuesSummary` of the issue fetched in Step 1 — look for a child issue whose title starts with "Plan:" or "計画:".
-
-**Sub-issue case** (has a parent issue):
-Re-run `shirokuma-docs items context {parent-number}` at the end of the chain to get the latest `subIssuesSummary` (other sub-issue statuses may have changed during chain execution). Look for a sibling issue whose title starts with "Plan:" or "計画:".
-
-**Epic case** (parent issue has multiple work sub-issues):
-Similarly, re-fetch the parent issue at the end of the chain to use the latest `subIssuesSummary`. Only update the plan issue to Done if all work sub-issues (excluding the plan issue itself) have a status of Done or Cancelled. If any work sub-issue remains in another status, skip the update.
-
-**Plan issue update procedure**:
-
-```bash
-shirokuma-docs items transition {plan-number} --to Done
-```
-
-- **Plan issue not found**: Silent skip (no warning). Covers cases like XS/S direct implementation path where no plan issue exists.
-- **Idempotent**: Re-updating to Done when already Done is harmless.
-
-#### Next Steps Suggestion (End of Chain)
-
-After Status update, present next action candidates to the user. Extract the PR number from `open-pr-issue`'s output to provide specific guidance. If the PR number is unavailable (e.g., PR not created), omit the `/review-flow` line.
-
-```
-## Next Steps
-
-- `/review-flow #{pr-number}` — Run self-review on the PR
-```
+See [reference/chain-end-steps.md](reference/chain-end-steps.md) for details on chain end steps (work summary, status update, plan issue done update, next steps suggestion).
 
 ### Step 6: Evolution Signal Auto-Recording
 
@@ -467,39 +393,15 @@ claude -p "/implement-flow --headless #42"
 | Issue Done | Warn, confirm reopen |
 | Already In Progress | Continue without status change |
 | Wrong branch | AskUserQuestion: switch or continue |
-| Chain failure | Report completed/remaining steps, return control. See "Chain Recovery Procedure" below |
-| Issue was reverted (after PR revert) | After merging revert PR, move original issue back to Backlog and re-implement on a new branch. See "Recovery after PR Revert" below |
+| Chain failure | Report completed/remaining steps, return control. See [reference/chain-recovery.md](reference/chain-recovery.md) |
+| Issue was reverted (after PR revert) | After merging revert PR, move original issue back to Backlog and re-implement on a new branch. See [reference/chain-recovery.md](reference/chain-recovery.md) |
 | Sub-issue with no integration branch | Use `develop` as base, warn user |
 | Epic issue selected directly | Check for non-plan child issues; see "Epic Issue Entry Point" below |
 | `--headless` + precondition not met | Display error message and stop |
 | `--headless` + wrong branch (W4) | Warn and stop (no auto-switch) |
 | `--headless` + worker UCP (W5) | Skip and record in Issue comment |
 
-### Recovery after PR Revert
-
-When a revert is required after a PR has been merged (issue is Done):
-
-1. Create and merge a revert PR (via GitHub UI or `git revert`)
-2. Manually update the original issue status to `Backlog` (re-implement) or `Cancelled` (cancelled)
-3. If re-implementing, run `/implement-flow #{number}` in a new conversation (a new branch will be created)
-
-> Revert is a manual operation and is not part of the `implement-flow` chain.
-
-### Chain Recovery Procedure
-
-If the `implement-flow` chain stops mid-way (network error, session disconnect, etc.), run the same `/implement-flow #{number}` again in a new conversation. The following idempotency guarantees allow safe resumption:
-
-| State | Behavior |
-|-------|----------|
-| Branch already exists | Switch to existing branch via `git checkout {branch}` (no re-creation) |
-| Status already In Progress | Skip status change |
-| Already committed and pushed | `commit-worker` detects no diff and skips |
-| PR already exists | `pr-worker` detects existing PR and skips |
-| `/simplify` already done | Safe to re-run (idempotent) |
-| Security review already done | Safe to re-run (idempotent) |
-| Work summary already posted | Duplicate comment is posted (manually delete) |
-
-> Only the work summary lacks idempotency. If duplicated, delete the extra manually.
+See [reference/chain-recovery.md](reference/chain-recovery.md) for details on recovery after PR revert and chain recovery procedure.
 
 ## Epic Issue Entry Point
 
