@@ -256,6 +256,9 @@ See `epic-workflow` reference for the full epic workflow.
 
 ```markdown
 ## Item Created
+
+{Summarize the purpose of the Issue in one sentence. Example: "Created an issue to allow CLI users to output the dependency graph in SVG format."}
+
 **Issue:** #123 | **Label:** area:cli | **Priority:** Medium | **Status:** Backlog
 
 Review the issue body content on GitHub. If the title, body, or fields need changes, provide instructions.

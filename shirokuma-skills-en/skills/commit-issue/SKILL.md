@@ -79,6 +79,17 @@ shirokuma-docs git commit-push -m "{type}: {description}" --issue {N}
 When the issue number is known, post the commit result as an Issue comment:
 
 ```bash
+# Write to file first, then post with items add comment
+cat > /tmp/shirokuma-docs/{issue-number}-commit-complete.md <<'EOF'
+## Commit Complete
+
+{Describe what was changed in 1–2 prose sentences. State what was changed and the scope of the change, conclusion-first.}
+
+**Branch:** {branch-name}
+**Commit:** {hash} {message}
+**Files:** {count} files changed
+**Pushed:** {yes/no}
+EOF
 shirokuma-docs items add comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-commit-complete.md
 ```
 

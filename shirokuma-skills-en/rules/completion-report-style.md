@@ -20,6 +20,23 @@ Use `## {Action Noun} Complete` as the standard heading.
 
 Append `: #{number} {title}` when contextual identification is useful.
 
+## Summary Paragraph (Recommended)
+
+Before the KV pairs, add a **1–2 sentence summary paragraph stating what was done**.
+
+```
+## Commit Complete
+
+Updated 2 rules (`github-writing-style` and `completion-report-style`) and 5 skill writing templates.
+
+**Branch:** feat/2090-writing-style
+**Commit:** abc1234 refactor: update writing rules
+**Files:** 7 files changed
+**Pushed:** yes
+```
+
+A summary paragraph conveys the **intent and scope** of the change, providing more context than KV pairs alone. It may be omitted when the intent is self-evident from the KV pairs alone (e.g., a single minor file change).
+
 ## Key-Value Display
 
 Use `**{Label}:** {value}` format.
@@ -73,12 +90,13 @@ Arrange completion report information in this priority order:
 
 ```
 Level 1: Heading (outcome + context ID)        -- 1 second scan
-Level 2: KV pairs (critical facts)             -- 5 second scan
-Level 3: Table or list (details)               -- 15 second scan
-Level 4: Prose explanation (rationale)          -- 30+ second read
+Level 2: Summary paragraph (intent + scope)    -- 3 second scan
+Level 3: KV pairs (critical facts)             -- 5 second scan
+Level 4: Table or list (details)               -- 15 second scan
+Level 5: Prose explanation (rationale)          -- 30+ second read
 ```
 
-**1-second test**: The first 3 lines must convey the outcome and where to find the artifact.
+**1-second test**: The heading + the first sentence of the summary paragraph must convey the outcome and where to find the artifact.
 
 ## Field Classification
 

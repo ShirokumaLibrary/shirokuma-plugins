@@ -104,8 +104,9 @@ Write the PR body to a file, then create the PR. When changes meet the Mermaid c
 ```markdown
 <!-- /tmp/shirokuma-docs/{number}-pr.md -->
 ## Summary
-- {bullet point 1}
-- {bullet point 2}
+{Describe what this PR achieves in 1–2 prose sentences. State the intent and scope of the change, conclusion-first.}
+
+- {Bullet points supplementing individual changes}
 
 ## Related Issues
 Closes #{issue-number}

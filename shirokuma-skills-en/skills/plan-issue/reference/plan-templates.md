@@ -38,6 +38,7 @@ labels: ["area:plan"]
 
 ### Approach
 {1-2 line description of the approach}
+{Include design decisions if applicable (e.g., what to include and what to exclude).}
 
 ## Parent Issue
 
@@ -58,7 +59,7 @@ labels: ["area:plan"]
 ## Plan
 
 ### Approach
-{Selected approach and rationale}
+{State the selected approach in 1–2 prose sentences, leading with the conclusion. Explain why this approach was chosen.}
 
 ### Target Files
 - `path/to/file.ts` - {Summary of changes}
@@ -86,7 +87,10 @@ labels: ["area:plan"]
 ## Plan
 
 ### Approach
-{Multi-option comparison and selection rationale}
+{Compare multiple options and state the selection rationale in 1–2 prose sentences, leading with the conclusion. Optionally supplement with a comparison table or additional details.}
+
+### Design Decisions
+{Describe key decisions — what to include and what to exclude — in prose or contrast format.}
 
 ### Target Files
 - `path/to/file.ts` - {Summary of changes}

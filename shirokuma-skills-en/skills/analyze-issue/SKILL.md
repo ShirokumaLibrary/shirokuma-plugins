@@ -99,7 +99,7 @@ Read required knowledge files based on role:
 
 Use `templates/report.md` format:
 
-1. Summary
+1. Summary (**lead with a 1–2 sentence prose overview** — state key findings and overall assessment conclusion-first)
 2. **Issue Summary** (breakdown table of detected issues by severity)
 3. Critical Issues
 4. Improvements

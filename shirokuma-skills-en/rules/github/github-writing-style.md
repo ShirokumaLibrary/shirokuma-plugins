@@ -8,7 +8,7 @@ priority: required
 
 Writing style for GitHub content (Issues, PRs, Discussions body and comments).
 
-## Bullets vs Prose
+## Prose vs Bullets
 
 | Condition | Format |
 |-----------|--------|
@@ -16,6 +16,37 @@ Writing style for GitHub content (Issues, PRs, Discussions body and comments).
 | Ordered steps | Numbered list |
 | Cause-effect / logical argument | Prose |
 | Single description | Prose |
+| Big-picture overview / context | Prose (summary paragraph) |
+
+## Prose Summary
+
+Before lists or tables, write a **1–2 sentence summary paragraph that states the conclusion first** — what changed, what was found, or what is proposed.
+
+```
+# Good (summary + details)
+State what changed or what the key finding is in 1–2 sentences, then follow with bullet points or tables for details.
+```
+
+```
+# Bad (no summary)
+Jumping straight into bullet points with no context on overall intent or scope.
+```
+
+**When a summary paragraph is most valuable:**
+- Issue or PR body opening
+- Review comments that address multiple items at once
+- Describing design changes or breaking changes
+
+## Clarification Through Contrast
+
+"Before / After" or "Current / Improved" contrast structures communicate the intent of a change concisely.
+
+```markdown
+**Before**: Lists start without a lead-in sentence, leaving context unclear.
+**After**: A lead-in sentence is added to state the purpose of the list.
+```
+
+Use a table when showing multiple contrasts.
 
 ## Formatting Rules
 
@@ -23,15 +54,17 @@ Writing style for GitHub content (Issues, PRs, Discussions body and comments).
 - **Nesting limit**: Maximum 2 levels (3+ levels: split or convert to table)
 - **List length**: 2-7 items per list (8+ items: consider grouping)
 - **Lead-in sentence**: Add one sentence of context before a list
+- **Conclusion first**: Summary paragraph leads with "what changes and how"
 
 ## Anti-Patterns
 
 | Pattern | Problem | Fix |
 |---------|---------|-----|
-| Wall of Bullets | Everything bulleted, key points buried | Mix prose and bullets appropriately |
+| Wall of Bullets | Everything bulleted, key points buried | Convert to prose summary + bullets |
 | Broken parallelism | Items use different grammatical structures | Rewrite with consistent structure |
 | List without lead-in | Missing context, meaning unclear | Add one introductory sentence |
 | Single-item list | Bullet adds no value | Convert to prose |
+| List with no summary | Intent and scope of change unclear | Add a 1–2 sentence summary at the top |
 
 ## Mermaid Diagrams
 
