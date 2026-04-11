@@ -21,8 +21,8 @@ Issue の計画フェーズを統括する: Issue の取得、ステータス遷
 | 1 | Issue を取得しステータスを更新する | Issue を取得しステータスを更新中 | マネージャー直接: `shirokuma-docs items context / transition` |
 | 2 | [条件付き] リサーチを実施する | リサーチを実施中 | `researching-best-practices` (subagent: `research-worker`) |
 | 3 | 計画を作成する | 計画を作成中 | `plan-issue` (subagent: `plan-worker`) |
-| 4 | 計画をレビューする | 計画をレビュー中 | `review-issue` (subagent: `review-worker`) |
-| 5 | [条件付き] レビュー指摘を修正し再レビューする | レビュー指摘を修正し再レビュー中 | `plan-issue` (subagent: `plan-worker`) + `review-issue` (subagent: `review-worker`) |
+| 4 | 計画をレビューする | 計画をレビュー中 | `analyze-issue` (subagent: `review-worker`) |
+| 5 | [条件付き] レビュー指摘を修正し再レビューする | レビュー指摘を修正し再レビュー中 | `plan-issue` (subagent: `plan-worker`) + `analyze-issue` (subagent: `review-worker`) |
 | 4a | [条件付き] エピック計画のサブ Issue を作成する | サブ Issue を作成中 | マネージャー直接: `shirokuma-docs items add issue/parent/push` |
 | 6 | ステータスを更新し計画サマリーをユーザーに返す | ステータスを更新し計画サマリーをユーザーに返却中 | マネージャー直接: `shirokuma-docs items transition / update` |
 
@@ -148,18 +148,18 @@ plan-worker が正常に完了したらステップ 4（計画レビュー）へ
 
 ### ステップ 4: 計画レビュー（Skill 委任）
 
-計画策定と同じコンテキストでレビューしても盲点に気づけない。`review-issue` の plan ロールに Agent ツール（`review-worker`）で委任する。plan-issue スキルが計画 Issue（子 Issue）を作成済みのため、reviewer は `subIssuesSummary` からタイトルが「計画:」で始まる子 Issue を特定し、その本文を直接参照して計画の詳細を取得できる。
+計画策定と同じコンテキストでレビューしても盲点に気づけない。`analyze-issue` の plan ロールに Agent ツール（`review-worker`）で委任する。plan-issue スキルが計画 Issue（子 Issue）を作成済みのため、reviewer は `subIssuesSummary` からタイトルが「計画:」で始まる子 Issue を特定し、その本文を直接参照して計画の詳細を取得できる。
 
 #### スキル利用可能チェック（フォールバック）
 
-レビュー起動前に `review-issue` スキルがスキルリストに存在するか確認する。
+レビュー起動前に `analyze-issue` スキルがスキルリストに存在するか確認する。
 
 | 状態 | アクション |
 |------|----------|
 | スキルが利用可能 | 下記「レビュアーの呼び出し」へ進む |
 | スキルが利用不可 | 下記「フォールバック（自己チェック）」で代替する |
 
-**フォールバック（自己チェック）**: `review-issue` が利用できない場合、以下のチェックリストで計画品質を自己確認する:
+**フォールバック（自己チェック）**: `analyze-issue` が利用できない場合、以下のチェックリストで計画品質を自己確認する:
 - [ ] 計画は Issue の全要件に対応しているか？
 - [ ] タスク漏れはないか？
 - [ ] 成果物（Deliverable）の定義は明確か？
@@ -169,7 +169,7 @@ plan-worker が正常に完了したらステップ 4（計画レビュー）へ
 
 #### レビュアーの呼び出し
 
-Agent ツールで `review-worker` を plan ロールで起動する。`review-issue` が自身で `shirokuma-docs items context {number}` を実行して Issue 本文を取得する。
+Agent ツールで `review-worker` を plan ロールで起動する。`analyze-issue` が自身で `shirokuma-docs items context {number}` を実行して Issue 本文を取得する。
 
 ```text
 Agent(
@@ -179,7 +179,7 @@ Agent(
 )
 ```
 
-レビュー結果は `review-issue` が Issue コメントとして投稿し、構造化データを返却する。
+レビュー結果は `analyze-issue` が Issue コメントとして投稿し、構造化データを返却する。
 
 #### レビュー出力の処理
 

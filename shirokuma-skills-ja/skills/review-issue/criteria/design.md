@@ -1,5 +1,7 @@
 # 設計レビュー基準
 
+> **Deprecated**: このファイルは `analyze-issue/criteria/` に移行しました。このファイルは後方互換のために残されていますが、将来削除されます。
+
 ## UI 設計成果物
 
 ### Design Brief

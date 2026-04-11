@@ -8,7 +8,7 @@
 **Date**: YYYY-MM-DD HH:MM
 **Reviewer**: Claude (reviewer agent)
 **Target**: [file/directory path]
-**Role**: [code|security|testing|nextjs|plan|design|requirements|research]
+**Role**: [code|security|testing|nextjs|docs|config]
 ```
 
 ## Sections
@@ -77,14 +77,6 @@ If 0 issues are found, omit this table and state "No issues were detected".
 **Finding Details** (only when findings exist):
 
 - `#N`: {detailed description of the finding}
-
-### 7. Design Assessment (requirements role only)
-
-> Display this section only for the requirements role. Omit for all other roles.
-
-**Design assessment:** NEEDED / NOT_NEEDED
-
-Rationale: {State in 1-2 sentences the primary basis for the NEEDED / NOT_NEEDED judgment}
 
 ---
 

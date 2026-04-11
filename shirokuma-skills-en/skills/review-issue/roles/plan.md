@@ -1,5 +1,8 @@
 # Plan Review Role
 
+> **Note**: This role has been migrated to `analyze-issue`. For the current implementation, see `analyze-issue/roles/plan.md`.
+> When `review-issue plan` is invoked, the backward compatibility stub in the `review-issue` SKILL.md automatically delegates to `analyze-issue`.
+
 ## Responsibilities
 
 Quality review of the plan (plan issue or `## Plan` / `## 計画` section):
@@ -13,12 +16,12 @@ Quality review of the plan (plan issue or `## Plan` / `## 計画` section):
 
 ## Distinction from `plan-issue`
 
-| Aspect | `plan-issue` built-in review | `review-issue` plan role |
+| Aspect | `plan-issue` built-in review | `analyze-issue` plan role |
 |--------|-------------------------------------|-------------------------------|
 | Timing | Immediate check right after planning | User-initiated at any time |
 | Data retrieval | Issue body embedded in Task agent | Plan issue identified from Issue number, fetched via `shirokuma-docs items context` |
 | Purpose | Initial quality gate for plan | Independent second opinion |
-| Invocation | Auto-executed at `plan-issue` step 4 | `/review-issue plan #N` or Review Issue |
+| Invocation | Auto-executed at `plan-issue` step 4 | `analyze-issue plan #N` |
 
 ## Required Knowledge
 
@@ -118,9 +121,9 @@ Use template from `templates/report.md`:
 4. **Best Practices**: Appropriate planning patterns found
 5. **Recommendations**: Prioritized action items
 
-## Trigger Keywords
+## Trigger Keywords (migrated to analyze-issue)
 
-- "plan review"
-- "計画レビュー"
-- "review plan"
-- "計画チェック"
+- "plan review" → `analyze-issue plan`
+- "計画レビュー" → `analyze-issue plan`
+- "review plan" → `analyze-issue plan`
+- "計画チェック" → `analyze-issue plan`

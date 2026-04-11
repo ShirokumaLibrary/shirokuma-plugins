@@ -186,13 +186,11 @@ Agent ツール（`review-worker`）の出力本文から `**レビュー結果:
 |---|---------|------------|
 | 1 | コード修正: {スレッド要約1}, {スレッド要約2}, ... | コード修正を実施中 |
 | 2 | コード修正をコミット・プッシュする | コミット・プッシュ中 |
-| 3 | コードを簡略化・改善する | コードを改善中 |
-| 4 | セキュリティレビューを実行する | セキュリティレビュー中 |
-| 5 | 改善コミットをプッシュする（変更があった場合のみ） | コミット・プッシュ中 |
-| 6 | 各スレッドに返信・解決する | スレッドに返信・解決中 |
-| 7 | PR サマリーコメントを投稿する | PR サマリーを投稿中 |
+| 3 | コードを後処理する（簡略化・セキュリティレビュー・改善コミット） | コードを後処理中 |
+| 4 | 各スレッドに返信・解決する | スレッドに返信・解決中 |
+| 5 | PR サマリーコメントを投稿する | PR サマリーを投稿中 |
 
-Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5, step 7 blockedBy 6.
+Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4.
 
 **質問・意見相違スレッドのみの場合:**
 
@@ -228,30 +226,13 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
    )
    ```
 
-3. **コード簡略化・改善**: `/simplify` を Skill ツールで実行:
+3. **後処理**: `finalize-changes` を Skill ツールで実行:
    ```text
-   Skill(skill: "simplify")
+   Skill(skill: "finalize-changes")
    ```
-   変更がなくても続行（追加コミットは変更があった場合のみ）。
+   `/simplify` → `reviewing-security` → 改善コミット（変更ありの場合のみ）を自動実行する。
 
-4. **セキュリティレビュー**: `/security-review` を Bash サブプロセスで実行:
-   ```bash
-   claude -p "/security-review"
-   ```
-   `claude` が利用できない場合は警告を出力して続行。
-   > **⚠️ 出力切り詰め禁止**: `| tail` / `| head` / `| grep` 等のパイプで出力を切り詰めてはならない。セキュリティレビュー結果が欠落し、脆弱性の指摘が失われる。
-
-5. **改善コミット（変更があった場合のみ）**: `/simplify` または `/security-review` でコード変更が生じた場合、`commit-worker` に追加コミットを委任:
-   ```text
-   Agent(
-     description: "commit-worker PR #{PR#} simplify/security improvements",
-     subagent_type: "commit-worker",
-     prompt: "simplify/security-review による改善をコミット・プッシュしてください。コミットには `shirokuma-docs git commit-push` を使用してください。"
-   )
-   ```
-   変更がなかった場合はこのステップをスキップし、タスクを `completed` に更新して次へ進む。
-
-6. **返信**: 各スレッドにコミット参照で返信（`--reply-to` には `pr comments` 出力の数値 `database_id` を使用）
+4. **返信**: 各スレッドにコミット参照で返信（`--reply-to` には `pr comments` 出力の数値 `database_id` を使用）
    ```bash
    shirokuma-docs items pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
    {commit-hash} で修正しました。
@@ -259,7 +240,7 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
    {修正内容の説明}
    EOF
    ```
-7. **解決**: スレッドを解決（`--thread-id` には `pr comments` 出力の `PRRT_` プレフィックス ID を使用）
+5. **解決**: スレッドを解決（`--thread-id` には `pr comments` 出力の `PRRT_` プレフィックス ID を使用）
    ```bash
    shirokuma-docs items pr resolve {PR#} --thread-id {PRRT_id}
    ```
@@ -342,7 +323,7 @@ shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/pr-{PR#}-revie
 
 | ツール | タイミング |
 |--------|-----------|
-| Skill | `code-issue` によるコード修正（ステップ 5） |
+| Skill | `code-issue` によるコード修正（ステップ 5）、`finalize-changes` による後処理（ステップ 5） |
 | Agent | `review-worker` によるコードレビュー実行（ステップ 2a）、`commit-worker` によるコミット・プッシュ（ステップ 5） |
 | Bash | `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve`, git 操作 |
 | Read | コード確認、計画参照 |

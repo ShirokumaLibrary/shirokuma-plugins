@@ -1,6 +1,8 @@
 # ADR Filter Logic Specification
 
-Defines the ADR filtering method used by `review-issue requirements` when performing Project Requirement Consistency checks.
+> **Note**: This role has been migrated to `analyze-issue`. For the current specification, see `analyze-issue/docs/adr-filter-logic.md`.
+
+Defines the ADR filtering method used by `analyze-issue requirements` when performing Project Requirement Consistency checks.
 
 ## Overview
 

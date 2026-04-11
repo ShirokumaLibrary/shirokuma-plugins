@@ -8,9 +8,8 @@
 |-------------|---------|-------------|---------|---------|
 | `code-issue` | Agent (`coding-worker`) | `commit-issue` | Agent (`commit-worker`) | `code-issue` を再起動しない |
 | `commit-issue` | Agent (`commit-worker`) | `open-pr-issue` | Agent (`pr-worker`) | `code-issue` に委任しない |
-| `open-pr-issue` | Agent (`pr-worker`) | `/simplify` | Skill ツール | この時点で Status を Review に変更しない |
-| `/simplify` | Skill ツール | `reviewing-security` | Skill ツール | Agent ツールで起動しない。出力を切り詰めない |
-| `reviewing-security` | Skill ツール | **マネージャー管理ステップ開始**（下記参照） | 直接実行 | Agent ツールで起動しない。出力を切り詰めない |
+| `open-pr-issue` | Agent (`pr-worker`) | `finalize-changes` | Skill ツール | この時点で Status を Review に変更しない |
+| `finalize-changes` | Skill ツール | **マネージャー管理ステップ開始**（下記参照） | 直接実行 | Agent ツールで起動しない |
 | `review-issue` | Agent (`review-worker`) | **完了**（コミット/PR チェーンなし。CONTINUE/STOP の詳細は下記「レビューワークタイプのチェーン」参照） | — | コミットチェーンを起動しない |
 
 ## Testing ステータス遷移の方針
@@ -25,15 +24,15 @@
 
 チェーン内で `Testing` ステータスを設定**しない**こと。チェーンは PR 作成とセキュリティレビュー完了後に `Review` ステータスを設定する。`Testing` への遷移は人間または CI システムの責務である。
 
-## `reviewing-security` 完了後のマネージャー管理ステップ（断絶最多ポイント）
+## `finalize-changes` 完了後のマネージャー管理ステップ（断絶最多ポイント）
 
-`reviewing-security` 完了後は、サブエージェントではなくマネージャーが直接実行する。レビューが完了した時点でチェーンが終わったように見えるが、**TaskList には pending ステップが残っている**。停止せずに**同じレスポンス内で**以下を Bash ツールで順次実行する:
+`finalize-changes` 完了後は、サブエージェントではなくマネージャーが直接実行する。後処理が完了した時点でチェーンが終わったように見えるが、**TaskList には pending ステップが残っている**。停止せずに**同じレスポンス内で**以下を Bash ツールで順次実行する:
 
 1. **Work Summary**: Issue コメントとして作業サマリーを投稿（Bash: `shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md`）
 2. **Status Update**: `shirokuma-docs items transition {number} --to Review`（Bash）
-3. **Evolution**: シグナル自動記録（ステップ 6 参照）
+3. **Evolution**: シグナル自動記録（ステップ 5 参照）
 
-> **なぜここで断絶するのか**: PR 作成とセキュリティレビューは視覚的な「完了感」が強く、LLM がサマリーを出力して停止しやすい。しかし TaskList の pending ステップが 0 になるまではチェーン途中である。
+> **なぜここで断絶するのか**: PR 作成と後処理チェーン（finalize-changes）は視覚的な「完了感」が強く、LLM がサマリーを出力して停止しやすい。しかし TaskList の pending ステップが 0 になるまではチェーン途中である。
 
 ## チェーン進行ロジック（擬似コード）
 
@@ -47,7 +46,7 @@ if frontmatter.action == "STOP":
 TaskUpdate("implement", "completed")
 
 // ステップ 2-3: commit, pr（Agent ツール — サブエージェント）
-// PR 作成時点では Status を Review に変更しない（レビューステップが残っているため）
+// PR 作成時点では Status を Review に変更しない（後処理ステップが残っているため）
 for each step in [commit, pr]:
   subagent_output = invoke_agent(step)
   frontmatter, body = parse_yaml_frontmatter(subagent_output)
@@ -56,19 +55,13 @@ for each step in [commit, pr]:
     break
   TaskUpdate(step, "completed")
 
-// ステップ 4: /simplify（Skill ツール）
-invoke_skill("simplify")
+// ステップ 4: finalize-changes（Skill ツール）
+// /simplify → reviewing-security → 改善コミット（変更ありの場合）を内包
+invoke_skill("finalize-changes")
 // Skill ツールはメインコンテキストで完了。エラーがなければ次へ進む
-// （変更がある場合は追加コミット・プッシュが必要）
-TaskUpdate("simplify", "completed")
+TaskUpdate("finalize_changes", "completed")
 
-// ステップ 5: reviewing-security（Skill ツール）
-// ⚠️ 出力を切り詰めてはならない（レビュー結果が欠落する）
-invoke_skill("reviewing-security")
-// Skill ツールがメインコンテキストで完了。エラーがなければ次へ進む
-TaskUpdate("security_review", "completed")
-
-// ステップ 6-7: work_summary, status_update（マネージャー直接実行）
+// ステップ 5-6: work_summary, status_update（マネージャー直接実行）
 // 作業サマリーを `items add comment` で投稿
 post_work_summary()  // shirokuma-docs items add comment {N} --file /tmp/...
 TaskUpdate("work_summary", "completed")

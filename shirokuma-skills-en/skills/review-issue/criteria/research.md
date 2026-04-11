@@ -1,5 +1,7 @@
 # Research Review Criteria
 
+> **Deprecated**: This file has been migrated to `analyze-issue/criteria/`. This file is retained for backward compatibility but will be removed in the future.
+
 ## Requirement Alignment
 
 | Criterion | Evaluation Aspect |

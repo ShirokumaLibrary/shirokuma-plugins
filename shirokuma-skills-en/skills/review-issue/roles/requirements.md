@@ -1,5 +1,8 @@
 # Requirements Review Role
 
+> **Note**: This role has been migrated to `analyze-issue`. For the current implementation, see `analyze-issue/roles/requirements.md`.
+> When `review-issue requirements` is invoked, the backward compatibility stub in the `review-issue` SKILL.md automatically delegates to `analyze-issue`.
+
 ## Responsibilities
 
 Quality review of the Issue body (purpose, overview, reproduction steps, expected behavior, deliverables, and considerations):
@@ -10,12 +13,12 @@ Quality review of the Issue body (purpose, overview, reproduction steps, expecte
 
 ## Distinction from `plan` Role
 
-| Aspect | `review-issue` requirements role | `review-issue` plan role |
+| Aspect | `analyze-issue` requirements role | `analyze-issue` plan role |
 |--------|----------------------------------|--------------------------|
 | Review target | Issue body (requirements/specs) itself | Plan content in the plan issue |
 | Timing | Any time before `prepare-flow` execution | Second opinion after planning |
 | Purpose | Quality gate for requirements and specs | Quality gate for plan implementability |
-| Invocation | `/review-issue requirements #N` | `/review-issue plan #N` |
+| Invocation | `analyze-issue requirements #N` | `analyze-issue plan #N` |
 
 ## Required Knowledge
 
@@ -152,12 +155,12 @@ Use template from `templates/report.md`:
 4. **Best Practices**: Appropriate description patterns found
 5. **Recommendations**: Prioritized action items
 
-## Trigger Keywords
+## Trigger Keywords (migrated to analyze-issue)
 
-- "requirements review"
-- "要件レビュー"
-- "requirements check"
-- "要件確認"
-- "requirement consistency"
-- "ADR check"
-- "verify past decisions"
+- "requirements review" → `analyze-issue requirements`
+- "要件レビュー" → `analyze-issue requirements`
+- "requirements check" → `analyze-issue requirements`
+- "要件確認" → `analyze-issue requirements`
+- "requirement consistency" → `analyze-issue requirements`
+- "ADR check" → `analyze-issue requirements`
+- "verify past decisions" → `analyze-issue requirements`

@@ -1,7 +1,7 @@
 ---
 name: design-flow
 description: 設計タイプに応じて適切な設計スキルにルーティングし、ディスカバリー・視覚評価ループを管理するオーケストレーター。`skills routing designing` で動的に発見されたフレームワーク固有設計スキルに委任し、マッチしない場合は `designing-generic`（汎用アーキテクチャ設計）にフォールバックします。トリガー: 「デザイン」「UI」「印象的」「design」「設計」。
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill, Agent
+allowed-tools: Read, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill, Agent
 ---
 
 !`shirokuma-docs rules inject --scope orchestrator`
@@ -16,16 +16,17 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUser
 
 | # | content | activeForm | Phase |
 |---|---------|------------|-------|
-| 1 | 設計スキルをルーティングする | 設計スキルをルーティング中 | Phase 1-2 |
-| 2 | 設計を実行する | 設計を実行中 | Phase 3 |
-| 3 | 設計レビューを実施する | 設計レビューを実施中 | Phase 3b |
-| 4 | 修正・再レビューする | 修正・再レビュー中 | Phase 3b（条件付き: NEEDS_REVISION 時のみ） |
-| 5 | 視覚評価を実施する | 視覚評価を実施中 | Phase 4（条件付き: 視覚要素がある場合のみ） |
-| 6 | ステータスを更新する | ステータスを更新中 | Phase 5 |
+| 1 | 設計スキルをルーティングする | 設計スキルをルーティング中 | Phase 1 |
+| 2 | デザインディスカバリーを実施する | デザインディスカバリーを実施中 | Phase 2 |
+| 3 | 設計を実行する | 設計を実行中 | Phase 3 |
+| 4 | 設計レビューを実施する | 設計レビューを実施中 | Phase 3b |
+| 5 | 修正・再レビューする | 修正・再レビュー中 | Phase 3b（条件付き: NEEDS_REVISION 時のみ） |
+| 6 | 視覚評価を実施する | 視覚評価を実施中 | Phase 4（条件付き: 視覚要素がある場合のみ） |
+| 7 | ステータスを更新する | ステータスを更新中 | Phase 5 |
 
-Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5.
+Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5, step 7 blockedBy 6.
 
-TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に `completed` に更新する。条件付きステップ（ステップ 4, 5）は該当しない場合にスキップ（`completed` にして次へ進む）。
+TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に `completed` に更新する。条件付きステップ（ステップ 5, 6）は該当しない場合にスキップ（`completed` にして次へ進む）。
 
 ## ワークフロー
 
@@ -46,44 +47,13 @@ shirokuma-docs items context {number}
 
 ### Phase 2: デザインディスカバリー
 
-コードを書く前にデザイン方向性を確定する。
+`discovering-design` スキルを Skill ツールで呼び出す。Issue コンテキスト（デザイン要件・計画セクション・技術的制約）を渡す:
 
-#### 2a. Design Brief 作成
-
-```markdown
-## Design Brief
-
-**Purpose**: このインターフェースが解決する問題は?
-**Context**: 技術的制約、既存のデザインシステム
-**Differentiation**: 何がこれを UNFORGETTABLE にする?
+```text
+Skill(skill: "discovering-design")
 ```
 
-#### 2b. 参考デザイン調査（オプション）
-
-必要に応じて `WebSearch` でデザインリファレンスやトレンドを調査する。
-
-#### 2c. Aesthetic Direction 決定
-
-```markdown
-## Aesthetic Direction
-
-**Tone**: [ONE を選択]
-- Brutally minimal / Maximalist chaos / Retro-futuristic
-- Organic/natural / Luxury/refined / Playful/toy-like
-- Editorial/magazine / Brutalist/raw / Art deco/geometric
-
-**Typography**: [フォントペアリングと根拠]
-**Color Palette**: [5-7色の HEX コード]
-**Motion Strategy**: [キーアニメーションモーメント]
-```
-
-#### 2d. ユーザー確認
-
-`AskUserQuestion` でデザイン方向性を提示し、承認を得る:
-
-- Design Brief サマリー
-- Aesthetic Direction
-- 参考デザイン（調査した場合）
+`discovering-design` は Design Brief 作成・Aesthetic Direction 決定・ユーザー確認を実施し、承認されたデザイン方向性を返す。
 
 ### Phase 3: 設計スキルに委任
 
@@ -123,54 +93,37 @@ shirokuma-docs skills routing designing
 
 マッチした設計スキルを Agent ツール（`design-worker`）で呼び出す。以下のコンテキストを渡す:
 
-- Design Brief
+- Phase 2 で確定した Design Brief
 - 設計タイプ固有の要件（Phase 1 のコンテキストから）
 - 技術的制約（フレームワークバージョン、既存パターン、DB エンジン等）
 - 計画セクション（存在する場合）
 
 ### Phase 3b: スキル完了後の判定
 
-設計スキルは Agent ツール（`design-worker`）で実行される。review-issue は Agent ツール（`review-worker`）で実行される。
+設計スキルは Agent ツール（`design-worker`）で実行される。analyze-issue は Agent ツール（`review-worker`）で実行される。
 
 - **設計スキル（design-worker）**: エラーがなければ Phase 4（視覚評価）へ進む
-- **review-issue (design ロール)**: Agent ツール（`review-worker`）の出力本文から `**レビュー結果:**` 文字列で判定する。`PASS` → 次のステップへ、`NEEDS_REVISION` → Phase 3 に戻り修正
+- **analyze-issue (design ロール)**: Agent ツール（`review-worker`）の出力本文から `**レビュー結果:**` 文字列で判定する。`PASS` → 次のステップへ、`NEEDS_REVISION` → Phase 3 に戻り修正
 
 ### Phase 4: 視覚評価ループ
 
-実装完了後、ユーザーによる視覚評価を実施する。
-
 **スキップ条件**: 視覚要素を持たない設計タイプ（データモデル設計等）の場合、Phase 4 をスキップして Phase 5 に直行する。
 
-#### 4a. dev サーバー確認
+`evaluating-design` スキルを Skill ツールで呼び出す。変更ファイルパス一覧を渡す:
 
-```bash
-# dev サーバーが起動しているか確認
-lsof -i :3000 2>/dev/null || echo "dev server not running"
+```text
+Skill(skill: "evaluating-design")
 ```
 
-必要に応じて起動を提案する。
+`evaluating-design` は dev サーバー確認・レビューチェックリスト提示・フィードバック収集を行い、以下のいずれかを返す:
 
-#### 4b. ユーザーレビュー
+| 結果 | 次のアクション |
+|------|--------------|
+| `APPROVED` | Phase 5 へ進む |
+| `NEEDS_REVISION: {修正内容}` | 修正内容を Agent（`design-worker`）に渡して Phase 3 に戻る |
+| `DIRECTION_CHANGE` | `discovering-design` を再度呼び出して Phase 2 に戻る |
 
-`AskUserQuestion` で以下を提示:
-
-- 変更ファイルパス一覧
-- 確認用 URL（dev サーバーが稼働している場合）
-- レビューチェックリスト:
-  - [ ] タイポグラフィが特徴的
-  - [ ] カラーパレットが統一的
-  - [ ] モーション/アニメーションの印象
-  - [ ] レイアウトの視覚的面白さ
-  - [ ] 全体的な印象
-
-選択肢を提示:
-1. **承認** → Phase 5 へ
-2. **修正依頼** → 修正内容を受け取り Phase 3 に戻る
-3. **方向性変更** → Phase 2 に戻る
-
-#### 4c. 安全上限
-
-視覚評価ループは **最大 3 イテレーション**。上限到達時は現状で進行し、フォローアップ Issue での改善を提案する。
+**イテレーション管理**: 視覚評価ループは **最大 3 イテレーション**。このスキル（`design-flow`）がイテレーション数をカウントし、上限到達時は `evaluating-design` を呼び出さずに Phase 5 に直行する。フォローアップ Issue での改善を提案する。
 
 ### Phase 5: 完了
 
@@ -180,7 +133,7 @@ lsof -i :3000 2>/dev/null || echo "dev server not running"
 shirokuma-docs items transition {number} --to Review
 ```
 
-> **ステータス遷移**: `create-item-flow` が `review-issue requirements` による設計要否判定で「NEEDED」と判定した場合、Issue は Backlog のまま `design-flow` に引き渡される。`design-flow` の完了時に無条件で Review に遷移することで設計完了を示す。Status が既に Review の場合は更新をスキップ（冪等）。
+> **ステータス遷移**: `create-item-flow` が `analyze-issue requirements` による設計要否判定で「NEEDED」と判定した場合、Issue は Backlog のまま `design-flow` に引き渡される。`design-flow` の完了時に無条件で Review に遷移することで設計完了を示す。Status が既に Review の場合は更新をスキップ（冪等）。
 
 ## 次のステップ
 
@@ -200,15 +153,15 @@ shirokuma-docs items transition {number} --to Review
 
 | ツール | タイミング |
 |--------|-----------|
-| AskUserQuestion | デザイン方向性確認、視覚評価ループ |
+| AskUserQuestion | Issue 番号確認（Phase 1） |
 | TaskCreate, TaskUpdate | Phase 進捗の追跡 |
+| Skill | `discovering-design`（Phase 2）、`evaluating-design`（Phase 4） |
 | Agent (design-worker) | 発見された `designing-*` スキルへの委任（サブエージェント、コンテキスト分離） |
-| WebSearch | デザインリファレンス調査（オプション） |
-| Bash | dev サーバー確認、ビルド確認 |
+| Bash | スキル発見（Phase 3）、ステータス遷移（Phase 5） |
 
 ## 注意事項
 
-- `create-item-flow` の完了レポートから `/design-flow` で起動（`review-issue requirements` による設計要否判定後の推奨チェーン）
-- 実装前にデザイン方向性をユーザーに確認する — 合意なく実装すると大幅な手戻りリスクがある
+- `create-item-flow` の完了レポートから `/design-flow` で起動（`analyze-issue requirements` による設計要否判定後の推奨チェーン）
+- `discovering-design` と `evaluating-design` は `AskUserQuestion` を使用するため Skill ツール（メインコンテキスト）で呼び出す（Agent 委任は不可）
 - 視覚評価ループは最大 3 イテレーション
 - 委任先の設計スキルがビルド検証を実施（このスキルでは不要）

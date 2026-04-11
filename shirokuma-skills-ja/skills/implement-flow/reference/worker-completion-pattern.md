@@ -4,13 +4,14 @@
 
 ## Skill ツール完了パターン
 
-Skill ツール（メインコンテキスト）で起動されるスキル（`code-issue`, `review-issue`, `plan-issue`, `reviewing-claude-config`）は、メイン AI と同一コンテキストで動作する。完了後の判定は以下のルールに従う:
+Skill ツール（メインコンテキスト）で起動されるスキル（`code-issue`, `review-issue`, `analyze-issue`, `plan-issue`, `reviewing-claude-config`）は、メイン AI と同一コンテキストで動作する。完了後の判定は以下のルールに従う:
 
 | スキル | 完了後の判定方法 |
 |--------|----------------|
 | `code-issue` | エラーがなければ次のステップ（`commit-issue`）へ進む |
 | `plan-issue` | エラーがなければ次のステップ（レビュー）へ進む |
 | `review-issue` | 出力に `**レビュー結果:** PASS` / `NEEDS_REVISION` / `FAIL` を含む。オーケストレーターはこの文字列で判定する |
+| `analyze-issue` | 出力に `**レビュー結果:** PASS` / `NEEDS_REVISION` を含む。オーケストレーターはこの文字列で判定する |
 | `reviewing-claude-config` | 出力に `**レビュー結果:** PASS` / `FAIL` を含む。オーケストレーターはこの文字列で判定する |
 
 **YAML パースは不要**。Skill ツールはメインコンテキスト内で完了するため、構造化データによる通信は行わない。
@@ -94,10 +95,10 @@ worker が #{ref} に投稿したコメントを確認してください。
 
 | オーケストレーター | スキル | 完了判定 | 次のステップ |
 |------------------|--------|---------|------------|
-| prepare-flow | plan-issue | エラーなし → 成功 | → review-issue |
-| prepare-flow | review-issue (plan) | `**レビュー結果:** PASS` / `NEEDS_REVISION` | → ステータス更新 or 修正ループ |
-| design-flow | 設計スキル群 | エラーなし → 成功 | → review-issue |
-| design-flow | review-issue (design) | `**レビュー結果:** PASS` / `NEEDS_REVISION` | → 視覚評価 or 完了 |
+| prepare-flow | plan-issue | エラーなし → 成功 | → analyze-issue |
+| prepare-flow | analyze-issue (plan) | `**レビュー結果:** PASS` / `NEEDS_REVISION` | → ステータス更新 or 修正ループ |
+| design-flow | 設計スキル群 | エラーなし → 成功 | → analyze-issue |
+| design-flow | analyze-issue (design) | `**レビュー結果:** PASS` / `NEEDS_REVISION` | → 視覚評価 or 完了 |
 | implement-flow | code-issue | エラーなし → 成功 | → commit-worker |
 | review-flow | review-issue (code) | `**レビュー結果:** PASS` / `FAIL` | → スレッド対応 |
 | review-flow | code-issue (修正) | エラーなし → 成功 | → commit-worker |

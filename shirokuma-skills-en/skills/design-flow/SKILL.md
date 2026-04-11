@@ -1,7 +1,7 @@
 ---
 name: design-flow
 description: Routes to the appropriate design skill based on design type, managing discovery and visual evaluation loops. Delegates to framework-specific design skills discovered via `skills routing designing`, falling back to `designing-generic` (generic architecture design) when no match is found. Triggers: "design", "UI", "memorable", "impressive", "architecture".
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, WebFetch, WebSearch, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill, Agent
+allowed-tools: Read, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, TaskList, Skill, Agent
 ---
 
 !`shirokuma-docs rules inject --scope orchestrator`
@@ -16,16 +16,17 @@ Register all chain steps with TaskCreate **before starting work**.
 
 | # | content | activeForm | Phase |
 |---|---------|------------|-------|
-| 1 | Route to design skill | Routing to design skill | Phases 1-2 |
-| 2 | Execute design | Executing design | Phase 3 |
-| 3 | Conduct design review | Conducting design review | Phase 3b |
-| 4 | Revise and re-review | Revising and re-reviewing | Phase 3b (conditional: only on NEEDS_REVISION) |
-| 5 | Conduct visual evaluation | Conducting visual evaluation | Phase 4 (conditional: only for visual design types) |
-| 6 | Update status | Updating status | Phase 5 |
+| 1 | Route to design skill | Routing to design skill | Phase 1 |
+| 2 | Conduct design discovery | Conducting design discovery | Phase 2 |
+| 3 | Execute design | Executing design | Phase 3 |
+| 4 | Conduct design review | Conducting design review | Phase 3b |
+| 5 | Revise and re-review | Revising and re-reviewing | Phase 3b (conditional: only on NEEDS_REVISION) |
+| 6 | Conduct visual evaluation | Conducting visual evaluation | Phase 4 (conditional: only for visual design types) |
+| 7 | Update status | Updating status | Phase 5 |
 
-Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5.
+Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5, step 7 blockedBy 6.
 
-Update each step to `in_progress` at start and `completed` on finish via TaskUpdate. Skip conditional steps (steps 4, 5) when not applicable (mark as `completed` and move to next).
+Update each step to `in_progress` at start and `completed` on finish via TaskUpdate. Skip conditional steps (steps 5, 6) when not applicable (mark as `completed` and move to next).
 
 ## Workflow
 
@@ -46,44 +47,13 @@ shirokuma-docs items context {number}
 
 ### Phase 2: Design Discovery
 
-Establish design direction before writing code.
+Call the `discovering-design` skill via Skill tool. Pass the issue context (design requirements, plan section, technical constraints):
 
-#### 2a. Create Design Brief
-
-```markdown
-## Design Brief
-
-**Purpose**: What problem does this interface solve?
-**Context**: Technical constraints, existing design system
-**Differentiation**: What makes this UNFORGETTABLE?
+```text
+Skill(skill: "discovering-design")
 ```
 
-#### 2b. Reference Design Research (Optional)
-
-Use `WebSearch` to research design references and trends as needed.
-
-#### 2c. Determine Aesthetic Direction
-
-```markdown
-## Aesthetic Direction
-
-**Tone**: [Choose ONE]
-- Brutally minimal / Maximalist chaos / Retro-futuristic
-- Organic/natural / Luxury/refined / Playful/toy-like
-- Editorial/magazine / Brutalist/raw / Art deco/geometric
-
-**Typography**: [Font pairing and rationale]
-**Color Palette**: [5-7 HEX codes]
-**Motion Strategy**: [Key animation moments]
-```
-
-#### 2d. User Confirmation
-
-Present design direction via `AskUserQuestion` and obtain approval:
-
-- Design Brief summary
-- Aesthetic Direction
-- Reference designs (if researched)
+`discovering-design` creates the Design Brief, determines Aesthetic Direction, obtains user confirmation, and returns the approved design direction.
 
 ### Phase 3: Delegate to Design Skill
 
@@ -123,54 +93,37 @@ When a project-specific skill matches the requirements, use it with higher prior
 
 Invoke the matched design skill via Agent tool (`design-worker`). Pass the following context:
 
-- Design Brief
+- Design Brief finalized in Phase 2
 - Requirements specific to the design type (from Phase 1 context)
 - Technical constraints (framework version, existing patterns, DB engine, etc.)
 - Plan section (if available)
 
 ### Phase 3b: Post-Skill Completion Handling
 
-Design skills run via Agent tool (`design-worker`). review-issue runs via Agent tool (`review-worker`).
+Design skills run via Agent tool (`design-worker`). analyze-issue runs via Agent tool (`review-worker`).
 
 - **Design skills**: If no errors, proceed to Phase 4 (visual evaluation)
-- **review-issue (design role)**: Determine result from the `**Review result:**` string in Agent tool (`review-worker`) output. `PASS` → proceed to next step, `NEEDS_REVISION` → return to Phase 3 for revision
+- **analyze-issue (design role)**: Determine result from the `**Review result:**` string in Agent tool (`review-worker`) output. `PASS` → proceed to next step, `NEEDS_REVISION` → return to Phase 3 for revision
 
 ### Phase 4: Visual Evaluation Loop
 
-After implementation completes, conduct visual evaluation with user.
-
 **Skip condition**: For non-visual design types (e.g., data model design), skip Phase 4 and proceed directly to Phase 5.
 
-#### 4a. Dev Server Check
+Call the `evaluating-design` skill via Skill tool. Pass the list of changed file paths:
 
-```bash
-# Check if dev server is running
-lsof -i :3000 2>/dev/null || echo "dev server not running"
+```text
+Skill(skill: "evaluating-design")
 ```
 
-Suggest starting it if needed.
+`evaluating-design` checks the dev server, presents the review checklist, and collects feedback, returning one of the following:
 
-#### 4b. User Review
+| Result | Next Action |
+|--------|------------|
+| `APPROVED` | Proceed to Phase 5 |
+| `NEEDS_REVISION: {feedback}` | Pass feedback to Agent (`design-worker`) and return to Phase 3 |
+| `DIRECTION_CHANGE` | Re-invoke `discovering-design` and return to Phase 2 |
 
-Present via `AskUserQuestion`:
-
-- List of changed file paths
-- Review URL (if dev server is running)
-- Review checklist:
-  - [ ] Typography is distinctive
-  - [ ] Color palette is cohesive
-  - [ ] Motion/animation impression
-  - [ ] Layout visual interest
-  - [ ] Overall impression
-
-Present choices:
-1. **Approve** → Proceed to Phase 5
-2. **Request changes** → Receive feedback, return to Phase 3
-3. **Change direction** → Return to Phase 2
-
-#### 4c. Safety Limit
-
-Visual evaluation loop is limited to **3 iterations maximum**. On reaching the limit, proceed with current state and suggest follow-up Issue for further improvements.
+**Iteration management**: The visual evaluation loop is limited to **3 iterations maximum**. This skill (`design-flow`) counts iterations and proceeds directly to Phase 5 without calling `evaluating-design` when the limit is reached. Suggest a follow-up Issue for further improvements.
 
 ### Phase 5: Completion
 
@@ -180,7 +133,7 @@ Design work is complete once approved. Transition the Issue Status to Review:
 shirokuma-docs items transition {number} --to Review
 ```
 
-> **Status transition**: When `create-item-flow` determines a design phase is needed via design assessment (`review-issue requirements`), the Issue is handed off from Backlog to `design-flow`. Transitioning unconditionally to Review on `design-flow` completion signals design completion. Skip the update if Status is already Review (idempotent).
+> **Status transition**: When `create-item-flow` determines a design phase is needed via design assessment (`analyze-issue requirements`), the Issue is handed off from Backlog to `design-flow`. Transitioning unconditionally to Review on `design-flow` completion signals design completion. Skip the update if Status is already Review (idempotent).
 
 ## Next Steps
 
@@ -200,15 +153,15 @@ Design skills are discovered dynamically via `shirokuma-docs skills routing desi
 
 | Tool | When |
 |------|------|
-| AskUserQuestion | Design direction confirmation, visual evaluation loop |
+| AskUserQuestion | Issue number confirmation (Phase 1) |
 | TaskCreate, TaskUpdate | Phase progress tracking |
+| Skill | `discovering-design` (Phase 2), `evaluating-design` (Phase 4) |
 | Agent (design-worker) | Delegation to discovered `designing-*` skills (sub-agent, context isolation) |
-| WebSearch | Design reference research (optional) |
-| Bash | Dev server check, build verification |
+| Bash | Skill discovery (Phase 3), status transition (Phase 5) |
 
 ## Notes
 
-- Invoked via `/design-flow` from `create-item-flow` completion report (recommended chain after design assessment by `review-issue requirements`)
-- Confirm design direction with user before implementation — implementing without alignment risks extensive rework
+- Invoked via `/design-flow` from `create-item-flow` completion report (recommended chain after design assessment by `analyze-issue requirements`)
+- `discovering-design` and `evaluating-design` use `AskUserQuestion` and must be called via Skill tool (main context); Agent delegation is not allowed
 - Visual evaluation loop limited to 3 iterations maximum
 - The delegated design skill handles build verification (not needed in this skill)

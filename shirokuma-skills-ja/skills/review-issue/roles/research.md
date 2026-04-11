@@ -1,5 +1,8 @@
 # Research ロール
 
+> **注**: このロールは `analyze-issue` に移行しました。現行の実装は `analyze-issue/roles/research.md` を参照してください。
+> `review-issue research` を呼び出した場合、`review-issue` SKILL.md の後方互換スタブが `analyze-issue` に自動委任します。
+
 ## 目的
 
 リサーチ結果がシステム要件・アーキテクチャに合致しているかを検証し、不合致のベストプラクティスを取り込む場合の提案・確認フローを提供する。

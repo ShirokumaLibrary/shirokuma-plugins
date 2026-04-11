@@ -1,5 +1,8 @@
 # Research Role
 
+> **Note**: This role has been migrated to `analyze-issue`. For the current implementation, see `analyze-issue/roles/research.md`.
+> When `review-issue research` is invoked, the backward compatibility stub in the `review-issue` SKILL.md automatically delegates to `analyze-issue`.
+
 ## Purpose
 
 Verify that research results align with system requirements and architecture, and provide a proposal/confirmation flow when adopting mismatched best practices.

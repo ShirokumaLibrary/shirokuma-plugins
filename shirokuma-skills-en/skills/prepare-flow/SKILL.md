@@ -21,8 +21,8 @@ Register all chain steps via TaskCreate **before starting work**.
 | 1 | Fetch issue and update status | Fetching issue and updating status | Manager direct: `shirokuma-docs items context/transition` |
 | 2 | [Conditional] Conduct research | Conducting research | `researching-best-practices` (subagent: `research-worker`) |
 | 3 | Create the plan | Creating the plan | `plan-issue` (subagent: `plan-worker`) |
-| 4 | Review the plan | Reviewing the plan | `review-issue` (subagent: `review-worker`) |
-| 5 | [Conditional] Fix review issues and re-review | Fixing review issues and re-reviewing | `plan-issue` (subagent: `plan-worker`) + `review-issue` (subagent: `review-worker`) |
+| 4 | Review the plan | Reviewing the plan | `analyze-issue` (subagent: `review-worker`) |
+| 5 | [Conditional] Fix review issues and re-review | Fixing review issues and re-reviewing | `plan-issue` (subagent: `plan-worker`) + `analyze-issue` (subagent: `review-worker`) |
 | 4a | [Conditional] Create sub-issues for epic plan | Creating sub-issues | Manager direct: `shirokuma-docs items add issue/parent/update` |
 | 6 | Update status and return plan summary to user | Updating status and returning plan summary to user | Manager direct: `shirokuma-docs items transition` |
 
@@ -147,18 +147,18 @@ When research was conducted (Step 2a), include the `## Research Findings (Refere
 
 ### Step 4: Plan Review (Skill Delegation)
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `review-issue` plan role via Agent tool (`review-worker`). Since the plan-issue skill creates a plan issue (child issue), the reviewer can identify the child issue with a title starting with "Plan:" from `subIssuesSummary` and fetch its body directly via `items context {plan-issue-number}`.
+Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `analyze-issue` plan role via Agent tool (`review-worker`). Since the plan-issue skill creates a plan issue (child issue), the reviewer can identify the child issue with a title starting with "Plan:" from `subIssuesSummary` and fetch its body directly via `items context {plan-issue-number}`.
 
 #### Skill Availability Check (Fallback)
 
-Before launching the review, verify that `review-issue` is available in the skill list.
+Before launching the review, verify that `analyze-issue` is available in the skill list.
 
 | State | Action |
 |-------|--------|
 | Skill available | Proceed to "Invoke the Reviewer" below |
 | Skill unavailable | Use "Fallback (self-check)" instead |
 
-**Fallback (self-check)**: When `review-issue` is unavailable, verify plan quality using this checklist:
+**Fallback (self-check)**: When `analyze-issue` is unavailable, verify plan quality using this checklist:
 - [ ] Does the plan address all requirements in the Issue?
 - [ ] Are there any missing tasks?
 - [ ] Is the deliverable (definition of done) clearly defined?
@@ -168,7 +168,7 @@ If all checks pass, proceed to Step 5.
 
 #### Invoke the Reviewer
 
-Invoke `review-worker` with plan role via the Agent tool. `review-issue` will fetch the Issue body itself via `shirokuma-docs items context {number}`.
+Invoke `review-worker` with plan role via the Agent tool. `analyze-issue` will fetch the Issue body itself via `shirokuma-docs items context {number}`.
 
 ```text
 Agent(
@@ -178,7 +178,7 @@ Agent(
 )
 ```
 
-The review result is posted as an Issue comment by `review-issue`, and structured output is returned.
+The review result is posted as an Issue comment by `analyze-issue`, and structured output is returned.
 
 #### Processing Review Output
 

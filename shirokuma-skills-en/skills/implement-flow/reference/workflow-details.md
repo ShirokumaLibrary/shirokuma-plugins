@@ -67,7 +67,7 @@ Use sessions when **context overflow risk** is high — i.e., the work is likely
 | plan-issue | Yes | — | Via Skill tool (from prepare-flow) |
 | code-issue | Yes | — | Via Skill tool (from implement-flow) |
 | Framework-specific skills | Yes | Yes | Via code-issue / design-flow or standalone (dynamically discovered) |
-| design-flow | — | Yes | Invoked from create-item-flow completion report (after the design assessment in review-issue requirements) |
+| design-flow | — | Yes | Invoked from create-item-flow completion report (after the design assessment in analyze-issue requirements) |
 | create-item-flow | — | Yes | Always standalone-capable |
 | commit-issue | Yes | Yes | Subagent (standalone also runs as subagent) |
 | open-pr-issue | Yes | Yes | Subagent (via chain or standalone) |

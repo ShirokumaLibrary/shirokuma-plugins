@@ -46,13 +46,13 @@
 
 ## レビューゲート
 
-`researching-best-practices` 完了後、Discussion に保存する前に `review-issue` を `research` ロールで通すことができる。
+`researching-best-practices` 完了後、Discussion に保存する前に `analyze-issue` を `research` ロールで通すことができる。
 
 ```
-implement-flow → researching-best-practices → review-issue（research ロール）→ Discussion 作成 → 完了
+implement-flow → researching-best-practices → analyze-issue（research ロール）→ Discussion 作成 → 完了
 ```
 
-`review-issue` を Agent ツール（`review-worker`）で起動する際は以下のコンテキストを渡す:
+`analyze-issue` を Agent ツール（`review-worker`）で起動する際は以下のコンテキストを渡す:
 
 ```
 role: research
@@ -60,7 +60,7 @@ target: researching-best-practices の調査レポート
 focus: 正確性、網羅性、不足している観点
 ```
 
-`review-issue` スキルには `roles/research.md` ロール定義があり、調査出力に対するレビューを導く。このロールを使って調査レポートが十分な質であることを確認してから保存する。
+`analyze-issue` スキルには `roles/research.md` ロール定義があり、調査出力に対するレビューを導く。このロールを使って調査レポートが十分な質であることを確認してから保存する。
 
 **レビューゲートを適用するタイミング**:
 
@@ -75,7 +75,7 @@ focus: 正確性、網羅性、不足している観点
 リサーチはコミット→PR チェーンではなく、Discussion 保存で完了する。
 
 ```
-researching-best-practices → [review-issue（research ロール）] → Discussion (Research) 作成 → 完了
+researching-best-practices → [analyze-issue（research ロール）] → Discussion (Research) 作成 → 完了
 ```
 
 ## Discussion 保存

@@ -186,13 +186,11 @@ Register tasks via TaskCreate based on classification using the following templa
 |---|---------|------------|
 | 1 | Code fix: {thread summary 1}, {thread summary 2}, ... | Applying code fixes |
 | 2 | Commit and push code fixes | Committing and pushing |
-| 3 | Simplify and improve code | Improving code |
-| 4 | Run security review | Running security review |
-| 5 | Push improvement commit (only if changes were made) | Committing and pushing |
-| 6 | Reply and resolve each thread | Replying and resolving threads |
-| 7 | Post PR summary comment | Posting PR summary |
+| 3 | Post-process code (simplify, security review, improvement commit) | Post-processing code |
+| 4 | Reply and resolve each thread | Replying and resolving threads |
+| 5 | Post PR summary comment | Posting PR summary |
 
-Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5, step 7 blockedBy 6.
+Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4.
 
 **When only question/disagreement threads exist:**
 
@@ -228,30 +226,13 @@ Process code fix threads together. Delegate fixes to `code-issue` via Skill tool
    )
    ```
 
-3. **Simplify and improve code**: Run `/simplify` via Skill tool:
+3. **Post-process**: Run `finalize-changes` via Skill tool:
    ```text
-   Skill(skill: "simplify")
+   Skill(skill: "finalize-changes")
    ```
-   Continue even if no changes are made (extra commit only needed when changes occur).
+   Automatically runs `/simplify` → `reviewing-security` → improvement commit (only if changes were made).
 
-4. **Security review**: Run `/security-review` via Bash subprocess:
-   ```bash
-   claude -p "/security-review"
-   ```
-   If `claude` is not available, output a warning and continue.
-   > **⚠️ Do NOT truncate output**: Do not pipe through `| tail` / `| head` / `| grep`. Security review findings will be lost if output is truncated.
-
-5. **Improvement commit (only if changes were made)**: If `/simplify` or `/security-review` produced code changes, delegate an additional commit to `commit-worker`:
-   ```text
-   Agent(
-     description: "commit-worker PR #{PR#} simplify/security improvements",
-     subagent_type: "commit-worker",
-     prompt: "Commit and push improvements from simplify/security-review. Use `shirokuma-docs git commit-push` for committing."
-   )
-   ```
-   If no changes were made, skip this step, update the task to `completed`, and continue.
-
-6. **Reply**: Reply to each thread referencing the commit (use numeric `database_id` from `pr comments` output for `--reply-to`)
+4. **Reply**: Reply to each thread referencing the commit (use numeric `database_id` from `pr comments` output for `--reply-to`)
    ```bash
    shirokuma-docs items pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
    Fixed in {commit-hash}.
@@ -259,7 +240,7 @@ Process code fix threads together. Delegate fixes to `code-issue` via Skill tool
    {description of the fix}
    EOF
    ```
-7. **Resolve**: Resolve the thread (use `PRRT_`-prefixed ID from `pr comments` output for `--thread-id`)
+5. **Resolve**: Resolve the thread (use `PRRT_`-prefixed ID from `pr comments` output for `--thread-id`)
    ```bash
    shirokuma-docs items pr resolve {PR#} --thread-id {PRRT_id}
    ```
@@ -342,7 +323,7 @@ Addressed {N} threads.
 
 | Tool | When |
 |------|------|
-| Skill | Code fixes via `code-issue` (Step 5) |
+| Skill | Code fixes via `code-issue` (Step 5), post-processing via `finalize-changes` (Step 5) |
 | Agent | Code review execution via `review-worker` (Step 2a), commits and pushes via `commit-worker` (Step 5) |
 | Bash | `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve`, git operations |
 | Read | Code review, plan reference |

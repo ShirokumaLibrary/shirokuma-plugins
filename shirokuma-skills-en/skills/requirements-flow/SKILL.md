@@ -1,6 +1,6 @@
 ---
 name: requirements-flow
-description: "Orchestrator for the requirements definition phase. Delegates ADR creation to write-adr, creates specification Discussions directly via CLI, and manages the connection to create-item-flow. Triggers: \"requirements\", \"requirements definition\", \"create ADR\", \"create spec\", \"define requirements\"."
+description: "Orchestrator for the full requirements definition phase. Searches existing ADRs/Discussions for consistency, delegates ADR creation to write-adr, creates specification Discussions, and guides next steps. Triggers: \"requirements\", \"requirements definition\", \"create ADR\", \"create spec\", \"define requirements\", \"record architecture decision\", \"technology selection\". To simply register a GitHub Issue/Discussion right now, use /create-item-flow instead."
 allowed-tools: Bash, AskUserQuestion, Agent, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
@@ -155,6 +155,23 @@ Both `write-adr` and specification Discussion creation can be invoked standalone
 | AskUserQuestion | Confirm task type when it cannot be determined |
 | Agent (requirements-worker) | Step 3: Delegate ADR creation and spec drafting (subagent, context isolation) |
 | TaskCreate, TaskUpdate, TaskGet, TaskList | Progress tracking for all steps |
+
+## Skill Selection Guide
+
+This skill and `create-item-flow` can both create GitHub items, but they serve different purposes.
+
+| Goal | Which skill to use |
+|------|-------------------|
+| "I want to run the full requirements definition process" / "I want to create an ADR" / "I want to create a spec Discussion" | `requirements-flow` (this skill) |
+| "I want to register this conversation as an Issue right now" / "I need a follow-up Issue" | `/create-item-flow` |
+
+**Decision rule**: If the goal is "run the requirements definition / ADR creation process," use `requirements-flow`. If the goal is only "register a GitHub Issue/Discussion right now," use `create-item-flow`.
+
+### Responsibility Boundary with `create-item-flow`
+
+- `requirements-flow` is the **requirements phase orchestrator** — it handles the full pipeline: searching existing ADRs/Discussions for consistency → creating ADRs and spec Discussions → guiding next steps
+- `create-item-flow` is the **UI layer** — it immediately registers an Issue/Discussion from the current conversation context. It does not handle the requirements definition process
+- Requests like "create a spec" or "write an ADR" should route to this skill. `create-item-flow` does not handle the requirements definition process
 
 ## Notes
 

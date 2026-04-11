@@ -8,20 +8,21 @@
 |---------|--------|
 | キーワード: `review`, `レビュー`, `audit`, `セキュリティチェック` | `review-issue` |
 | PR レビュー依頼 | `review-issue` |
+| キーワード: `計画レビュー`, `要件レビュー`, `設計レビュー`, `リサーチレビュー` | `analyze-issue` |
 
 ## 実行コンテキスト
 
 `review-issue` は Agent ツール（サブエージェント）として実行される。メインコンテキストを汚さない。
+`analyze-issue` も同様に Agent ツール（サブエージェント: `review-worker`）として実行される。
 
 ## TDD 非適用
 
 レビューワークタイプでは TDD は適用しない。
 
-## review-issue が提供するもの
+## review-issue / analyze-issue が提供するもの
 
-- 専門ロール別レビュー（code, security, test, docs, plan）
-- Issue / PR コンテキストに基づくレビュー
-- レビュー結果の PR コメント投稿
+- `review-issue`: 専門ロール別レビュー（code, security, test, docs）、Issue / PR コンテキストに基づくレビュー、レビュー結果の PR コメント投稿
+- `analyze-issue`: Issue 分析ロール（plan, requirements, design, research）、Issue コメント投稿
 
 ## チェーン
 
@@ -29,6 +30,7 @@
 
 ```
 review-issue → レポート投稿 → 完了
+analyze-issue → Issue コメント投稿 → 完了
 ```
 
 ## レビュー完了後のフォローアップ

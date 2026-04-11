@@ -46,13 +46,13 @@ Research work type does not use TDD.
 
 ## Review Gate
 
-After `researching-best-practices` completes, optionally pass the output through `review-issue` with the `research` role before saving to Discussion.
+After `researching-best-practices` completes, optionally pass the output through `analyze-issue` with the `research` role before saving to Discussion.
 
 ```
-implement-flow → researching-best-practices → review-issue (research role) → Discussion creation → Complete
+implement-flow → researching-best-practices → analyze-issue (research role) → Discussion creation → Complete
 ```
 
-Invoke `review-issue` via Agent tool (`review-worker`) with the following context:
+Invoke `analyze-issue` via Agent tool (`review-worker`) with the following context:
 
 ```
 role: research
@@ -60,7 +60,7 @@ target: research report from researching-best-practices
 focus: accuracy, completeness, missing perspectives
 ```
 
-The `review-issue` skill has a `roles/research.md` role definition that guides the review for research outputs. Use this role to ensure the research report is thorough before saving.
+The `analyze-issue` skill has a `roles/research.md` role definition that guides the review for research outputs. Use this role to ensure the research report is thorough before saving.
 
 **When to apply the review gate**:
 
@@ -75,7 +75,7 @@ The `review-issue` skill has a `roles/research.md` role definition that guides t
 Research uses Discussion creation instead of the commit → PR chain.
 
 ```
-researching-best-practices → [review-issue (research role)] → Discussion (Research) creation → Complete
+researching-best-practices → [analyze-issue (research role)] → Discussion (Research) creation → Complete
 ```
 
 ## Discussion Storage

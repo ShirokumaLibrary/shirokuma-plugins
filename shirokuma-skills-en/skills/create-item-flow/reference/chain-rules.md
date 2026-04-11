@@ -19,11 +19,11 @@ Follow `managing-github-items`'s `reference/create-item.md`.
 
 ## Chain Decision
 
-Default recommended chain target after creation (3-way branching based on `review-issue requirements` result):
+Default recommended chain target after creation (3-way branching based on `analyze-issue requirements` result):
 
 | Condition | Default Recommendation | Reason |
 |-----------|----------------------|--------|
-| `review-issue requirements` result is `**Design assessment:** NEEDED` | `/design-flow #{issue-number}` | Design phase is required before planning |
+| `analyze-issue requirements` result is `**Design assessment:** NEEDED` | `/design-flow #{issue-number}` | Design phase is required before planning |
 | Design NOT_NEEDED + Size M+ or requirements ambiguous | `/prepare-flow #{issue-number}` | Go to planning phase |
 | Design NOT_NEEDED + Size XS/S and requirements clear | `/implement-flow #{issue-number}` | Implement directly |
 | User explicitly skips | `/implement-flow` or `/prepare-flow` | Explicit intent |
@@ -38,7 +38,7 @@ Default recommended chain target after creation (3-way branching based on `revie
 - Completes as a mechanical transformation (pattern replacement, type fix, rename, format change)
 - No ambiguity in implementation scope
 
-"Requirements unclear" — recommend `/review-issue requirements` when:
+"Requirements unclear" — recommend `/analyze-issue requirements` when:
 
 - Only "I want to improve X" with no concrete change specified
 - Multiple implementation approaches are possible
@@ -46,7 +46,7 @@ Default recommended chain target after creation (3-way branching based on `revie
 
 ## Review Execution Conditions
 
-After Issue creation, `create-item-flow` Step 2b **automatically runs** `review-issue requirements` (skipped for Discussion).
+After Issue creation, `create-item-flow` Step 2b **automatically runs** `analyze-issue requirements` (skipped for Discussion).
 
 | Condition | Auto-execute | Reason |
 |-----------|--------------|--------|
@@ -54,9 +54,9 @@ After Issue creation, `create-item-flow` Step 2b **automatically runs** `review-
 | Discussion creation | No | Discussions are out of scope; only next action candidates are presented |
 | During batch creation | No | Prioritize Backlog placement over individual reviews during bulk creation |
 
-**Purpose of review**: A quality gate for Issue body requirements, specs, and design necessity before planning (prepare-flow) or design (design-flow). The `review-issue` requirements role evaluates completeness, clarity, implementability, and design assessment.
+**Purpose of review**: A quality gate for Issue body requirements, specs, and design necessity before planning (prepare-flow) or design (design-flow). The `analyze-issue` requirements role evaluates completeness, clarity, implementability, and design assessment.
 
-**Post-review flow (3-way branching)**: After `review-issue requirements` completes, Step 2b results (`**Design assessment:**` and `**Review result:**`) automatically branch in 3 directions:
+**Post-review flow (3-way branching)**: After `analyze-issue requirements` completes, Step 2b results (`**Design assessment:**` and `**Review result:**`) automatically branch in 3 directions:
 
 - Design needed (`**Design assessment:** NEEDED`) → `/design-flow #{issue-number}`
 - Design not needed + planning needed (`**Design assessment:** NOT_NEEDED` and Size M+ or ambiguous) → `/prepare-flow #{issue-number}`
@@ -74,4 +74,4 @@ Keep in Backlog without chaining when:
 
 When `implement-flow` is invoked with text description only (no issue number), Step 1a calls `create-item-flow`. `create-item-flow` creates the Issue and returns the number, and `implement-flow` continues. In this case, chain decision is not needed (as `implement-flow` automatically continues).
 
-> **Note:** When design assessment (`review-issue requirements`) returns NEEDED, `create-item-flow` guides to `/design-flow` first. After design completion, the chain proceeds to `/prepare-flow` → `/implement-flow`.
+> **Note:** When design assessment (`analyze-issue requirements`) returns NEEDED, `create-item-flow` guides to `/design-flow` first. After design completion, the chain proceeds to `/prepare-flow` → `/implement-flow`.

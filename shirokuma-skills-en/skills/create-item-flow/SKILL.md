@@ -1,12 +1,12 @@
 ---
 name: create-item-flow
-description: Creates GitHub Issues or Discussions with auto-inferred metadata from conversation context, automatically runs requirements review, and routes to the next flow. Triggers: "create issue", "make this an issue", "follow-up issue", "create spec", "new issue", "file an issue".
+description: Creates GitHub Issues or Discussions with auto-inferred metadata from conversation context, automatically runs requirements review, and routes to the next flow. Triggers: "create issue", "make this an issue", "follow-up issue", "new issue", "file an issue". For creating specs, ADRs, or running the full requirements definition process, use /requirements-flow instead.
 allowed-tools: Bash, Skill, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # Creating Items
 
-Auto-infer Issue metadata from conversation context and delegate creation to `managing-github-items`. For Issues, automatically run `review-issue requirements` after creation and route to the next flow (`/design-flow`, `/prepare-flow`, `/implement-flow`) based on the review result (`**Review result:**`) and design assessment (`**Design assessment:**`). For Discussions, skip the review and present next action candidates.
+Auto-infer Issue metadata from conversation context and delegate creation to `managing-github-items`. For Issues, automatically run `analyze-issue requirements` after creation and route to the next flow (`/design-flow`, `/prepare-flow`, `/implement-flow`) based on the review result (`**Review result:**`) and design assessment (`**Design assessment:**`). For Discussions, skip the review and present next action candidates.
 
 ## Responsibility Split
 
@@ -24,7 +24,7 @@ Auto-infer Issue metadata from conversation context and delegate creation to `ma
 | 1 | Analyze context and infer metadata | Analyzing context | Manager direct |
 | 1b | Search for similar issues and suggest linking | Searching for similar issues | Manager direct: `shirokuma-docs items search` |
 | 2 | Delegate creation to managing-github-items | Creating the item | `managing-github-items` (Skill) |
-| 2b | [Issue only] Run requirements review and design assessment | Running requirements review | `review-issue` (Skill, requirements role) |
+| 2b | [Issue only] Run requirements review and design assessment | Running requirements review | `analyze-issue` (Skill, requirements role) |
 | 3 | Return next action candidates to user | Presenting next actions | Manager direct |
 
 Dependencies: step 1b blockedBy 1, step 2 blockedBy 1b, step 2b blockedBy 2 (conditional: only for Issue creation), step 3 blockedBy 2 or 2b.
@@ -68,22 +68,22 @@ Skill: managing-github-items
 Args: create-item --title "{Title}" --issue-type "{Type}" --labels "{area:label}" --priority "{Priority}" --size "{Size}"
 ```
 
-### Step 2b: Requirements Review and Design Assessment (invoke review-issue requirements)
+### Step 2b: Requirements Review and Design Assessment (invoke analyze-issue requirements)
 
 **Scope**: Execute only when the created item's type is `issue`. Skip for `discussion` and present next action candidates in Step 3 as usual.
 
-Leverage the context immediately after Issue creation to invoke `review-issue requirements #{issue-number}` via the Skill tool.
+Leverage the context immediately after Issue creation to invoke `analyze-issue requirements #{issue-number}` via the Skill tool.
 
 ```
-Skill: review-issue
+Skill: analyze-issue
 Args: requirements #{issue-number}
 ```
 
-`review-issue requirements` may additionally perform a Project Requirement Consistency check (ADR reference) based on Issue keywords and labels. See [../review-issue/roles/requirements.md](../review-issue/roles/requirements.md#project-requirement-consistency) for trigger conditions and output fields.
+`analyze-issue requirements` may additionally perform a Project Requirement Consistency check (ADR reference) based on Issue keywords and labels. See [../analyze-issue/roles/requirements.md](../analyze-issue/roles/requirements.md#project-requirement-consistency) for trigger conditions and output fields.
 
 #### Expected Output Fields
 
-Scan the Issue comment posted by `review-issue` for the following strings:
+Scan the Issue comment posted by `analyze-issue` for the following strings:
 - `**Review result:**` — PASS or NEEDS_REVISION (always output)
 - `**Design assessment:**` — NEEDED or NOT_NEEDED (always output)
 - `**Project Requirement Consistency:**` — PASS or NEEDS_REVISION (only when ADR check is performed)
@@ -91,7 +91,7 @@ Scan the Issue comment posted by `review-issue` for the following strings:
 
 #### Handling on Check Failure
 
-When `Review result` is `NEEDS_REVISION` (revision loop): Present the issues to the user and request corrections to the Issue body. Invoke `review-issue requirements` again after corrections (maximum 2 revision loops; on the 3rd NEEDS_REVISION, defer to the user).
+When `Review result` is `NEEDS_REVISION` (revision loop): Present the issues to the user and request corrections to the Issue body. Invoke `analyze-issue requirements` again after corrections (maximum 2 revision loops; on the 3rd NEEDS_REVISION, defer to the user).
 
 When `Project Requirement Consistency` is `NEEDS_REVISION`: Present the conflicting ADR numbers and conflict details. Use AskUserQuestion to let the user choose:
 - "Modify the Issue body to make it consistent" → run requirements review again after modification
@@ -149,7 +149,7 @@ See [reference/chain-rules.md](reference/chain-rules.md) for chain decision deta
 
 ## Next Steps
 
-Based on Step 2b `review-issue requirements` result, branch in 3 directions: Design NEEDED → `/design-flow`, Design NOT_NEEDED + M+ → `/prepare-flow`, Design NOT_NEEDED + XS/S + clear requirements → `/implement-flow`. See Step 3 for details.
+Based on Step 2b `analyze-issue requirements` result, branch in 3 directions: Design NEEDED → `/design-flow`, Design NOT_NEEDED + M+ → `/prepare-flow`, Design NOT_NEEDED + XS/S + clear requirements → `/implement-flow`. See Step 3 for details.
 
 ## Evolution Signal Auto-Recording
 
@@ -160,6 +160,24 @@ At the end of the item creation completion report, auto-record Evolution signals
 ## GitHub Writing Rules
 
 Issue title and body must comply with the `output-language` rule and `github-writing-style` rule. This rule also applies to the delegated `managing-github-items` skill.
+
+## Skill Selection Guide
+
+This skill and `requirements-flow` can both create GitHub items, but they serve different purposes.
+
+| Goal | Which skill to use |
+|------|-------------------|
+| "I want to register this conversation as an Issue" / "I need a follow-up Issue" | `create-item-flow` (this skill) |
+| "I want to create a spec or ADR first, then track it as an Issue" / "I want to run the full requirements definition process" | `/requirements-flow` |
+| "I want to write an ADR" / "I want to record a technology decision" | `/requirements-flow` |
+
+**Decision rule**: If the goal is "register this as a GitHub Issue/Discussion right now," use `create-item-flow`. If the goal is "run the requirements definition / ADR creation process," use `requirements-flow`.
+
+### Responsibility Boundary with `requirements-flow`
+
+- `create-item-flow` is the **UI layer** — it immediately registers an Issue/Discussion based on the current conversation context
+- `requirements-flow` is the **requirements phase orchestrator** — it handles the full pipeline: searching existing ADRs/Discussions for consistency → creating ADRs and spec Discussions → guiding next steps
+- A request like "create a spec Discussion" should be routed to `requirements-flow`. This skill does not handle the requirements definition process for specs
 
 ## Notes
 

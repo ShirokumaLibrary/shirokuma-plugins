@@ -172,9 +172,9 @@ shirokuma-docs items add discussion --file /tmp/shirokuma-docs/findings.md
 
 ## レビューゲート
 
-`implement-flow` チェーン経由で呼び出された場合、調査結果は `review-issue`（Skill）の **research ロール**によるレビューを経て確定する。異なるモデルの視点による品質担保を実現する。
+`implement-flow` チェーン経由で呼び出された場合、調査結果は `analyze-issue`（Skill）の **research ロール**によるレビューを経て確定する。異なるモデルの視点による品質担保を実現する。
 
-research ロールは以下の観点でレビューする（詳細は `review-issue` の `roles/research.md` および `criteria/research.md` を参照）:
+research ロールは以下の観点でレビューする（詳細は `analyze-issue` の `roles/research.md` および `criteria/research.md` を参照）:
 - **要件合致性**: 推奨パターンがプロジェクトの tech-stack・既存パターン・依存関係と互換か
 - **調査品質**: ソースの多様性、バージョン整合性、ソース帰属、最新性
 - **実装可能性**: 具体性、段階的導入パス、リスク識別

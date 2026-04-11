@@ -1,6 +1,6 @@
 # Review Work Type Reference
 
-Guide for delegating from `implement-flow` to `review-issue` skill.
+Guide for delegating from `implement-flow` to `review-issue` / `analyze-issue` skills.
 
 ## Delegation Conditions
 
@@ -8,10 +8,11 @@ Guide for delegating from `implement-flow` to `review-issue` skill.
 |-----------|-------------|
 | Keywords: `review`, `audit`, `security check` | `review-issue` |
 | PR review request | `review-issue` |
+| Keywords: `plan review`, `requirements review`, `design review`, `research review` | `analyze-issue` |
 
 ## Execution Context
 
-`review-issue` runs as an Agent tool (subagent). Does not pollute main context.
+`review-issue` / `analyze-issue` run as an Agent tool (subagent). Does not pollute main context.
 
 ## TDD Not Applied
 
@@ -19,9 +20,15 @@ Review work type does not use TDD.
 
 ## What review-issue Provides
 
-- Role-specific reviews (code, security, test, docs, plan)
+- Role-specific reviews (code, security, test, docs)
 - Issue / PR context-based review
 - Review results posted as PR comments
+
+## What analyze-issue Provides
+
+- Issue analysis roles (plan, requirements, design, research)
+- Structured output fields for orchestrator branching (`**Review result:**`, `**Design assessment:**`)
+- Review results posted as Issue comments
 
 ## Chain
 
@@ -29,11 +36,12 @@ Review work type does NOT execute the commit → PR chain (completes with report
 
 ```
 review-issue → Report posted → Complete
+analyze-issue → Report posted → Complete
 ```
 
 ## Post-Review Follow-up
 
-After `review-issue` completes, the manager evaluates the output and determines the next action:
+After `review-issue` / `analyze-issue` completes, the manager evaluates the output and determines the next action:
 
 | Condition | Action |
 |-----------|--------|

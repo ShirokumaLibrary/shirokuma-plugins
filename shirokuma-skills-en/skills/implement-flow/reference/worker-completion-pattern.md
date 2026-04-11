@@ -4,13 +4,14 @@ Common flow executed by all orchestrators after a Skill (Skill tool) or Agent Wo
 
 ## Skill Tool Completion Pattern
 
-Skills invoked via Skill tool (main context) — `code-issue`, `review-issue`, `plan-issue`, `reviewing-claude-config` — run in the same context as the main AI. Post-completion handling follows these rules:
+Skills invoked via Skill tool (main context) — `code-issue`, `review-issue`, `analyze-issue`, `plan-issue`, `reviewing-claude-config` — run in the same context as the main AI. Post-completion handling follows these rules:
 
 | Skill | Completion Handling |
 |-------|-------------------|
 | `code-issue` | If no errors, proceed to next step (`commit-issue`) |
 | `plan-issue` | If no errors, proceed to next step (review) |
 | `review-issue` | Output contains `**Review result:** PASS` / `NEEDS_REVISION` / `FAIL`. Orchestrator uses this string for determination |
+| `analyze-issue` | Output contains `**Review result:** PASS` / `NEEDS_REVISION`. Orchestrator uses this string for determination |
 | `reviewing-claude-config` | Output contains `**Review result:** PASS` / `FAIL`. Orchestrator uses this string for determination |
 
 **No YAML parsing needed**. Skill tools complete within the main context, so structured data communication is not used.
@@ -94,10 +95,10 @@ Would you like to proceed?
 
 | Orchestrator | Skill | Completion Handling | Next Step |
 |--------------|-------|-------------------|-----------|
-| prepare-flow | plan-issue | No errors → success | → review-issue |
-| prepare-flow | review-issue (plan) | `**Review result:** PASS` / `NEEDS_REVISION` | → status update or revision loop |
-| design-flow | design skill group | No errors → success | → review-issue |
-| design-flow | review-issue (design) | `**Review result:** PASS` / `NEEDS_REVISION` | → visual evaluation or completion |
+| prepare-flow | plan-issue | No errors → success | → analyze-issue |
+| prepare-flow | analyze-issue (plan) | `**Review result:** PASS` / `NEEDS_REVISION` | → status update or revision loop |
+| design-flow | design skill group | No errors → success | → analyze-issue |
+| design-flow | analyze-issue (design) | `**Review result:** PASS` / `NEEDS_REVISION` | → visual evaluation or completion |
 | implement-flow | code-issue | No errors → success | → commit-worker |
 | review-flow | review-issue (code) | `**Review result:** PASS` / `FAIL` | → thread response |
 | review-flow | code-issue (fixes) | No errors → success | → commit-worker |

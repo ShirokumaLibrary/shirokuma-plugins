@@ -1,5 +1,8 @@
 # 設計レビューロール
 
+> **注**: このロールは `analyze-issue` に移行しました。現行の実装は `analyze-issue/roles/design.md` を参照してください。
+> `review-issue design` を呼び出した場合、`review-issue` SKILL.md の後方互換スタブが `analyze-issue` に自動委任します。
+
 ## 責務
 
 設計成果物（Design Brief、Aesthetic Direction、UI 実装）の品質レビュー:
@@ -11,11 +14,11 @@
 
 ## `design-flow` との使い分け
 
-| 観点 | `design-flow` 内蔵チェック | `review-issue` design ロール |
+| 観点 | `design-flow` 内蔵チェック | `analyze-issue` design ロール |
 |------|----------------------------------|-----------------------------------|
 | タイミング | 設計フェーズ中の反復チェック | 設計完了後のゲートレビュー |
 | 目的 | 設計の方向性確認 | 独立したセカンドオピニオン |
-| 起動方法 | `design-flow` のループ内 | `/review-issue design #N` |
+| 起動方法 | `design-flow` のループ内 | `analyze-issue design #N` |
 
 ## 必要な知識
 
@@ -99,9 +102,9 @@
 4. **良い実践**: 適切な設計パターン
 5. **推奨事項**: 優先度順のアクション項目
 
-## トリガーキーワード
+## トリガーキーワード（analyze-issue に移行済み）
 
-- "design review"
-- "設計レビュー"
-- "review design"
-- "デザインレビュー"
+- "design review" → `analyze-issue design`
+- "設計レビュー" → `analyze-issue design`
+- "review design" → `analyze-issue design`
+- "デザインレビュー" → `analyze-issue design`

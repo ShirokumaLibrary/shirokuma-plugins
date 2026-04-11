@@ -171,9 +171,9 @@ shirokuma-docs items add discussion --file /tmp/shirokuma-docs/findings.md
 
 ## Review Gate
 
-When invoked via `implement-flow` chain, research results are reviewed by `review-issue` (Skill) using the **research role** before being finalized. This ensures research quality through a different model perspective.
+When invoked via `implement-flow` chain, research results are reviewed by `analyze-issue` (Skill) using the **research role** before being finalized. This ensures research quality through a different model perspective.
 
-The research role reviews the following aspects (see `review-issue`'s `roles/research.md` and `criteria/research.md` for details):
+The research role reviews the following aspects (see `analyze-issue`'s `roles/research.md` and `criteria/research.md` for details):
 - **Requirement alignment**: Whether recommended patterns are compatible with the project's tech-stack, existing patterns, and dependencies
 - **Research quality**: Source diversity, version consistency, source attribution, currency
 - **Implementability**: Specificity, incremental adoption paths, risk identification
@@ -190,4 +190,4 @@ For conditional branching logic after research completion (Discussion save, Issu
 
 - Results can be passed to framework-specific coding skills for implementation
 - Runs as Agent tool (`research-worker` subagent) for isolated execution without polluting main context
-- Research results are reviewed by `review-issue` (Skill) when invoked through the workflow chain
+- Research results are reviewed by `analyze-issue` (Skill) when invoked through the workflow chain

@@ -25,12 +25,11 @@ Register **all chain steps** via TaskCreate **before starting work**.
 | 1 | Implement changes | Implementing changes | `code-issue` (subagent: `coding-worker`) |
 | 2 | Commit and push changes | Committing and pushing | `commit-issue` (subagent) |
 | 3 | Create pull request | Creating pull request | `open-pr-issue` (subagent) |
-| 4 | Simplify and improve code | Improving code | `/simplify` (Skill tool) |
-| 5 | Run security review | Running security review | `reviewing-security` (Skill tool) |
-| 6 | Post work summary | Posting work summary | Manager direct: `items add comment` |
-| 7 | Update Status to Review | Updating Status to Review | Manager direct: `items transition {number} --to Review` |
+| 4 | Post-process code (simplify, security review, improvement commit) | Post-processing code | `finalize-changes` (Skill tool) |
+| 5 | Post work summary | Posting work summary | Manager direct: `items add comment` |
+| 6 | Update Status to Review | Updating Status to Review | Manager direct: `items transition {number} --to Review` |
 
-Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5, step 7 blockedBy 6.
+Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5.
 
 **Research:**
 
@@ -223,7 +222,7 @@ After work completes, execute the chain **automatically**. No user confirmation 
 
 | Work Type | Chain |
 |-----------|-------|
-| General Coding | Work → Commit → PR → /simplify → reviewing-security → Work Summary → Status Update |
+| General Coding | Work → Commit → PR → finalize-changes → Work Summary → Status Update |
 | Research | Research → Discussion |
 | Review | Review → Report posted → Complete (no commit/PR chain) |
 
@@ -261,8 +260,7 @@ Skills are invoked via Skill tool (main context) or Agent tool (subagent). Skill
 | Skill | Invocation | Reason |
 |-------|-----------|--------|
 | `code-issue` | Agent (`coding-worker`) | Context isolation (implementation work bloats main context) |
-| `/simplify` | Skill tool | Claude Code built-in skill, runs in main context |
-| `reviewing-security` | Skill tool | Wraps `!claude -p '/security-review'`. **Do NOT substitute with `review-issue`. Do NOT invoke via Agent tool** |
+| `finalize-changes` | Skill tool | Post-processing chain: `/simplify` + `reviewing-security` + improvement commit. **Do NOT invoke via Agent tool** |
 | `review-issue` | Agent (`review-worker`) | Context isolation + opus model selection |
 | `reviewing-claude-config` | Skill tool | Needs project rules for quality standards, relatively lightweight |
 | `commit-issue` | Agent (`commit-worker`) | Git operations only |
@@ -300,7 +298,7 @@ Agent(
 
 `open-pr-issue` includes `Closes #{issue-number}` in the PR body when launched with an issue number, linking the PR to the issue. **If the issue number is omitted, `Closes` is skipped and the PR will not be linked to the issue.**
 
-> **CRITICAL — Chain continuation after Skill tool / Agent tool returns**: When a Skill tool (`/simplify`, `reviewing-security`, etc.) or sub-agent (`pr-worker`, `commit-worker`, etc.) completes, **check TaskList for remaining `pending` steps**. If pending steps remain (commit, PR creation, work summary, status update), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. A Skill tool or Agent tool returning is a chain mid-point, not a completion signal. The PR → `/simplify` → `reviewing-security` transition is particularly prone to chain breaks — pay extra attention.
+> **CRITICAL — Chain continuation after Skill tool / Agent tool returns**: When a Skill tool (`finalize-changes`, etc.) or sub-agent (`pr-worker`, `commit-worker`, etc.) completes, **check TaskList for remaining `pending` steps**. If pending steps remain (commit, PR creation, work summary, status update), **immediately proceed to the next pending step in the same response**. Do NOT stop, summarize, or ask the user. A Skill tool or Agent tool returning is a chain mid-point, not a completion signal. The PR → `finalize-changes` transition is particularly prone to chain breaks — pay extra attention.
 
 #### Work Summary (Issue Comment)
 
@@ -336,7 +334,7 @@ Skip this step if no issue number is associated with the work.
 
 #### Status Update (End of Chain)
 
-**IMPORTANT**: Do NOT update Status to Review at PR creation time. The `/simplify` and `/security-review` review steps must complete first. Update Status only after work summary is posted.
+**IMPORTANT**: Do NOT update Status to Review at PR creation time. The `finalize-changes` post-processing step must complete first. Update Status only after work summary is posted.
 
 Update Status to Review for issues with a number:
 

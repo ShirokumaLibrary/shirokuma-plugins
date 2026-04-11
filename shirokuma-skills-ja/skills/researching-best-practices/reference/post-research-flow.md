@@ -9,7 +9,7 @@
 `implement-flow` がフロー全体を制御する。リサーチスキルは調査結果を返すのみ。
 
 ```
-researching-best-practices → review-issue(research, Skill) → Discussion 自動保存 → チェーン完了
+researching-best-practices → analyze-issue(research, Skill) → Discussion 自動保存 → チェーン完了
 ```
 
 - Discussion 保存: **必須**（`implement-flow` の `researching-reference.md` が実行）

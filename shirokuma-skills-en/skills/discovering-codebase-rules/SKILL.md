@@ -180,7 +180,7 @@ When analyzing codebases or GitHub Discussions, detect the following as ADR life
 |-------------|-----------------|----------------------|
 | Consistent management of ADR status transitions (Proposed/Accepted/Deprecated/Superseded) | Analyze status description patterns in Discussion titles and bodies | "ADR lifecycle management pattern" |
 | Conflicts between naming convention Issues/ADRs and new Issues/code | Detect naming convention violations via `items search` + code analysis | "Naming convention conflict detection pattern" |
-| `review-issue requirements` check items that are reusable in other codebases | Evaluate generalizability of consistency check patterns | "Reusable check item pattern" |
+| `analyze-issue requirements` check items that are reusable in other codebases | Evaluate generalizability of consistency check patterns | "Reusable check item pattern" |
 
 ### Detection Logic
 
@@ -228,7 +228,7 @@ When ADR lifecycle management patterns are detected, record the following signal
 ```bash
 cat > /tmp/shirokuma-docs/{evolution-number}-adr-signal.md <<'EOF'
 **Type:** ADR lifecycle management pattern
-**Target:** write-adr skill / review-issue requirements role
+**Target:** write-adr skill / analyze-issue requirements role
 **Context:** {specific situation of the discovered pattern}
 **Proposal:** {applicability to other codebases or improvement suggestions}
 **Signal type:** {"ADR lifecycle management pattern"|"Naming convention conflict detection pattern"|"Reusable check item pattern"}

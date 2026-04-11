@@ -1,6 +1,6 @@
 ---
 name: review-issue
-description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, documentation, plan quality, requirements quality, design quality, and research quality. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "plan review", "requirements review", "design review", "research review", "code review", "config review".
+description: Provides comprehensive review workflow with specialized roles for code quality, security, testing patterns, and documentation. Triggers: "review", "security audit", "security check", "test review", "test quality", "Next.js review", "docs review", "code review", "config review". Issue analysis (plan, requirements, design, research) has moved to analyze-issue.
 allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 ---
 
@@ -23,10 +23,27 @@ Comprehensive review workflow with specialized roles for different review types.
 | **testing** | TDD, coverage, mocks | "test review", "テストレビュー" |
 | **nextjs** | Framework, patterns (delegates to `reviewing-nextjs` with fallback) | "Next.js review", "プロジェクト" |
 | **docs** | Markdown structure, links, terminology | "docs review", "ドキュメントレビュー" |
-| **plan** | Requirements coverage, task granularity, risks | "plan review", "計画レビュー" |
-| **requirements** | Issue body completeness, clarity, implementability | "requirements review", "要件レビュー", "要件確認" |
-| **design** | Design Brief, Aesthetic Direction, UI implementation | "design review", "設計レビュー" |
-| **research** | Requirement alignment, research quality, implementability | "research review", "リサーチレビュー" |
+
+> **Issue analysis roles (plan / requirements / design / research) have moved to `analyze-issue`.** Backward compatibility stubs will automatically delegate to `analyze-issue` when these keywords are used.
+
+## Backward Compatibility Delegation Stubs
+
+When `review-issue` is invoked with the following keywords, it automatically delegates to `analyze-issue`:
+
+| Keyword | Delegated Role |
+|---------|---------------|
+| "plan review", "計画レビュー", "計画チェック" | `analyze-issue` plan |
+| "requirements review", "要件レビュー", "要件確認", "要件整合性", "ADR 確認" | `analyze-issue` requirements |
+| "design review", "設計レビュー", "デザインレビュー" | `analyze-issue` design |
+| "research review", "リサーチレビュー" | `analyze-issue` research |
+
+**Behavior**: When a keyword is detected, output the following message and exit (no Skill delegation):
+
+```
+This role has moved to the analyze-issue skill. Please use `analyze-issue {role name}`.
+```
+
+Example: When "plan review" is detected → output `"This role has moved to the analyze-issue skill. Please use \`analyze-issue plan\`."` and exit.
 
 ## Workflow
 
@@ -49,10 +66,10 @@ Based on user request, select appropriate role:
 | "test", "テスト" | testing | criteria/testing, patterns/e2e-testing |
 | "Next.js", "nextjs" | nextjs | Discover `reviewing-nextjs` via `skills routing reviewing`; fall back to ALL knowledge files if not installed |
 | "docs", "ドキュメント" | docs | roles/docs.md |
-| "plan", "計画レビュー" | plan | roles/plan.md |
-| "requirements", "要件レビュー", "要件確認" | requirements | roles/requirements.md |
-| "design", "設計レビュー", "デザイン" | design | criteria/design, roles/design |
-| "research", "リサーチレビュー" | research | roles/research, criteria/research |
+| "plan", "計画レビュー" | → delegate to `analyze-issue` | — |
+| "requirements", "要件レビュー", "要件確認" | → delegate to `analyze-issue` | — |
+| "design", "設計レビュー", "デザイン" | → delegate to `analyze-issue` | — |
+| "research", "リサーチレビュー" | → delegate to `analyze-issue` | — |
 
 #### `nextjs` Role Dynamic Delegation (`skills routing reviewing` Integration)
 
@@ -97,7 +114,7 @@ User request
 | 5 | docs | Document analysis is independent of code analysis |
 | 6 | code+annotation | Special mode of code |
 
-**Excluded roles:** plan / requirements / design / research are excluded from multi-role auto-detection (they are issue analysis roles, and mixing with code review roles is unnatural).
+**Excluded roles:** plan / requirements / design / research have moved to `analyze-issue` and are excluded from multi-role auto-detection in this skill.
 
 **Exclusion rules:**
 - `code` and `config` are subject to auto-switching, so when both match, the existing `config` auto-detection logic takes priority (no multi-role).
@@ -171,10 +188,7 @@ Skip this substep if no local documentation is available (no `ready` sources).
 | testing | lint tests, lint coverage (test-related only) |
 | docs | lint docs (document structure only) |
 | config | Skip (config files are analyzed using `reviewing-claude-config` validation logic) |
-| plan | Skip (target is Issue body, not code/document files) |
-| requirements | Skip (target is Issue body, not code/document files) |
-| design | Skip (target is Issue body / design artifacts, not code/document files) |
-| research | Skip (target is research findings, not code/document files) |
+| plan / requirements / design / research | Delegate to `analyze-issue` (these roles are not handled by this skill) |
 
 **code / code+annotation / nextjs roles:**
 
@@ -239,45 +253,6 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 6. `plugin.json` version consistency (match against `package.json`)
 7. Manual date stamps
 8. ASCII art diagrams
-
-**Requirements role:**
-
-1. Fetch Issue body via `shirokuma-docs items context {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
-2. Analyze each section (purpose, overview, reproduction steps, deliverables, considerations) for presence and content
-3. Evaluate each item in review checklist (`roles/requirements.md`)
-4. Check against anti-patterns
-5. Assess completeness, clarity, implementability, and consistency
-6. Perform the design assessment and append `**Design assessment:** NEEDED / NOT_NEEDED` to the report (see the Design Assessment section in `roles/requirements.md`)
-
-**Plan role:**
-
-1. Fetch the parent Issue via `shirokuma-docs items context {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
-2. Identify the plan issue from `subIssuesSummary` — the child issue with a title starting with "Plan:" or "計画:"
-3. Fetch the plan issue body via `shirokuma-docs items context {plan-issue-number}` and read `.shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md`
-4. Extract the `## Plan` / `## 計画` section from the plan issue body as the review target
-5. Evaluate each item in review checklist (`roles/plan.md`)
-6. Check against anti-patterns
-7. Verify consistency with requirements and deliverables
-
-**Backward compatibility**: When no plan issue (child issue) exists but the parent issue body contains a `## Plan` / `## 計画` section (legacy approach), use the parent issue's plan section as the review target.
-
-**Design role:**
-
-1. Fetch Issue body via `shirokuma-docs items context {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
-2. Extract Design Brief, Aesthetic Direction, and UI implementation results
-3. Evaluate each item in review checklist (`roles/design.md`)
-4. Check against review criteria (`criteria/design.md`)
-5. Check against anti-patterns
-6. Verify requirements alignment and technical feasibility
-
-**Research role:**
-
-1. Fetch research findings (Discussion or Issue comment)
-2. Verify requirement alignment (`criteria/research.md`)
-3. Evaluate research quality (source diversity, version consistency, source attribution)
-4. Verify implementability (specificity, incremental adoption, risk identification)
-5. Assess alignment level using the mismatch decision matrix (`roles/research.md`)
-6. Create adoption proposals for mismatched but useful patterns
 
 **Artifact Review (only when prompt contains "Artifact review targets:" or "成果物レビュー対象:" in a PR context):**
 
@@ -353,10 +328,7 @@ Report the Discussion URL to the user.
 |---------|---------------|-----------------|
 | PR number specified | PR comment (summary) | Discussion only if 5+ errors |
 | File/directory | Discussion (Reports) | — |
-| Issue number specified (plan role) | Issue comment | — |
-| Issue number specified (requirements role) | Issue comment | — |
-| Issue number specified (design role) | Issue comment | — |
-| Issue number specified (research role) | Issue comment | — |
+| Issue analysis (plan/requirements/design/research) | Delegate to `analyze-issue` | — |
 
 > See `rules/output-destinations.md` for the full output destination policy.
 
@@ -395,12 +367,14 @@ For token efficiency:
 "security review lib/actions/"     # Security
 "test review"                      # Testing
 "Next.js review"                   # Next.js project
-"plan review #42"                  # Plan review
-"requirements review #42"          # Requirements review
-"design review #42"                # Design review
-"research review #42"              # Research review
 "security + code review src/"      # Multi-role
 "reviewer --update"                # Update knowledge
+
+# Issue analysis roles (moved to analyze-issue):
+# "plan review #42"          → /analyze-issue plan #42
+# "requirements review #42"  → /analyze-issue requirements #42
+# "design review #42"        → /analyze-issue design #42
+# "research review #42"      → /analyze-issue research #42
 ```
 
 ## Next Steps
@@ -473,46 +447,7 @@ Results from earlier roles (lint results, detected issues) are available as cont
 
 On review completion, output the following standard expressions so that the calling orchestrator can consistently determine the result.
 
-### Plan Review Mode (plan role)
-
-When invoked from `prepare-flow` with plan role, post the plan review result as an Issue comment and include the following verdict.
-
-- **PASS**: `**Review result:** PASS` — No critical issues in the plan (Suggestions may still be present)
-- **NEEDS_REVISION**: `**Review result:** NEEDS_REVISION` — Missing requirements, significant inconsistencies, or anti-patterns detected
-
-On NEEDS_REVISION, classify issues into `[Plan]` and `[Issue description]`. `plan-issue` uses this classification to perform fixes.
-
-### Requirements Review Mode (requirements role)
-
-When invoked with requirements role, post the requirements review result as an Issue comment and include the following verdict.
-
-- **PASS**: `**Review result:** PASS` — No critical issues in the Issue body (improvement suggestions may still be present)
-- **NEEDS_REVISION**: `**Review result:** NEEDS_REVISION` — Missing required sections, fatal ambiguities, or unimplementable requirements
-
-On NEEDS_REVISION, classify issues into `[Completeness]`, `[Clarity]`, and `[Implementability]`.
-
-Regardless of whether the result is PASS or NEEDS_REVISION, perform the design assessment (see `roles/requirements.md` "Design Assessment" section) and always append:
-
-- **Assessment NEEDED**: `**Design assessment:** NEEDED` — Design phase is required
-- **Assessment NOT_NEEDED**: `**Design assessment:** NOT_NEEDED` — Design phase is not required
-
-This structured output is mandatory because `create-item-flow` scans for the `**Design assessment:**` string to automatically branch to the next flow.
-
-The trigger conditions, check items, and structured output fields (`**Project Requirement Consistency:**` / `**Referenced ADRs:**`) for the Project Requirement Consistency check are authoritatively defined in [`roles/requirements.md` "Project Requirement Consistency"](roles/requirements.md#project-requirement-consistency). `create-item-flow` Step 2b scans these fields to branch downstream processing.
-
-### Design Review Mode (design role)
-
-When invoked with design role, post the design review result as an Issue comment and include the following verdict.
-
-- **PASS**: `**Review result:** PASS` — No critical issues in the design (improvement suggestions may still be present)
-- **NEEDS_REVISION**: `**Review result:** NEEDS_REVISION` — Missing Design Brief, uncovered requirements, accessibility violations, significant inconsistencies
-
-### Research Review Mode (research role)
-
-When invoked with research role, post the research review result as an Issue comment and include the following verdict.
-
-- **PASS**: `**Review result:** PASS` — No critical issues in research findings, aligned with requirements
-- **NEEDS_REVISION**: `**Review result:** NEEDS_REVISION` — Insufficient sources, version inconsistencies, critical mismatches with requirements
+> **Note**: Plan / requirements / design / research roles have moved to `analyze-issue`. See the `analyze-issue` skill for their verdict expressions.
 
 ### Normal Review Mode (code / security / testing / docs / config roles)
 
@@ -534,12 +469,14 @@ Review reports (PR comments, Discussions) must follow the language specified in 
 
 | Directory | Files |
 |-----------|-------|
-| `criteria/` | [code-quality](criteria/code-quality.md), [coding-conventions](criteria/coding-conventions.md), [security](criteria/security.md), [testing](criteria/testing.md), [design](criteria/design.md), [research](criteria/research.md) |
+| `criteria/` | [code-quality](criteria/code-quality.md), [coding-conventions](criteria/coding-conventions.md), [security](criteria/security.md), [testing](criteria/testing.md) |
 | `patterns/` | [server-actions](patterns/server-actions.md), [server-actions-structure](patterns/server-actions-structure.md), [drizzle-orm](patterns/drizzle-orm.md), [better-auth](patterns/better-auth.md), [e2e-testing](patterns/e2e-testing.md), [tailwind-v4](patterns/tailwind-v4.md), [radix-ui-hydration](patterns/radix-ui-hydration.md), [jsdoc](patterns/jsdoc.md), [nextjs-patterns](patterns/nextjs-patterns.md), [i18n](patterns/i18n.md), [code-quality](patterns/code-quality.md), [account-lockout](patterns/account-lockout.md), [audit-logging](patterns/audit-logging.md), [docs-management](patterns/docs-management.md) |
 | `reference/` | [tech-stack](reference/tech-stack.md), [progress-report-examples](reference/progress-report-examples.md) |
-| `roles/` | [code](roles/code.md), [security](roles/security.md), [testing](roles/testing.md), [nextjs](roles/nextjs.md), [docs](roles/docs.md), [plan](roles/plan.md), [requirements](roles/requirements.md), [design](roles/design.md), [research](roles/research.md) |
+| `roles/` | [code](roles/code.md), [security](roles/security.md), [testing](roles/testing.md), [nextjs](roles/nextjs.md), [docs](roles/docs.md) |
 | `templates/` | [report](templates/report.md) |
 | `docs/setup/` | [auth-setup](docs/setup/auth-setup.md), [database-setup](docs/setup/database-setup.md), [infra-setup](docs/setup/infra-setup.md), [project-init](docs/setup/project-init.md), [styling-setup](docs/setup/styling-setup.md) |
 | `docs/workflows/` | [annotation-consistency](docs/workflows/annotation-consistency.md), [shirokuma-docs-verification](docs/workflows/shirokuma-docs-verification.md) |
+
+> **Issue analysis skill references**: For plan/requirements/design/research role knowledge files, see the `analyze-issue/` skill.
 
 See the role selection table in Step 1 for per-role file loading.

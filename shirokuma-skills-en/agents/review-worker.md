@@ -6,13 +6,17 @@ model: opus
 memory: project
 skills:
   - review-issue
+  - analyze-issue
 ---
 
 # Issue Review (Sub-agent)
 
-Follow the injected skill (`review-issue`) instructions to perform the review.
+Follow the injected skill (`review-issue` / `analyze-issue`) instructions to perform the review.
 
-Role selection, multi-role auto-detection, report generation and saving are all handled by the `review-issue` skill. This agent serves as a wrapper to execute `review-issue` in a context-isolated environment.
+- Code/security/test/docs reviews: handled by the `review-issue` skill
+- Issue analysis (plan/requirements/design/research): handled by the `analyze-issue` skill
+
+Role selection, multi-role auto-detection, report generation and saving are all handled by each skill. This agent serves as a wrapper to execute `review-issue` / `analyze-issue` in a context-isolated environment.
 
 ## Output Language (Required)
 

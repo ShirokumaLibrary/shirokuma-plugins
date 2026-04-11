@@ -6,13 +6,17 @@ model: opus
 memory: project
 skills:
   - review-issue
+  - analyze-issue
 ---
 
 # Issue レビュー（サブエージェント）
 
-注入されたスキル（`review-issue`）の指示に従いレビューを実行する。
+注入されたスキル（`review-issue` / `analyze-issue`）の指示に従いレビューを実行する。
 
-ロール選択、マルチロール自動判定、レポート生成・保存は全て `review-issue` スキルが担当する。このエージェントは `review-issue` をコンテキスト分離された環境で実行するためのラッパーである。
+- コード・セキュリティ・テスト・ドキュメントレビュー: `review-issue` スキルが担当
+- Issue 分析（計画・要件・設計・リサーチ）: `analyze-issue` スキルが担当
+
+ロール選択、マルチロール自動判定、レポート生成・保存は各スキルが担当する。このエージェントは `review-issue` / `analyze-issue` をコンテキスト分離された環境で実行するためのラッパーである。
 
 ## 出力言語（必須）
 

@@ -1,12 +1,12 @@
 ---
 name: create-item-flow
-description: 会話コンテキストからGitHub Issue/Discussionを自動推定して作成し、要件レビューを自動実行して次フローに誘導します。トリガー: 「Issue にして」「Issue 作って」「フォローアップ Issue」「仕様作成して」「新規 Issue」。
+description: 会話コンテキストからGitHub Issue/Discussionを自動推定して作成し、要件レビューを自動実行して次フローに誘導します。トリガー: 「Issue にして」「Issue 作って」「フォローアップ Issue」「新規 Issue」。仕様・ADR の作成・要件定義プロセス全体が目的の場合は /requirements-flow を使用してください。
 allowed-tools: Bash, Skill, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
 # アイテム作成
 
-会話コンテキストから Issue メタデータを自動推定し、`managing-github-items` に委任して作成。Issue の場合は作成後に `review-issue requirements` を自動実行し、レビュー結果（`**レビュー結果:**`）と設計要否判定（`**設計要否:**`）に基づき次フロー（`/design-flow`, `/prepare-flow`, `/implement-flow`）に誘導する。Discussion の場合はレビューをスキップして次のアクション候補を提示する。
+会話コンテキストから Issue メタデータを自動推定し、`managing-github-items` に委任して作成。Issue の場合は作成後に `analyze-issue requirements` を自動実行し、レビュー結果（`**レビュー結果:**`）と設計要否判定（`**設計要否:**`）に基づき次フロー（`/design-flow`, `/prepare-flow`, `/implement-flow`）に誘導する。Discussion の場合はレビューをスキップして次のアクション候補を提示する。
 
 ## 責務分担
 
@@ -24,7 +24,7 @@ allowed-tools: Bash, Skill, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate
 | 1 | コンテキストを分析しメタデータを推定する | コンテキストを分析中 | マネージャー直接 |
 | 1b | 類似課題を検索し関連付けを提案する | 類似課題を検索中 | マネージャー直接: `shirokuma-docs items search` |
 | 2 | managing-github-items に委任して作成する | アイテムを作成中 | `managing-github-items` (Skill) |
-| 2b | [Issue のみ] 要件レビューと設計要否判定を実行する | 要件レビュー中 | `review-issue` (Skill, requirements ロール) |
+| 2b | [Issue のみ] 要件レビューと設計要否判定を実行する | 要件レビュー中 | `analyze-issue` (Skill, requirements ロール) |
 | 3 | ユーザーに次のアクション候補を返す | 次のアクションを提示中 | マネージャー直接 |
 
 Dependencies: step 1b blockedBy 1, step 2 blockedBy 1b, step 2b blockedBy 2 (条件付き: Issue 作成時のみ), step 3 blockedBy 2 or 2b.
@@ -68,22 +68,22 @@ Skill: managing-github-items
 Args: create-item --title "{タイトル}" --issue-type "{Type}" --labels "{area:ラベル}" --priority "{Priority}" --size "{Size}"
 ```
 
-### ステップ 2b: 要件レビューと設計要否判定（review-issue requirements 呼び出し）
+### ステップ 2b: 要件レビューと設計要否判定（analyze-issue requirements 呼び出し）
 
 **適用範囲**: 作成したアイテムの type が `issue` の場合のみ実行する。`discussion` の場合はスキップし、ステップ 3 で従来通り次のアクション候補を提示する。
 
-Issue 作成直後のコンテキストを活かし、Skill ツールで `review-issue requirements #{issue-number}` を呼び出す。
+Issue 作成直後のコンテキストを活かし、Skill ツールで `analyze-issue requirements #{issue-number}` を呼び出す。
 
 ```
-Skill: review-issue
+Skill: analyze-issue
 Args: requirements #{issue-number}
 ```
 
-`review-issue requirements` は Issue のキーワード・ラベルに応じてプロジェクト要件整合性チェック（ADR 参照）を追加実行する場合がある。トリガー条件と出力フィールドは [../review-issue/roles/requirements.md](../review-issue/roles/requirements.md#プロジェクト要件整合性) を参照。
+`analyze-issue requirements` は Issue のキーワード・ラベルに応じてプロジェクト要件整合性チェック（ADR 参照）を追加実行する場合がある。トリガー条件と出力フィールドは [../analyze-issue/roles/requirements.md](../analyze-issue/roles/requirements.md#プロジェクト要件整合性) を参照。
 
 #### 期待出力フィールド
 
-`review-issue` が Issue コメントに投稿した結果から以下の文字列を走査する:
+`analyze-issue` が Issue コメントに投稿した結果から以下の文字列を走査する:
 - `**レビュー結果:**` — PASS または NEEDS_REVISION（常に出力）
 - `**設計要否:**` — NEEDED または NOT_NEEDED（常に出力）
 - `**プロジェクト要件整合性:**` — PASS または NEEDS_REVISION（ADR チェック実施時のみ）
@@ -91,7 +91,7 @@ Args: requirements #{issue-number}
 
 #### チェック失敗時のハンドリング
 
-`レビュー結果` が `NEEDS_REVISION` の場合（修正ループ）: 問題点をユーザーに提示し、Issue 本文の修正を依頼する。修正後に再度 `review-issue requirements` を呼び出す（修正ループは最大 2 回。3 回目の NEEDS_REVISION はユーザーに判断を委ねる）。
+`レビュー結果` が `NEEDS_REVISION` の場合（修正ループ）: 問題点をユーザーに提示し、Issue 本文の修正を依頼する。修正後に再度 `analyze-issue requirements` を呼び出す（修正ループは最大 2 回。3 回目の NEEDS_REVISION はユーザーに判断を委ねる）。
 
 `プロジェクト要件整合性` が `NEEDS_REVISION` の場合: 矛盾する ADR 番号と矛盾内容を提示する。AskUserQuestion でユーザーに以下のいずれかを選択させる:
 - 「Issue 本文を修正して整合させる」→ 修正後に再度 requirements レビューを実行
@@ -106,7 +106,7 @@ Discussion 作成完了: #{number}
 → 続編の議論や関連 Issue があれば案内
 ```
 
-**Issue の場合**: ステップ 2b の `**レビュー結果:**` が PASS の場合、`**設計要否:**` に基づき以下の 3 方向に分岐する。
+**Issue の場合**: ステップ 2b の `**レビュー結果:**`（`analyze-issue` が投稿）が PASS の場合、`**設計要否:**` に基づき以下の 3 方向に分岐する。
 
 **設計要否 NEEDED の場合（設計フェーズへ）:**
 
@@ -149,7 +149,7 @@ Discussion 作成完了: #{number}
 
 ## 次のステップ
 
-ステップ 2b の `review-issue requirements` 結果に基づき 3 方向に分岐する: 設計 NEEDED → `/design-flow`、設計 NOT_NEEDED + M+ → `/prepare-flow`、設計 NOT_NEEDED + XS/S + 要件明確 → `/implement-flow`。詳細はステップ 3 参照。
+ステップ 2b の `analyze-issue requirements` 結果に基づき 3 方向に分岐する: 設計 NEEDED → `/design-flow`、設計 NOT_NEEDED + M+ → `/prepare-flow`、設計 NOT_NEEDED + XS/S + 要件明確 → `/implement-flow`。詳細はステップ 3 参照。
 
 ## Evolution シグナル自動記録
 
@@ -160,6 +160,24 @@ Discussion 作成完了: #{number}
 ## GitHub 書き込みルール
 
 Issue のタイトル・本文は `output-language` ルールと `github-writing-style` ルールに準拠すること。委任先の `managing-github-items` にもこのルールが適用される。
+
+## スキル選択ガイド
+
+このスキルと `requirements-flow` はどちらも GitHub アイテムを作成できますが、目的が異なります。
+
+| 目的 | 使うべきスキル |
+|------|--------------|
+| 「この会話の内容を Issue として登録したい」「フォローアップ Issue を作りたい」 | `create-item-flow`（このスキル） |
+| 「仕様・ADR を作成してから Issue 化したい」「要件定義プロセス全体を実行したい」 | `/requirements-flow` |
+| 「ADR を書きたい」「技術選定を記録したい」 | `/requirements-flow` |
+
+**判断基準**: 「今すぐ GitHub Issue/Discussion として登録する」ことが目的なら `create-item-flow`。「要件定義・ADR 作成というプロセス全体を実行する」ことが目的なら `requirements-flow`。
+
+### `requirements-flow` との責務境界
+
+- `create-item-flow` は **UI レイヤー** であり、既存の会話コンテキストをもとに Issue/Discussion を即時登録する
+- `requirements-flow` は **要件定義フェーズのオーケストレーター** であり、既存 ADR・Discussion の検索・整合確認→ write-adr / 仕様 Discussion 作成→次フロー案内までを統括する
+- 「仕様 Discussion を作ってほしい」という発話は `requirements-flow` にルーティングする。このスキルは仕様の要件定義プロセスを担当しない
 
 ## 注意事項
 

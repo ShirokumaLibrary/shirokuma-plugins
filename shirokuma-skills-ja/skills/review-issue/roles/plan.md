@@ -1,5 +1,8 @@
 # 計画レビューロール
 
+> **注**: このロールは `analyze-issue` に移行しました。現行の実装は `analyze-issue/roles/plan.md` を参照してください。
+> `review-issue plan` を呼び出した場合、`review-issue` SKILL.md の後方互換スタブが `analyze-issue` に自動委任します。
+
 ## 責務
 
 Issue の計画（計画 Issue または `## 計画` セクション）の品質レビュー:
@@ -13,12 +16,12 @@ Issue の計画（計画 Issue または `## 計画` セクション）の品質
 
 ## `plan-issue` との使い分け
 
-| 観点 | `plan-issue` 内蔵レビュー | `review-issue` plan ロール |
+| 観点 | `plan-issue` 内蔵レビュー | `analyze-issue` plan ロール |
 |------|--------------------------------|--------------------------------|
 | タイミング | 計画策定直後の即時チェック | ユーザーが任意タイミングで依頼 |
 | データ取得 | Task エージェントに Issue 本文を埋め込み | Issue 番号から計画 Issue を特定し `shirokuma-docs items context` で取得 |
 | 目的 | 計画の初期品質ゲート | 独立したセカンドオピニオン |
-| 起動方法 | `plan-issue` のステップ 4 で自動実行 | `/review-issue plan #N` または Review Issue 指定 |
+| 起動方法 | `plan-issue` のステップ 4 で自動実行 | `analyze-issue plan #N` |
 
 ## 必要な知識
 
@@ -118,9 +121,9 @@ Issue の計画（計画 Issue または `## 計画` セクション）の品質
 4. **良い実践**: 適切な計画パターン
 5. **推奨事項**: 優先度順のアクション項目
 
-## トリガーキーワード
+## トリガーキーワード（analyze-issue に移行済み）
 
-- "plan review"
-- "計画レビュー"
-- "review plan"
-- "計画チェック"
+- "plan review" → `analyze-issue plan`
+- "計画レビュー" → `analyze-issue plan`
+- "review plan" → `analyze-issue plan`
+- "計画チェック" → `analyze-issue plan`

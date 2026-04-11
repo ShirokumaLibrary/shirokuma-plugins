@@ -1,12 +1,12 @@
 ---
 name: reviewing-security
-description: /security-review を実行します。implement-flow チェーンから呼び出されます。直接呼び出しも可能です。
+description: /security-review を実行します。finalize-changes スキル経由で implement-flow と review-flow チェーンから呼び出されます。直接呼び出しも可能です。
 allowed-tools: Bash
 ---
 
 # セキュリティレビュー
 
-`/security-review` を実行するスキル。`implement-flow` チェーンのステップ 5 として呼び出される。
+`/security-review` を実行するスキル。`finalize-changes` スキル経由で `implement-flow` と `review-flow` のチェーンから呼び出される。
 
 !`claude -p '/security-review'`
 

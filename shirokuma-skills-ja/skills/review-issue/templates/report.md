@@ -8,7 +8,7 @@
 **日付**: YYYY-MM-DD HH:MM
 **レビュアー**: Claude (reviewer agent)
 **対象**: [ファイル/ディレクトリパス]
-**ロール**: [code|security|testing|nextjs|plan|design|requirements|research]
+**ロール**: [code|security|testing|nextjs|docs|config]
 ```
 
 ## セクション
@@ -77,14 +77,6 @@
 **指摘詳細**（指摘がある場合のみ）:
 
 - `#N`: {指摘内容の詳細説明}
-
-### 7. 設計要否（requirements ロールの場合のみ）
-
-> このセクションは requirements ロールの場合のみ表示する。他のロールでは省略する。
-
-**設計要否:** NEEDED / NOT_NEEDED
-
-判定根拠: {NEEDED / NOT_NEEDED と判定した主要な根拠を 1-2 文で記載}
 
 ---
 

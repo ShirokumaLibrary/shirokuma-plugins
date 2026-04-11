@@ -1,5 +1,8 @@
 # Design Review Role
 
+> **Note**: This role has been migrated to `analyze-issue`. For the current implementation, see `analyze-issue/roles/design.md`.
+> When `review-issue design` is invoked, the backward compatibility stub in the `review-issue` SKILL.md automatically delegates to `analyze-issue`.
+
 ## Responsibilities
 
 Quality review of design artifacts (Design Brief, Aesthetic Direction, UI implementation):
@@ -11,11 +14,11 @@ Quality review of design artifacts (Design Brief, Aesthetic Direction, UI implem
 
 ## Distinction from `design-flow`
 
-| Aspect | `design-flow` built-in check | `review-issue` design role |
+| Aspect | `design-flow` built-in check | `analyze-issue` design role |
 |--------|--------------------------------------|----------------------------------|
 | Timing | Iterative checks during design phase | Gate review after design completion |
 | Purpose | Confirm design direction | Independent second opinion |
-| Invocation | Within `design-flow` loop | `/review-issue design #N` |
+| Invocation | Within `design-flow` loop | `analyze-issue design #N` |
 
 ## Required Knowledge
 
@@ -99,9 +102,9 @@ Use template from `templates/report.md`:
 4. **Best Practices**: Appropriate design patterns found
 5. **Recommendations**: Prioritized action items
 
-## Trigger Keywords
+## Trigger Keywords (migrated to analyze-issue)
 
-- "design review"
-- "設計レビュー"
-- "review design"
-- "デザインレビュー"
+- "design review" → `analyze-issue design`
+- "設計レビュー" → `analyze-issue design`
+- "review design" → `analyze-issue design`
+- "デザインレビュー" → `analyze-issue design`

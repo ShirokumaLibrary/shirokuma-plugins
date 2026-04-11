@@ -1,6 +1,8 @@
 # ADR 絞り込みロジック仕様
 
-`review-issue requirements` がプロジェクト要件整合性チェックを実行する際の ADR 絞り込み方式を定義する。
+> **注**: このロールは `analyze-issue` に移行しました。現行の仕様は `analyze-issue/docs/adr-filter-logic.md` を参照してください。
+
+`analyze-issue requirements` がプロジェクト要件整合性チェックを実行する際の ADR 絞り込み方式を定義する。
 
 ## 方式概要
 

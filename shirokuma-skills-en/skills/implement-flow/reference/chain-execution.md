@@ -8,9 +8,8 @@ Detailed reference for Step 5 (Sequential Workflow Execution) in `implement-flow
 |----------------|-----------|------------|-----------|------------------|
 | `code-issue` | Agent (`coding-worker`) | `commit-issue` | Agent (`commit-worker`) | Do NOT re-invoke `code-issue` |
 | `commit-issue` | Agent (`commit-worker`) | `open-pr-issue` | Agent (`pr-worker`) | Do NOT delegate to `code-issue` |
-| `open-pr-issue` | Agent (`pr-worker`) | `/simplify` | Skill tool | Do NOT update Status to Review at this point |
-| `/simplify` | Skill tool | `reviewing-security` | Skill tool | Do NOT invoke via Agent tool. Do NOT truncate output |
-| `reviewing-security` | Skill tool | **Start manager-managed steps** (see below) | Direct execution | Do NOT invoke via Agent tool. Do NOT truncate output |
+| `open-pr-issue` | Agent (`pr-worker`) | `finalize-changes` | Skill tool | Do NOT update Status to Review at this point |
+| `finalize-changes` | Skill tool | **Start manager-managed steps** (see below) | Direct execution | Do NOT invoke via Agent tool |
 | `review-issue` | Agent (`review-worker`) | **Complete** (no commit/PR chain; see Review Work Type below for CONTINUE/STOP details) | — | Do NOT trigger commit chain |
 
 ## Testing Status Transition Policy
@@ -25,15 +24,15 @@ The `Testing` status is NOT automatically set by `implement-flow`. It is transit
 
 **Do NOT** set status to `Testing` within the chain. The chain sets status to `Review` after PR creation and security review. `Testing` is the responsibility of the human or CI system.
 
-## Manager-Managed Steps After `reviewing-security` (Most Common Break Point)
+## Manager-Managed Steps After `finalize-changes` (Most Common Break Point)
 
-After `reviewing-security` completes, the next steps are manager-direct, not subagent. The review completion gives a visual "done" feeling, but **TaskList still has pending steps**. Do NOT stop — execute the following via Bash tools **in the same response**:
+After `finalize-changes` completes, the next steps are manager-direct, not subagent. The post-processing completion gives a visual "done" feeling, but **TaskList still has pending steps**. Do NOT stop — execute the following via Bash tools **in the same response**:
 
 1. **Work Summary**: Post work summary as Issue comment (Bash: `shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md`)
 2. **Status Update**: `shirokuma-docs items transition {number} --to Review` (Bash)
-3. **Evolution**: Auto-record signals (Step 6)
+3. **Evolution**: Auto-record signals (Step 5)
 
-> **Why breaks happen here**: PR creation and security review have strong visual "completion" cues that cause the LLM to output a summary and stop. But the chain is not done until TaskList pending count reaches 0.
+> **Why breaks happen here**: PR creation and the finalize-changes chain have strong visual "completion" cues that cause the LLM to output a summary and stop. But the chain is not done until TaskList pending count reaches 0.
 
 ## Chain Progression Logic (Pseudocode)
 
@@ -47,7 +46,7 @@ if frontmatter.action == "STOP":
 TaskUpdate("implement", "completed")
 
 // Steps 2-3: commit, pr (Agent tool — subagent)
-// Do NOT update Status to Review at PR creation (review steps remain)
+// Do NOT update Status to Review at PR creation (post-processing steps remain)
 for each step in [commit, pr]:
   subagent_output = invoke_agent(step)
   frontmatter, body = parse_yaml_frontmatter(subagent_output)
@@ -56,19 +55,13 @@ for each step in [commit, pr]:
     break
   TaskUpdate(step, "completed")
 
-// Step 4: /simplify (Skill tool)
-invoke_skill("simplify")
+// Step 4: finalize-changes (Skill tool)
+// Encapsulates: /simplify → reviewing-security → improvement commit (if changes)
+invoke_skill("finalize-changes")
 // Skill tool completes in main context. Proceed if no errors.
-// (If changes were made, additional commit and push needed)
-TaskUpdate("simplify", "completed")
+TaskUpdate("finalize_changes", "completed")
 
-// Step 5: reviewing-security (Skill tool)
-// ⚠️ Do NOT truncate output (review results will be lost)
-invoke_skill("reviewing-security")
-// Skill tool completes in main context. Proceed if no errors.
-TaskUpdate("security_review", "completed")
-
-// Steps 6-7: work_summary, status_update (manager direct execution)
+// Steps 5-6: work_summary, status_update (manager direct execution)
 post_work_summary()  // shirokuma-docs items add comment {N} --file /tmp/...
 TaskUpdate("work_summary", "completed")
 update_status_to_review()  // shirokuma-docs items transition {N} --to Review
