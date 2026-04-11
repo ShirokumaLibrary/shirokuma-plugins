@@ -1,7 +1,7 @@
 {
   "name": "shirokuma-nextjs-ja",
   "description": "Next.js/shadcn/Drizzle フレームワーク固有スキル（Claude Code 用）",
-  "version": "0.3.0-alpha.111",
+  "version": "0.3.0-alpha.112",
   "author": {
     "name": "ShirokumaLibrary"
   },
