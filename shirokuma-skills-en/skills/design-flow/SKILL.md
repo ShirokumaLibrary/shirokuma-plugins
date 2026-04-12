@@ -16,7 +16,7 @@ Register all chain steps with TaskCreate **before starting work**.
 
 | # | content | activeForm | Phase |
 |---|---------|------------|-------|
-| 1 | Route to design skill | Routing to design skill | Phase 1 |
+| 1 | Get Issue and update status | Getting Issue and updating status | Phase 1 |
 | 2 | Conduct design discovery | Conducting design discovery | Phase 2 |
 | 3 | Execute design | Executing design | Phase 3 |
 | 4 | Conduct design review | Conducting design review | Phase 3b |
@@ -44,6 +44,16 @@ shirokuma-docs items context {number}
 | Issue number | Yes | `#{number}` |
 | Plan section | Yes (if exists) | Extracted from `## Plan` in issue body |
 | Design requirements | No | Design-related requirements from issue body |
+
+### Phase 1b: Update Status to In Progress
+
+If the Issue status is Backlog, transition to In Progress to record the start of design work.
+
+```bash
+shirokuma-docs items transition {number} --to "In Progress"
+```
+
+Skip status update if already In Progress / Review (idempotent).
 
 ### Phase 2: Design Discovery
 
@@ -157,7 +167,7 @@ Design skills are discovered dynamically via `shirokuma-docs skills routing desi
 | TaskCreate, TaskUpdate | Phase progress tracking |
 | Skill | `discovering-design` (Phase 2), `evaluating-design` (Phase 4) |
 | Agent (design-worker) | Delegation to discovered `designing-*` skills (sub-agent, context isolation) |
-| Bash | Skill discovery (Phase 3), status transition (Phase 5) |
+| Bash | Skill discovery (Phase 3), status transition (Phase 1b, Phase 5) |
 
 ## Notes
 

@@ -127,6 +127,8 @@ AI MUST update issue status at these points:
 |---------|--------|-------|---------|
 | Planning started | → In Progress + assign | `prepare-flow` | `items transition {n} --to "In Progress"` |
 | Plan created | → Review | `prepare-flow` | `items transition {n} --to Review` |
+| Design started | → In Progress | `design-flow` | `items transition {n} --to "In Progress"` |
+| Design complete | → Review | `design-flow` | `items transition {n} --to Review` |
 | User approves plan, starts work | → In Progress + branch | `implement-flow` | `items transition {n} --to "In Progress"` |
 | implement-flow chain complete | → Review | `implement-flow` | `items transition {n} --to Review` (after PR creation, simplify, security-review, work summary) |
 | review-flow starts | → In Progress | `review-flow` | `items transition {n} --to "In Progress"` |
@@ -142,7 +144,7 @@ AI MUST update issue status at these points:
 ### In Progress Usage (Planning and Implementation)
 
 - **Purpose**: Visibility that active work is in progress (planning, design, or implementation)
-- **Entry**: `prepare-flow` sets this status when planning starts; `implement-flow` sets when implementation begins
+- **Entry**: `prepare-flow` sets this status when planning starts; `design-flow` sets when design starts; `implement-flow` sets when implementation begins
 - **Exit**: Work complete → Review
 
 ### Review Usage (AI Work Complete, Human Review Possible)

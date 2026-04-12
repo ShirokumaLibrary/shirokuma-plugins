@@ -32,8 +32,8 @@ graph LR
 | Phase | Orchestrator | Responsibility | Delegates to |
 |-------|-------------|----------------|-------------|
 | Planning | `prepare-flow` | Planning + plan review | `plan-issue` (Skill), `review-worker` (Agent) |
-| Designing | `design-flow` | Design routing + design review | Framework-specific design skills (dynamically discovered), `review-worker` (Agent) |
-| Working | `implement-flow` | Implementation, commit, PR | `coding-worker` (Agent), `commit-worker`, `pr-worker` |
+| Design | `design-flow` | Design routing + design review | Framework-specific design skills (dynamically discovered), `review-worker` (Agent) |
+| Implementation | `implement-flow` | Implementation, commit, PR | `coding-worker` (Agent), `commit-worker`, `pr-worker` |
 
 Conversation flow, epic pattern, and session vs standalone details are auto-loaded when the `implement-flow` skill is executed.
 

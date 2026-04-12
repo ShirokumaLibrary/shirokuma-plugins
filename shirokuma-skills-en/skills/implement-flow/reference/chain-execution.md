@@ -6,7 +6,8 @@ Detailed reference for Step 5 (Sequential Workflow Execution) in `implement-flow
 
 | Completed Skill | Invocation | Next Skill | Invocation | Prohibited Action |
 |----------------|-----------|------------|-----------|------------------|
-| `code-issue` | Agent (`coding-worker`) | `commit-issue` | Agent (`commit-worker`) | Do NOT re-invoke `code-issue` |
+| `code-issue` (`changes_made: true`) | Agent (`coding-worker`) | `commit-issue` | Agent (`commit-worker`) | Do NOT re-invoke `code-issue` |
+| `code-issue` (`changes_made: false`) | Agent (`coding-worker`) | **No-changes chain** (see "No-Changes Path" below) | Manager direct execution | Skip commit / PR / finalize-changes |
 | `commit-issue` | Agent (`commit-worker`) | `open-pr-issue` | Agent (`pr-worker`) | Do NOT delegate to `code-issue` |
 | `open-pr-issue` | Agent (`pr-worker`) | `finalize-changes` | Skill tool | Do NOT update Status to Review at this point |
 | `finalize-changes` | Skill tool | **Start manager-managed steps** (see below) | Direct execution | Do NOT invoke via Agent tool |
@@ -45,6 +46,13 @@ if frontmatter.action == "STOP":
   break
 TaskUpdate("implement", "completed")
 
+// Step 1b: No-changes branch (coding-worker only)
+if frontmatter.changes_made == false:
+  // Skip commit / PR / finalize-changes, proceed to no-changes chain
+  // See chain-end-steps.md "No-Changes Path" section
+  execute_no_changes_chain(frontmatter, body)
+  break
+
 // Steps 2-3: commit, pr (Agent tool — subagent)
 // Do NOT update Status to Review at PR creation (post-processing steps remain)
 for each step in [commit, pr]:
@@ -67,6 +75,16 @@ TaskUpdate("work_summary", "completed")
 update_status_to_review()  // shirokuma-docs items transition {N} --to Review
 TaskUpdate("status_update", "completed")
 ```
+
+## No-Changes Path (`changes_made: false`)
+
+When `coding-worker` completes with `changes_made: false`, the normal commit → PR → finalize chain is not executed. Instead, the following manager-direct steps run:
+
+1. **Post no-changes work summary**: Post Issue comment as an investigation result (see "No-Changes Work Summary" in chain-end-steps.md)
+2. **Status determination**: Determine the reason from the coding-worker body and update status (see "Status Determination for No Changes" in chain-end-steps.md)
+3. **Next-step suggestions**: Omit `/review-flow` since no PR exists
+
+Mark the commit-issue / open-pr-issue / finalize-changes tasks as `skipped` (or treat as `completed`-equivalent skip).
 
 ## Agent Tool Structured Data Field Definitions
 

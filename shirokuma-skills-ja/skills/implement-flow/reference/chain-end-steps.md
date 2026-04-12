@@ -79,3 +79,77 @@ Status 更新後、ユーザーに次のアクション候補を提示する。`
 
 - `/review-flow #{pr-number}` — PR のセルフレビューを実行
 ```
+
+## 変更なしパス（`coding-worker` が `changes_made: false` で完了した場合）
+
+`coding-worker` が `changes_made: false` を返した場合、通常チェーン（commit → PR → finalize-changes）をスキップし、以下の手順を実行する。
+
+### 変更なし用作業サマリー
+
+PR がないため、`### プルリクエスト` セクションを省略した専用テンプレートを使用する。「既に実装済み」「仕様上正しい」「再現せず」等の調査結果として記録する。
+
+```bash
+shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-no-changes-summary.md
+```
+
+`/tmp/shirokuma-docs/{number}-no-changes-summary.md` の内容:
+
+```markdown
+## 作業サマリー（変更なし）
+
+### 調査結果
+{coding-worker が確認した内容 — なぜ変更不要と判断したか}
+
+### 判定
+{例: 既に実装済み、仕様上正しい、再現しない、等}
+
+### 確認したファイル
+- `path/file.ts` - {確認内容}
+
+### 技術的判断
+- {判断と根拠}
+```
+
+### 変更なし時のステータス判定
+
+「変更なし」でチェーンが終了した場合、コード変更も PR もないため `In Progress` から通常の `Review` / `Done` 遷移には進めない（`status-workflow.ts` の `STATUS_TRANSITIONS` 参照）。正規ルートは以下のいずれか:
+
+| 選択肢 | 遷移手段 | 用途 |
+|--------|---------|------|
+| Cancelled | `shirokuma-docs items cancel {n} --comment "{理由}"` | 「変更不要」として Issue を close（推奨） |
+| On Hold | `shirokuma-docs items transition {n} --to "On Hold"` | 再検討・追加情報待ち |
+| Backlog | `shirokuma-docs items transition {n} --to Backlog` | 後で再評価する |
+
+> **重要**: `Cancelled` は **`items cancel`** 専用コマンドで遷移する。`items transition --to Cancelled` は Issue を open のまま残すため整合性が崩れる（`status-workflow.ts` L121 参照）。
+
+実装:
+
+```text
+reason = extract_first_line(body)  # coding-worker 本文 1 行目サマリー
+user_choice = AskUserQuestion(
+    "変更なしで完了しました。理由: {reason}。ステータスをどうしますか？",
+    options=[
+      "Cancelled（取り下げ・推奨）",
+      "On Hold（再検討）",
+      "Backlog（後で再評価）"
+    ]
+)
+
+if user_choice == "Cancelled":
+    run: shirokuma-docs items cancel {number} --comment "{reason}"
+else:
+    run: shirokuma-docs items transition {number} --to {user_choice}
+```
+
+ヘッドレスモード（`--headless`）では AskUserQuestion をスキップし、デフォルト動作として `items cancel {number} --comment "{reason}"` を実行する（Cancelled は `items reopen` + `items transition` で復旧可能）。
+
+### 変更なし時の次のステップ提案
+
+PR がないため `/review-flow` 行を省略し、以下のみを提示する:
+
+```
+## 次のステップ
+
+変更が不要と判断されました。必要に応じて:
+- `/implement-flow #{number}` — 再実行（判定が誤っていた場合）
+```

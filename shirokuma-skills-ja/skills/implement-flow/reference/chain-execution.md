@@ -6,7 +6,8 @@
 
 | 完了したスキル | 起動方法 | 次に呼ぶスキル | 起動方法 | 禁止行動 |
 |-------------|---------|-------------|---------|---------|
-| `code-issue` | Agent (`coding-worker`) | `commit-issue` | Agent (`commit-worker`) | `code-issue` を再起動しない |
+| `code-issue` (`changes_made: true`) | Agent (`coding-worker`) | `commit-issue` | Agent (`commit-worker`) | `code-issue` を再起動しない |
+| `code-issue` (`changes_made: false`) | Agent (`coding-worker`) | **変更なしチェーン**（下記「変更なしパス」参照） | マネージャー直接実行 | コミット・PR・finalize-changes をスキップする |
 | `commit-issue` | Agent (`commit-worker`) | `open-pr-issue` | Agent (`pr-worker`) | `code-issue` に委任しない |
 | `open-pr-issue` | Agent (`pr-worker`) | `finalize-changes` | Skill ツール | この時点で Status を Review に変更しない |
 | `finalize-changes` | Skill ツール | **マネージャー管理ステップ開始**（下記参照） | 直接実行 | Agent ツールで起動しない |
@@ -45,6 +46,13 @@ if frontmatter.action == "STOP":
   break
 TaskUpdate("implement", "completed")
 
+// ステップ 1b: 変更なし分岐（coding-worker 限定）
+if frontmatter.changes_made == false:
+  // コミット・PR・finalize-changes をスキップし、変更なしチェーンに進む
+  // 詳細は chain-end-steps.md「変更なしパス」セクション参照
+  execute_no_changes_chain(frontmatter, body)
+  break
+
 // ステップ 2-3: commit, pr（Agent ツール — サブエージェント）
 // PR 作成時点では Status を Review に変更しない（後処理ステップが残っているため）
 for each step in [commit, pr]:
@@ -68,6 +76,16 @@ TaskUpdate("work_summary", "completed")
 update_status_to_review()  // shirokuma-docs items transition {N} --to Review
 TaskUpdate("status_update", "completed")
 ```
+
+## 変更なしパス（`changes_made: false`）
+
+`coding-worker` が `changes_made: false` で完了した場合、通常の commit → PR → finalize チェーンは実行しない。代わりに以下のマネージャー直接ステップを実行する:
+
+1. **変更なし作業サマリー投稿**: 調査結果として Issue コメントを投稿（chain-end-steps.md「変更なし用作業サマリー」参照）
+2. **ステータス判定**: coding-worker の本文から理由を判定し、ステータスを更新（chain-end-steps.md「変更なし時のステータス判定」参照）
+3. **次のステップ提案**: PR がないため `/review-flow` は省略
+
+commit-issue / open-pr-issue / finalize-changes のタスクは `skipped`（または `completed` に相当するスキップ扱い）としてマークする。
 
 ## Agent ツール構造化データフィールド定義
 

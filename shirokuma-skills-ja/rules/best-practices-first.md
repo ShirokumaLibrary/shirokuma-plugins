@@ -32,8 +32,8 @@ graph LR
 | フェーズ | オーケストレーター | 責務 | 実作業の委任先 |
 |---------|-----------------|------|-------------|
 | Planning | `prepare-flow` | 計画策定・計画レビュー | `plan-issue` (Skill), `review-worker` (Agent) |
-| Designing | `design-flow` | 設計ルーティング・設計レビュー | フレームワーク固有設計スキル（動的発見）, `review-worker` (Agent) |
-| Working | `implement-flow` | 実装・コミット・PR | `coding-worker` (Agent), `commit-worker`, `pr-worker` |
+| Design | `design-flow` | 設計ルーティング・設計レビュー | フレームワーク固有設計スキル（動的発見）, `review-worker` (Agent) |
+| Implementation | `implement-flow` | 実装・コミット・PR | `coding-worker` (Agent), `commit-worker`, `pr-worker` |
 
 会話フロー・エピックパターン・セッション vs スタンドアロンの詳細は `implement-flow` スキル実行時に自動ロードされる。
 

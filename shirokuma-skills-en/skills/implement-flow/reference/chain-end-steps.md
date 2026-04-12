@@ -78,3 +78,77 @@ After Status update, present next action candidates to the user. Extract the PR 
 
 - `/review-flow #{pr-number}` — Run self-review on the PR
 ```
+
+## No-Changes Path (when `coding-worker` completes with `changes_made: false`)
+
+When `coding-worker` returns `changes_made: false`, skip the normal chain (commit → PR → finalize-changes) and execute the following procedure.
+
+### No-Changes Work Summary
+
+Since no PR exists, use a dedicated template that omits the `### Pull Request` section. Record as an investigation result ("already implemented", "spec-correct", "cannot reproduce", etc.).
+
+```bash
+shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-no-changes-summary.md
+```
+
+Where `/tmp/shirokuma-docs/{number}-no-changes-summary.md` contains:
+
+```markdown
+## Work Summary (No Changes)
+
+### Investigation Result
+{What coding-worker confirmed — why no change was needed}
+
+### Determination
+{e.g., Already implemented, Spec-correct, Cannot reproduce, etc.}
+
+### Files Examined
+- `path/file.ts` - {What was checked}
+
+### Technical Decisions
+- {Decision and rationale}
+```
+
+### Status Determination for No Changes
+
+When the chain ends with no changes, there is no code change or PR, so the issue cannot progress from `In Progress` through the normal `Review` / `Done` transitions (see `STATUS_TRANSITIONS` in `status-workflow.ts`). The valid routes are:
+
+| Option | Transition Command | Use Case |
+|--------|--------------------|----------|
+| Cancelled | `shirokuma-docs items cancel {n} --comment "{reason}"` | Close the issue as "no changes needed" (recommended) |
+| On Hold | `shirokuma-docs items transition {n} --to "On Hold"` | Pending reconsideration or more information |
+| Backlog | `shirokuma-docs items transition {n} --to Backlog` | Re-evaluate later |
+
+> **Important**: `Cancelled` must be set via the dedicated **`items cancel`** command. Using `items transition --to Cancelled` leaves the issue open and breaks consistency (see `status-workflow.ts` L121).
+
+Implementation:
+
+```text
+reason = extract_first_line(body)  # coding-worker body first-line summary
+user_choice = AskUserQuestion(
+    "Completed with no changes. Reason: {reason}. How should the status be handled?",
+    options=[
+      "Cancelled (recommended)",
+      "On Hold (reconsider)",
+      "Backlog (re-evaluate later)"
+    ]
+)
+
+if user_choice == "Cancelled":
+    run: shirokuma-docs items cancel {number} --comment "{reason}"
+else:
+    run: shirokuma-docs items transition {number} --to {user_choice}
+```
+
+In headless mode (`--headless`), skip AskUserQuestion and run `items cancel {number} --comment "{reason}"` as the default action (Cancelled can be reversed via `items reopen` + `items transition`).
+
+### Next Steps Suggestion for No Changes
+
+Since no PR exists, omit the `/review-flow` line and present only:
+
+```
+## Next Steps
+
+No changes were deemed necessary. If needed:
+- `/implement-flow #{number}` — Re-run (in case the determination was incorrect)
+```

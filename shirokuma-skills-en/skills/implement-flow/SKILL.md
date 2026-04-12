@@ -31,6 +31,8 @@ Register **all chain steps** via TaskCreate **before starting work**.
 
 Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5.
 
+> **No-changes branch**: When `coding-worker` completes with `changes_made: false`, skip steps 2–4 (commit, PR, finalize-changes) and proceed to step 5 (no-changes work summary) → step 6 (status determination). See the "No-Changes Path" sections in [reference/chain-execution.md](reference/chain-execution.md) and [reference/chain-end-steps.md](reference/chain-end-steps.md) for details.
+
 **Research:**
 
 | # | content | activeForm | Skill |
@@ -237,15 +239,17 @@ After work completes, execute the chain **automatically**. No user confirmation 
 | Invocation Method | Completion Handling |
 |-------------------|-------------------|
 | Skill tool (`reviewing-claude-config`, etc.) | Completes in main context. Proceed to next step if no errors. No YAML parsing needed |
-| Agent tool (`commit-worker`, `pr-worker`) | Parse YAML frontmatter for `action` field: `CONTINUE` → next step, `STOP` → halt (see [reference/worker-completion-pattern.md](reference/worker-completion-pattern.md)) |
+| Agent tool (`coding-worker`, `review-worker`, `commit-worker`, `pr-worker`) | Parse YAML frontmatter for `action` field: `CONTINUE` → next step, `STOP` → halt (see [reference/worker-completion-pattern.md](reference/worker-completion-pattern.md)) |
 
 **Agent tool output parse checkpoint** — On receiving Agent tool (subagent) output:
 
 1. Read `action` from YAML frontmatter
-2. `action: CONTINUE` → **immediately** invoke the skill in the `next` field **in the same response** (output only a one-line summary from the body's first line)
+2. `action: CONTINUE` → apply the exception checks below, then **immediately** invoke the skill in the `next` field **in the same response** (output only a one-line summary from the body's first line)
 3. `action: STOP` / `REVISE` → stop chain, report to user
 
-Exception: If `ucp_required: true` or `suggestions_count > 0`, present to user via AskUserQuestion before continuing.
+Exceptions (in priority order):
+1. **`coding-worker` with `changes_made: false`**: Ignore the `next` field and branch to the no-changes chain (see "No-Changes Path" in [reference/chain-execution.md](reference/chain-execution.md)). This is evaluated before the `ucp_required` check
+2. **`ucp_required: true` or `suggestions_count > 0`**: Present to user via AskUserQuestion before continuing
 
 **The core rule: when a skill or subagent completes, respond with a tool call, not text output.**
 
@@ -394,6 +398,7 @@ claude -p "/implement-flow --headless #42"
 | Already In Progress | Continue without status change |
 | Wrong branch | AskUserQuestion: switch or continue |
 | Chain failure | Report completed/remaining steps, return control. See [reference/chain-recovery.md](reference/chain-recovery.md) |
+| `coding-worker` completes with `changes_made: false` | Skip commit / PR / finalize-changes, post no-changes work summary, confirm status via AskUserQuestion (Cancelled recommended via `items cancel` / On Hold / Backlog). See "No-Changes Path" in [reference/chain-end-steps.md](reference/chain-end-steps.md) |
 | Issue was reverted (after PR revert) | After merging revert PR, move original issue back to Backlog and re-implement on a new branch. See [reference/chain-recovery.md](reference/chain-recovery.md) |
 | Sub-issue with no integration branch | Use `develop` as base, warn user |
 | Epic issue selected directly | Check for non-plan child issues; see "Epic Issue Entry Point" below |

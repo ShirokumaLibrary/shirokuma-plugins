@@ -16,7 +16,7 @@ allowed-tools: Read, Bash, AskUserQuestion, TaskCreate, TaskUpdate, TaskGet, Tas
 
 | # | content | activeForm | Phase |
 |---|---------|------------|-------|
-| 1 | 設計スキルをルーティングする | 設計スキルをルーティング中 | Phase 1 |
+| 1 | Issue を取得しステータスを更新する | Issue を取得しステータスを更新中 | Phase 1 |
 | 2 | デザインディスカバリーを実施する | デザインディスカバリーを実施中 | Phase 2 |
 | 3 | 設計を実行する | 設計を実行中 | Phase 3 |
 | 4 | 設計レビューを実施する | 設計レビューを実施中 | Phase 3b |
@@ -44,6 +44,16 @@ shirokuma-docs items context {number}
 | Issue 番号 | はい | `#{number}` |
 | 計画セクション | はい（存在する場合） | Issue 本文の `## 計画` から抽出 |
 | デザイン要件 | いいえ | Issue 本文からのデザイン関連要件 |
+
+### Phase 1b: ステータスを In Progress に更新
+
+Issue のステータスが Backlog の場合、In Progress に遷移して設計開始を記録する。
+
+```bash
+shirokuma-docs items transition {number} --to "In Progress"
+```
+
+既に In Progress / Review の場合はステータス更新をスキップ（冪等）。
 
 ### Phase 2: デザインディスカバリー
 
@@ -157,7 +167,7 @@ shirokuma-docs items transition {number} --to Review
 | TaskCreate, TaskUpdate | Phase 進捗の追跡 |
 | Skill | `discovering-design`（Phase 2）、`evaluating-design`（Phase 4） |
 | Agent (design-worker) | 発見された `designing-*` スキルへの委任（サブエージェント、コンテキスト分離） |
-| Bash | スキル発見（Phase 3）、ステータス遷移（Phase 5） |
+| Bash | スキル発見（Phase 3）、ステータス遷移（Phase 1b, Phase 5） |
 
 ## 注意事項
 
