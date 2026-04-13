@@ -1,12 +1,12 @@
 ---
 name: approve
-description: Explicitly approve a Review-status Issue (plan, design, etc.) and transition it to Done. Trigger: "approve", "approve issue", "approve plan".
+description: Explicitly approve a Review-status Issue (plan, design, etc.) and transition it to Done. The Issue remains Open (closed when the parent closes). Trigger: "approve", "approve issue", "approve plan".
 allowed-tools: Bash, Read, Edit
 ---
 
 # Approve Issue
 
-Explicitly approve a Review-status Issue and transition it to Done. Handles the case where you want to confirm a plan but not start implementation immediately.
+Explicitly approve a Review-status Issue and transition it to Done (Issue remains Open). Handles the case where you want to confirm a plan but not start implementation immediately.
 
 Normally, `/implement-flow` implicitly approves plan Issues when starting work (#1932). This skill is for cases where that implicit approval won't happen (reviewing and approving without starting work).
 
@@ -19,23 +19,24 @@ Normally, `/implement-flow` implicitly approves plan Issues when starting work (
 
 ## Workflow
 
-1. **Fetch Issue**: `shirokuma-docs items context {number}` to cache the Issue
-2. **Check status**: Read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` and check frontmatter `status`
-   - If not Review, warn and exit ("Issue #{number} is not in Review status (current: {status})")
-3. **Execute approval**: `shirokuma-docs items close {number}` to set Done + close
-4. **Completion report**:
+1. **Execute approval**: Run `shirokuma-docs items approve {number}`. The CLI validates status internally and exits with `result: "error"` if the Issue is not in Review.
+2. **Branch on result**: Inspect `result` in the JSON output
+   - `"ok"` → Show completion report and present `next_suggestions` to the user
+   - `"error"` → Display the `message` field as-is and exit
+3. **Completion report** (when `result: "ok"`):
 
 ```
 ## Approval Complete
 
 **Issue:** #{number} {title}
-**Transition:** Review → Done + Closed
+**Transition:** Review → Done (remains Open)
+
+### Next Actions
+{next_suggestions content}
 ```
 
 ## Edge Cases
 
 | Situation | Action |
 |-----------|--------|
-| Status is not Review | Warn and exit |
-| Already Done / Closed | Display "Already Done" and exit |
-| Issue not found | Display error |
+| Not Review / Already Done / Issue not found | Surface the CLI `result: "error"` `message` and exit |

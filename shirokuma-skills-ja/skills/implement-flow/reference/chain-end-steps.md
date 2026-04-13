@@ -48,27 +48,9 @@ shirokuma-docs items transition {number} --to Review
 
 ## 計画 Issue の Done 更新（チェーン末尾）
 
-Status 更新後、計画 Issue が存在する場合は Done に更新する。
+> **Phase 5 以降は不要**: Review ステータスからの暗黙承認ステップ（ステップ 2「Review からの遷移」）で計画 Issue は既に `items approve {plan-number}` によって Done(Open) に遷移済み。チェーン末尾での追加更新は行わない。
 
-**トップレベル Issue のケース**（親 Issue がない場合）:
-`items context {number}` の JSON 出力の `subIssuesSummary` からタイトルが「計画:」または「Plan:」で始まる子 Issue を計画 Issue として特定する。
-
-**サブ Issue のケース**（親 Issue がある場合）:
-チェーン末尾時点で `shirokuma-docs items context {parent-number}` を再実行し、最新の `subIssuesSummary` を取得する。タイトルが「計画:」または「Plan:」で始まる兄弟 Issue を計画 Issue として特定する。
-
-**エピックのケース**（親 Issue に複数の実作業サブ Issue がある場合）:
-上記と同様にチェーン末尾時点で親 Issue を再取得し、最新の `subIssuesSummary` を使用する。全実作業サブ Issue（計画 Issue 以外）のステータスが全て Done または Cancelled の場合のみ、計画 Issue を Done に更新する。1 つでも Done / Cancelled 以外のサブ Issue が残っている場合はスキップ。
-
-**計画 Issue の更新手順**:
-
-```bash
-# 計画 Issue を Done に遷移（バリデーション付き）
-shirokuma-docs items transition {plan-number} --to Done
-```
-
-- **pull スキップ条件**: トップレベル Issue のケースではステップ 1 で計画 Issue を既に取得済み — 手順 2（frontmatter 編集）と手順 3（push）に直接進む。サブ Issue / エピックのケースでは計画 Issue を事前取得していないため pull が必要。
-- **計画 Issue が見つからない場合**: サイレントスキップ（警告なし）。XS/S の直接実装パス等で計画 Issue がない場合を想定
-- **冪等性**: 既に Done なら再更新は無害
+計画 Issue が存在しないケース（XS/S 直接実装パス等）ではこのステップを常にスキップ。`STATUS_TRANSITIONS[IN_PROGRESS]` は `DONE` を含まないため `items transition {plan-number} --to Done` はエラーになる。計画 Issue が In Progress のまま残っているのは暗黙承認の漏れを示すため、警告ログのみ出力し自動修復は行わない。
 
 ## 次のステップ提案（チェーン末尾）
 

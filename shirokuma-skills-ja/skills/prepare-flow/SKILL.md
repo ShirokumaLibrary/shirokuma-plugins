@@ -338,7 +338,7 @@ shirokuma-docs items transition {number} --to Review
 
 | 参照元 | 用途 |
 |--------|------|
-| `project-items` ルール | In Progress/Ready/Review ステータスの運用 |
+| `project-items` ルール | In Progress/Review ステータスの運用 |
 | `output-language` ルール | Issue コメント・本文の出力言語 |
 | `github-writing-style` ルール | 箇条書き vs 散文のガイドライン |
 | `implement-flow` スキル | Worker 完了後の統一パターン、UCP チェック |

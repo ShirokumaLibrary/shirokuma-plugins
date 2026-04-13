@@ -149,6 +149,7 @@ shirokuma-docs items transition {number} --to Review
 
 ```
 デザイン完了。次のステップ:
+→ 設計 Issue の承認: `/approve #{設計Issue番号}` または `shirokuma-docs items approve #{設計Issue番号}`
 → `/prepare-flow #{課題番号}` で計画フェーズへ（設計後は必ず計画を立てる）
 → 変更のみコミットする場合は `/commit-issue` を使用
 ```

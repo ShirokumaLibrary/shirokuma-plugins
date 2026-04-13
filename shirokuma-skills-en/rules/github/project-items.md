@@ -21,28 +21,38 @@ Every project item MUST have:
 
 ```mermaid
 graph LR
-  Pending2[Pending] --> Backlog --> Ready --> InProgress[In Progress]
-  InProgress --> Review --> Done
-  InProgress --> Completed
+  Pending2[Pending] --> Backlog --> InProgress[In Progress]
+  InProgress --> Review --> DoneOpen["Done(Open)"]
   InProgress <--> OnHold[On Hold]
   Review <--> OnHold
   Backlog --> Cancelled
-  Ready --> Cancelled
   InProgress --> Cancelled
-  Done --> Completed
+  Closed[Closed/Done]
+  DoneOpen -->|cascades Close on parent Close| Closed
 ```
 
 | Status | Description |
 |--------|-------------|
 | Pending | Not yet triaged |
 | Backlog | Planned work. Requirements may still need refinement |
-| Ready | Ready to start. Plan approved, awaiting implementation |
-| In Progress | Currently working on |
+| In Progress | Currently working on (planning, design, or implementation) |
 | On Hold | Blocked (document reason) |
-| Completed | Implementation done on issue side, PR created. Reverts to In Progress if PR is closed |
 | Review | AI work complete, human review possible (plan approval gate or code review pending) |
-| Done | Completed |
+| Done(Open) | Sub-issue work complete. GitHub Issue remains Open. Closed automatically when parent Issue closes |
+| Done / Closed | Completed and closed |
 | Cancelled | Explicitly not planned (set by `items cancel`) |
+
+> **@deprecated**: `Ready` and `Completed` are retained for backward compatibility with existing Issues but must not be used as new transition targets. Escape paths only: `Ready → In Progress`, `Completed → Done`.
+
+### items approve and Done(Open) State
+
+`items approve {number}` is a dedicated CLI command to transition a Review-status Issue to Done(Open) (ADR-v3-013).
+
+- **Transition**: Review → Done (GitHub Issue state remains Open)
+- **Fails if not Review**: exits with `result: "error"` and exit 1
+- **JSON output**: `{ "result": "ok" | "error", "message": "...", "next_suggestions": [...] }`
+
+Done(Open) is an intermediate state indicating "sub-issue work complete but Issue kept Open". When the parent Issue is closed, `syncChildCloseOnParentClose` automatically closes all Done(Open) child Issues.
 
 ### PR Status Workflow
 
@@ -63,11 +73,12 @@ Epic Issue status is **auto-derived** from sub-issue states. Manual updates are 
 
 | Sub-Issue State | Effect on Parent Issue |
 |----------------|----------------------|
-| All sub-issues Done | Parent auto-transitions to Done |
-| All sub-issues Completed or Done | Parent auto-transitions to Review |
-| Some In Progress / Review / Completed | Parent stays In Progress |
-| Some Done + rest Backlog / Ready | Parent stays In Progress (treated as in-progress) |
+| All sub-issues Done(Open) or Done | Parent auto-transitions to Done |
+| Some In Progress / Review | Parent stays In Progress |
+| Some Done(Open) + rest Backlog | Parent stays In Progress (treated as in-progress) |
 | All sub-issues Cancelled | Parent auto-reverts to Backlog |
+
+**Cascading Close on parent close**: When a parent Issue is closed, all Done(Open) child Issues are automatically closed via `syncChildCloseOnParentClose`.
 
 **Reactive auto-derivation**: The CLI detects sub-issue status changes during `items transition`, `items close` (including `items cancel`), `items update-status`, and `items pr merge`, then auto-derives and updates the parent status. Explicit `items integrity --fix` is not required (still available for batch consistency checks).
 
@@ -131,6 +142,7 @@ AI MUST update issue status at these points:
 | Design complete | → Review | `design-flow` | `items transition {n} --to Review` |
 | User approves plan, starts work | → In Progress + branch | `implement-flow` | `items transition {n} --to "In Progress"` |
 | implement-flow chain complete | → Review | `implement-flow` | `items transition {n} --to Review` (after PR creation, simplify, security-review, work summary) |
+| User explicitly approves | → Done(Open) | `approve` skill / manual | `items approve {n}` |
 | review-flow starts | → In Progress | `review-flow` | `items transition {n} --to "In Progress"` |
 | review-flow response complete | → Review | `review-flow` | `items transition {n} --to Review` |
 | PR merged | → Done | `commit-issue` (via `pr merge`) | Automatic |
@@ -160,12 +172,6 @@ Review means "AI work is complete and human review is possible". Used in two con
 - **Exit**: Review complete → Testing or Done
 
 > **Important**: Review is NOT set at PR creation time. AI work steps (`/simplify`, security review) remain after PR creation, so the transition happens only after all steps complete.
-
-### Ready Usage
-
-- **Purpose**: Visibility that the issue is ready to start, plan approved
-- **Entry**: User approves plan in Review, or manual setting
-- **Exit**: `implement-flow` starts implementation → In Progress
 
 ### Rules
 

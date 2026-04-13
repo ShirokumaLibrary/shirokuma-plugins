@@ -149,6 +149,7 @@ shirokuma-docs items transition {number} --to Review
 
 ```
 Design complete. Next steps:
+→ Approve the design Issue: `/approve #{design-issue-number}` or `shirokuma-docs items approve #{design-issue-number}`
 → `/prepare-flow #{issue number}` to move to the planning phase (always plan after design)
 → Use `/commit-issue` to commit changes only
 ```

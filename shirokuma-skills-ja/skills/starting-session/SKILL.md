@@ -42,7 +42,8 @@ shirokuma-docs items dashboard
 {PR がない場合は「オープン PR はありません。」と表示}
 
 ### アクティブな Issue
-{ステータスでグループ化: 作業中 → 準備完了 → バックログ → アイスボックス}
+{ステータスでグループ化: 作業中 → バックログ → アイスボックス}
+{@deprecated な Ready / Completed ステータスの Issue は「バックログ」にフォールバック表示する（既存 Issue の可視性担保）}
 ```
 
 未コミット変更がある場合（`uncommitted_changes > 0`）、ユーザーに通知。

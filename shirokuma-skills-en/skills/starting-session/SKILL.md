@@ -55,14 +55,11 @@ Parse the JSON output and display:
 **In Progress:**
 - #{number} {title} (Priority: {priority}, Size: {size})
 
-**Ready ({count}):**
-- #{number} {title}
-
 **Backlog ({count}):**
 - #{number} {title}
 ```
 
-Group issues by status: In Progress → Ready → Backlog → Pending → (no status)
+Group issues by status: In Progress → Backlog → Pending → (no status). Fold issues in `@deprecated` statuses (Ready / Completed) into the Backlog group so legacy issues remain visible.
 
 If there are uncommitted changes (`git.uncommitted_changes > 0`), inform the user before proceeding.
 

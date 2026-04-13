@@ -48,26 +48,9 @@ shirokuma-docs items transition {number} --to Review
 
 ## Plan Issue Done Update (End of Chain)
 
-After the Status update, update the plan issue to Done if one exists.
+> **Not required from Phase 5 onward**: The plan Issue is already transitioned to Done(Open) by `items approve {plan-number}` in Step 2 ("Review explicit approval"). No additional update is needed at the end of the chain.
 
-**Top-level issue case** (no parent issue):
-Identify the plan issue from the `subIssuesSummary` of the issue fetched in Step 1 — look for a child issue whose title starts with "Plan:" or "計画:".
-
-**Sub-issue case** (has a parent issue):
-Re-run `shirokuma-docs items context {parent-number}` at the end of the chain to get the latest `subIssuesSummary` (other sub-issue statuses may have changed during chain execution). Look for a sibling issue whose title starts with "Plan:" or "計画:".
-
-**Epic case** (parent issue has multiple work sub-issues):
-Similarly, re-fetch the parent issue at the end of the chain to use the latest `subIssuesSummary`. Only update the plan issue to Done if all work sub-issues (excluding the plan issue itself) have a status of Done or Cancelled. If any work sub-issue remains in another status, skip the update.
-
-**Plan issue update procedure**:
-
-```bash
-shirokuma-docs items transition {plan-number} --to Done
-```
-
-- **Pull skip condition**: For the top-level issue case, the plan issue was already fetched in Step 1 — proceed directly to Step 2 (frontmatter edit) and Step 3 (push). For sub-issue / epic cases, pull is required since the plan issue was not pre-fetched.
-- **Plan issue not found**: Silent skip (no warning). Covers cases like XS/S direct implementation path where no plan issue exists.
-- **Idempotent**: Re-updating to Done when already Done is harmless.
+If no plan issue exists (e.g., XS/S direct implementation path), always skip this step. Because `STATUS_TRANSITIONS[IN_PROGRESS]` does not include `DONE`, `items transition {plan-number} --to Done` will error out. If the plan issue is still In Progress at this point, it indicates that the implicit approval step was missed — log a warning and do not attempt automatic remediation.
 
 ## Next Steps Suggestion (End of Chain)
 
