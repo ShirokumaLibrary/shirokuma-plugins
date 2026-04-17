@@ -195,6 +195,26 @@ GitHub Projects には組み込みの Workflows（`Item closed` → Status を D
 - 二重実行は冪等性により実害なし
 - リオープン時のみ CLI の Status 復元と Workflows の Backlog 設定が競合し得るが、CLI 実行後に Workflows が上書きする可能性がある。競合した場合は `shirokuma-docs items update-status {number} --status {正しいステータス}` で修正する
 
+## Issue 作成時の初期ステータス制約
+
+`items add issue` コマンドで Issue を作成する際、`status` フィールドに指定できる初期ステータスは以下のみ:
+
+| ステータス | 許可 | 用途 |
+|-----------|------|------|
+| `Backlog` | はい | 通常の新規 Issue（デフォルト） |
+| `Pending` | はい | トリアージ未対応の Issue |
+| `Review` 以降 | いいえ | 作成後に `items transition` で遷移する |
+
+**計画 Issue の作成手順:**
+
+```bash
+# 1. Backlog で作成（Review 指定は不可）
+shirokuma-docs items add issue --file /tmp/shirokuma-docs/{n}-plan-issue.md
+# 2. 2ステップで Review に遷移（Backlog → Review の直遷移は未定義）
+shirokuma-docs items transition {PLAN_ISSUE_NUMBER} --to "In Progress"
+shirokuma-docs items transition {PLAN_ISSUE_NUMBER} --to "Review"
+```
+
 ## 計画 Issue 方式
 
 計画は親 Issue の子 Issue（タイトルが「計画:」または「Plan:」で始まる Issue）として作成される。これにより計画が独立した Issue として管理され、GitHub Projects 上でフェーズ進捗を可視化できる。

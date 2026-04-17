@@ -124,7 +124,7 @@
     {
       "id": "gh-pr-edit",
       "pattern": "gh pr edit",
-      "reason": "Use `shirokuma-docs items push` instead of `gh pr edit`. Edit the cached frontmatter and push.",
+      "reason": "Use `shirokuma-docs items pr edit <number> --base <branch>` instead of `gh pr edit`.",
       "enabled": true
     },
     {

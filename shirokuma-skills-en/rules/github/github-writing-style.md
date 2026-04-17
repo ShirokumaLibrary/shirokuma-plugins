@@ -56,6 +56,18 @@ Use a table when showing multiple contrasts.
 - **Lead-in sentence**: Add one sentence of context before a list
 - **Conclusion first**: Summary paragraph leads with "what changes and how"
 
+## Identifier and Reference Notation
+
+In GitHub Issue / PR / Discussion bodies and comments, `#<number>` is automatically linked to Issues/PRs/Discussions. Use the following notation to avoid unintended auto-linking.
+
+| Target | Notation |
+|--------|----------|
+| Issue / PR / Discussion reference | `#123` |
+| Sequence numbers (problem lists, identifiers) | `P-1`, `Problem 1`, `G1` (no `#`) |
+| Local identifiers | Letter prefix + digit (`D1`, `Q2`, etc.) |
+
+**Anti-pattern**: Writing `#1`, `#2` in a problem table makes every entry an Issue auto-link. Do not use `#` for sequence numbers.
+
 ## Anti-Patterns
 
 | Pattern | Problem | Fix |
@@ -86,6 +98,8 @@ GitHub renders Mermaid natively. Use diagrams to explain complex structures and 
 - **Labels**: Keep concise (~10 characters per node)
 - **Direction**: Use `graph TD` (top-down) or `graph LR` (left-right) as appropriate
 - **Code block**: Wrap in ` ```mermaid `
+- **Line breaks**: Use `<br/>` inside labels and notes. `\n` is rendered literally by the GitHub Mermaid renderer
+- **Background colors**: Do not customize node background colors with `rect rgb(...)` or `style fill:...`. Light backgrounds combined with white text become unreadable in dark mode
 
 ### Anti-Patterns
 

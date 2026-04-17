@@ -74,8 +74,8 @@ parentIssue:
 2. **フォールバック（リモートブランチ検索）**: `git branch -r --list "origin/*/{parent-number}-*"` で検索
    - 1件マッチ → 自動採用
    - 複数マッチ → 最初のマッチを採用し、結果に代替候補を記載
-   - 0件 → `develop` をベースにし、結果に警告を記載
-3. **最終フォールバック**: `develop`
+   - 0件 → エラー返却（`--base` 明示を要求）
+3. **エラー**: 0件かつ `--base` 未指定 → CLI がエラーで停止する（`--base` 明示を要求）
 
 ```bash
 # サブ Issue の場合
@@ -112,7 +112,7 @@ Closes #{issue-number}
 ```
 
 ```bash
-shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/{number}-pr.md
+shirokuma-docs items pr create {issue-number} --from-file /tmp/shirokuma-docs/{number}-pr.md
 ```
 
 **タイトルルール**: 70文字以内、プレフィックス(`feat:` 等)は英語、**それ以降は日本語**で記述する。Issue番号はタイトルに入れない。
@@ -238,7 +238,7 @@ docs: update CLAUDE.md command table     ← 日本語設定では不正
 | コミットなし | エラー返却: PR作成不可 |
 | 既存PRあり | URL を結果に含めて返却 |
 | プッシュ失敗 | エラー返却、`git pull --rebase` を提案 |
-| サブ Issue で integration ブランチ未検出 | `develop` をベースにし結果に警告を記載 |
+| サブ Issue で integration ブランチ未検出 | エラー返却（`--base` 明示を要求） |
 | integration ブランチベースの PR | `Closes #N` を必ず記載（`Refs` では CLI の `parseLinkedIssues()` が解析不可。GitHub サイドバー非表示は受容、CLI が代替） |
 | フォールバック検索で複数ブランチがマッチ | 最初のマッチを採用、結果に代替候補を記載 |
 | PR 作成後にベースブランチの誤りが判明 | REST API で修正: `gh api repos/{owner}/{repo}/pulls/{pr-number} --method PATCH -f base="correct-branch"` |

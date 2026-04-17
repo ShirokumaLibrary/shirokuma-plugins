@@ -78,8 +78,8 @@ When a sub-issue is detected, determine the integration branch in this order:
 2. **Fallback (remote branch search)**: `git branch -r --list "origin/*/{parent-number}-*"`
    - 1 match → auto-select
    - Multiple matches → select first match, include alternatives in result
-   - 0 matches → fall back to `develop`, include warning in result
-3. **Final fallback**: `develop`
+   - 0 matches → return error (require explicit `--base`)
+3. **Error**: 0 matches with no `--base` specified → CLI returns error (require explicit `--base`)
 
 ```bash
 # Sub-issue
@@ -117,7 +117,7 @@ Closes #{issue-number}
 ```
 
 ```bash
-shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/{number}-pr.md
+shirokuma-docs items pr create {issue-number} --from-file /tmp/shirokuma-docs/{number}-pr.md
 ```
 
 **Title rules:**
@@ -259,7 +259,7 @@ Review reports output by `review-issue` must also follow the `output-language` r
 | No commits ahead of base | Return error: nothing to create PR for |
 | PR already exists for branch | Include existing PR URL in result |
 | Push fails | Return error, suggest `git pull --rebase` |
-| Sub-issue with no integration branch found | Use `develop` as base, include warning in result |
+| Sub-issue with no integration branch found | Return error (require explicit `--base`) |
 | Integration branch PR | Always include `Closes #N` in body (not `Refs` — CLI's `parseLinkedIssues()` only matches `Closes/Fixes/Resolves`. GitHub sidebar won't show link, but CLI handles it) |
 | Multiple branches match fallback search | Select first match, include alternatives in result |
 | Base branch was wrong after PR creation | Fix via REST API: `gh api repos/{owner}/{repo}/pulls/{pr-number} --method PATCH -f base="correct-branch"` |

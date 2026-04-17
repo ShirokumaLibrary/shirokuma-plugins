@@ -197,6 +197,26 @@ GitHub Projects has built-in Workflows (e.g., `Item closed` → set Status to Do
 - Duplicate execution is harmless due to idempotency
 - On reopen, CLI's Status restore and Workflows' Backlog setting may conflict; Workflows may overwrite after CLI execution. If conflicted, correct with `shirokuma-docs items update-status {number} --status {correct-status}`
 
+## Initial Status Constraint at Issue Creation
+
+When creating an Issue with `items add issue`, the following initial statuses are allowed in the `status` field:
+
+| Status | Allowed | Purpose |
+|--------|---------|---------|
+| `Pending` | Yes | Triage-pending issues |
+| `Backlog` | Yes | Normal new issues (default) |
+| `Review` and later | No | Transition via `items transition` after creation |
+
+**Plan Issue creation procedure:**
+
+```bash
+# 1. Create with Backlog (Review cannot be specified)
+shirokuma-docs items add issue --file /tmp/shirokuma-docs/{n}-plan-issue.md
+# 2. Transition to Review in 2 steps (Backlog → Review direct transition is undefined)
+shirokuma-docs items transition {PLAN_ISSUE_NUMBER} --to "In Progress"
+shirokuma-docs items transition {PLAN_ISSUE_NUMBER} --to "Review"
+```
+
 ## Plan Issue Approach
 
 Plans are created as child issues of the parent issue (issues with titles starting with "Plan:" or "計画:"). This allows plans to be managed as independent issues, making phase progress visible on GitHub Projects.

@@ -73,7 +73,7 @@ Create the plan issue body file:
 cat > /tmp/shirokuma-docs/{number}-plan-issue.md <<'EOF'
 ---
 title: "Plan: {parent issue title}"
-status: "Review"
+status: "Backlog"
 labels: ["area:plan"]
 ---
 
@@ -89,6 +89,13 @@ shirokuma-docs items add issue --file /tmp/shirokuma-docs/{number}-plan-issue.md
 ```
 
 After the plan issue is created, record the returned issue number as `PLAN_ISSUE_NUMBER`.
+
+Transition to Review in 2 steps (direct `Backlog → Review` is not defined in the transition table):
+
+```bash
+shirokuma-docs items transition {PLAN_ISSUE_NUMBER} --to "In Progress"
+shirokuma-docs items transition {PLAN_ISSUE_NUMBER} --to "Review"
+```
 
 > The plan issue body language and style must comply with the `output-language` rule and `github-writing-style` rule.
 
@@ -126,8 +133,8 @@ shirokuma-docs items parent {PLAN_ISSUE_NUMBER} {parent-number}
 
 - Runs via Skill tool (main context), but progress management and user interaction are handled by the orchestrator (`prepare-flow`)
 - Plan review is handled by `prepare-flow` — this skill only creates the plan
-- **Does not update status** — status transitions (In Progress, Review) are managed by `prepare-flow`
-- Plan issues are created with status `Review` and label `area:plan`
+- **Does not update parent issue status** — parent issue status transitions (In Progress, Review) are managed by `prepare-flow`
+- Plan issues are created with status `Backlog`, then immediately transitioned to `Review` via `Backlog → In Progress → Review` (2 steps). Label is `area:plan`
 
 ## GitHub Writing Rules
 
