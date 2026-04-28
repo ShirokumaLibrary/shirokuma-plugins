@@ -42,7 +42,7 @@ This agent's responsibility is **code changes only**. Committing, pushing, and P
 
 **Explicitly prohibited:**
 - Do NOT directly execute `git commit` / `git push`
-- Do NOT directly invoke `gh pr create` or `shirokuma-docs items pr create`
+- Do NOT directly invoke `gh pr create` or `shirokuma-docs pr create`
 - Do NOT update Issue Project Status
 
 ## Completion Output (Required Fields)

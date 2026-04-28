@@ -42,7 +42,7 @@ GitHub に書き込む全てのコンテンツは**日本語**で記述する。
 
 **明示的な禁止事項:**
 - `git commit` / `git push` を直接実行しない
-- `gh pr create` / `shirokuma-docs items pr create` を直接呼び出さない
+- `gh pr create` / `shirokuma-docs pr create` を直接呼び出さない
 - Issue の Project Status を更新しない
 
 ## 完了出力（必須フィールド）

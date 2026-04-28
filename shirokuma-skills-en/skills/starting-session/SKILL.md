@@ -15,7 +15,7 @@ A simple entry point that loads rules and displays project state for a new conve
 ### Step 1: Fetch Project State
 
 ```bash
-shirokuma-docs items dashboard
+shirokuma-docs dashboard
 ```
 
 This returns JSON with:
@@ -80,7 +80,7 @@ After displaying active issues (Step 2), check for batch candidates among Backlo
 
 ### Detection
 
-1. Filter issues from `items dashboard` output: Status = Backlog, Size = XS or S
+1. Filter issues from `dashboard` output: Status = Backlog, Size = XS or S
 2. Group by `area:*` label (primary) or title keyword similarity (fallback: 2+ common nouns)
 3. Show groups with 3+ issues, max 3 groups
 
@@ -103,7 +103,7 @@ To start batch processing, run `/implement-flow #101 #102 #105`.
 After context display (Step 2), check if signals have accumulated in Evolution Issues (see `evolution-details.md` "Standard Search & Creation Flow" for the search command).
 
 ```bash
-shirokuma-docs items list --issue-type Evolution --limit 1
+shirokuma-docs issue list --issue-type Evolution --limit 1
 ```
 
 If signals are accumulated, show a single line after the Active Issues section:
@@ -117,17 +117,17 @@ If signals are accumulated, show a single line after the Active Issues section:
 
 ## Multi-Developer Mode
 
-In team development, add options to `items dashboard`:
+In team development, add options to `dashboard`:
 
 ```bash
 # Show handovers from a specific user
-shirokuma-docs items dashboard --user {username}
+shirokuma-docs dashboard --user {username}
 
 # Show handovers from all members (no filter)
-shirokuma-docs items dashboard --all
+shirokuma-docs dashboard --all
 
 # Team dashboard (grouped by member)
-shirokuma-docs items dashboard --team
+shirokuma-docs dashboard --team
 ```
 
 | Option | Behavior |
@@ -146,7 +146,7 @@ shirokuma-docs items dashboard --team
 | `not logged in` | Run: `gh auth login` |
 | issues is empty | Show "No active issues" |
 | git pull fails | Warn and continue with local base branch |
-| `items dashboard: command not found` | Upgrade shirokuma-docs: `shirokuma-docs update` |
+| `dashboard: command not found` | Upgrade shirokuma-docs: `shirokuma-docs update` |
 
 ## Next Steps
 
@@ -161,6 +161,6 @@ After displaying state, the user selects the next action:
 
 - Always show current time in session header
 - Show items in priority order within each status
-- Done items are automatically excluded by `items dashboard`
-- Use `shirokuma-docs items dashboard` instead of raw `gh` commands — the CLI aggregates handover, issues, and PRs in one call, saving context window
-- Handover save/restore is not this skill's responsibility. Issue status updates are managed via `items update-status` CLI, not directly by this skill
+- Done items are automatically excluded by `dashboard`
+- Use `shirokuma-docs dashboard` instead of raw `gh` commands — the CLI aggregates handover, issues, and PRs in one call, saving context window
+- Handover save/restore is not this skill's responsibility. Issue status updates are managed via `status update-batch` CLI, not directly by this skill

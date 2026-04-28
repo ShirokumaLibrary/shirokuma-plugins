@@ -30,7 +30,7 @@ Load these files for context:
 
 ```
 1. Role selection: "requirements review" or "要件レビュー"
-2. Fetch Issue body: shirokuma-docs items context {number} (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
+2. Fetch Issue body: shirokuma-docs issue context {number} (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
 3. Lint execution: Skip (target is not code files)
 4. Issue body analysis: Analyze each section against review criteria
 5. Report generation: Template format
@@ -87,11 +87,11 @@ For the ADR filtering logic, see [docs/adr-filter-logic.md](../docs/adr-filter-l
 
 Check items:
 
-1. - [ ] Does a related ADR in Accepted status exist, and does it not conflict with the direction of this Issue? (check via `items adr list` + top 5 details)
-2. - [ ] Does this comply with past naming convention/constraint Issues? (search with keywords like "naming convention", "convention", "naming" including Closed issues via `items search`)
+1. - [ ] Does a related ADR in Accepted status exist, and does it not conflict with the direction of this Issue? (check via `discussion adr list` + top 5 details)
+2. - [ ] Does this comply with past naming convention/constraint Issues? (search with keywords like "naming convention", "convention", "naming" including Closed issues via `issue search`)
 3. - [ ] Does the technology selection or architecture approach proposed in this Issue avoid re-adopting options that existing ADRs have marked as Deprecated/Superseded?
 4. - [ ] Does the scope and responsibility boundary align with boundaries explicitly stated in existing ADRs (e.g., ADR for CLI ↔ skill responsibility separation)?
-5. - [ ] Does the proposed change not conflict with other in-progress Issues (In Progress / Review status)? (check via `items list --status "In Progress"`)
+5. - [ ] Does the proposed change not conflict with other in-progress Issues (In Progress / Review status)? (check via `issue list --status "In progress"`)
 6. - [ ] Does the report explicitly state the basis for the "no conflict" determination in the ADR consistency check (referenced ADR numbers)?
 7. - [ ] For new skill/rule additions, are there no trigger keyword overlaps with existing skills? (see `skill-authoring.md`)
 8. - [ ] If this Issue is an epic, are there no inconsistencies between sub-Issues (conflicting deliverables, competing scopes)?

@@ -28,7 +28,7 @@ Claude Code skills produce two types of output. Route each to the appropriate de
 
 ```bash
 # Create via shirokuma-docs CLI (frontmatter includes metadata)
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/report.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/report.md
 ```
 
 **Characteristics**:
@@ -86,7 +86,7 @@ When updating skills, replace local log references:
 Review results targeting a PR should be posted directly as PR comments.
 
 ```bash
-shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/{PR#}-review-summary.md
+shirokuma-docs issue comment {PR#} --file /tmp/shirokuma-docs/{PR#}-review-summary.md
 ```
 
 | Condition | Destination |

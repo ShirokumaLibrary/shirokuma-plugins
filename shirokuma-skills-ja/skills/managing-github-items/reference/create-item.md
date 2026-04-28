@@ -91,7 +91,7 @@ C) その他（具体的に教えてください）
 
 ## ステップ 2: 本文生成
 
-> **CLI テンプレート**: `shirokuma-docs items template issue --output <file>` で Issue テンプレート骨格を生成できます。AI はこのテンプレートを Read して構成を理解し、コンテキストに基づいて書き込みます。
+> **CLI テンプレート**: `shirokuma-docs issue template issue --output <file>` で Issue テンプレート骨格を生成できます。AI はこのテンプレートを Read して構成を理解し、コンテキストに基づいて書き込みます。
 
 種別に応じたテンプレートを使用する。全種別で `## 目的` セクションを必須とする。
 
@@ -214,15 +214,15 @@ Issue 番号は GitHub が作成時に採番するため、作成前には不明
 | 作成後 | `/tmp/shirokuma-docs/{number}-body.md` 可 | `/tmp/shirokuma-docs/42-body.md` |
 
 ```bash
-# Issue（推奨 — items add issue でメタデータ+本文を一括入力）
-shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
+# Issue（推奨 — issue add でメタデータ+本文を一括入力）
+shirokuma-docs issue add --file /tmp/shirokuma-docs/{slug}.md
 
 # frontmatter に status を設定して作成
 # /tmp/shirokuma-docs/{slug}.md の frontmatter に status: Backlog を記述
 
 # サブ Issue として作成後に親 Issue を設定
-shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
-# 作成後: shirokuma-docs items parent {number} {parent-number}
+shirokuma-docs issue add --file /tmp/shirokuma-docs/{slug}.md
+# 作成後: shirokuma-docs issue parent {number} {parent-number}
 
 ```
 
@@ -230,7 +230,7 @@ shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
 
 エピック（親 Issue）のサブ Issue を作成する場合:
 
-- `items parent {number} {親Issue番号}` で親子関係を設定する
+- `issue parent {number} {親Issue番号}` で親子関係を設定する
 - サブ Issue の本文に親 Issue への参照（`Refs #{親番号}`）を含める
 - サブ Issue の Issue Type は親から継承せず、個々のタスクに適切な Type を設定する
 - サイズは個々のタスクの工数で設定（親が L/XL でもサブ Issue は S/M が一般的）

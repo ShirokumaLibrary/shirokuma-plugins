@@ -36,7 +36,7 @@
 
 | 確認項目 | コマンド |
 |---------|---------|
-| PR がすでに作成されているか？ | `gh pr list --head {branch}`（直接 `gh` — `shirokuma-docs items pr list` はブランチフィルタ未対応） |
+| PR がすでに作成されているか？ | `gh pr list --head {branch}`（直接 `gh` — `shirokuma-docs pr list` はブランチフィルタ未対応） |
 | コミットがリモートにプッシュされているか？ | `git log --oneline origin/{branch}..HEAD` |
 
 **冪等性**: 条件付き — PR がすでに存在する場合、`open-pr-issue` は検出してスキップする。存在しない場合は新規作成する。
@@ -47,7 +47,7 @@
 
 | 確認項目 | コマンド |
 |---------|---------|
-| レビューレポートが投稿されているか？ | `shirokuma-docs items comments {number}` で Issue コメントを確認 |
+| レビューレポートが投稿されているか？ | `shirokuma-docs issue comments {number}` で Issue コメントを確認 |
 
 **冪等性**: あり — `review-issue`（Agent: `review-worker`）の再実行は安全。新しいレポートが生成される。
 
@@ -85,13 +85,24 @@ TaskList の `pending` ステップが再開可能状態を定義する。チェ
 
 ## PR revert 後のリカバリー
 
-PR がマージ済み（Issue が Done）の状態で revert が必要な場合:
+PR がマージ済み（Issue が Done）の状態で revert が必要な場合、CLI に統合された `issue rollback` コマンド（#2024 Phase 1-D）を使うのが正規パス:
 
-1. revert PR を作成してマージする（GitHub UI または `git revert`）
-2. 元 Issue のステータスを `Backlog`（再実装予定）または `Cancelled`（見送り）に手動更新
-3. 再実装する場合は新しい会話で `/implement-flow #{number}` を実行（新しいブランチが作成される）
+```bash
+shirokuma-docs issue rollback {plan-issue#} --action revert
+```
 
-> revert は手動操作。`implement-flow` のチェーンには含まれない。
+このコマンドは以下を一括実行する:
+
+1. revert ブランチ作成（`revert/pr-{N}` を develop / 親 base ブランチから分岐）
+2. `git revert -m 1 --no-commit` でマージコミットを取り消し
+3. revert PR を作成（PR タイトル: `Revert: PR #N`、body に `Closes #{plan-issue#}`）
+4. 計画 Issue のステータスを `Backlog` に戻す（再実装予定）
+
+revert PR をマージした後、再実装する場合は新しい会話で `/implement-flow #{plan-issue#}` を実行する（新しいフィーチャーブランチが作成される）。
+
+「見送り」の場合は revert PR マージ後に `shirokuma-docs issue cancel {plan-issue#}` で Done(NOT_PLANNED) 化する。
+
+> 旧仕様（手動 revert + 手動ステータス変更）は #2024 Phase 1-D で `issue rollback --action revert` に統合された。手動操作は引き続き可能だが、CLI コマンドが正規パス。
 
 ## 冪等性保証
 

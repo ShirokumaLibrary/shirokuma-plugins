@@ -83,5 +83,5 @@ researching-best-practices → [analyze-issue (research role)] → Discussion (R
 Research results are saved to Research category Discussion:
 
 ```bash
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/research-result.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/research-result.md
 ```

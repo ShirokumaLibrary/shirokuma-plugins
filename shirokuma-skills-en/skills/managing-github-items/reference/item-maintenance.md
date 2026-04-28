@@ -25,7 +25,7 @@ For Issues / Discussions / PRs. Supplements the overview in the `project-items` 
 
 ```bash
 # Issues / Discussions (write body to file then update)
-shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
+shirokuma-docs issue update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 ## File-Based Body Editing

@@ -258,7 +258,7 @@ shirokuma-docs lint docs -p . -f terminal
 
 prompt 内の「成果物レビュー対象:」/「Artifact review targets:」セクションに記載された各 `#N` に対して:
 
-1. `shirokuma-docs items context {N}` で Discussion または Issue の内容を取得し、`.shirokuma/github/{org}/{repo}/issues/{N}/body.md` を Read ツールで読み込む
+1. `shirokuma-docs issue context {N}` で Discussion または Issue の内容を取得し、`.shirokuma/github/{org}/{repo}/issues/{N}/body.md` を Read ツールで読み込む
 2. `roles/code.md` の「GitHub ドキュメントレビュー観点」を適用してレビュー:
    - フォーマット準拠（Discussion カテゴリに適したフォーマット）
    - YAML フロントマター混入チェック（`---` で始まるメタデータが本文に漏れていないか）
@@ -305,10 +305,10 @@ PR にレビューサマリーを issuecomment として投稿（レビュース
 
 ```bash
 # Write ツールでファイル作成後
-shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/{number}-review-summary.md
+shirokuma-docs issue comment {PR#} --file /tmp/shirokuma-docs/{number}-review-summary.md
 ```
 
-> **注意**: `items add comment` は PR に issuecomment を投稿する。これは `pr comments` 出力の `issue_comments` セクションに表示され、レビュースレッドコメントとは別に管理される。
+> **注意**: `issue comment` は PR に issuecomment を投稿する。これは `pr comments` 出力の `issue_comments` セクションに表示され、レビュースレッドコメントとは別に管理される。
 
 重大な問題（severity: error）が多数（5件以上）ある場合のみ、詳細レポートを Discussion にも保存し、PR コメントに Discussion URL をリンクする。
 
@@ -318,7 +318,7 @@ Reports カテゴリに Discussion を作成（従来の動作）：
 
 ```bash
 # frontmatter に title と category を設定したファイルを用意してから実行
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-report.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/review-report.md
 ```
 
 Discussion URL をユーザーに報告。

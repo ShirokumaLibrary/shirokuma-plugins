@@ -22,13 +22,13 @@ Evolution Issue からシグナルを取得する。
 
 ```bash
 # Evolution Issue を検索（分析フェーズは --limit 10 で横断分析。値の使い分けは evolution-details.md「標準検索・作成フロー」参照）
-shirokuma-docs items list --issue-type Evolution --limit 10
+shirokuma-docs issue list --issue-type Evolution --limit 10
 ```
 
 Issue が見つかったら、コメントを含む詳細を取得:
 
 ```bash
-shirokuma-docs items context {number}
+shirokuma-docs issue context {number}
 # → .shirokuma/github/{org}/{repo}/issues/{number}/body.md と .shirokuma/github/{org}/{repo}/issues/{number}/ 配下のコメントファイルを Read ツールで読み込む
 ```
 
@@ -109,11 +109,11 @@ AskUserQuestion で提案を Issue として記録するかを確認する:
 Issue 作成後、元の Evolution Issue のコメントに作成した Issue への参照を記録する:
 
 ```bash
-# ファイルに書き出してから items add comment で投稿
+# ファイルに書き出してから issue comment で投稿
 cat > /tmp/shirokuma-docs/{evolution-number}-evolution-ref.md <<'EOF'
 提案 Issue を作成しました: #{created-issue-number}
 EOF
-shirokuma-docs items add comment {evolution-number} --file /tmp/shirokuma-docs/{evolution-number}-evolution-ref.md
+shirokuma-docs issue comment {evolution-number} --file /tmp/shirokuma-docs/{evolution-number}-evolution-ref.md
 ```
 
 ### ステップ 7: 記録更新と Issue クローズ
@@ -129,7 +129,7 @@ shirokuma-docs items add comment {evolution-number} --file /tmp/shirokuma-docs/{
 - **影響範囲**: 変更が他のルール・スキルに及ぼす影響の評価
 
 ```bash
-# ファイルに書き出してから items add comment で投稿
+# ファイルに書き出してから issue comment で投稿
 cat > /tmp/shirokuma-docs/{number}-analysis.md <<'EOF'
 ## 分析完了: {date}
 
@@ -145,7 +145,7 @@ cat > /tmp/shirokuma-docs/{number}-analysis.md <<'EOF'
 ### 影響範囲
 {変更が他のルール・スキルに及ぼす影響。なければ「影響なし」}
 EOF
-shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-analysis.md
+shirokuma-docs issue comment {number} --file /tmp/shirokuma-docs/{number}-analysis.md
 ```
 
 #### 7b: 本文更新（構造化サマリー）
@@ -176,14 +176,14 @@ shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-an
 
 ```bash
 # 本文をファイルに書き出してから update
-shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
+shirokuma-docs issue update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 #### 7c: Issue クローズ
 
 ```bash
 # Evolution Issue をクローズ（1 分析サイクル = 1 Issue）
-shirokuma-docs items close {number}
+shirokuma-docs issue close {number}
 ```
 
 クローズ後に新たなシグナルが発生した場合は、新しい Evolution Issue に記録する（`rule-evolution` ルールの Evolution Issue ライフサイクルセクション参照）。

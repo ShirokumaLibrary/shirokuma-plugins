@@ -70,7 +70,7 @@ parentIssue:
 
 サブ Issue を検出した場合、以下の順序で integration ブランチを決定する:
 
-1. **キャッシュまたは API から抽出**: `shirokuma-docs items context {parent-number}` で親 Issue を取得し JSON 出力から `body` フィールドを確認。`### Integration Branch`（EN）ヘッディングを探す。直後のバッククォート内のブランチ名を採用（プレフィックスは `epic/`, `chore/`, `feat/` 等任意）
+1. **キャッシュまたは API から抽出**: `shirokuma-docs issue context {parent-number}` で親 Issue を取得し JSON 出力から `body` フィールドを確認。`### Integration Branch`（EN）ヘッディングを探す。直後のバッククォート内のブランチ名を採用（プレフィックスは `epic/`, `chore/`, `feat/` 等任意）
 2. **フォールバック（リモートブランチ検索）**: `git branch -r --list "origin/*/{parent-number}-*"` で検索
    - 1件マッチ → 自動採用
    - 複数マッチ → 最初のマッチを採用し、結果に代替候補を記載
@@ -95,7 +95,7 @@ base_branch="develop"
 
 PR 本文をファイルに書き出してから PR を作成する。変更内容が `github-writing-style` ルールの Mermaid 使用条件を満たす場合、PR 本文に図を含める。
 
-> **CLI テンプレート**: `shirokuma-docs items template pr --output <file>` で PR 本文テンプレートを生成できます。
+> **CLI テンプレート**: `shirokuma-docs issue template pr --output <file>` で PR 本文テンプレートを生成できます。
 
 ```markdown
 <!-- /tmp/shirokuma-docs/{number}-pr.md -->
@@ -112,7 +112,7 @@ Closes #{issue-number}
 ```
 
 ```bash
-shirokuma-docs items pr create {issue-number} --from-file /tmp/shirokuma-docs/{number}-pr.md
+shirokuma-docs pr create {issue-number} --from-file /tmp/shirokuma-docs/{number}-pr.md
 ```
 
 **タイトルルール**: 70文字以内、プレフィックス(`feat:` 等)は英語、**それ以降は日本語**で記述する。Issue番号はタイトルに入れない。
@@ -124,11 +124,11 @@ shirokuma-docs items pr create {issue-number} --from-file /tmp/shirokuma-docs/{n
 **条件**: `base_branch !== default_branch`
 
 ```bash
-# ファイルに書き出してから items add comment で投稿
+# ファイルに書き出してから issue comment で投稿
 cat > /tmp/shirokuma-docs/{issue-number}-pr-link.md <<'EOF'
 PR #{pr-number} がこの Issue に関連しています。
 EOF
-shirokuma-docs items add comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-pr-link.md
+shirokuma-docs issue comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-pr-link.md
 ```
 
 バッチモードの場合、`Closes` で参照されている各 Issue に対して投稿する。

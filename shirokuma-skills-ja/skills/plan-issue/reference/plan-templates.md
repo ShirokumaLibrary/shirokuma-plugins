@@ -2,7 +2,7 @@
 
 Issue の計画レベルに応じたテンプレート。ステップ 3 で判定したレベルに合うテンプレートを使用する。
 
-> **CLI テンプレート**: `shirokuma-docs items template plan --level {level} --output <file>` でテンプレート骨格を生成できます。
+> **CLI テンプレート**: `shirokuma-docs issue template plan --level {level} --output <file>` でテンプレート骨格を生成できます。
 
 ## 計画 Issue 方式について
 

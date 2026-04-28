@@ -50,7 +50,7 @@ Do NOT create Issues for undecided ideas. Use Discussions for exploration and de
 
 ## AI Behavior
 
-1. **Search**: Run `shirokuma-docs items discussions search "{keyword}"` or `shirokuma-docs items search --type discussions "{keyword}"` before creating new ones
+1. **Search**: Run `shirokuma-docs discussion search "{keyword}"` or `shirokuma-docs issue search --type discussions "{keyword}"` before creating new ones
 2. **Read**: Check Discussions for context when researching
 3. **Write**: Create Discussions for significant findings
 4. **Extract**: Propose Rule via `managing-rules` skill when pattern is confirmed

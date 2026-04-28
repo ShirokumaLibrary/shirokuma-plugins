@@ -21,5 +21,5 @@ skills:
 
 **明示的な禁止事項:**
 - 注入スキル（`commit-issue`）の PR チェーンステップ（ステップ 4）は**実行しない**。PR 作成は呼び出し元が `pr-worker` 経由で制御する。ここで PR を作成すると `Closes #{number}` が欠落し、Issue リンクが成立しない。
-- `gh pr create` や `shirokuma-docs items pr create` を直接呼び出さない。
+- `gh pr create` や `shirokuma-docs pr create` を直接呼び出さない。
 - Issue の Project Status を更新しない（Status 更新は呼び出し元のマネージャーまたは `pr merge` CLI が管理する）。

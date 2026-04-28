@@ -25,7 +25,7 @@ GitHub API ではワークフロー有効化が不可のため、**Web UI から
 
 ```bash
 # リポジトリリンク（自動検出）
-shirokuma-docs projects setup --lang=ja
+shirokuma-docs project setup --lang=ja
 ```
 
 ## Issue Types 設定

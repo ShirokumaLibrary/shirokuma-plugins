@@ -29,8 +29,8 @@
 
 `finalize-changes` 完了後は、サブエージェントではなくマネージャーが直接実行する。後処理が完了した時点でチェーンが終わったように見えるが、**TaskList には pending ステップが残っている**。停止せずに**同じレスポンス内で**以下を Bash ツールで順次実行する:
 
-1. **Work Summary**: Issue コメントとして作業サマリーを投稿（Bash: `shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md`）
-2. **Status Update**: `shirokuma-docs items transition {number} --to Review`（Bash）
+1. **Work Summary**: Issue コメントとして作業サマリーを投稿（Bash: `shirokuma-docs issue comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md`）
+2. **Status Update**: `shirokuma-docs status transition {number} --to Review`（Bash）
 3. **Evolution**: シグナル自動記録（ステップ 5 参照）
 
 > **なぜここで断絶するのか**: PR 作成と後処理チェーン（finalize-changes）は視覚的な「完了感」が強く、LLM がサマリーを出力して停止しやすい。しかし TaskList の pending ステップが 0 になるまではチェーン途中である。
@@ -70,10 +70,10 @@ invoke_skill("finalize-changes")
 TaskUpdate("finalize_changes", "completed")
 
 // ステップ 5-6: work_summary, status_update（マネージャー直接実行）
-// 作業サマリーを `items add comment` で投稿
-post_work_summary()  // shirokuma-docs items add comment {N} --file /tmp/...
+// 作業サマリーを `issue comment` で投稿
+post_work_summary()  // shirokuma-docs issue comment {N} --file /tmp/...
 TaskUpdate("work_summary", "completed")
-update_status_to_review()  // shirokuma-docs items transition {N} --to Review
+update_status_to_review()  // shirokuma-docs status transition {N} --to Review
 TaskUpdate("status_update", "completed")
 ```
 

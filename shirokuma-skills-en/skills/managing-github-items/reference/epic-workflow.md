@@ -18,7 +18,7 @@ Unified reference for working with epics (parent issue + sub-issue structure) on
 Epics are identified by **structure**, not Issue Type. An issue with non-plan child issues (child issues whose titles do NOT start with "Plan:" or "計画:") in `subIssuesSummary` is an epic. An issue with only a plan issue is not considered an epic.
 
 ```bash
-shirokuma-docs items context {number}
+shirokuma-docs issue context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 # → Check frontmatter subIssuesSummary: { total: 3, completed: 1 }
 ```
@@ -67,7 +67,7 @@ When a child issue has a parent (detected via the `parentIssue` field in `.shiro
 
 ```bash
 # Get branch name from parent issue body
-shirokuma-docs items context {parent-number}
+shirokuma-docs issue context {parent-number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md
 # → Extract `chore/958-octokit-migration` from "### Integration Branch" section
 
@@ -103,12 +103,12 @@ Sub-issues follow the standard `project-items` rule. The only difference is that
 
 ### Status Update Operational Guidance
 
-The `items update-status` CLI is not epic-aware. Using `--done` on an epic issue while sub-issues are incomplete risks prematurely transitioning the epic to Done.
+The `status update-batch` CLI is not epic-aware. Using `--done` on an epic issue while sub-issues are incomplete risks prematurely transitioning the epic to Done.
 
 | Situation | Recommended Action |
 |-----------|--------------------|
-| Sub-issue work complete (awaiting review) | `items update-status --review {sub-issue-number}` to update only the sub-issue |
-| All sub-issues complete, final PR merged | `items update-status --done {epic-number}` to set epic to Done |
+| Sub-issue work complete (awaiting review) | `status update-batch --review {sub-issue-number}` to update only the sub-issue |
+| All sub-issues complete, final PR merged | `status update-batch --done {epic-number}` to set epic to Done |
 | Sub-issues still remaining | Do NOT use `--done` on the epic issue. Manually maintain In Progress |
 
 ## `Closes #N` Behavior and Base Branch
@@ -186,7 +186,7 @@ This single command triggers the full epic kickoff:
 
 1. **Detect epic**: `implement-flow` reads the issue, finds `subIssuesSummary` or `### Sub-Issue Structure` in the plan
 2. **Create integration branch**: From `### Integration Branch` section → `git checkout -b epic/{number}-{slug}`
-3. **Create sub-issues**: Parse `### Sub-Issue Structure` table → `shirokuma-docs items add issue` for each row
+3. **Create sub-issues**: Parse `### Sub-Issue Structure` table → `shirokuma-docs issue add` for each row
 4. **Update plan**: Replace placeholder issue references in the plan with actual sub-issue numbers
 5. **Propose order**: Present dependency-based execution order via AskUserQuestion
 6. **Start first sub-issue**: `implement-flow #{first-sub}` — auto-detects integration branch via `parentIssue`
@@ -200,11 +200,11 @@ This single command triggers the full epic kickoff:
 
 ### Relationship to `create-item-flow`
 
-Sub-issue creation in the epic kickoff uses `shirokuma-docs items add issue` directly, not `create-item-flow`. The plan already specifies all sub-issue metadata, making `create-item-flow`'s inference logic unnecessary.
+Sub-issue creation in the epic kickoff uses `shirokuma-docs issue add` directly, not `create-item-flow`. The plan already specifies all sub-issue metadata, making `create-item-flow`'s inference logic unnecessary.
 
 ## Out of Scope (Follow-up)
 
 The following are out of scope for now and will be addressed in separate issues:
 
 - Epic progress display in `starting-session` / `showing-github` (sub-issue summary visualization)
-- Epic awareness in `items update-status` CLI (automated epic status protection when sub-issues are incomplete)
+- Epic awareness in `status update-batch` CLI (automated epic status protection when sub-issues are incomplete)

@@ -12,9 +12,9 @@ allowed-tools: Read, Bash, Glob, Grep
 
 - **カテゴリ:** 調査系ワーカー
 - **スコープ:** `shirokuma-docs lint security` による脆弱性スキャン（Bash 読み取り系コマンド）、結果の分析・優先度付け、セキュリティレポートの生成、Issue 作成候補の提示。
-- **スコープ外:** 依存パッケージの自動更新、ユーザー確認なしの Issue 自動作成。Issue 作成はユーザー確認後に CLI（`shirokuma-docs items add issue`）経由で実行する
+- **スコープ外:** 依存パッケージの自動更新、ユーザー確認なしの Issue 自動作成。Issue 作成はユーザー確認後に CLI（`shirokuma-docs issue add`）経由で実行する
 
-> **Bash 例外**: `shirokuma-docs lint security` および `shirokuma-docs items search` 等の読み取り・検索コマンドは許可。パッケージ更新コマンド（`pnpm update` 等）は禁止。
+> **Bash 例外**: `shirokuma-docs lint security` および `shirokuma-docs issue search` 等の読み取り・検索コマンドは許可。パッケージ更新コマンド（`pnpm update` 等）は禁止。
 
 ## ワークフロー
 
@@ -60,13 +60,13 @@ JSON 出力の `vulnerabilities` を以下の観点で分類する:
 ### 3. 既存 Issue の重複チェック
 
 ```bash
-shirokuma-docs items list --search "security" --search "vulnerability"
+shirokuma-docs issue list --search "security" --search "vulnerability"
 ```
 
 または個別パッケージ名で検索:
 
 ```bash
-shirokuma-docs items search "{package-name} vulnerability"
+shirokuma-docs issue search "{package-name} vulnerability"
 ```
 
 重複する Issue がある場合はスキップし、既存 Issue を更新する。
@@ -108,7 +108,7 @@ shirokuma-docs items search "{package-name} vulnerability"
 # type: Bug
 # priority: High
 # size: S
-shirokuma-docs items add issue --file /tmp/shirokuma-docs/security-issue.md
+shirokuma-docs issue add --file /tmp/shirokuma-docs/security-issue.md
 ```
 
 Issue 本文テンプレート:

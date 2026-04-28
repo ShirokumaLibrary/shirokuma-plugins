@@ -38,17 +38,17 @@ GitHub Projects V2 のビルトイン自動化ワークフローが、CLI ベー
 
 | CLI 機能 | 自動化との共存 |
 |---------|--------------|
-| `items update-status --review` | Review を設定。PR マージ時に自動化が Done に移行 |
-| `items update-status --review`（PR マージ済み） | `findMergedPrForIssue()` で Done に自動昇格 — 自動化と冪等 |
-| `items update-status --done` | Done を直接設定 — 自動化と冪等 |
-| `items integrity` | 無効化されている推奨自動化を警告として報告 |
-| `items integrity --fix` | 不整合を修正 — 自動化と互換 |
-| `items cancel` | close 後に Cancelled を設定。「Item closed → Done」自動化と競合の可能性あり — 通常は CLI の更新が優先。`items integrity --fix` で検出・修正可能 |
+| `status update-batch --review` | Review を設定。PR マージ時に自動化が Done に移行 |
+| `status update-batch --review`（PR マージ済み） | `findMergedPrForIssue()` で Done に自動昇格 — 自動化と冪等 |
+| `status update-batch --done` | Done を直接設定 — 自動化と冪等 |
+| `integrity` | 無効化されている推奨自動化を警告として報告 |
+| `integrity --fix` | 不整合を修正 — 自動化と互換 |
+| `issue cancel` | close 後に Cancelled を設定。「Item closed → Done」自動化と競合の可能性あり — 通常は CLI の更新が優先。`integrity --fix` で検出・修正可能 |
 
 ### 自動化状態の確認
 
 ```bash
-shirokuma-docs projects workflows
+shirokuma-docs project workflows
 ```
 
 全ワークフローの有効/無効状態と推奨事項を報告する。
@@ -85,9 +85,9 @@ shirokuma-docs projects workflows
 
 | 操作 | コマンド | 備考 |
 |------|---------|------|
-| コメント追加 | `items add comment {number} --file {file}` | Issue/Discussion 両対応、キャッシュ自動保存 |
-| コメント一覧 | `items comments {number}` | JSON 出力 |
-| コメント編集 | `items update {number} --comment-id {comment-id} --body {file}` | ファイル書き出し → update のワークフロー |
+| コメント追加 | `issue comment {number} --file {file}` | Issue/Discussion 両対応、キャッシュ自動保存 |
+| コメント一覧 | `issue comments {number}` | JSON 出力 |
+| コメント編集 | `issue update {number} --comment-id {comment-id} --body {file}` | ファイル書き出し → update のワークフロー |
 
 ## アイテム作成
 
@@ -100,7 +100,7 @@ shirokuma-docs projects workflows
 
 ### 初期ステータスガイドライン
 
-`items add issue` はデフォルトで Status を **Backlog** に設定する。frontmatter の `status` フィールドでオーバーライド可能:
+`issue add` はデフォルトで Status を **Backlog** に設定する。frontmatter の `status` フィールドでオーバーライド可能:
 
 | シナリオ | ステータス |
 |---------|----------|

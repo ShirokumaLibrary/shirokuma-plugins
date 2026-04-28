@@ -138,13 +138,13 @@ Priority check order:
 
 When PR context is present:
 ```bash
-shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/review-shadcn-ui.md
+shirokuma-docs issue comment {PR#} --file /tmp/shirokuma-docs/review-shadcn-ui.md
 ```
 
 When no PR context:
 ```bash
 # Set title: "[Review] shadcn-ui: {target}" and category: Reports in frontmatter first
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-shadcn-ui.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/review-shadcn-ui.md
 ```
 
 ## Review Verdict

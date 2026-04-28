@@ -26,10 +26,12 @@ Register **all chain steps** via TaskCreate **before starting work**.
 | 2 | Commit and push changes | Committing and pushing | `commit-issue` (subagent) |
 | 3 | Create pull request | Creating pull request | `open-pr-issue` (subagent) |
 | 4 | Post-process code (simplify, security review, improvement commit) | Post-processing code | `finalize-changes` (Skill tool) |
-| 5 | Post work summary | Posting work summary | Manager direct: `items add comment` |
-| 6 | Update Status to Review | Updating Status to Review | Manager direct: `items transition {number} --to Review` |
+| 5 | Post work summary | Posting work summary | Manager direct: `issue comment` |
+| 6 | Update Status to Review (idempotent sync) | Updating Status to Review | Manager direct: `status transition {number} --to Review` |
 
 Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5 blockedBy 4, step 6 blockedBy 5.
+
+> **Step 6 positioning (idempotent sync)**: The `pr create` invocation in step 3 parses `Closes #N` in the PR body and auto-transitions linked Issues from **In progress → Review** (#2240). Step 6 normally runs after this auto-transition, so the Status update succeeds idempotently when the Issue is already Review. Step 6 remains as a fallback sync in case the auto-transition does not fire (e.g., the PR body lacks `Closes`, or the Issue had an unexpected status).
 
 > **No-changes branch**: When `coding-worker` completes with `changes_made: false`, skip steps 2–4 (commit, PR, finalize-changes) and proceed to step 5 (no-changes work summary) → step 6 (status determination). See the "No-Changes Path" sections in [reference/chain-execution.md](reference/chain-execution.md) and [reference/chain-end-steps.md](reference/chain-end-steps.md) for details.
 
@@ -38,7 +40,7 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
 | 1 | Conduct research | Conducting research | `researching-best-practices` (subagent) |
-| 2 | Save findings to Discussion | Creating Discussion | `shirokuma-docs items add discussion` |
+| 2 | Save findings to Discussion | Creating Discussion | `shirokuma-docs discussion add` |
 
 Dependencies: step 2 blockedBy 1.
 
@@ -53,27 +55,27 @@ Use TaskUpdate to set each step to `in_progress` when starting and `completed` w
 When the received issue title starts with "Plan: " or "計画: ", treat it as a plan issue and auto-redirect to the parent issue:
 
 1. Check the `parent` field from the cache frontmatter
-2. If `parent` is set → run `items context` with the parent issue number, and continue the flow using the parent issue number (the plan issue number is only used for plan context reference)
-3. If `parent` is not set → re-fetch via `items context {number}` to check for `parent`
+2. If `parent` is set → run `issue context` with the parent issue number, and continue the flow using the parent issue number (the plan issue number is only used for plan context reference)
+3. If `parent` is not set → re-fetch via `issue context {number}` to check for `parent`
 4. If `parent` is still unknown → display error message and stop:
    "Cannot determine parent issue for plan issue #{number}. Please specify the parent issue number directly."
 
-**Issue number provided**: `shirokuma-docs items context {number}` to fetch and cache, then read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` to extract title/body/labels/status/priority/size.
+**Issue number provided**: `shirokuma-docs issue context {number}` to fetch and cache, then read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` to extract title/body/labels/status/priority/size.
 
 #### Sub-Issue Detection
 
 When `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` frontmatter contains a `parentIssue` field, the issue is a sub-issue of an epic:
 
-1. Identify the plan issue (child issue with a title starting with "Plan:" or "計画:") from the parent's `subIssuesSummary`, fetch it via `items context {plan-issue-number}`, and use its body as overall context
+1. Identify the plan issue (child issue with a title starting with "Plan:" or "計画:") from the parent's `subIssuesSummary`, fetch it via `issue context {plan-issue-number}`, and use its body as overall context
 2. Set base branch to the parent's integration branch instead of `develop` (Step 3)
 3. `open-pr-issue` will self-detect the sub-issue via the `parentIssue` field, so explicit context passing is not required (if passed, it is used as supplementary; otherwise, self-detection is the fallback)
 
 ```bash
 # Check parent issue
-shirokuma-docs items context {parent-number}
+shirokuma-docs issue context {parent-number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md
 # Identify child issue with title starting with "Plan:" from subIssuesSummary
-shirokuma-docs items context {plan-issue-number}
+shirokuma-docs issue context {plan-issue-number}
 # → Fetch plan body and use as context
 ```
 
@@ -87,7 +89,7 @@ Check `subIssuesSummary` for a child issue with a title starting with "Plan:" or
 | No plan issue | Size XS/S (clear requirements) and not a sub-issue, and not Review | → Skip planning, proceed directly to `code-issue` |
 | No plan issue | Size M+ or ambiguous requirements | → Delegate to `prepare-flow` |
 | No plan issue | Sub-issue (`parentIssue` present) | → Delegate to `prepare-flow` regardless of size |
-| Plan issue exists | — | → Fetch plan issue body via `items context {plan-issue-number}` and pass as context to implementation skill |
+| Plan issue exists | — | → Fetch plan issue body via `issue context {plan-issue-number}` and pass as context to implementation skill |
 
 #### Review Status Priority Path
 
@@ -108,7 +110,7 @@ Warning message example for anomaly fallback: "⚠️ Status is Review but no pl
 When a plan issue exists (new approach):
 
 ```bash
-shirokuma-docs items context {plan-issue-number}
+shirokuma-docs issue context {plan-issue-number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md to get plan content
 ```
 
@@ -133,11 +135,11 @@ Text description → create-item-flow → Issue number → Join Step 1
 
 ### Step 2: Update Status
 
-If issue is not already In Progress: run `shirokuma-docs items transition {number} --to "In Progress"`
+If issue is not already In Progress: run `shirokuma-docs status transition {number} --to "In progress"`
 
-**Review explicit approval**: Invoking `/implement-flow` from Review is explicit plan approval. Run `shirokuma-docs items approve {plan-number}` at this point to transition the plan Issue to Done(Open), then transition the target Issue to In Progress.
+**Review explicit approval**: Invoking `/implement-flow` from Review is explicit plan approval. Run `shirokuma-docs status approve {plan-number}` at this point to transition the plan Issue to Done(Open), then transition the target Issue to In Progress.
 
-> **Re-run tolerance**: `items approve` exits 1 when the plan Issue is not in `Review` (e.g., already Done, In Progress). On re-runs or after manual transitions, skip `result: "error"` in the JSON output and proceed to the next step (do not treat the CLI error as fatal).
+> **Re-run tolerance**: `status approve` exits 1 when the plan Issue is not in `Review` (e.g., already Done, In Progress). On re-runs or after manual transitions, skip `result: "error"` in the JSON output and proceed to the next step (do not treat the CLI error as fatal).
 
 ### Step 3: Ensure Feature Branch
 
@@ -312,6 +314,21 @@ See [reference/chain-end-steps.md](reference/chain-end-steps.md) for details on 
 
 After successful chain completion (skip on chain failure), auto-record Evolution signals following the "Auto-Recording Procedure at Skill Completion" in the `rule-evolution` rule. Do not register as a task (non-blocking processing).
 
+## Auto-Actions After PR Merge (Out-of-Chain)
+
+The `implement-flow` chain ends at **Updating Status to Review**, and **merge is not part of the chain**. The user runs `shirokuma-docs pr merge` separately (or merges via the GitHub UI).
+
+`pr merge` (`src/commands/pr/merge.ts`) performs the following auto-actions:
+
+| Situation | Auto-action |
+|-----------|------------|
+| Merge succeeds | Linked Issues → Done, the PR itself → Done, parent sync via syncParentStatus |
+| Base branch is not the default branch (integration branch) | Explicitly closes linked Issues via the REST API |
+| Merge completes all work sub-issues + all plans | Auto-creates a PR from integration → develop, adds it to the project as Review, and suggests `/review-flow` |
+| Merge does not yet complete all work sub-issues (Backlog plans remain) | Suggests the next Backlog plan as `/implement-flow #{N}` |
+
+Users invoking `implement-flow` should remember that post-merge behavior is automated by the CLI and no additional orchestrator invocation is needed. After merging, follow the `next_action` directive emitted by `pr merge` to proceed.
+
 ## Batch Mode
 
 When multiple issue numbers are provided (e.g., `#101 #102 #103`), activate batch mode.
@@ -400,8 +417,8 @@ claude -p "/implement-flow --headless #42"
 | Already In Progress | Continue without status change |
 | Wrong branch | AskUserQuestion: switch or continue |
 | Chain failure | Report completed/remaining steps, return control. See [reference/chain-recovery.md](reference/chain-recovery.md) |
-| `coding-worker` completes with `changes_made: false` | Skip commit / PR / finalize-changes, post no-changes work summary, confirm status via AskUserQuestion (Cancelled recommended via `items cancel` / On Hold / Backlog). See "No-Changes Path" in [reference/chain-end-steps.md](reference/chain-end-steps.md) |
-| Issue was reverted (after PR revert) | After merging revert PR, move original issue back to Backlog and re-implement on a new branch. See [reference/chain-recovery.md](reference/chain-recovery.md) |
+| `coding-worker` completes with `changes_made: false` | Skip commit / PR / finalize-changes, post no-changes work summary, confirm status via AskUserQuestion (cancel via `issue cancel` — internally translated to Done + state_reason: not_planned per #2204 / Blocked / Backlog). See "No-Changes Path" in [reference/chain-end-steps.md](reference/chain-end-steps.md) |
+| Issue was reverted (after PR revert) | Run `shirokuma-docs issue rollback {plan-issue#} --action revert` to batch-execute revert branch creation, revert PR creation, and reset the plan Issue to Backlog. Then re-implement on a new branch. See [reference/chain-recovery.md](reference/chain-recovery.md) |
 | Sub-issue with no integration branch | Use `develop` as base, warn user |
 | Epic issue selected directly | Check for non-plan child issues; see "Epic Issue Entry Point" below |
 | `--headless` + precondition not met | Display error message and stop |
@@ -434,10 +451,10 @@ The epic must have a plan issue (child issue with title starting with "Plan:" or
 
 2. **Create sub-issues in batch** (only when no non-plan child issues exist): Skip this step if sub-issues were already created by `prepare-flow`. Parse the `### Sub-Issue Structure` table from the plan issue body. For each row, create a sub-issue via CLI:
    ```bash
-   shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
+   shirokuma-docs issue add --file /tmp/shirokuma-docs/{slug}.md
    ```
    Body: Minimal stub referencing the parent plan (`See #{epic-number} for full plan`).
-   After creation, update the plan issue's `### Sub-Issue Structure` table placeholders (`#{sub1}`, etc.) with actual issue numbers and sync via `items update {plan-issue-number} --body /tmp/shirokuma-docs/{plan-issue-number}-body.md`.
+   After creation, update the plan issue's `### Sub-Issue Structure` table placeholders (`#{sub1}`, etc.) with actual issue numbers and sync via `issue update {plan-issue-number} --body /tmp/shirokuma-docs/{plan-issue-number}-body.md`.
 
 3. **Present execution order**: Based on the `### Execution Order` section or dependency column, display the recommended order and end. Do NOT propose immediate work start — each sub-issue should be worked on in a separate conversation per the epic pattern in `best-practices-first`:
    ```
@@ -456,7 +473,7 @@ The epic must have a plan issue (child issue with title starting with "Plan:" or
 
 ### Responsibility Note
 
-Sub-issue creation in this flow uses `shirokuma-docs items add issue` directly (not `create-item-flow`). The plan already specifies sub-issue details, so `create-item-flow`'s inference logic is unnecessary.
+Sub-issue creation in this flow uses `shirokuma-docs issue add` directly (not `create-item-flow`). The plan already specifies sub-issue details, so `create-item-flow`'s inference logic is unnecessary.
 
 ## Rule References
 
@@ -478,7 +495,7 @@ Sub-issue creation in this flow uses `shirokuma-docs items add issue` directly (
 | AskUserQuestion | Requirement clarification, approach selection, edge cases (manager (main AI) pre-resolves) |
 | TaskCreate, TaskUpdate | Chain step registration and status updates (required for all work) |
 | TaskList, TaskGet | Check pending steps and task state |
-| Bash | Git operations, `shirokuma-docs items` commands |
+| Bash | Git operations, `shirokuma-docs issue` commands |
 
 ## Notes
 

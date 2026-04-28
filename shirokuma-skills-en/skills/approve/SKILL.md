@@ -19,7 +19,7 @@ Normally, `/implement-flow` implicitly approves plan Issues when starting work (
 
 ## Workflow
 
-1. **Execute approval**: Run `shirokuma-docs items approve {number}`. The CLI validates status internally and exits with `result: "error"` if the Issue is not in Review.
+1. **Execute approval**: Run `shirokuma-docs status approve {number}`. The CLI validates status internally and exits with `result: "error"` if the Issue is not in Review.
 2. **Branch on result**: Inspect `result` in the JSON output
    - `"ok"` → Show completion report and present `next_suggestions` to the user
    - `"error"` → Display the `message` field as-is and exit

@@ -24,17 +24,20 @@ Takes a PR number and performs code review execution (via `review-issue` Agent /
 
 ## Workflow
 
-### Issue Status Transitions
+### Issue Status Transitions (Conditional)
 
-Update the status of Issues in `linked_issues` at the following points:
+`pr create` (#2240) auto-transitions linked Issues from In progress → Review, so **Review** is the default status while a PR is open. `review-flow` only moves the status conditionally based on whether code changes are made.
 
-| Timing | Action | Command |
-|--------|--------|---------|
-| `review-flow` starts | → In Progress | `items transition {n} --to "In Progress"` |
-| After review response complete | → Review | `items transition {n} --to Review` |
+| Condition | At Start | At Completion |
+|-----------|----------|---------------|
+| **Code-fix threads present** (Step 3 classifies ≥1 thread as "code fix") | Review → In progress (`status transition {n} --to "In progress"`) | In progress → Review (`status transition {n} --to Review`) |
+| **Question / disagreement threads only** (no code changes) | Stay in Review (no update) | Stay in Review (no update) |
+| **PASS + recommendations only** (issue_comments) | Move to In progress only when code fixes will be made | Return to Review only when code fixes were made |
 
 - Skip status transitions when `linked_issues` is empty
 - Skip update if status is already correct (idempotent)
+
+> **Design intent**: Earlier `review-flow` unconditionally toggled Review → In progress → Review, but after `pr create` auto-Reviews the Issue, "Review-locked while a PR is open" is the natural semantics. Only revert to In progress when the review response actually changes code (this also prevents duplicate `Review at` timestamp records in `autoSetTimestamps`).
 
 ### Step 1: Context Restoration (Required — Must Run First)
 
@@ -42,7 +45,7 @@ Update the status of Issues in `linked_issues` at the following points:
 
 1. Fetch PR information and record `review_count` and `linked_issues` (used for branching in Step 2):
    ```bash
-   shirokuma-docs items pr show {PR#}
+   shirokuma-docs pr show {PR#}
    ```
    Fields to extract:
    - `review_count`: Number of submitted reviews (0 = triggers new review mode)
@@ -52,7 +55,7 @@ Update the status of Issues in `linked_issues` at the following points:
 
 2. If a related Issue exists, reference its plan for context:
    ```bash
-   shirokuma-docs items context {issue-number}
+   shirokuma-docs issue context {issue-number}
    # → Read .shirokuma/github/{org}/{repo}/issues/{issue-number}/body.md
    ```
 3. Review the PR diff:
@@ -68,7 +71,7 @@ Update the status of Issues in `linked_issues` at the following points:
    - Exclude references matching `Closes #N` / `Fixes #N` / `Refs #N` / `References #N` patterns as linked issues
    - The remaining `#N` references in the `## Summary` / `## 概要` section, or any `#N` references in the `## Artifacts` / `## 成果物` section, become artifact candidates
    - If 0 artifact candidates → skip artifact review (diff-only review as before)
-   - If artifact candidates exist → use `shirokuma-docs items context {N}` to cache and read `.shirokuma/github/{org}/{repo}/issues/{N}/body.md` frontmatter `type` field to identify Discussion / Issue / PR type, and include only Discussions and Issues as review targets
+   - If artifact candidates exist → use `shirokuma-docs issue context {N}` to cache and read `.shirokuma/github/{org}/{repo}/issues/{N}/body.md` frontmatter `type` field to identify Discussion / Issue / PR type, and include only Discussions and Issues as review targets
    - **Limit**: Up to 10 artifacts maximum. If exceeded, review only the first 10 and output a warning
 
    Record as **artifact candidate list** (format: `#N (Discussion)`, `#N (Issue)`, etc.)
@@ -82,7 +85,7 @@ First check the `review_count` obtained in Step 1:
 **If `review_count > 0` → fetch unresolved threads and branch**:
 
 ```bash
-shirokuma-docs items pr comments {PR#}
+shirokuma-docs pr comments {PR#}
 ```
 
 - 0 unresolved threads → display completion report and propose re-review ("Would you like to run a re-review with `review-issue`?" via AskUserQuestion). If user accepts, transition to Step 2a
@@ -115,7 +118,7 @@ When no review has been submitted yet, invoke `review-issue` via the Agent tool 
 3. If `review-issue` posted an issue comment, check for its presence via `pr comments`
 4. Check for unresolved threads:
    ```bash
-   shirokuma-docs items pr comments {PR#}
+   shirokuma-docs pr comments {PR#}
    ```
    Branch based on the following condition table:
 
@@ -234,7 +237,7 @@ Process code fix threads together. Delegate fixes to `code-issue` via Skill tool
 
 4. **Reply**: Reply to each thread referencing the commit (use numeric `database_id` from `pr comments` output for `--reply-to`)
    ```bash
-   shirokuma-docs items pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
+   shirokuma-docs pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
    Fixed in {commit-hash}.
 
    {description of the fix}
@@ -242,14 +245,14 @@ Process code fix threads together. Delegate fixes to `code-issue` via Skill tool
    ```
 5. **Resolve**: Resolve the thread (use `PRRT_`-prefixed ID from `pr comments` output for `--thread-id`)
    ```bash
-   shirokuma-docs items pr resolve {PR#} --thread-id {PRRT_id}
+   shirokuma-docs pr resolve {PR#} --thread-id {PRRT_id}
    ```
 
 #### Comment Fix Threads
 
 1. **Edit comment**: Fix the erroneous comment
    ```bash
-   shirokuma-docs items update {number} --comment-id {comment-id} --body /tmp/shirokuma-docs/{number}-comment-fix.md
+   shirokuma-docs issue update {number} --comment-id {comment-id} --body /tmp/shirokuma-docs/{number}-comment-fix.md
    ```
 2. **Reply**: Reply noting the correction
 3. **Resolve**: Resolve the thread
@@ -269,7 +272,7 @@ Process code fix threads together. Delegate fixes to `code-issue` via Skill tool
 After completing thread responses that include code fixes, post a summary comment to the PR so that reviewers can track all response actions within the PR history.
 
 ```bash
-shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/pr-{PR#}-review-response.md
+shirokuma-docs issue comment {PR#} --file /tmp/shirokuma-docs/pr-{PR#}-review-response.md
 ```
 
 Content of `/tmp/shirokuma-docs/pr-{PR#}-review-response.md`:
@@ -318,6 +321,8 @@ Addressed {N} threads.
 | User decides no fixes needed (UCP) | Display completion report and exit. Skip thread resolution |
 | User selects partial addressing (UCP) | Process only specified threads, leave the rest unresolved |
 | PASS + recommendations only, user chose to address (no review threads) | Skip Step 3 (thread classification), apply code fixes based on issue comment recommendations → commit. Thread reply/resolve steps are not needed |
+| User chooses to close the PR (e.g., wrong direction) | Guide and run `shirokuma-docs pr close {PR#} --rollback`. The `--rollback` flag auto-reverts linked Issues from Completed/Review back to In progress (#2234, F-006). This flow ends; skip the Issue status update |
+| Merged PR needs to be reverted | Guide `shirokuma-docs issue rollback {plan-issue#} --action revert`. It batch-executes revert branch creation, revert PR creation, and resetting the plan Issue to Backlog (#2024 Phase 1-D) |
 
 ## Tool Usage
 
@@ -325,7 +330,7 @@ Addressed {N} threads.
 |------|------|
 | Skill | Code fixes via `code-issue` (Step 5), post-processing via `finalize-changes` (Step 5) |
 | Agent | Code review execution via `review-worker` (Step 2a), commits and pushes via `commit-worker` (Step 5) |
-| Bash | `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve`, git operations |
+| Bash | `shirokuma-docs pr comments`, `pr reply`, `pr resolve`, git operations |
 | Read | Code review, plan reference |
 | TaskCreate, TaskUpdate | Track thread processing progress |
 

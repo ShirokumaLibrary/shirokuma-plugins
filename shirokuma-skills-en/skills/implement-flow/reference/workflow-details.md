@@ -83,5 +83,5 @@ For substantial standalone work without `implement-flow`:
 | Standalone Scope | Action |
 |-----------------|--------|
 | Quick single-skill invocation (typo fix, item creation) | Not needed |
-| Multiple commits or significant code changes | Update issue status manually via `items update-status` CLI |
+| Multiple commits or significant code changes | Update issue status manually via `status update-batch` CLI |
 | Research findings or architecture investigation | Recommend creating a Discussion |

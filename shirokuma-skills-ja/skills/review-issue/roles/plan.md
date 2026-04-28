@@ -12,14 +12,14 @@ Issue の計画（計画 Issue または `## 計画` セクション）の品質
 - リスク分析（破壊的変更、パフォーマンス影響の見落とし）
 - Issue 記述の十分性（計画 Issue の本文だけで計画を理解・評価できるか）
 
-> **計画 Issue 方式**: 計画は親 Issue の子 Issue（タイトルが「計画:」で始まる Issue）として作成される。`subIssuesSummary` から計画 Issue を特定し、`items context {plan-issue-number}` で本文を取得してレビューする。旧方式（Issue 本文の `## 計画` セクション）が存在する場合はフォールバックとして使用する。
+> **計画 Issue 方式**: 計画は親 Issue の子 Issue（タイトルが「計画:」で始まる Issue）として作成される。`subIssuesSummary` から計画 Issue を特定し、`issue context {plan-issue-number}` で本文を取得してレビューする。旧方式（Issue 本文の `## 計画` セクション）が存在する場合はフォールバックとして使用する。
 
 ## `plan-issue` との使い分け
 
 | 観点 | `plan-issue` 内蔵レビュー | `analyze-issue` plan ロール |
 |------|--------------------------------|--------------------------------|
 | タイミング | 計画策定直後の即時チェック | ユーザーが任意タイミングで依頼 |
-| データ取得 | Task エージェントに Issue 本文を埋め込み | Issue 番号から計画 Issue を特定し `shirokuma-docs items context` で取得 |
+| データ取得 | Task エージェントに Issue 本文を埋め込み | Issue 番号から計画 Issue を特定し `shirokuma-docs issue context` で取得 |
 | 目的 | 計画の初期品質ゲート | 独立したセカンドオピニオン |
 | 起動方法 | `plan-issue` のステップ 4 で自動実行 | `analyze-issue plan #N` |
 
@@ -33,8 +33,8 @@ Issue の計画（計画 Issue または `## 計画` セクション）の品質
 
 ```
 1. ロール選択: "plan review" or Review Issue
-2. Issue 本文取得: shirokuma-docs items context {number}（→ .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む）
-3. 計画 Issue 特定: subIssuesSummary からタイトルが「計画:」で始まる子 Issue を特定し、items context {plan-issue-number} で本文を取得（フォールバック: 本文の ## 計画 セクション）
+2. Issue 本文取得: shirokuma-docs issue context {number}（→ .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む）
+3. 計画 Issue 特定: subIssuesSummary からタイトルが「計画:」で始まる子 Issue を特定し、issue context {plan-issue-number} で本文を取得（フォールバック: 本文の ## 計画 セクション）
 4. Lint 実行: スキップ（対象がコードファイルではないため）
 5. 計画分析: 計画 Issue の本文（または旧方式の計画セクション）をレビュー観点で分析
 6. レポート生成: テンプレート形式

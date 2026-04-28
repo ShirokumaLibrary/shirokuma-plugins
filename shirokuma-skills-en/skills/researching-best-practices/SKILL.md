@@ -114,7 +114,7 @@ Compare official recommendations with project patterns:
 For significant research, create a Discussion in the Research category:
 
 ```bash
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/findings.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/findings.md
 ```
 
 ## Output Format

@@ -9,7 +9,7 @@ After PR creation, post a technical work summary to the Issue as a comment. This
 The work summary focuses on **technical work details** — what was changed, which files were modified, and technical decisions made.
 
 ```bash
-shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md
+shirokuma-docs issue comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md
 ```
 
 Where `/tmp/shirokuma-docs/{number}-work-summary.md` contains:
@@ -41,16 +41,16 @@ Skip this step if no issue number is associated with the work.
 Update Status to Review for issues with a number:
 
 ```bash
-shirokuma-docs items transition {number} --to Review
+shirokuma-docs status transition {number} --to Review
 ```
 
-**Status fallback verification**: After chain completion, if the transition was skipped or failed, run `shirokuma-docs items transition {number} --to Review` again (idempotent: re-updating to Review when already Review is harmless).
+**Status fallback verification**: After chain completion, if the transition was skipped or failed, run `shirokuma-docs status transition {number} --to Review` again (idempotent: re-updating to Review when already Review is harmless).
 
 ## Plan Issue Done Update (End of Chain)
 
-> **Not required from Phase 5 onward**: The plan Issue is already transitioned to Done(Open) by `items approve {plan-number}` in Step 2 ("Review explicit approval"). No additional update is needed at the end of the chain.
+> **Not required from Phase 5 onward**: The plan Issue is already transitioned to Done(Open) by `status approve {plan-number}` in Step 2 ("Review explicit approval"). No additional update is needed at the end of the chain.
 
-If no plan issue exists (e.g., XS/S direct implementation path), always skip this step. Because `STATUS_TRANSITIONS[IN_PROGRESS]` does not include `DONE`, `items transition {plan-number} --to Done` will error out. If the plan issue is still In Progress at this point, it indicates that the implicit approval step was missed — log a warning and do not attempt automatic remediation.
+If no plan issue exists (e.g., XS/S direct implementation path), always skip this step. Because `STATUS_TRANSITIONS[IN_PROGRESS]` does not include `DONE`, `status transition {plan-number} --to Done` will error out. If the plan issue is still In Progress at this point, it indicates that the implicit approval step was missed — log a warning and do not attempt automatic remediation.
 
 ## Next Steps Suggestion (End of Chain)
 
@@ -71,7 +71,7 @@ When `coding-worker` returns `changes_made: false`, skip the normal chain (commi
 Since no PR exists, use a dedicated template that omits the `### Pull Request` section. Record as an investigation result ("already implemented", "spec-correct", "cannot reproduce", etc.).
 
 ```bash
-shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-no-changes-summary.md
+shirokuma-docs issue comment {number} --file /tmp/shirokuma-docs/{number}-no-changes-summary.md
 ```
 
 Where `/tmp/shirokuma-docs/{number}-no-changes-summary.md` contains:
@@ -98,11 +98,11 @@ When the chain ends with no changes, there is no code change or PR, so the issue
 
 | Option | Transition Command | Use Case |
 |--------|--------------------|----------|
-| Cancelled | `shirokuma-docs items cancel {n} --comment "{reason}"` | Close the issue as "no changes needed" (recommended) |
-| On Hold | `shirokuma-docs items transition {n} --to "On Hold"` | Pending reconsideration or more information |
-| Backlog | `shirokuma-docs items transition {n} --to Backlog` | Re-evaluate later |
+| Cancelled | `shirokuma-docs issue cancel {n} --comment "{reason}"` | Close the issue as "no changes needed" (recommended) |
+| On Hold | `shirokuma-docs status transition {n} --to "On Hold"` | Pending reconsideration or more information |
+| Backlog | `shirokuma-docs status transition {n} --to Backlog` | Re-evaluate later |
 
-> **Important**: `Cancelled` must be set via the dedicated **`items cancel`** command. Using `items transition --to Cancelled` leaves the issue open and breaks consistency (see `status-workflow.ts` L121).
+> **Important**: `Cancelled` must be set via the dedicated **`issue cancel`** command. Using `status transition --to Cancelled` leaves the issue open and breaks consistency (see `status-workflow.ts` L121).
 
 Implementation:
 
@@ -118,12 +118,12 @@ user_choice = AskUserQuestion(
 )
 
 if user_choice == "Cancelled":
-    run: shirokuma-docs items cancel {number} --comment "{reason}"
+    run: shirokuma-docs issue cancel {number} --comment "{reason}"
 else:
-    run: shirokuma-docs items transition {number} --to {user_choice}
+    run: shirokuma-docs status transition {number} --to {user_choice}
 ```
 
-In headless mode (`--headless`), skip AskUserQuestion and run `items cancel {number} --comment "{reason}"` as the default action (Cancelled can be reversed via `items reopen` + `items transition`).
+In headless mode (`--headless`), skip AskUserQuestion and run `issue cancel {number} --comment "{reason}"` as the default action (Cancelled can be reversed via `issue reopen` + `status transition`).
 
 ### Next Steps Suggestion for No Changes
 

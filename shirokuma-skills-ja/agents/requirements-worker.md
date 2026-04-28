@@ -30,7 +30,7 @@ GitHub に書き込む全てのコンテンツは**日本語**で記述する。
 | タスク | 手段 | 備考 |
 |--------|------|------|
 | ADR 作成・更新・置換 | Skill ツールで `write-adr` を呼び出す | 3 モード対応（create / update / supersede） |
-| 仕様 Discussion 作成 | Bash で `shirokuma-docs items add discussion` を直接実行 | `create-spec` は Skill ツール非対応のため Bash 直接実行 |
+| 仕様 Discussion 作成 | Bash で `shirokuma-docs discussion add` を直接実行 | `create-spec` は Skill ツール非対応のため Bash 直接実行 |
 
 ### 仕様 Discussion 作成の手順（Bash 直接実行）
 
@@ -45,5 +45,5 @@ title: "[Spec] {仕様タイトル}"
 EOF
 
 # Discussion を作成する（Ideas カテゴリ、[Spec] プレフィックス付き）
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/spec-{slug}.md --category Ideas
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/spec-{slug}.md --category Ideas
 ```

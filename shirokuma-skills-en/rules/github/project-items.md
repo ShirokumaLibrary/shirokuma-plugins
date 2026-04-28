@@ -40,13 +40,13 @@ graph LR
 | Review | AI work complete, human review possible (plan approval gate or code review pending) |
 | Done(Open) | Sub-issue work complete. GitHub Issue remains Open. Closed automatically when parent Issue closes |
 | Done / Closed | Completed and closed |
-| Cancelled | Explicitly not planned (set by `items cancel`) |
+| Cancelled | Explicitly not planned (set by `issue cancel`) |
 
 > **@deprecated**: `Ready` and `Completed` are retained for backward compatibility with existing Issues but must not be used as new transition targets. Escape paths only: `Ready → In Progress`, `Completed → Done`.
 
-### items approve and Done(Open) State
+### status approve and Done(Open) State
 
-`items approve {number}` is a dedicated CLI command to transition a Review-status Issue to Done(Open) (ADR-v3-013).
+`status approve {number}` is a dedicated CLI command to transition a Review-status Issue to Done(Open) (ADR-v3-013).
 
 - **Transition**: Review → Done (GitHub Issue state remains Open)
 - **Fails if not Review**: exits with `result: "error"` and exit 1
@@ -60,12 +60,12 @@ PRs use the same Status field as Issues, operating on a subset of the Issue work
 
 | Status | Description | Transition Trigger |
 |--------|-------------|-------------------|
-| Review | Immediately after PR creation | Auto-set by `items pr create` when adding PR to Projects |
-| Done | After merge | Auto-set by `items pr merge` |
+| Review | Immediately after PR creation | Auto-set by `pr create` when adding PR to Projects |
+| Done | After merge | Auto-set by `pr merge` |
 
 **Unused statuses**: Backlog, Pending, Ready, In Progress, On Hold, Completed, and Cancelled do not apply to PRs.
 
-> `items integrity` detects PR status inconsistencies (OPEN PR with Done status, MERGED/CLOSED PR with active status, issue-only statuses on PRs).
+> `integrity` detects PR status inconsistencies (OPEN PR with Done status, MERGED/CLOSED PR with active status, issue-only statuses on PRs).
 
 ### Two-Layer Status Model (Epics / Sub-Issues)
 
@@ -80,13 +80,13 @@ Epic Issue status is **auto-derived** from sub-issue states. Manual updates are 
 
 **Cascading Close on parent close**: When a parent Issue is closed, all Done(Open) child Issues are automatically closed via `syncChildCloseOnParentClose`.
 
-**Reactive auto-derivation**: The CLI detects sub-issue status changes during `items transition`, `items close` (including `items cancel`), `items update-status`, and `items pr merge`, then auto-derives and updates the parent status. Explicit `items integrity --fix` is not required (still available for batch consistency checks).
+**Reactive auto-derivation**: The CLI detects sub-issue status changes during `status transition`, `issue close` (including `issue cancel`), `status update-batch`, and `pr merge`, then auto-derives and updates the parent status. Explicit `integrity --fix` is not required (still available for batch consistency checks).
 
 ### Plan Reset Flow
 
 To reset an epic's plan from scratch (when sub-issues already exist):
 
-1. Set all sub-issues to Cancelled via `items cancel {sub-numbers}` (CLI auto-transitions parent to Backlog)
+1. Set all sub-issues to Cancelled via `issue cancel {sub-numbers}` (CLI auto-transitions parent to Backlog)
 2. Re-plan with `prepare-flow`
 
 ### Idea → Issue Flow
@@ -136,22 +136,22 @@ AI MUST update issue status at these points:
 
 | Trigger | Action | Owner | Command |
 |---------|--------|-------|---------|
-| Planning started | → In Progress + assign | `prepare-flow` | `items transition {n} --to "In Progress"` |
-| Plan created | → Review | `prepare-flow` | `items transition {n} --to Review` |
-| Design started | → In Progress | `design-flow` | `items transition {n} --to "In Progress"` |
-| Design complete | → Review | `design-flow` | `items transition {n} --to Review` |
-| User approves plan, starts work | → In Progress + branch | `implement-flow` | `items transition {n} --to "In Progress"` |
-| implement-flow chain complete | → Review | `implement-flow` | `items transition {n} --to Review` (after PR creation, simplify, security-review, work summary) |
-| User explicitly approves | → Done(Open) | `approve` skill / manual | `items approve {n}` |
-| review-flow starts | → In Progress | `review-flow` | `items transition {n} --to "In Progress"` |
-| review-flow response complete | → Review | `review-flow` | `items transition {n} --to Review` |
+| Planning started | → In Progress + assign | `prepare-flow` | `status transition {n} --to "In progress"` |
+| Plan created | → Review | `prepare-flow` | `status transition {n} --to Review` |
+| Design started | → In Progress | `design-flow` | `status transition {n} --to "In progress"` |
+| Design complete | → Review | `design-flow` | `status transition {n} --to Review` |
+| User approves plan, starts work | → In Progress + branch | `implement-flow` | `status transition {n} --to "In progress"` |
+| implement-flow chain complete | → Review | `implement-flow` | `status transition {n} --to Review` (after PR creation, simplify, security-review, work summary) |
+| User explicitly approves | → Done(Open) | `approve` skill / manual | `status approve {n}` |
+| review-flow starts | → In Progress | `review-flow` | `status transition {n} --to "In progress"` |
+| review-flow response complete | → Review | `review-flow` | `status transition {n} --to Review` |
 | PR merged | → Done | `commit-issue` (via `pr merge`) | Automatic |
-| Blocked by dependency | → On Hold | Manual | `items transition {n} --to "On Hold"` + comment |
-| Complete (no PR needed) | → Done | Manual | `items update-status --done {n}` |
-| Cancelled | → Cancelled | `items cancel` | `items cancel {n}` |
-| Plan approved | → Done (plan issue) | `implement-flow` | `items transition {plan-n} --to Done` (for epics: only after all work sub-issues are Done) |
+| Blocked by dependency | → On Hold | Manual | `status transition {n} --to "On Hold"` + comment |
+| Complete (no PR needed) | → Done | Manual | `status update-batch --done {n}` |
+| Cancelled | → Cancelled | `issue cancel` | `issue cancel {n}` |
+| Plan approved | → Done (plan issue) | `implement-flow` | `status transition {plan-n} --to Done` (for epics: only after all work sub-issues are Done) |
 
-> **GitHub Projects built-in automation**: When the `Pull request linked to issue` workflow is enabled, linking a PR to an Issue automatically adds both to the Project. Date fields (Start at / Review at / End at) on the PR are set automatically by `items integrity`. See the "GitHub Projects Workflow Configuration" section in `github-commands.md` for setup instructions.
+> **GitHub Projects built-in automation**: When the `Pull request linked to issue` workflow is enabled, linking a PR to an Issue automatically adds both to the Project. Date fields (Start at / Review at / End at) on the PR are set automatically by `integrity`. See the "GitHub Projects Workflow Configuration" section in `github-commands.md` for setup instructions.
 
 ### In Progress Usage (Planning and Implementation)
 
@@ -183,38 +183,38 @@ Review means "AI work is complete and human review is possible". Used in two con
 
 ### CLI and GitHub Projects Workflows Responsibility Division
 
-GitHub Projects has built-in Workflows (e.g., `Item closed` → set Status to Done), and the CLI's `items close` also sets Status to Done. This can result in the same Status update being executed twice.
+GitHub Projects has built-in Workflows (e.g., `Item closed` → set Status to Done), and the CLI's `issue close` also sets Status to Done. This can result in the same Status update being executed twice.
 
 | Operation | CLI Responsibility | Workflows Responsibility | Duplicate Execution |
 |-----------|-------------------|--------------------------|---------------------|
-| Issue close | `items close` sets Status → Done | `Item closed` sets Status → Done | Yes (idempotent) |
-| PR merge | `items pr merge` sets Status → Done | `Pull request merged` sets Status → Done | Yes (idempotent) |
-| Issue reopen | `items reopen` restores Status | `Item reopened` sets Status → Backlog | Potential conflict |
+| Issue close | `issue close` sets Status → Done | `Item closed` sets Status → Done | Yes (idempotent) |
+| PR merge | `pr merge` sets Status → Done | `Pull request merged` sets Status → Done | Yes (idempotent) |
+| Issue reopen | `issue reopen` restores Status | `Item reopened` sets Status → Backlog | Potential conflict |
 
 **Principles:**
 - CLI performs **authoritative Status updates** (including timestamp updates and parent issue derivation)
 - Workflows act as a **backstop** (covering manual operations that bypass the CLI)
 - Duplicate execution is harmless due to idempotency
-- On reopen, CLI's Status restore and Workflows' Backlog setting may conflict; Workflows may overwrite after CLI execution. If conflicted, correct with `shirokuma-docs items update-status {number} --status {correct-status}`
+- On reopen, CLI's Status restore and Workflows' Backlog setting may conflict; Workflows may overwrite after CLI execution. If conflicted, correct with `shirokuma-docs status update-batch {number} --status {correct-status}`
 
 ## Initial Status Constraint at Issue Creation
 
-When creating an Issue with `items add issue`, the following initial statuses are allowed in the `status` field:
+When creating an Issue with `issue add`, the following initial statuses are allowed in the `status` field:
 
 | Status | Allowed | Purpose |
 |--------|---------|---------|
 | `Pending` | Yes | Triage-pending issues |
 | `Backlog` | Yes | Normal new issues (default) |
-| `Review` and later | No | Transition via `items transition` after creation |
+| `Review` and later | No | Transition via `status transition` after creation |
 
 **Plan Issue creation procedure:**
 
 ```bash
 # 1. Create with Backlog (Review cannot be specified)
-shirokuma-docs items add issue --file /tmp/shirokuma-docs/{n}-plan-issue.md
+shirokuma-docs issue add --file /tmp/shirokuma-docs/{n}-plan-issue.md
 # 2. Transition to Review in 2 steps (Backlog → Review direct transition is undefined)
-shirokuma-docs items transition {PLAN_ISSUE_NUMBER} --to "In Progress"
-shirokuma-docs items transition {PLAN_ISSUE_NUMBER} --to "Review"
+shirokuma-docs status transition {PLAN_ISSUE_NUMBER} --to "In progress"
+shirokuma-docs status transition {PLAN_ISSUE_NUMBER} --to "Review"
 ```
 
 ## Plan Issue Approach
@@ -237,18 +237,18 @@ Plan issues represent the lifecycle of the plan itself and do not participate in
 | Review | Plan created, awaiting review / code review | Set by `prepare-flow` after plan creation (plan issue) or `implement-flow` chain end (PR) |
 | Done | Plan approved | Auto-updated at `implement-flow` chain end, or on manual approval |
 
-**`items integrity` aggregation exclusion**: When auto-deriving parent Issue status, plan issues with the `area:plan` label are excluded from sub-issue status aggregation. This prevents a plan issue remaining in Review from affecting the parent's In Progress derivation.
+**`integrity` aggregation exclusion**: When auto-deriving parent Issue status, plan issues with the `area:plan` label are excluded from sub-issue status aggregation. This prevents a plan issue remaining in Review from affecting the parent's In Progress derivation.
 
 > `classifyParentStatusInconsistencies` excludes plan issues with the `area:plan` label from sub-issue status aggregation. `syncParentStatus` (reactive derivation) applies the same exclusion.
 
 ### Referencing a Plan Issue
 
-Identify the child issue with a title starting with "Plan:" from `subIssuesSummary`, then fetch its body via `items context {plan-issue-number}`.
+Identify the child issue with a title starting with "Plan:" from `subIssuesSummary`, then fetch its body via `issue context {plan-issue-number}`.
 
 ```bash
-shirokuma-docs items context {parent-number}
+shirokuma-docs issue context {parent-number}
 # → Identify child issue with title starting with "Plan:" from subIssuesSummary
-shirokuma-docs items context {plan-issue-number}
+shirokuma-docs issue context {plan-issue-number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md
 ```
 
@@ -291,25 +291,25 @@ Follow the comment-first principle: record the deviation reason as a comment bef
 ### Command
 
 ```bash
-shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
+shirokuma-docs issue update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 Epic status management, built-in automations, label details, item body maintenance, and item creation guidelines are auto-loaded when the `managing-github-items` skill is executed.
 
 ## Comment Retrieval Convention When Reviewing Issues/PRs/Discussions
 
-### `items context` vs Direct Subcommand Usage
+### `issue context` vs Direct Subcommand Usage
 
 | Command | Returns | Use case |
 |---------|---------|----------|
-| `shirokuma-docs items context {number}` | Body + all comments (cached) | Content review, pre-implementation research |
-| `shirokuma-docs items show {number}` | Body only | Checking field values (Status/Priority, etc.) |
-| `shirokuma-docs items pr show {number}` | Body only | PR metadata (branches, change counts, etc.) |
-| `shirokuma-docs items discussions show {number}` | Body only | Discussion body only |
+| `shirokuma-docs issue context {number}` | Body + all comments (cached) | Content review, pre-implementation research |
+| `shirokuma-docs issue show {number}` | Body only | Checking field values (Status/Priority, etc.) |
+| `shirokuma-docs pr show {number}` | Body only | PR metadata (branches, change counts, etc.) |
+| `shirokuma-docs discussion show {number}` | Body only | Discussion body only |
 
 ### Workflow That Assumes Full Comment Loading
 
-When AI reviews the content of an Issue/PR/Discussion, **use `shirokuma-docs items context {number}` to cache comments, then read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` with the Read tool**. This gives you:
+When AI reviews the content of an Issue/PR/Discussion, **use `shirokuma-docs issue context {number}` to cache comments, then read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` with the Read tool**. This gives you:
 
 - Issue: body + all comments (plan details, discussion history, blocker information)
 - PR: body + review comments + review threads + regular comments

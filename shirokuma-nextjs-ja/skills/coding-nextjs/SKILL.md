@@ -70,7 +70,7 @@ TaskCreate で進捗トラッカーを作成。
 
 ```bash
 # frontmatter に title: "[Implementation] {feature-name}" と category: Reports を設定してから実行
-shirokuma-docs items add discussion --file report.md
+shirokuma-docs discussion add --file report.md
 ```
 
 ### ステップ 5: ポータル更新（重要な変更の場合）

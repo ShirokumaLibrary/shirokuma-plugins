@@ -115,7 +115,7 @@ WebSearch: "[技術] official documentation [トピック]"
 
 ```bash
 # frontmatter に title と category を設定したファイルを用意してから実行
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/findings.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/findings.md
 ```
 
 ## 出力フォーマット

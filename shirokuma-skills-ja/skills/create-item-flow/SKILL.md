@@ -22,7 +22,7 @@ allowed-tools: Bash, Skill, AskUserQuestion, Read, Write, TaskCreate, TaskUpdate
 | # | content | activeForm | スキル |
 |---|---------|------------|--------|
 | 1 | コンテキストを分析しメタデータを推定する | コンテキストを分析中 | マネージャー直接 |
-| 1b | 類似課題を検索し関連付けを提案する | 類似課題を検索中 | マネージャー直接: `shirokuma-docs items search` |
+| 1b | 類似課題を検索し関連付けを提案する | 類似課題を検索中 | マネージャー直接: `shirokuma-docs issue search` |
 | 2 | managing-github-items に委任して作成する | アイテムを作成中 | `managing-github-items` (Skill) |
 | 2b | [Issue のみ] 要件レビューと設計要否判定を実行する | 要件レビュー中 | `analyze-issue` (Skill, requirements ロール) |
 | 3 | ユーザーに次のアクション候補を返す | 次のアクションを提示中 | マネージャー直接 |
@@ -52,11 +52,11 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 コンテキスト分析後、作成前に類似する既存 Issue / Discussion を検索し、重複や関連付けの機会を提示する。
 
 ```bash
-shirokuma-docs items search "<キーワード>" --limit 5
+shirokuma-docs issue search "<キーワード>" --limit 5
 ```
 
 - 類似 Issue が見つかった場合: ユーザーに提示し、新規作成するか既存 Issue にまとめるかを確認する（`AskUserQuestion`）
-- 関連 Issue が見つかった場合: 作成後に `items parent` で親子関係を設定することを提案する
+- 関連 Issue が見つかった場合: 作成後に `issue parent` で親子関係を設定することを提案する
 - 何も見つからない場合: そのまま次のステップへ進む
 
 ### ステップ 2: `managing-github-items` に委任

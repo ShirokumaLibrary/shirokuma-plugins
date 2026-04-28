@@ -79,7 +79,7 @@ shirokuma-docs git commit-push -m "{type}: {description}" --issue {N}
 When the issue number is known, post the commit result as an Issue comment:
 
 ```bash
-# Write to file first, then post with items add comment
+# Write to file first, then post with issue comment
 cat > /tmp/shirokuma-docs/{issue-number}-commit-complete.md <<'EOF'
 ## Commit Complete
 
@@ -90,7 +90,7 @@ cat > /tmp/shirokuma-docs/{issue-number}-commit-complete.md <<'EOF'
 **Files:** {count} files changed
 **Pushed:** {yes/no}
 EOF
-shirokuma-docs items add comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-commit-complete.md
+shirokuma-docs issue comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-commit-complete.md
 ```
 
 Skip comment posting if the issue number is unknown (not derivable from branch name, not passed via context).
@@ -142,7 +142,7 @@ After a successful push on a feature branch, determine whether to chain into PR 
 **Pre-check before offering PR**:
 
 ```bash
-shirokuma-docs items pr list --head {branch-name} --format json
+shirokuma-docs pr list --head {branch-name} --format json
 ```
 
 If a PR already exists for this branch, include the existing URL in the result and skip.
@@ -180,23 +180,23 @@ Handles PR merge with automatic Issue status update. Activated by merge keywords
 1. **Merge the PR and update related Issues**:
 
 ```bash
-shirokuma-docs items pr merge --head {current-branch}
+shirokuma-docs pr merge --head {current-branch}
 ```
 
 This single command handles: resolve PR from branch name, squash merge, extract linked Issues from PR body (`Closes/Fixes/Resolves #N`), update their Project Status to "Done", and delete the branch.
 
-**Status update idempotency**: `items pr merge` CLI automatically updates related Issue Project Status to Done. If `items update-status --done` runs for the same issue later, it operates idempotently (no-op if already Done).
+**Status update idempotency**: `pr merge` CLI automatically updates related Issue Project Status to Done. If `status update-batch --done` runs for the same issue later, it operates idempotently (no-op if already Done).
 
-**PR-Issue Link Graph Verification**: `items pr merge` verifies the PR-Issue link graph:
+**PR-Issue Link Graph Verification**: `pr merge` verifies the PR-Issue link graph:
 
 | Pattern | CLI Behavior |
 |---------|-------------|
 | 1:1 / 1:N / N:1 | Auto-process (Status → Done) |
 | N:N (complex link graph) | Error and stop with structured output |
 
-N:N detection: CLI outputs a structured list of related PRs/Issues. Review the list and individually update Status via `items transition {number} --to Done`. Use `--skip-link-check` to bypass after reviewing.
+N:N detection: CLI outputs a structured list of related PRs/Issues. Review the list and individually update Status via `status transition {number} --to Done`. Use `--skip-link-check` to bypass after reviewing.
 
-**Integration branch merge (important)**: For sub-issue PRs targeting an integration branch, GitHub's native auto-close does NOT work (it only triggers on merges to the default branch). Therefore, `shirokuma-docs items pr merge` is **required** — merging via `gh pr merge` or the GitHub UI will not update Issue status. The PR body must include `Closes #N` (not `Refs` — `parseLinkedIssues()` cannot parse `Refs`).
+**Integration branch merge (important)**: For sub-issue PRs targeting an integration branch, GitHub's native auto-close does NOT work (it only triggers on merges to the default branch). Therefore, `shirokuma-docs pr merge` is **required** — merging via `gh pr merge` or the GitHub UI will not update Issue status. The PR body must include `Closes #N` (not `Refs` — `parseLinkedIssues()` cannot parse `Refs`).
 
 If no PR found for the branch, return error and stop.
 
@@ -209,7 +209,7 @@ Note: Internally calls `gh pr merge` which is protected by PreToolUse hook. Merg
 Post result as Issue comment:
 
 ```bash
-shirokuma-docs items add comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-merge-complete.md
+shirokuma-docs issue comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-merge-complete.md
 ```
 
 Output template:
@@ -281,7 +281,7 @@ If invoked with a message argument (e.g., `/commit-issue fix typo in config`):
 | PR has unresolved reviews | Include warning in result |
 | No issue references in PR body | Skip status update, include note in result |
 | N:N link graph detected | CLI stops merge, include structured output in result |
-| Integration branch merge | `shirokuma-docs items pr merge` required (GitHub auto-close is inactive). PR body must use `Closes #N` (not `Refs`) |
+| Integration branch merge | `shirokuma-docs pr merge` required (GitHub auto-close is inactive). PR body must use `Closes #N` (not `Refs`) |
 
 ## Rule References
 
@@ -300,4 +300,4 @@ If invoked with a message argument (e.g., `/commit-issue fix typo in config`):
 - Push is automatic on feature branches, skipped on `develop` and `main`
 - PR chain activates only on direct invocation with PR keywords; does not interfere with `implement-flow` orchestration
 - Merge chain can be invoked standalone (just "merge") or chained with commit/PR
-- After merge, `shirokuma-docs items pr merge` automatically updates related Issue status to Done
+- After merge, `shirokuma-docs pr merge` automatically updates related Issue status to Done

@@ -58,7 +58,7 @@ ${ACTIVE_ISSUES:-情報取得失敗}
 
 ---
 > このファイルは PreCompact フックにより自動生成されました。
-> Issue ステータス更新が必要な場合は \`shirokuma-docs items update-status\` を実行してください。
+> Issue ステータス更新が必要な場合は \`shirokuma-docs status update-batch\` を実行してください。
 EOF
 
 echo '{}'

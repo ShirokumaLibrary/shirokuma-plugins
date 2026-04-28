@@ -24,17 +24,20 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 
 ## ワークフロー
 
-### Issue ステータス遷移
+### Issue ステータス遷移（条件付き）
 
-`linked_issues` に含まれる Issue のステータスを以下のタイミングで更新する:
+`pr create` (#2240) がリンク Issue を In progress → Review に自動遷移するため、PR open 中は **Review** が標準ステータス。`review-flow` はコード修正の有無に応じて条件付きでステータスを動かす。
 
-| タイミング | アクション | コマンド |
-|-----------|----------|---------|
-| `review-flow` 開始時 | → In Progress | `items transition {n} --to "In Progress"` |
-| レビュー対応完了後 | → Review | `items transition {n} --to Review` |
+| 条件 | 開始時 | 完了時 |
+|------|-------|--------|
+| **コード修正スレッドあり**（ステップ 3 で 1 件以上「コード修正」型に分類） | Review → In progress（`status transition {n} --to "In progress"`） | In progress → Review（`status transition {n} --to Review`） |
+| **質問・意見相違スレッドのみ**（コード変更なし） | Review のまま（更新なし） | Review のまま（更新なし） |
+| **PASS + 推奨事項のみ**（issue_comments） | コード修正を実行する場合のみ Review → In progress | コード修正実行後のみ In progress → Review |
 
 - `linked_issues` が空の場合はステータス遷移をスキップする
 - 既に正しいステータスの場合は更新をスキップする（冪等）
+
+> **設計意図**: 過去の review-flow は無条件で Review → In progress → Review を往復していたが、`pr create` の自動 Review 遷移後は「PR open 中は Review 固定」が自然な意味論。コード変更を伴うレビュー対応のときだけ In progress に戻す（`autoSetTimestamps` の Review at 重複記録を避ける副次効果もある）。
 
 ### ステップ 1: コンテキスト復元（必須・最初に実行）
 
@@ -42,7 +45,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 
 1. PR 情報を取得し、`review_count` と `linked_issues` を記録する（ステップ 2 の分岐判定で使用）:
    ```bash
-   shirokuma-docs items pr show {PR#}
+   shirokuma-docs pr show {PR#}
    ```
    取得すべきフィールド:
    - `review_count`: レビュー提出数（0 = 新規レビューモード判定に使用）
@@ -52,7 +55,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 
 2. 関連 Issue がある場合、Issue の計画を参照してコンテキストを把握:
    ```bash
-   shirokuma-docs items context {issue-number}
+   shirokuma-docs issue context {issue-number}
    # → .shirokuma/github/{org}/{repo}/issues/{issue-number}/body.md を Read ツールで読み込む
    ```
 3. PR の diff を確認:
@@ -68,7 +71,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
    - `Closes #N` / `Fixes #N` / `Refs #N` / `References #N` パターンに一致するものは linked issues として除外する
    - `## Summary` / `## 概要` セクション内の残りの `#N` 参照、または `## Artifacts` / `## 成果物` セクション内の `#N` 参照を成果物候補とする
    - 成果物候補が 0 件の場合 → 成果物レビューをスキップ（従来通り diff のみレビュー）
-   - 成果物候補がある場合 → `shirokuma-docs items context {N}` でキャッシュし、`.shirokuma/github/{org}/{repo}/issues/{N}/body.md` の frontmatter `type` フィールドで Discussion / Issue / PR を判別し、Discussion と Issue のみをレビュー対象とする
+   - 成果物候補がある場合 → `shirokuma-docs issue context {N}` でキャッシュし、`.shirokuma/github/{org}/{repo}/issues/{N}/body.md` の frontmatter `type` フィールドで Discussion / Issue / PR を判別し、Discussion と Issue のみをレビュー対象とする
    - **上限**: 成果物は最大 10 件まで。超過時は最初の 10 件のみレビューし、警告を出力する
 
    **成果物候補リスト** として記録する（形式: `#N (Discussion)`, `#N (Issue)` 等）
@@ -82,7 +85,7 @@ PR 番号を受け取り、コードレビュー実行（`review-issue` Agent / 
 **`review_count > 0` の場合 → 未解決スレッドを取得して分岐**:
 
 ```bash
-shirokuma-docs items pr comments {PR#}
+shirokuma-docs pr comments {PR#}
 ```
 
 - 未解決スレッドが 0 件 → 完了レポートを表示し、再レビューを提案（「`review-issue` で再レビューを実行しますか？」と AskUserQuestion）。ユーザーが承認した場合はステップ 2a へ遷移
@@ -115,7 +118,7 @@ shirokuma-docs items pr comments {PR#}
 3. `review-issue` が issue comment を投稿した場合、PR コメントの存在を `pr comments` で確認する
 4. 未解決スレッドを確認する:
    ```bash
-   shirokuma-docs items pr comments {PR#}
+   shirokuma-docs pr comments {PR#}
    ```
    以下の条件テーブルに基づいて分岐する:
 
@@ -234,7 +237,7 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
 
 4. **返信**: 各スレッドにコミット参照で返信（`--reply-to` には `pr comments` 出力の数値 `database_id` を使用）
    ```bash
-   shirokuma-docs items pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
+   shirokuma-docs pr reply {PR#} --reply-to {database_id} --body-file - <<'EOF'
    {commit-hash} で修正しました。
 
    {修正内容の説明}
@@ -242,14 +245,14 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
    ```
 5. **解決**: スレッドを解決（`--thread-id` には `pr comments` 出力の `PRRT_` プレフィックス ID を使用）
    ```bash
-   shirokuma-docs items pr resolve {PR#} --thread-id {PRRT_id}
+   shirokuma-docs pr resolve {PR#} --thread-id {PRRT_id}
    ```
 
 #### コメント修正スレッド
 
 1. **コメント編集**: 誤りのあるコメントを修正
    ```bash
-   shirokuma-docs items update {number} --comment-id {comment-id} --body /tmp/shirokuma-docs/{number}-comment-fix.md
+   shirokuma-docs issue update {number} --comment-id {comment-id} --body /tmp/shirokuma-docs/{number}-comment-fix.md
    ```
 2. **返信**: 修正した旨をスレッドに返信
 3. **解決**: スレッドを解決
@@ -269,7 +272,7 @@ Dependencies: step 2 blockedBy 1, step 3 blockedBy 2, step 4 blockedBy 3, step 5
 コード修正を含むスレッド対応が完了した後、対応全体のサマリーを PR コメントとして投稿する。レビュアーが PR 上で全対応履歴を追跡できるようにするため。
 
 ```bash
-shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/pr-{PR#}-review-response.md
+shirokuma-docs issue comment {PR#} --file /tmp/shirokuma-docs/pr-{PR#}-review-response.md
 ```
 
 `/tmp/shirokuma-docs/pr-{PR#}-review-response.md` の内容:
@@ -318,6 +321,8 @@ shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/pr-{PR#}-revie
 | ユーザーが修正不要と判断（UCP） | 完了レポートを表示して終了。スレッド対応をスキップ |
 | ユーザーが一部のみ対応を選択（UCP） | 指定されたスレッドのみ処理し、残りは未解決のまま保持 |
 | PASS + 推奨事項のみで対応を選択（review thread なし） | ステップ 3（スレッド分類）をスキップし、issue comment の推奨事項を元にコード修正 → コミットを実行。スレッド返信・解決ステップは不要 |
+| ユーザーが「PR を close する」を選択（修正の方向性が違う等） | `shirokuma-docs pr close {PR#} --rollback` を案内・実行する。`--rollback` フラグでリンク Issue が Completed/Review から In progress に自動差し戻しされる（#2234, F-006）。本フローは終了し、Issue ステータス更新はスキップ |
+| マージ済み PR の取り消しが必要（revert 要求） | `shirokuma-docs issue rollback {plan-issue#} --action revert` を案内する。revert ブランチ作成 + revert PR 作成 + 計画 Issue を Backlog に戻す処理を一括実行する（#2024 Phase 1-D） |
 
 ## ツール使用
 
@@ -325,7 +330,7 @@ shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/pr-{PR#}-revie
 |--------|-----------|
 | Skill | `code-issue` によるコード修正（ステップ 5）、`finalize-changes` による後処理（ステップ 5） |
 | Agent | `review-worker` によるコードレビュー実行（ステップ 2a）、`commit-worker` によるコミット・プッシュ（ステップ 5） |
-| Bash | `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve`, git 操作 |
+| Bash | `shirokuma-docs pr comments`, `pr reply`, `pr resolve`, git 操作 |
 | Read | コード確認、計画参照 |
 | TaskCreate, TaskUpdate | スレッド処理の進捗管理 |
 

@@ -32,7 +32,7 @@ TaskCreate で全チェーンステップを登録する:
 
 1. **一括ステータス更新**: 全 Issue → In Progress に同時遷移
    ```bash
-   shirokuma-docs items transition {n} --to "In Progress"
+   shirokuma-docs status transition {n} --to "In progress"
    # (各 Issue に対して繰り返し)
    ```
 
@@ -44,7 +44,7 @@ TaskCreate で全チェーンステップを登録する:
    type の決定: 単一 type → その type。混在 → `chore`。
 
 3. **Issue ループ**: 各 Issue に対して:
-   - Issue 詳細取得: `shirokuma-docs items context {number}`（→ `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` を Read ツールで読み込む）
+   - Issue 詳細取得: `shirokuma-docs issue context {number}`（→ `.shirokuma/github/{org}/{repo}/issues/{number}/body.md` を Read ツールで読み込む）
    - 実装実行（`code-issue` にサブエージェント委任）
    - 品質チェックポイント: 変更ファイル確認 + 関連テスト実行
    - `filesByIssue` マッピングを記録（スコープ付きコミット用）

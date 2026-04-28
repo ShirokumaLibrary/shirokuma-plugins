@@ -58,7 +58,7 @@ shirokuma-docs init --with-skills --project {path}
 作成後、フィールドを自動設定:
 
 ```bash
-shirokuma-docs projects setup --lang={en|ja}
+shirokuma-docs project setup --lang={en|ja}
 ```
 
 その後、手動セットアップが必要な項目をガイド:
@@ -82,7 +82,7 @@ Skill: project-config-generator
 全ステップの完了を検証:
 
 ```bash
-shirokuma-docs items integrity --setup
+shirokuma-docs integrity --setup
 ```
 
 ## 再実行対応

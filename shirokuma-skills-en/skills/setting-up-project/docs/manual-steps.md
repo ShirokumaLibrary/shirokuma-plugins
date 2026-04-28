@@ -24,7 +24,7 @@ Step-by-step guide for GitHub Projects V2 initial configuration, from project cr
 After creation, link the repository and configure fields via CLI:
 
 ```bash
-shirokuma-docs projects setup --lang=en
+shirokuma-docs project setup --lang=en
 ```
 
 ## Issue Types Configuration

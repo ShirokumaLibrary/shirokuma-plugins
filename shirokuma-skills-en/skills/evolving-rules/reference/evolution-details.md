@@ -62,12 +62,12 @@ Search (--limit 1) → Check results
 ### Search Command
 
 ```bash
-shirokuma-docs items list --issue-type Evolution --limit 1
+shirokuma-docs issue list --issue-type Evolution --limit 1
 ```
 
 ### Body Template for New Issues
 
-If 0 issues found, write the following to `/tmp/shirokuma-docs/evolution.md` and create via `items add issue --file`:
+If 0 issues found, write the following to `/tmp/shirokuma-docs/evolution.md` and create via `issue add --file`:
 
 ```markdown
 ---
@@ -136,7 +136,7 @@ Skill completion → Introspection checks → Environment checks (implement-flow
 1. Follow the "Standard Search & Creation Flow" to secure an Evolution Issue (search → create if 0 found)
 2. Post signals as a comment (consolidate multiple signals into 1 comment):
    ```bash
-   shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-signal.md
+   shirokuma-docs issue comment {number} --file /tmp/shirokuma-docs/{number}-signal.md
    ```
 3. Display 1-line recording confirmation:
    > 🧬 Evolution signal recorded ({type}: {target}).
@@ -155,7 +155,7 @@ Use the "Standard Search & Creation Flow" search command to check for accumulate
 - Maximum 1 comment per skill completion (consolidate multiple signals)
 - Do not register as a task (non-blocking processing)
 - Self-review uses concise checklist format to minimize context consumption
-- When no signals detected, minimize CLI command execution (`items list` once only)
+- When no signals detected, minimize CLI command execution (`issue list` once only)
 - When `create-item-flow` creates an item with Issue Type Evolution, skip the entire signal recording (the Evolution Issue itself is an improvement proposal, preventing duplicate recording)
 
 ## Standalone Signal Recording
@@ -179,11 +179,11 @@ Follow the "Standard Search & Creation Flow" to secure an Evolution Issue, then 
 
 ```bash
 # 1. Secure Evolution Issue (follow Standard Search & Creation Flow)
-shirokuma-docs items list --issue-type Evolution --limit 1
+shirokuma-docs issue list --issue-type Evolution --limit 1
 # → If 0 found, create new (see body template in "Standard Search & Creation Flow")
 
 # 2. Post signal as comment
-shirokuma-docs items add comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-signal.md
+shirokuma-docs issue comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-signal.md
 ```
 
 When a reminder is displayed at skill completion, copy and use the template above.

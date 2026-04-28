@@ -258,7 +258,7 @@ Reference the validation logic in `reviewing-claude-config/SKILL.md` and check t
 
 For each `#N` listed in the "Artifact review targets:" / "成果物レビュー対象:" section of the prompt:
 
-1. Fetch the Discussion or Issue body via `shirokuma-docs items context {N}` and read `.shirokuma/github/{org}/{repo}/issues/{N}/body.md`
+1. Fetch the Discussion or Issue body via `shirokuma-docs issue context {N}` and read `.shirokuma/github/{org}/{repo}/issues/{N}/body.md`
 2. Apply the "GitHub Document Review Perspectives" from `roles/code.md`:
    - Format compliance (format appropriate for the Discussion category)
    - YAML frontmatter leakage check (metadata starting with `---` must not appear in the body)
@@ -305,10 +305,10 @@ Post review summary as a PR issuecomment (not a review thread comment):
 
 ```bash
 # Write tool でファイル作成後
-shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/{number}-review-summary.md
+shirokuma-docs issue comment {PR#} --file /tmp/shirokuma-docs/{number}-review-summary.md
 ```
 
-> **Note**: `items add comment` posts an issuecomment on the PR. These appear in the `issue_comments` section of `pr comments` output, separate from review thread comments.
+> **Note**: `issue comment` posts an issuecomment on the PR. These appear in the `issue_comments` section of `pr comments` output, separate from review thread comments.
 
 Only save a detailed report to Discussions when there are many critical issues (severity: error, 5 or more), and link the Discussion URL in the PR comment.
 
@@ -317,7 +317,7 @@ Only save a detailed report to Discussions when there are many critical issues (
 Create Discussion in Reports category (existing behavior):
 
 ```bash
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-report.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/review-report.md
 ```
 
 Report the Discussion URL to the user.

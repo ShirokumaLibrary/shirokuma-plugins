@@ -113,13 +113,13 @@ find . -name ".env*" -not -name "*.example" | head -10
 
 PR コンテキストがある場合:
 ```bash
-shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/review-infra.md
+shirokuma-docs issue comment {PR#} --file /tmp/shirokuma-docs/review-infra.md
 ```
 
 PR コンテキストがない場合:
 ```bash
 # frontmatter に title: "[Review] infra: {target}" と category: Reports を設定してから実行
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-infra.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/review-infra.md
 ```
 
 ## レビュー結果の判定

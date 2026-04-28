@@ -22,13 +22,13 @@ Fetch signals from Evolution Issues.
 
 ```bash
 # Search for Evolution Issues (analysis phase uses --limit 10 for cross-analysis. See evolution-details.md "Standard Search & Creation Flow" for value guidelines)
-shirokuma-docs items list --issue-type Evolution --limit 10
+shirokuma-docs issue list --issue-type Evolution --limit 10
 ```
 
 If an Issue is found, fetch details including comments:
 
 ```bash
-shirokuma-docs items context {number}
+shirokuma-docs issue context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md and comment files in .shirokuma/github/{org}/{repo}/issues/{number}/
 ```
 
@@ -109,7 +109,7 @@ Context to pass to `create-item-flow`:
 After creating the Issue, record a reference to the created Issue in a comment on the original Evolution Issue:
 
 ```bash
-shirokuma-docs items add comment {evolution-number} --file /tmp/shirokuma-docs/{evolution-number}-evolution-ref.md
+shirokuma-docs issue comment {evolution-number} --file /tmp/shirokuma-docs/{evolution-number}-evolution-ref.md
 ```
 
 ### Step 7: Update Records and Close Issue
@@ -125,7 +125,7 @@ Record the analysis thinking process as a comment. The comment must meet these c
 - **Impact scope**: Assessment of how changes affect other rules/skills
 
 ```bash
-shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-analysis.md
+shirokuma-docs issue comment {number} --file /tmp/shirokuma-docs/{number}-analysis.md
 ```
 
 #### 7b: Update Body (Structured Summary)
@@ -156,14 +156,14 @@ Structure the comment content and consolidate into the body. The body records re
 
 ```bash
 # Write body to temp file, then update
-shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
+shirokuma-docs issue update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 #### 7c: Close Issue
 
 ```bash
 # Close the Evolution Issue (1 analysis cycle = 1 Issue)
-shirokuma-docs items close {number}
+shirokuma-docs issue close {number}
 ```
 
 New signals after closure are recorded in a new Evolution Issue (see `rule-evolution` rule, Evolution Issue Lifecycle section).

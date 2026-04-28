@@ -74,7 +74,7 @@ If context was passed from `implement-flow`, use it; otherwise, self-detect usin
 
 When a sub-issue is detected, determine the integration branch in this order:
 
-1. **Extract from parent issue body**: Fetch the parent issue with `shirokuma-docs items context {parent-number}` and read `.shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md`. Look for a `### Integration Branch` (EN) / `### Integration ブランチ` (JA) heading. Extract the branch name from the backtick block immediately following the heading (any prefix accepted: `epic/`, `chore/`, `feat/`, etc.)
+1. **Extract from parent issue body**: Fetch the parent issue with `shirokuma-docs issue context {parent-number}` and read `.shirokuma/github/{org}/{repo}/issues/{parent-number}/body.md`. Look for a `### Integration Branch` (EN) / `### Integration ブランチ` (JA) heading. Extract the branch name from the backtick block immediately following the heading (any prefix accepted: `epic/`, `chore/`, `feat/`, etc.)
 2. **Fallback (remote branch search)**: `git branch -r --list "origin/*/{parent-number}-*"`
    - 1 match → auto-select
    - Multiple matches → select first match, include alternatives in result
@@ -99,7 +99,7 @@ Use `recent_commits` and `diff_stat` from the Step 1 `shirokuma-docs git check` 
 
 Write the PR body to a file, then create the PR. When changes meet the Mermaid conditions in the `github-writing-style` rule, include diagrams in the PR body.
 
-> **CLI Template**: Use `shirokuma-docs items template pr --output <file>` to generate a PR body template.
+> **CLI Template**: Use `shirokuma-docs issue template pr --output <file>` to generate a PR body template.
 
 ```markdown
 <!-- /tmp/shirokuma-docs/{number}-pr.md -->
@@ -117,7 +117,7 @@ Closes #{issue-number}
 ```
 
 ```bash
-shirokuma-docs items pr create {issue-number} --from-file /tmp/shirokuma-docs/{number}-pr.md
+shirokuma-docs pr create {issue-number} --from-file /tmp/shirokuma-docs/{number}-pr.md
 ```
 
 **Title rules:**
@@ -154,7 +154,7 @@ When the base branch is not the repository's default branch (e.g., integration b
 **Condition**: `base_branch !== default_branch`
 
 ```bash
-shirokuma-docs items add comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-pr-link.md
+shirokuma-docs issue comment {issue-number} --file /tmp/shirokuma-docs/{issue-number}-pr-link.md
 ```
 
 In batch mode, post to each issue referenced by `Closes`.

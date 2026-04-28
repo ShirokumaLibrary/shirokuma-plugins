@@ -58,7 +58,7 @@ Read required knowledge files based on role:
 
 **Requirements role:**
 
-1. Fetch Issue body via `shirokuma-docs items context {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
+1. Fetch Issue body via `shirokuma-docs issue context {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
 2. Analyze each section (purpose, overview, reproduction steps, deliverables, considerations) for presence and content
 3. Evaluate each item in review checklist (`roles/requirements.md`)
 4. Check against anti-patterns
@@ -67,9 +67,9 @@ Read required knowledge files based on role:
 
 **Plan role:**
 
-1. Fetch the parent Issue via `shirokuma-docs items context {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
+1. Fetch the parent Issue via `shirokuma-docs issue context {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
 2. Identify the plan issue from `subIssuesSummary` — the child issue with a title starting with "Plan:" or "計画:"
-3. Fetch the plan issue body via `shirokuma-docs items context {plan-issue-number}` and read `.shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md`
+3. Fetch the plan issue body via `shirokuma-docs issue context {plan-issue-number}` and read `.shirokuma/github/{org}/{repo}/issues/{plan-issue-number}/body.md`
 4. Extract the `## Plan` / `## 計画` section from the plan issue body as the review target
 5. Evaluate each item in review checklist (`roles/plan.md`)
 6. Check against anti-patterns
@@ -79,7 +79,7 @@ Read required knowledge files based on role:
 
 **Design role:**
 
-1. Fetch Issue body via `shirokuma-docs items context {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
+1. Fetch Issue body via `shirokuma-docs issue context {number}` and read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`
 2. Extract Design Brief, Aesthetic Direction, and UI implementation results
 3. Evaluate each item in review checklist (`roles/design.md`)
 4. Check against review criteria (`criteria/design.md`)
@@ -127,7 +127,7 @@ Post as Issue comment based on analysis context.
 
 ```bash
 # After creating file with Write tool
-shirokuma-docs items add comment {issue#} --file /tmp/shirokuma-docs/{number}-analyze-report.md
+shirokuma-docs issue comment {issue#} --file /tmp/shirokuma-docs/{number}-analyze-report.md
 ```
 
 #### Routing Summary

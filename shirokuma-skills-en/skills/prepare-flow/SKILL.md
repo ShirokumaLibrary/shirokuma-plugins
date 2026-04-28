@@ -18,13 +18,13 @@ Register all chain steps via TaskCreate **before starting work**.
 
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
-| 1 | Fetch issue and update status | Fetching issue and updating status | Manager direct: `shirokuma-docs items context/transition` |
+| 1 | Fetch issue and update status | Fetching issue and updating status | Manager direct: `shirokuma-docs issue context/transition` |
 | 2 | [Conditional] Conduct research | Conducting research | `researching-best-practices` (subagent: `research-worker`) |
 | 3 | Create the plan | Creating the plan | `plan-issue` (subagent: `plan-worker`) |
 | 4 | Review the plan | Reviewing the plan | `analyze-issue` (subagent: `review-worker`) |
 | 5 | [Conditional] Fix review issues and re-review | Fixing review issues and re-reviewing | `plan-issue` (subagent: `plan-worker`) + `analyze-issue` (subagent: `review-worker`) |
-| 4a | [Conditional] Create sub-issues for epic plan | Creating sub-issues | Manager direct: `shirokuma-docs items add issue/parent/update` |
-| 6 | Update status and return plan summary to user | Updating status and returning plan summary to user | Manager direct: `shirokuma-docs items transition` |
+| 4a | [Conditional] Create sub-issues for epic plan | Creating sub-issues | Manager direct: `shirokuma-docs issue add/parent/update` |
+| 6 | Update status and return plan summary to user | Updating status and returning plan summary to user | Manager direct: `shirokuma-docs status transition` |
 
 Dependencies: step 2 blockedBy 1 (conditional: only when research trigger applies), step 3 blockedBy 1 or 2, step 4 blockedBy 3, step 5 blockedBy 4 (conditional: only on NEEDS_REVISION), step 4a blockedBy 4 or 5 (conditional: only for epic plans), step 6 blockedBy 4 or 5 or 4a.
 
@@ -35,7 +35,7 @@ Update each step to `in_progress` at start and `completed` on finish via TaskUpd
 ### Step 1: Fetch Issue
 
 ```bash
-shirokuma-docs items context {number}
+shirokuma-docs issue context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 ```
 
@@ -43,15 +43,22 @@ Review title, body, type, priority, size, labels, and comments.
 
 ### Step 1b: Set Status to In Progress + Assign
 
-If the issue status is Backlog, transition to In Progress to record the planning start. Also auto-assign the user.
+Branch by current Issue status. Assignee is idempotent, so always execute.
+
+| Current Status | Action |
+|----------------|--------|
+| Backlog | Transition to In Progress to record the planning start |
+| In Progress | Skip (continuing planning) |
+| Review | **Confirm re-planning via AskUserQuestion** → if "Yes", transition back to In Progress (explicit confirmation prevents overwriting a completed plan-review state) |
 
 ```bash
-shirokuma-docs items transition {number} --to "In Progress"
+# When Backlog, or Review with re-plan confirmed
+shirokuma-docs status transition {number} --to "In progress"
 # Assign the user
-shirokuma-docs items update {number} --assign "@me"
+shirokuma-docs issue update {number} --assign "@me"
 ```
 
-Skip status update if already In Progress or Review. Assignee is idempotent, so always execute.
+> **Re-planning from Review**: Review is the explicit signal "plan review complete, awaiting implementation approval"; re-planning requires deliberate user intent. Use `AskUserQuestion` with "Issue is in Review (awaiting implementation approval). Start re-planning?", and only revert to In Progress if the user answers "Yes". On "No", cancel the planning step and return control to the caller.
 
 ### Step 2: Research Trigger Assessment (Conditional)
 
@@ -119,9 +126,11 @@ When child issues with titles that do NOT start with "Plan:" exist (count > 0), 
 
 - **Continue (re-plan keeping existing sub-issues)**: Update the plan document only; keep existing sub-issues.
 - **Reset (cancel all sub-issues and re-plan)**: Execute the following:
-  1. Cancel all non-plan sub-issues via `shirokuma-docs items transition {sub-number} --to Cancelled` for each
-  2. Run `shirokuma-docs items integrity --fix` → parent transitions to Backlog automatically when all sub-issues are Cancelled
+  1. Cancel all non-plan sub-issues via `shirokuma-docs issue cancel {sub-numbers}` to set them to **Done(NOT_PLANNED)** (internally recorded as `state_reason: not_planned` close + Status: Done, #2204; `issue cancel` automatically unparents grandchild issues if any)
+  2. Force the parent back to Backlog: `shirokuma-docs status transition {parent-number} --to "Backlog" --force` (the auto-sync in `integrity --fix` does not distinguish `state_reason: not_planned` and would transition the parent to Done instead, so `--force` manual reset is the canonical path)
   3. Return to Step 1b to re-transition to In Progress, then proceed to Step 3 (plan-issue delegation)
+
+  > **Alternative**: When sub-issues themselves have linked PRs or grandchild issues, use `shirokuma-docs issue rollback {sub-number} --action cancel` per sub-issue instead — it batch-executes related PR closure, branch deletion, grandchild unparenting, and Done(NOT_PLANNED) marking. Replace step 1 with rollback, then proceed to step 2 (force parent back to Backlog).
 
 ### Step 3: Delegate to plan-worker
 
@@ -147,7 +156,7 @@ When research was conducted (Step 2a), include the `## Research Findings (Refere
 
 ### Step 4: Plan Review (Skill Delegation)
 
-Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `analyze-issue` plan role via Agent tool (`review-worker`). Since the plan-issue skill creates a plan issue (child issue), the reviewer can identify the child issue with a title starting with "Plan:" from `subIssuesSummary` and fetch its body directly via `items context {plan-issue-number}`.
+Reviewing in the same context that wrote the plan cannot catch blind spots. Delegate review to `analyze-issue` plan role via Agent tool (`review-worker`). Since the plan-issue skill creates a plan issue (child issue), the reviewer can identify the child issue with a title starting with "Plan:" from `subIssuesSummary` and fetch its body directly via `issue context {plan-issue-number}`.
 
 #### Skill Availability Check (Fallback)
 
@@ -168,7 +177,7 @@ If all checks pass, proceed to Step 5.
 
 #### Invoke the Reviewer
 
-Invoke `review-worker` with plan role via the Agent tool. `analyze-issue` will fetch the Issue body itself via `shirokuma-docs items context {number}`.
+Invoke `review-worker` with plan role via the Agent tool. `analyze-issue` will fetch the Issue body itself via `shirokuma-docs issue context {number}`.
 
 ```text
 Agent(
@@ -205,7 +214,7 @@ Determine the result from the `**Review result:**` string in review-worker's out
 1. Post a **plan review response comment** (evidence that the review passed):
 
 ```bash
-shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-review-pass.md
+shirokuma-docs issue comment {number} --file /tmp/shirokuma-docs/{number}-review-pass.md
 ```
 
 Where `/tmp/shirokuma-docs/{number}-review-pass.md` contains the plan review response (PASS result, fixes summary if any).
@@ -213,7 +222,7 @@ Where `/tmp/shirokuma-docs/{number}-review-pass.md` contains the plan review res
 If PASS was reached after NEEDS_REVISION cycles, include revision details in the file:
 
 ```bash
-shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-review-pass.md
+shirokuma-docs issue comment {number} --file /tmp/shirokuma-docs/{number}-review-pass.md
 ```
 
 → Proceed to Step 4a (if epic plan) or Step 5.
@@ -222,7 +231,7 @@ shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-re
 
 After review PASS, execute this step if the plan issue body contains a `### Sub-Issue Structure` section **and** no non-plan child issues exist (count of child issues with titles NOT starting with "Plan:" === 0). Skip and proceed to Step 5 if the condition is not met.
 
-The plan issue number is found by scanning `subIssuesSummary` for a child issue with a title starting with "Plan:". Fetch its body via `items context {plan-issue-number}` to check for the `### Sub-Issue Structure` section.
+The plan issue number is found by scanning `subIssuesSummary` for a child issue with a title starting with "Plan:". Fetch its body via `issue context {plan-issue-number}` to check for the `### Sub-Issue Structure` section.
 
 #### Sub-issue Creation Procedure
 
@@ -239,13 +248,13 @@ The plan issue number is found by scanning `subIssuesSummary` for a child issue 
    EOF
 
    # Create the sub-issue
-   shirokuma-docs items add issue --file /tmp/shirokuma-docs/{parent-number}-sub-{n}.md
+   shirokuma-docs issue add --file /tmp/shirokuma-docs/{parent-number}-sub-{n}.md
 
    # Set parent-child relationship
-   shirokuma-docs items parent {sub-number} {parent-number}
+   shirokuma-docs issue parent {sub-number} {parent-number}
    ```
 
-2. After all sub-issues are created, update the placeholders (`#{sub1}`, etc.) in the epic's `### Sub-Issue Structure` table with actual issue numbers and sync via `items update {parent-number} --body /tmp/shirokuma-docs/{parent-number}-body.md`.
+2. After all sub-issues are created, update the placeholders (`#{sub1}`, etc.) in the epic's `### Sub-Issue Structure` table with actual issue numbers and sync via `issue update {parent-number} --body /tmp/shirokuma-docs/{parent-number}-body.md`.
 
 #### On Failure
 
@@ -270,7 +279,7 @@ plan-issue → Plan written to body
 ### Step 5: Update Status (Issue → Review)
 
 ```bash
-shirokuma-docs items transition {number} --to Review
+shirokuma-docs status transition {number} --to Review
 ```
 
 ### Step 6: Return to User
@@ -337,7 +346,7 @@ At the end of the plan completion report, auto-record Evolution signals followin
 
 | Tool | When |
 |------|------|
-| Bash | `shirokuma-docs items context/transition/update/add comment` |
+| Bash | `shirokuma-docs issue context/transition/update/add comment` |
 | Agent (research-worker) | Step 2a: Conduct research (conditional, subagent, context isolation) |
 | Agent (plan-worker) | Step 3: Delegate plan creation (sub-agent, context isolation) |
 | Agent (review-worker) | Step 4: Plan review (subagent, context isolation) |

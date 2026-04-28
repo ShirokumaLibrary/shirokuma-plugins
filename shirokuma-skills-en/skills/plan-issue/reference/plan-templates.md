@@ -2,7 +2,7 @@
 
 Templates for each plan depth level. Use the template matching the level determined in Step 3.
 
-> **CLI Template**: Use `shirokuma-docs items template plan --level {level} --output <file>` to generate a template skeleton.
+> **CLI Template**: Use `shirokuma-docs issue template plan --level {level} --output <file>` to generate a template skeleton.
 
 ## Plan Issue Approach
 

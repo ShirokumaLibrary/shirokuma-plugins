@@ -89,7 +89,7 @@
 
 ```bash
 # frontmatter なし、直接コメント本文として投稿
-shirokuma-docs items add comment {issue-number} --file /tmp/shirokuma-docs/{number}-analyze-report.md
+shirokuma-docs issue comment {issue-number} --file /tmp/shirokuma-docs/{number}-analyze-report.md
 ```
 
 > 出力先ポリシーは rules/output-destinations.md 参照。

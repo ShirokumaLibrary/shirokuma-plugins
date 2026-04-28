@@ -9,9 +9,9 @@
 | 3 | `shirokuma-docs.config.yaml` | ファイル存在確認 | 自動 |
 | 4 | プラグインインストール | `claude plugin list` | 自動 |
 | 5 | `.claude/rules/shirokuma/` デプロイ | ディレクトリ存在確認 | 自動 |
-| 6 | GitHub Projects V2 | `shirokuma-docs items list` | 自動 |
-| 7 | Status/Priority/Size フィールド | `items integrity --setup` | 自動 |
-| 8 | Discussion カテゴリ | `items integrity --setup` | 手動 |
+| 6 | GitHub Projects V2 | `shirokuma-docs issue list` | 自動 |
+| 7 | Status/Priority/Size フィールド | `integrity --setup` | 自動 |
+| 8 | Discussion カテゴリ | `integrity --setup` | 手動 |
 | 9 | Issue Types | GitHub UI で確認 | 手動 |
 | 10 | ビルトイン自動化 | `projects workflows` | 手動 |
 
@@ -19,7 +19,7 @@
 
 ```bash
 # 一括検証
-shirokuma-docs items integrity --setup
+shirokuma-docs integrity --setup
 ```
 
 ## よくある問題

@@ -22,7 +22,7 @@ Auto-infer Issue metadata from conversation context and delegate creation to `ma
 | # | content | activeForm | Skill |
 |---|---------|------------|-------|
 | 1 | Analyze context and infer metadata | Analyzing context | Manager direct |
-| 1b | Search for similar issues and suggest linking | Searching for similar issues | Manager direct: `shirokuma-docs items search` |
+| 1b | Search for similar issues and suggest linking | Searching for similar issues | Manager direct: `shirokuma-docs issue search` |
 | 2 | Delegate creation to managing-github-items | Creating the item | `managing-github-items` (Skill) |
 | 2b | [Issue only] Run requirements review and design assessment | Running requirements review | `analyze-issue` (Skill, requirements role) |
 | 3 | Return next action candidates to user | Presenting next actions | Manager direct |
@@ -52,11 +52,11 @@ Infer from conversation context:
 After context analysis, search for similar existing Issues/Discussions before creation to identify duplicates or linking opportunities.
 
 ```bash
-shirokuma-docs items search "<keyword>" --limit 5
+shirokuma-docs issue search "<keyword>" --limit 5
 ```
 
 - If similar Issues found: present to user and ask whether to create a new issue or consolidate into an existing one (`AskUserQuestion`)
-- If related Issues found: suggest setting parent-child relationship with `items parent` after creation
+- If related Issues found: suggest setting parent-child relationship with `issue parent` after creation
 - If nothing found: proceed to the next step
 
 ### Step 2: Delegate to `managing-github-items`

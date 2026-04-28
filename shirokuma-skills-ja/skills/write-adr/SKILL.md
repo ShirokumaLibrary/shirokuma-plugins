@@ -40,7 +40,7 @@ create モードの場合のみ下記「ワークフロー（create モード）
 ADR 番号は連番で付与する。新規 ADR 作成前に:
 
 ```bash
-shirokuma-docs items adr list
+shirokuma-docs discussion adr list
 ```
 
 既存の最大 ADR 番号を確認し、1 を加算する。
@@ -67,8 +67,8 @@ shirokuma-docs items adr list
 関連・矛盾する ADR がないか確認する:
 
 ```bash
-shirokuma-docs items adr list
-shirokuma-docs items discussions search "関連キーワード"
+shirokuma-docs discussion adr list
+shirokuma-docs discussion search "関連キーワード"
 ```
 
 関連 ADR が見つかった場合、「関連する決定」セクションに記載する。
@@ -95,14 +95,14 @@ ADREOF
 ### ステップ 5: Discussion 作成
 
 ```bash
-shirokuma-docs items adr create "ADR-{NNN}: {タイトル}"
+shirokuma-docs discussion adr create "ADR-{NNN}: {タイトル}"
 ```
 
 生成したコンテンツで本文を更新する:
 
 ```bash
 # 更新したコンテンツをファイルに書き出してから update
-shirokuma-docs items update {discussion-number} --body /tmp/shirokuma-docs/{discussion-number}-body.md
+shirokuma-docs issue update {discussion-number} --body /tmp/shirokuma-docs/{discussion-number}-body.md
 ```
 
 ### ステップ 6: 関連 ADR のリンク
@@ -125,7 +125,7 @@ shirokuma-docs items update {discussion-number} --body /tmp/shirokuma-docs/{disc
 
 ```bash
 # 更新したコンテンツをファイルに書き出してから update
-shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
+shirokuma-docs issue update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 ## 既存 ADR 更新サブフロー
@@ -137,7 +137,7 @@ shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ### ステップ 1: 対象 ADR 番号の取得
 
 ```bash
-shirokuma-docs items adr list
+shirokuma-docs discussion adr list
 ```
 
 一覧を表示し、AskUserQuestion で対象 ADR 番号を確認する。
@@ -157,7 +157,7 @@ AskUserQuestion で以下を確認する:
 
 ```bash
 # ADR 本文を取得
-shirokuma-docs items adr get {number}
+shirokuma-docs discussion adr get {number}
 ```
 
 取得した本文を編集して一時ファイルに書き出す:
@@ -167,7 +167,7 @@ shirokuma-docs items adr get {number}
 
 ```bash
 # 更新した本文を適用
-shirokuma-docs items update {discussion-number} --body /tmp/shirokuma-docs/{number}-body.md
+shirokuma-docs issue update {discussion-number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 ### ステップ 4: 完了レポート
@@ -193,7 +193,7 @@ shirokuma-docs items update {discussion-number} --body /tmp/shirokuma-docs/{numb
 ### ステップ 1: 旧 ADR 番号の取得
 
 ```bash
-shirokuma-docs items adr list
+shirokuma-docs discussion adr list
 ```
 
 一覧を表示し、AskUserQuestion で置換対象の旧 ADR 番号を確認する。
@@ -225,7 +225,7 @@ AskUserQuestion で以下を収集する:
 cat > /tmp/shirokuma-docs/{old-number}-comment.md << 'EOF'
 この ADR は ADR-{新番号} により置換されました。詳細は #{new-discussion-number} を参照してください。
 EOF
-shirokuma-docs items add comment {old-discussion-number} --file /tmp/shirokuma-docs/{old-number}-comment.md
+shirokuma-docs issue comment {old-discussion-number} --file /tmp/shirokuma-docs/{old-number}-comment.md
 ```
 
 ### ステップ 6: 完了レポート
@@ -274,7 +274,7 @@ shirokuma-docs items add comment {old-discussion-number} --file /tmp/shirokuma-d
 
 | 状況 | アクション |
 |------|----------|
-| ADR 番号の衝突 | `items adr list` を再確認し次の空き番号を使用 |
+| ADR 番号の衝突 | `discussion adr list` を再確認し次の空き番号を使用 |
 | 検索で関連 ADR 発見 | 「関連する決定」セクションで参照 |
 | ユーザーが代替案に迷っている | `AskUserQuestion` でブレインストーミングを支援 |
 | 決定が些末 | 軽量テンプレートを提案、または ADR をスキップ |
@@ -313,7 +313,7 @@ shirokuma-docs items add comment {old-discussion-number} --file /tmp/shirokuma-d
 
 | ツール | タイミング |
 |--------|-----------|
-| Bash | `shirokuma-docs items adr` コマンド、一時ファイル作成 |
+| Bash | `shirokuma-docs discussion adr` コマンド、一時ファイル作成 |
 | Read | 置換リンクのための既存 ADR コンテンツ読み込み |
 | AskUserQuestion | ユーザーから不足している決定コンテキストを収集 |
 

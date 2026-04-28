@@ -27,7 +27,7 @@
 
 ```
 1. ロール選択: "design review" or デザイン関連 Issue
-2. Issue 本文取得: shirokuma-docs items context {number}（→ .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む）
+2. Issue 本文取得: shirokuma-docs issue context {number}（→ .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む）
 3. Lint 実行: スキップ（対象がコードファイルではないため）
 4. 設計分析: Design Brief, Aesthetic Direction, UI 実装結果をレビュー
 5. レポート生成: テンプレート形式

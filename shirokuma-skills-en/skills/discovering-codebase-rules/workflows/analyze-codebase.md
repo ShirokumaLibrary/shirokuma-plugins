@@ -143,7 +143,7 @@ Copy [templates/rule-proposal.md](../templates/rule-proposal.md)
 
 ```bash
 # Save report to GitHub Discussions (Research category)
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/report.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/report.md
 ```
 
 #### 6.2 Link to Future Plans (if applicable)

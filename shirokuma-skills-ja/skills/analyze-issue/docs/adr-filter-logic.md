@@ -4,14 +4,14 @@
 
 ## 方式概要
 
-**確定方式:** Issue タイトル + 本文の `##` レベル見出し語からキーワードを 3-5 個抽出 → `shirokuma-docs items discussions search "<キーワード>"` で 1 次絞り込み → 上位 5 件まで詳細取得（`items adr get {number}`）
+**確定方式:** Issue タイトル + 本文の `##` レベル見出し語からキーワードを 3-5 個抽出 → `shirokuma-docs discussion search "<キーワード>"` で 1 次絞り込み → 上位 5 件まで詳細取得（`discussion adr get {number}`）
 
 ```bash
 # 1 次絞り込み
-shirokuma-docs items discussions search "<抽出キーワード>"
+shirokuma-docs discussion search "<抽出キーワード>"
 
 # 詳細取得（上位 5 件）
-shirokuma-docs items adr get {number}
+shirokuma-docs discussion adr get {number}
 ```
 
 ## キーワード抽出ルール
@@ -43,7 +43,7 @@ shirokuma-docs items adr get {number}
 検索ヒットがゼロの場合:
 
 ```bash
-shirokuma-docs items adr list
+shirokuma-docs discussion adr list
 ```
 
 全 ADR タイトル一覧を取得し、タイトルのみの軽量参照に切り替える（本文詳細は取得しない）。
@@ -61,7 +61,7 @@ shirokuma-docs items adr list
 
 ```bash
 # Deprecated/Superseded ADR を含めた検索（再採用チェック専用）
-shirokuma-docs items discussions search "<キーワード>"
+shirokuma-docs discussion search "<キーワード>"
 # → タイトルに "Deprecated" または "Superseded" が含まれるものを特定して確認
 ```
 
@@ -71,7 +71,7 @@ Issue タイトル: 「スキルのトリガーキーワード設計を変更す
 ラベル: `area:plugin`
 
 1. キーワード抽出: 「スキル」「トリガーキーワード」「設計」「plugin」（4 個）
-2. 検索: `shirokuma-docs items discussions search "スキル トリガーキーワード"`
+2. 検索: `shirokuma-docs discussion search "スキル トリガーキーワード"`
 3. ヒット例: ADR-003（スキルアーキテクチャ）、ADR-007（ブランチモデル）→ ADR-003 を優先取得
-4. 詳細取得: `shirokuma-docs items adr get {ADR-003 の Discussion 番号}`
+4. 詳細取得: `shirokuma-docs discussion adr get {ADR-003 の Discussion 番号}`
 5. 整合性チェック: ADR-003 の内容と Issue の方針を比較

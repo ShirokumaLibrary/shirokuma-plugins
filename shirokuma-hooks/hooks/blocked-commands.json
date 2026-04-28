@@ -4,7 +4,7 @@
     {
       "id": "pr-merge",
       "pattern": "gh pr merge",
-      "reason": "PR merge requires explicit user approval. Ask the user before merging.",
+      "reason": "Use `shirokuma-docs pr merge <number>` instead of `gh pr merge`. This ensures Project status sync is performed correctly.",
       "enabled": true
     },
     {
@@ -40,115 +40,115 @@
     {
       "id": "gh-issue-list",
       "pattern": "gh issue list",
-      "reason": "Use `shirokuma-docs items list` instead of `gh issue list`.",
+      "reason": "Use `shirokuma-docs issue list` instead of `gh issue list`.",
       "enabled": true
     },
     {
       "id": "gh-issue-view",
       "pattern": "gh issue view",
-      "reason": "Use `shirokuma-docs items pull <number>` instead of `gh issue view`.",
+      "reason": "Use `shirokuma-docs issue pull <number>` instead of `gh issue view`.",
       "enabled": true
     },
     {
       "id": "gh-issue-create",
       "pattern": "gh issue create",
-      "reason": "Use `shirokuma-docs items add issue` instead of `gh issue create`.",
+      "reason": "Use `shirokuma-docs issue add` instead of `gh issue create`.",
       "enabled": true
     },
     {
       "id": "gh-issue-comment",
       "pattern": "gh issue comment",
-      "reason": "Use `shirokuma-docs items add comment <number> --file <file>` instead of `gh issue comment`.",
+      "reason": "Use `shirokuma-docs issue comment <number> --file <file>` instead of `gh issue comment`.",
       "enabled": true
     },
     {
       "id": "gh-issue-edit",
       "pattern": "gh issue edit",
-      "reason": "Use `shirokuma-docs items push <number>` instead of `gh issue edit`. Edit the cached frontmatter and push.",
+      "reason": "Use `shirokuma-docs issue push <number>` instead of `gh issue edit`. Edit the cached frontmatter and push.",
       "enabled": true
     },
     {
       "id": "gh-issue-close",
       "pattern": "gh issue close",
-      "reason": "Use `shirokuma-docs items close <number>` instead of `gh issue close`.",
+      "reason": "Use `shirokuma-docs issue close <number>` instead of `gh issue close`.",
       "enabled": true
     },
     {
       "id": "gh-issue-reopen",
       "pattern": "gh issue reopen",
-      "reason": "Use `shirokuma-docs items reopen <number>` instead of `gh issue reopen`.",
+      "reason": "Use `shirokuma-docs issue reopen <number>` instead of `gh issue reopen`.",
       "enabled": true
     },
     {
       "id": "gh-issue-delete",
       "pattern": "gh issue delete",
-      "reason": "Use `shirokuma-docs items remove <number>` instead of `gh issue delete`.",
+      "reason": "Use `shirokuma-docs issue remove <number>` instead of `gh issue delete`.",
       "enabled": true
     },
     {
       "id": "gh-pr-create",
       "pattern": "gh pr create",
-      "reason": "Use `shirokuma-docs items pr create` instead of `gh pr create`.",
+      "reason": "Use `shirokuma-docs pr create` instead of `gh pr create`.",
       "enabled": true
     },
     {
       "id": "gh-pr-view",
       "pattern": "gh pr view",
-      "reason": "Use `shirokuma-docs items pr show` instead of `gh pr view`.",
+      "reason": "Use `shirokuma-docs pr show` instead of `gh pr view`.",
       "enabled": true
     },
     {
       "id": "gh-pr-list",
       "pattern": "gh pr list",
-      "reason": "Use `shirokuma-docs items pr list` instead of `gh pr list`.",
+      "reason": "Use `shirokuma-docs pr list` instead of `gh pr list`.",
       "enabled": true
     },
     {
       "id": "gh-pr-review",
       "pattern": "gh pr review",
-      "reason": "Use `shirokuma-docs items pr comments`, `items pr reply`, `items pr resolve` instead of `gh pr review`.",
+      "reason": "Use `shirokuma-docs pr comments`, `items pr reply`, `items pr resolve` instead of `gh pr review`.",
       "enabled": true
     },
     {
       "id": "gh-pr-comment",
       "pattern": "gh pr comment",
-      "reason": "Use `shirokuma-docs items pr reply` for review comments, or `shirokuma-docs items add comment` for general comments instead of `gh pr comment`.",
+      "reason": "Use `shirokuma-docs pr reply` for review comments, or `shirokuma-docs issue comment` for general comments instead of `gh pr comment`.",
       "enabled": true
     },
     {
       "id": "gh-pr-close",
       "pattern": "gh pr close",
-      "reason": "Use `shirokuma-docs items pr close` instead of `gh pr close`.",
+      "reason": "Use `shirokuma-docs pr close` instead of `gh pr close`.",
       "enabled": true
     },
     {
       "id": "gh-pr-edit",
       "pattern": "gh pr edit",
-      "reason": "Use `shirokuma-docs items pr edit <number> --base <branch>` instead of `gh pr edit`.",
+      "reason": "Use `shirokuma-docs pr edit <number> --base <branch>` instead of `gh pr edit`.",
       "enabled": true
     },
     {
       "id": "gh-pr-reopen",
       "pattern": "gh pr reopen",
-      "reason": "Use `shirokuma-docs items reopen <number>` instead of `gh pr reopen`.",
+      "reason": "Use `shirokuma-docs issue reopen <number>` instead of `gh pr reopen`.",
       "enabled": true
     },
     {
       "id": "gh-project",
       "pattern": "gh project (item-list|field-list)",
-      "reason": "Use `shirokuma-docs items list` or `items fields` instead of `gh project`.",
+      "reason": "Use `shirokuma-docs issue list` or `items fields` instead of `gh project`.",
       "enabled": true
     },
     {
       "id": "gh-search",
       "pattern": "gh search issues",
-      "reason": "Use `shirokuma-docs items search` instead of `gh search issues`.",
+      "reason": "Use `shirokuma-docs issue search` instead of `gh search issues`.",
       "enabled": true
     },
     {
       "id": "gh-search-prs",
       "pattern": "gh search prs",
-      "reason": "Use `shirokuma-docs items search --type pr` instead of `gh search prs`.",
+      "reason": "Use `shirokuma-docs issue search --type pr` instead of `gh search prs`.",
       "enabled": true
     }
   ]

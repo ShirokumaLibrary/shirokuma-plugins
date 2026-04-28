@@ -154,7 +154,7 @@ Reviewed 5 Server Action files. Overall security posture is **Good** with one cr
 **Create Discussion in Reports category:**
 
 ```bash
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-report.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/review-report.md
 ```
 
 Report the Discussion URL to the user.

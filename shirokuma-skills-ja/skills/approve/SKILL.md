@@ -19,7 +19,7 @@ Review 状態の Issue を明示的に承認し Done に遷移する（Issue は
 
 ## ワークフロー
 
-1. **承認実行**: `shirokuma-docs items approve {number}` を実行。CLI は内部でステータスを検証し、Review 以外なら `result: "error"` で終了する
+1. **承認実行**: `shirokuma-docs status approve {number}` を実行。CLI は内部でステータスを検証し、Review 以外なら `result: "error"` で終了する
 2. **結果分岐**: JSON 出力の `result` を確認
    - `"ok"` → 完了レポート + `next_suggestions` をユーザーに提示
    - `"error"` → `message` フィールドをそのまま表示して終了

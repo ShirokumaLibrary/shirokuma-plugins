@@ -32,7 +32,7 @@ Register all chain steps via TaskCreate:
 
 1. **Bulk status update**: All issues → In Progress simultaneously
    ```bash
-   shirokuma-docs items transition {n} --to "In Progress"
+   shirokuma-docs status transition {n} --to "In progress"
    # (repeat for each issue)
    ```
 
@@ -44,7 +44,7 @@ Register all chain steps via TaskCreate:
    Type determination: single type → use it; mixed → `chore`.
 
 3. **Issue loop**: For each issue:
-   - Fetch issue details: `shirokuma-docs items context {number}` (→ Read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`)
+   - Fetch issue details: `shirokuma-docs issue context {number}` (→ Read `.shirokuma/github/{org}/{repo}/issues/{number}/body.md`)
    - Execute implementation (delegate to `code-issue` subagent)
    - Quality checkpoint: verify changed files + run related tests
    - Track `filesByIssue` mapping for scoped commits

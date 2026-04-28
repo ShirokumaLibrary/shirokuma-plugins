@@ -100,10 +100,10 @@ Before proposing a rule, save findings as a Knowledge Discussion to preserve con
 
 ```bash
 # For confirmed patterns → Knowledge category (frontmatter includes metadata)
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/knowledge.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/knowledge.md
 
 # For investigations still in progress → Research category
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/research.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/research.md
 ```
 
 **Choose the category based on confidence level:**
@@ -179,7 +179,7 @@ When analyzing codebases or GitHub Discussions, detect the following as ADR life
 | Pattern Type | Detection Method | Evolution Signal Type |
 |-------------|-----------------|----------------------|
 | Consistent management of ADR status transitions (Proposed/Accepted/Deprecated/Superseded) | Analyze status description patterns in Discussion titles and bodies | "ADR lifecycle management pattern" |
-| Conflicts between naming convention Issues/ADRs and new Issues/code | Detect naming convention violations via `items search` + code analysis | "Naming convention conflict detection pattern" |
+| Conflicts between naming convention Issues/ADRs and new Issues/code | Detect naming convention violations via `issue search` + code analysis | "Naming convention conflict detection pattern" |
 | `analyze-issue requirements` check items that are reusable in other codebases | Evaluate generalizability of consistency check patterns | "Reusable check item pattern" |
 
 ### Detection Logic
@@ -188,12 +188,12 @@ When analyzing codebases or GitHub Discussions, detect the following as ADR life
 
 ```bash
 # Check status distribution in ADR list
-shirokuma-docs items adr list
+shirokuma-docs discussion adr list
 
 # Check consistency of status descriptions
-shirokuma-docs items discussions search "Status: Accepted"
-shirokuma-docs items discussions search "Status: Deprecated"
-shirokuma-docs items discussions search "Status: Superseded"
+shirokuma-docs discussion search "Status: Accepted"
+shirokuma-docs discussion search "Status: Deprecated"
+shirokuma-docs discussion search "Status: Superseded"
 ```
 
 **Pattern confirmation (2+ observations):**
@@ -204,8 +204,8 @@ shirokuma-docs items discussions search "Status: Superseded"
 
 ```bash
 # Search for naming convention/rule Issues/ADRs
-shirokuma-docs items search "naming convention rule" --limit 10
-shirokuma-docs items discussions search "naming convention"
+shirokuma-docs issue search "naming convention rule" --limit 10
+shirokuma-docs discussion search "naming convention"
 ```
 
 **Conflict detection judgment:**
@@ -216,7 +216,7 @@ shirokuma-docs items discussions search "naming convention"
 
 ```bash
 # Check for overlap between Deprecated/Superseded ADRs and new proposals
-shirokuma-docs items discussions search "Deprecated Superseded"
+shirokuma-docs discussion search "Deprecated Superseded"
 ```
 
 **Detection condition:** Detect patterns where technology selections or architecture approaches rejected in Deprecated/Superseded ADRs are being re-proposed in new Issues or current code.
@@ -233,7 +233,7 @@ cat > /tmp/shirokuma-docs/{evolution-number}-adr-signal.md <<'EOF'
 **Proposal:** {applicability to other codebases or improvement suggestions}
 **Signal type:** {"ADR lifecycle management pattern"|"Naming convention conflict detection pattern"|"Reusable check item pattern"}
 EOF
-shirokuma-docs items add comment {evolution-number} --file /tmp/shirokuma-docs/{evolution-number}-adr-signal.md
+shirokuma-docs issue comment {evolution-number} --file /tmp/shirokuma-docs/{evolution-number}-adr-signal.md
 ```
 
 ## Existing Rule Deficiency Detection
@@ -241,7 +241,7 @@ shirokuma-docs items add comment {evolution-number} --file /tmp/shirokuma-docs/{
 When discovering patterns reveals deficiencies in existing rules (coverage gaps, ambiguous descriptions, divergence from practice), record them as comments in an Evolution Issue.
 
 ```bash
-shirokuma-docs items add comment {evolution-number} --file /tmp/shirokuma-docs/{evolution-number}-signal.md
+shirokuma-docs issue comment {evolution-number} --file /tmp/shirokuma-docs/{evolution-number}-signal.md
 ```
 
 `discovering-codebase-rules` does not modify existing rules (new proposals only). Existing rule improvements are the responsibility of the `evolving-rules` skill.

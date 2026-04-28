@@ -38,7 +38,7 @@ If any criterion matches a higher level, use that level.
 ### Step 1: Fetch Issue
 
 ```bash
-shirokuma-docs items context {number}
+shirokuma-docs issue context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 ```
 
@@ -65,7 +65,7 @@ Plan templates for each level (Lightweight/Standard/Detailed/Epic) are in [refer
 
 ### Step 4: Create Plan Issue
 
-Create a plan issue using `items add issue` with the plan content from Step 3 as the body.
+Create a plan issue using `issue add` with the plan content from Step 3 as the body.
 
 Create the plan issue body file:
 
@@ -85,17 +85,23 @@ labels: ["area:plan"]
 
 See #{parent-number} for the task context.
 EOF
-shirokuma-docs items add issue --file /tmp/shirokuma-docs/{number}-plan-issue.md
+shirokuma-docs issue add --file /tmp/shirokuma-docs/{number}-plan-issue.md
 ```
 
 After the plan issue is created, record the returned issue number as `PLAN_ISSUE_NUMBER`.
 
-Transition to Review in 2 steps (direct `Backlog → Review` is not defined in the transition table):
+Transition to Review using the `--via` option to perform Backlog → In progress → Review in a single command (direct `Backlog → Review` is not defined in the transition table, but `--via` chains two transitions atomically; #2244):
 
 ```bash
-shirokuma-docs items transition {PLAN_ISSUE_NUMBER} --to "In Progress"
-shirokuma-docs items transition {PLAN_ISSUE_NUMBER} --to "Review"
+shirokuma-docs status transition {PLAN_ISSUE_NUMBER} --to "Review" --via "In progress"
 ```
+
+> **Backward compatibility**: If using older CLI versions without `--via` support, use two separate commands as before:
+>
+> ```bash
+> shirokuma-docs status transition {PLAN_ISSUE_NUMBER} --to "In progress"
+> shirokuma-docs status transition {PLAN_ISSUE_NUMBER} --to "Review"
+> ```
 
 > The plan issue body language and style must comply with the `output-language` rule and `github-writing-style` rule.
 
@@ -116,17 +122,17 @@ cat > /tmp/shirokuma-docs/{number}-reasoning.md <<'EOF'
 ### Constraints Discovered
 {Technical constraints and dependencies found during codebase investigation. If none: "No constraints"}
 EOF
-shirokuma-docs items add comment {PLAN_ISSUE_NUMBER} --file /tmp/shirokuma-docs/{number}-reasoning.md
+shirokuma-docs issue comment {PLAN_ISSUE_NUMBER} --file /tmp/shirokuma-docs/{number}-reasoning.md
 ```
 
 > Comment language and style must comply with the `output-language` rule and `github-writing-style` rule.
 
 ### Step 4b: Set Parent-Child Relationship
 
-Register the plan issue as a child of the parent issue using the `items parent` command.
+Register the plan issue as a child of the parent issue using the `issue parent` command.
 
 ```bash
-shirokuma-docs items parent {PLAN_ISSUE_NUMBER} {parent-number}
+shirokuma-docs issue parent {PLAN_ISSUE_NUMBER} {parent-number}
 ```
 
 ## Constraints

@@ -41,7 +41,7 @@ Project naming convention: Project name = repository name (e.g., `blogcms` repo 
 | Comments | No | Yes |
 | Use case | Lightweight memo | Full task |
 
-**Recommendation**: Use `items add issue` by default for `#number` support.
+**Recommendation**: Use `issue add` by default for `#number` support.
 
 ## shirokuma-docs CLI Reference
 
@@ -50,64 +50,64 @@ Prefer shirokuma-docs CLI over direct `gh` commands. Config in `shirokuma-docs.c
 ### Issues (Primary Interface)
 
 ```bash
-shirokuma-docs items list                            # Open issues
-shirokuma-docs items list --all                      # Include closed
-shirokuma-docs items list --status "In Progress"     # Filter by status
-shirokuma-docs items context {number}                # Fetch details and cache (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
-shirokuma-docs items add issue --file /tmp/shirokuma-docs/new-issue.md  # Metadata + body in one file
-shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md  # Update body
-shirokuma-docs items update {number} --title "New title"                           # Update title
-shirokuma-docs items update {number} --labels "area:cli,area:plugin"               # Update labels
-shirokuma-docs items update {number} --assignees "@me"                             # Update assignees
-shirokuma-docs items transition {number} --to "In Progress"                        # Status transition
-shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-comment.md
-shirokuma-docs items comments {number}                   # List comments
-shirokuma-docs items update {number} --comment-id {comment-id} --body /tmp/shirokuma-docs/{number}-comment-fix.md  # Edit comment
-shirokuma-docs items close {number}
-shirokuma-docs items cancel {number}
-shirokuma-docs items reopen {number}
+shirokuma-docs issue list                            # Open issues
+shirokuma-docs issue list --all                      # Include closed
+shirokuma-docs issue list --status "In progress"     # Filter by status
+shirokuma-docs issue context {number}                # Fetch details and cache (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
+shirokuma-docs issue add --file /tmp/shirokuma-docs/new-issue.md  # Metadata + body in one file
+shirokuma-docs issue update {number} --body /tmp/shirokuma-docs/{number}-body.md  # Update body
+shirokuma-docs issue update {number} --title "New title"                           # Update title
+shirokuma-docs issue update {number} --labels "area:cli,area:plugin"               # Update labels
+shirokuma-docs issue update {number} --assignees "@me"                             # Update assignees
+shirokuma-docs status transition {number} --to "In progress"                        # Status transition
+shirokuma-docs issue comment {number} --file /tmp/shirokuma-docs/{number}-comment.md
+shirokuma-docs issue comments {number}                   # List comments
+shirokuma-docs issue update {number} --comment-id {comment-id} --body /tmp/shirokuma-docs/{number}-comment-fix.md  # Edit comment
+shirokuma-docs issue close {number}
+shirokuma-docs issue cancel {number}
+shirokuma-docs issue reopen {number}
 ```
 
 ### Pull Requests
 
 ```bash
-shirokuma-docs items pr create --from-file /tmp/shirokuma-docs/pr.md             # Metadata + body in one file
-shirokuma-docs items pr create --base main --head develop --title "release: v0.2.0"  # Release workflow (metadata only)
-shirokuma-docs items pr list                                      # PR list (default: open)
-shirokuma-docs items pr list --state merged --limit 5            # Filtering
-shirokuma-docs items pr show {number}                             # PR details (body, diff stats, linked issues)
-shirokuma-docs items pr comments {number}                         # Review comments and threads
-shirokuma-docs items pr merge {number} --squash                   # Merge + status update
-shirokuma-docs items pr reply {number} --reply-to {id} --body-file - <<'EOF'
+shirokuma-docs pr create --from-file /tmp/shirokuma-docs/pr.md             # Metadata + body in one file
+shirokuma-docs pr create --base main --head develop --title "release: v0.2.0"  # Release workflow (metadata only)
+shirokuma-docs pr list                                      # PR list (default: open)
+shirokuma-docs pr list --state merged --limit 5            # Filtering
+shirokuma-docs pr show {number}                             # PR details (body, diff stats, linked issues)
+shirokuma-docs pr comments {number}                         # Review comments and threads
+shirokuma-docs pr merge {number} --squash                   # Merge + status update
+shirokuma-docs pr reply {number} --reply-to {id} --body-file - <<'EOF'
 Reply content
 EOF
-shirokuma-docs items pr resolve {number} --thread-id {id}        # Resolve thread
+shirokuma-docs pr resolve {number} --thread-id {id}        # Resolve thread
 ```
 
 ### Projects (Item Operations)
 
 ```bash
-shirokuma-docs items projects update {number} --field-status "Done"  # Field update (only way)
-shirokuma-docs items projects add-issue {number}                     # Add issue to project
-shirokuma-docs items projects delete PVTI_xxx                        # Delete item
+shirokuma-docs project update {number} --field-status "Done"  # Field update (only way)
+shirokuma-docs project add-issue {number}                     # Add issue to project
+shirokuma-docs project delete PVTI_xxx                        # Delete item
 ```
 
 ### Discussions
 
 ```bash
-shirokuma-docs items discussions list --category Handovers --limit 5
-shirokuma-docs items discussions search "keyword"            # Discussion search
-shirokuma-docs items search --type discussions "keyword"     # Via items search
-shirokuma-docs items context {number}   # Fetch details and cache (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/discussion.md  # Metadata + body in one file
+shirokuma-docs discussion list --category Handovers --limit 5
+shirokuma-docs discussion search "keyword"            # Discussion search
+shirokuma-docs issue search --type discussions "keyword"     # Via issue search
+shirokuma-docs issue context {number}   # Fetch details and cache (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/discussion.md  # Metadata + body in one file
 ```
 
 ### Cross-search
 
 ```bash
-shirokuma-docs items search "keyword"                          # Issues / PR search (default)
-shirokuma-docs items search --type discussions "keyword"       # Discussions only
-shirokuma-docs items search --type issues,discussions "keyword" # Issues + Discussions cross-search
+shirokuma-docs issue search "keyword"                          # Issues / PR search (default)
+shirokuma-docs issue search --type discussions "keyword"       # Discussions only
+shirokuma-docs issue search --type issues,discussions "keyword" # Issues + Discussions cross-search
 ```
 
 ### Repository
@@ -120,8 +120,8 @@ shirokuma-docs repo labels
 ### Cross-repo Operations
 
 ```bash
-shirokuma-docs items list --repo docs
-shirokuma-docs items add issue --repo docs --file /tmp/shirokuma-docs/new-issue.md
+shirokuma-docs issue list --repo docs
+shirokuma-docs issue add --repo docs --file /tmp/shirokuma-docs/new-issue.md
 ```
 
 ### gh Fallback (CLI unsupported only)
@@ -144,9 +144,9 @@ gh auth status
 
 | Pattern | Commands | Reason |
 |---------|----------|--------|
-| `items add` recommended | `items add issue`, `items add discussion` | Metadata + body in one file, prevents flag combination errors |
-| `--body-file` kept | `items pr reply`, `items update-status` | Body only, no metadata needed |
-| `items update` / `items transition` | Status/body/title/labels/assignees update | Direct update without cache-edit workflow |
+| `issue add` recommended | `issue add`, `discussion add` | Metadata + body in one file, prevents flag combination errors |
+| `--body-file` kept | `pr reply`, `status update-batch` | Body only, no metadata needed |
+| `issue update` / `status transition` | Status/body/title/labels/assignees update | Direct update without cache-edit workflow |
 
 ### `--from-file` Frontmatter Format
 
@@ -166,9 +166,9 @@ Safe frontmatter fields vary by command:
 
 | Command | Safe Fields |
 |---------|-------------|
-| `items add issue` | `title`, `type`, `priority`, `size`, `labels`, `state`, `state_reason`, `parent` |
-| `items pr create` | `title`, `base`, `head` |
-| `items add discussion` | `title`, `category` |
+| `issue add` | `title`, `type`, `priority`, `size`, `labels`, `state`, `state_reason`, `parent` |
+| `pr create` | `title`, `base`, `head` |
+| `discussion add` | `title`, `category` |
 
 CLI flags take precedence when set. `--from-file` and `--body-file` are mutually exclusive (error if both specified).
 

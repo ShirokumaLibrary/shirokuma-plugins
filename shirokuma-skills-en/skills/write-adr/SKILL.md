@@ -40,7 +40,7 @@ Only execute the "Workflow (create mode)" section below for create mode. For upd
 ADR numbers are assigned sequentially. Before creating a new ADR:
 
 ```bash
-shirokuma-docs items adr list
+shirokuma-docs discussion adr list
 ```
 
 Extract the highest existing ADR number and increment by 1.
@@ -67,8 +67,8 @@ If key information is missing, use `AskUserQuestion` to gather it.
 Check for related or conflicting ADRs:
 
 ```bash
-shirokuma-docs items adr list
-shirokuma-docs items discussions search "relevant keywords"
+shirokuma-docs discussion adr list
+shirokuma-docs discussion search "relevant keywords"
 ```
 
 If a related ADR exists, note it in the "Related Decisions" section.
@@ -95,14 +95,14 @@ ADREOF
 ### Step 5: Create Discussion
 
 ```bash
-shirokuma-docs items adr create "ADR-{NNN}: {title}"
+shirokuma-docs discussion adr create "ADR-{NNN}: {title}"
 ```
 
 Then update the body with the generated content:
 
 ```bash
 # Write updated content to temp file, then update
-shirokuma-docs items update {discussion-number} --body /tmp/shirokuma-docs/{discussion-number}-body.md
+shirokuma-docs issue update {discussion-number} --body /tmp/shirokuma-docs/{discussion-number}-body.md
 ```
 
 ### Step 6: Link Related ADRs
@@ -125,7 +125,7 @@ Status is tracked in the ADR body header. Update with:
 
 ```bash
 # Write updated body to temp file, then update
-shirokuma-docs items update {number} --body /tmp/shirokuma-docs/{number}-body.md
+shirokuma-docs issue update {number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 ## Existing ADR Update Sub-flow
@@ -137,7 +137,7 @@ Edit the body of a single ADR. Status transitions (e.g., Proposed → Accepted, 
 ### Step 1: Get Target ADR Number
 
 ```bash
-shirokuma-docs items adr list
+shirokuma-docs discussion adr list
 ```
 
 Display the list and confirm the target ADR number via AskUserQuestion.
@@ -157,7 +157,7 @@ Use AskUserQuestion to confirm:
 
 ```bash
 # Retrieve ADR body
-shirokuma-docs items adr get {number}
+shirokuma-docs discussion adr get {number}
 ```
 
 Edit the retrieved body and write to a temp file:
@@ -167,7 +167,7 @@ Edit the retrieved body and write to a temp file:
 
 ```bash
 # Apply updated body
-shirokuma-docs items update {discussion-number} --body /tmp/shirokuma-docs/{number}-body.md
+shirokuma-docs issue update {discussion-number} --body /tmp/shirokuma-docs/{number}-body.md
 ```
 
 ### Step 4: Completion Report
@@ -193,7 +193,7 @@ A two-ADR operation that creates a new ADR and transitions the old ADR to Supers
 ### Step 1: Get Old ADR Number
 
 ```bash
-shirokuma-docs items adr list
+shirokuma-docs discussion adr list
 ```
 
 Display the list and confirm the old ADR number to be replaced via AskUserQuestion.
@@ -225,7 +225,7 @@ Use Step 3 of the [Existing ADR Update Sub-flow](#existing-adr-update-sub-flow) 
 cat > /tmp/shirokuma-docs/{old-number}-comment.md << 'EOF'
 This ADR has been replaced by ADR-{new-number}. See #{new-discussion-number} for details.
 EOF
-shirokuma-docs items add comment {old-discussion-number} --file /tmp/shirokuma-docs/{old-number}-comment.md
+shirokuma-docs issue comment {old-discussion-number} --file /tmp/shirokuma-docs/{old-number}-comment.md
 ```
 
 ### Step 6: Completion Report
@@ -274,7 +274,7 @@ shirokuma-docs items add comment {old-discussion-number} --file /tmp/shirokuma-d
 
 | Situation | Action |
 |-----------|--------|
-| ADR number conflict | Re-check `items adr list` and use next available |
+| ADR number conflict | Re-check `discussion adr list` and use next available |
 | Related ADR found during search | Reference it in "Related Decisions" |
 | User unsure about alternatives | Help brainstorm with `AskUserQuestion` |
 | Decision is trivial | Suggest lightweight template or skip ADR |
@@ -313,7 +313,7 @@ Out of scope:
 
 | Tool | When |
 |------|------|
-| Bash | `shirokuma-docs items adr` commands, temp file creation |
+| Bash | `shirokuma-docs discussion adr` commands, temp file creation |
 | Read | Reading existing ADR content for superseding links |
 | AskUserQuestion | Gathering missing decision context from user |
 

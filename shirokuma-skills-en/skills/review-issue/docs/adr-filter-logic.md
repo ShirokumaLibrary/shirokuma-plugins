@@ -6,14 +6,14 @@ Defines the ADR filtering method used by `analyze-issue requirements` when perfo
 
 ## Overview
 
-**Confirmed method:** Extract 3-5 keywords from the Issue title and `##`-level headings → Use `shirokuma-docs items discussions search "<keywords>"` for initial filtering → Retrieve details for up to 5 results (`items adr get {number}`)
+**Confirmed method:** Extract 3-5 keywords from the Issue title and `##`-level headings → Use `shirokuma-docs discussion search "<keywords>"` for initial filtering → Retrieve details for up to 5 results (`discussion adr get {number}`)
 
 ```bash
 # Initial filtering
-shirokuma-docs items discussions search "<extracted keywords>"
+shirokuma-docs discussion search "<extracted keywords>"
 
 # Retrieve details (top 5)
-shirokuma-docs items adr get {number}
+shirokuma-docs discussion adr get {number}
 ```
 
 ## Keyword Extraction Rules
@@ -45,7 +45,7 @@ Add the value portion of `area:*` labels as additional keywords (e.g., `area:plu
 When search returns zero results:
 
 ```bash
-shirokuma-docs items adr list
+shirokuma-docs discussion adr list
 ```
 
 Retrieve the full list of ADR titles and switch to lightweight title-only reference (do not retrieve body details).
@@ -63,7 +63,7 @@ Exclude ADRs with Superseded/Deprecated status from filtered results.
 
 ```bash
 # Search including Deprecated/Superseded ADRs (for re-adoption check only)
-shirokuma-docs items discussions search "<keyword>"
+shirokuma-docs discussion search "<keyword>"
 # → Identify entries with "Deprecated" or "Superseded" in the title and review them
 ```
 
@@ -73,7 +73,7 @@ Issue title: "Change the trigger keyword design for skills"
 Labels: `area:plugin`
 
 1. Keyword extraction: "skill", "trigger keyword", "design", "plugin" (4 items)
-2. Search: `shirokuma-docs items discussions search "skill trigger keyword"`
+2. Search: `shirokuma-docs discussion search "skill trigger keyword"`
 3. Hits: ADR-003 (skill architecture), ADR-007 (branch model) → prioritize ADR-003
-4. Detail retrieval: `shirokuma-docs items adr get {ADR-003 discussion number}`
+4. Detail retrieval: `shirokuma-docs discussion adr get {ADR-003 discussion number}`
 5. Consistency check: Compare ADR-003 content with the Issue's direction

@@ -91,7 +91,7 @@ Label options (for impact scope classification — area labels):
 
 ## Step 2: Generate Body
 
-> **CLI Template**: Use `shirokuma-docs items template issue --output <file>` to generate an Issue template skeleton. The AI reads this template to understand the structure, then fills it in based on context.
+> **CLI Template**: Use `shirokuma-docs issue template issue --output <file>` to generate an Issue template skeleton. The AI reads this template to understand the structure, then fills it in based on context.
 
 Use the type-specific template. All types require a `## Purpose` section.
 
@@ -215,10 +215,10 @@ Issue numbers are assigned by GitHub at creation time — they are unknown befor
 
 ```bash
 # Issue (recommended — frontmatter includes metadata)
-shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
+shirokuma-docs issue add --file /tmp/shirokuma-docs/{slug}.md
 
 # Sub-Issue (frontmatter includes parent field)
-shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
+shirokuma-docs issue add --file /tmp/shirokuma-docs/{slug}.md
 
 ```
 
@@ -226,7 +226,7 @@ shirokuma-docs items add issue --file /tmp/shirokuma-docs/{slug}.md
 
 When creating sub-issues of an epic (parent issue):
 
-- Use `items parent {number} {parent-issue-number}` to set the parent-child relationship
+- Use `issue parent {number} {parent-issue-number}` to set the parent-child relationship
 - Include a reference to the parent issue (`Refs #{parent-number}`) in the sub-issue body
 - Set Issue Type appropriate to the individual task, not inherited from the parent
 - Size should reflect the individual task's effort (sub-issues are typically S/M even if parent is L/XL)

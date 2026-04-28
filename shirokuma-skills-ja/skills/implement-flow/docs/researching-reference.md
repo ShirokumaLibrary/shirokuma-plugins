@@ -84,5 +84,5 @@ researching-best-practices → [analyze-issue（research ロール）] → Discu
 
 ```bash
 # frontmatter に title: "[Research] {トピック}" と category: Research を設定してから実行
-shirokuma-docs items add discussion --file research-result.md
+shirokuma-docs discussion add --file research-result.md
 ```

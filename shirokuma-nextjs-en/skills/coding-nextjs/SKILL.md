@@ -64,7 +64,7 @@ Based on implementation feedback:
 
 ```bash
 # Set title: "[Implementation] {feature-name}" and category: Reports in frontmatter first
-shirokuma-docs items add discussion --file report.md
+shirokuma-docs discussion add --file report.md
 ```
 
 ### Step 5: Portal Update (for significant changes)

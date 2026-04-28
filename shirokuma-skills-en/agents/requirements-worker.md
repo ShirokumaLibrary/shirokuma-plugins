@@ -30,7 +30,7 @@ This agent's responsibility is **requirements definition (ADR creation and speci
 | Task | Method | Notes |
 |------|--------|-------|
 | ADR creation / update / supersede | Invoke `write-adr` via Skill tool | Supports three modes (create / update / supersede) |
-| Specification Discussion creation | Run `shirokuma-docs items add discussion` directly via Bash | `create-spec` does not support Skill tool invocation; use Bash directly |
+| Specification Discussion creation | Run `shirokuma-docs discussion add` directly via Bash | `create-spec` does not support Skill tool invocation; use Bash directly |
 
 ### Specification Discussion Creation Procedure (Bash Direct Execution)
 
@@ -45,5 +45,5 @@ title: "[Spec] {Spec title}"
 EOF
 
 # Create the Discussion (Ideas category with [Spec] prefix)
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/spec-{slug}.md --category Ideas
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/spec-{slug}.md --category Ideas
 ```

@@ -126,13 +126,13 @@ Priority check order:
 
 When PR context is present:
 ```bash
-shirokuma-docs items add comment {PR#} --file /tmp/shirokuma-docs/review-aws.md
+shirokuma-docs issue comment {PR#} --file /tmp/shirokuma-docs/review-aws.md
 ```
 
 When no PR context:
 ```bash
 # Set title: "[Review] aws: {target}" and category: Reports in frontmatter first
-shirokuma-docs items add discussion --file /tmp/shirokuma-docs/review-aws.md
+shirokuma-docs discussion add --file /tmp/shirokuma-docs/review-aws.md
 ```
 
 ## Review Verdict

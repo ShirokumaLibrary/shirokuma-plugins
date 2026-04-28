@@ -15,7 +15,7 @@ allowed-tools: Bash, Read, Grep
 ### ステップ 1: プロジェクト状態取得
 
 ```bash
-shirokuma-docs items dashboard
+shirokuma-docs dashboard
 ```
 
 返される JSON: `repository`, `git`（`branch`, `uncommitted_changes`, `unpushed_commits` 等）, `backups`（PreCompact バックアップ）, `issues`（アクティブ Issue + フィールド）, `total_issues`, `openPRs`（オープン PR + レビューステータス）
@@ -65,7 +65,7 @@ Args: #{N}
 
 ### 検出
 
-1. `items dashboard` 出力から Issue をフィルタ: Status = Backlog, Size = XS or S
+1. `dashboard` 出力から Issue をフィルタ: Status = Backlog, Size = XS or S
 2. `area:*` ラベル（第1優先）またはタイトルキーワード類似度（フォールバック: 共通名詞2語以上）でグルーピング
 3. 3 Issue 以上のグループを表示、最大3グループ
 
@@ -88,7 +88,7 @@ Args: #{N}
 コンテキスト表示（ステップ 2）後、Evolution Issue にシグナルが蓄積されているか確認する（検索コマンドは `evolution-details.md`「標準検索・作成フロー」参照）。
 
 ```bash
-shirokuma-docs items list --issue-type Evolution --limit 1
+shirokuma-docs issue list --issue-type Evolution --limit 1
 ```
 
 シグナルが蓄積されている場合、アクティブな Issue セクションの後に 1 行で表示:
@@ -102,11 +102,11 @@ shirokuma-docs items list --issue-type Evolution --limit 1
 
 ## マルチ開発者モード
 
-チーム開発では `items dashboard` に以下のオプションを追加できる：
+チーム開発では `dashboard` に以下のオプションを追加できる：
 
 ```bash
 # チームダッシュボード（メンバー別にグループ化）
-shirokuma-docs items dashboard --team
+shirokuma-docs dashboard --team
 ```
 
 | オプション | 動作 |
@@ -137,5 +137,5 @@ shirokuma-docs items dashboard --team
 
 - セッションヘッダーに現在時刻を表示
 - 優先度順に表示
-- `shirokuma-docs items dashboard` を使用する（直接 `gh` コマンドではなく）— CLI がハンドオーバー・Issues・PR を 1 回で集約し、コンテキストウィンドウを節約する
-- ハンドオーバー保存・復元は本スキルの責務外。ステータス更新は `items update-status` CLI で行い、スキルが直接管理しない
+- `shirokuma-docs dashboard` を使用する（直接 `gh` コマンドではなく）— CLI がハンドオーバー・Issues・PR を 1 回で集約し、コンテキストウィンドウを節約する
+- ハンドオーバー保存・復元は本スキルの責務外。ステータス更新は `status update-batch` CLI で行い、スキルが直接管理しない

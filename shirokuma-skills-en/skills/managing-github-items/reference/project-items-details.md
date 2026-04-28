@@ -38,17 +38,17 @@ Built-in automations are configured via the GitHub UI (not API):
 
 | CLI Feature | Behavior with Automations |
 |-------------|--------------------------|
-| `items update-status --review` | Sets Review. When PR merges, automation moves to Done |
-| `items update-status --review` (PR already merged) | Auto-promotes to Done via `findMergedPrForIssue()` — idempotent with automation |
-| `items update-status --done` | Sets Done directly — idempotent with automation |
-| `items integrity` | Reports disabled recommended automations as warnings |
-| `items integrity --fix` | Fixes inconsistencies — compatible with automation |
-| `items cancel` | Sets Cancelled after close. May race with "Item closed → Done" automation — CLI update usually wins. Use `items integrity --fix` to detect/correct. |
+| `status update-batch --review` | Sets Review. When PR merges, automation moves to Done |
+| `status update-batch --review` (PR already merged) | Auto-promotes to Done via `findMergedPrForIssue()` — idempotent with automation |
+| `status update-batch --done` | Sets Done directly — idempotent with automation |
+| `integrity` | Reports disabled recommended automations as warnings |
+| `integrity --fix` | Fixes inconsistencies — compatible with automation |
+| `issue cancel` | Sets Cancelled after close. May race with "Item closed → Done" automation — CLI update usually wins. Use `integrity --fix` to detect/correct. |
 
 ### Checking Automation Status
 
 ```bash
-shirokuma-docs projects workflows
+shirokuma-docs project workflows
 ```
 
 Reports all workflows with their enabled/disabled status and recommendations.
@@ -85,9 +85,9 @@ Comment operation CLI commands:
 
 | Operation | Command | Notes |
 |-----------|---------|-------|
-| Add comment | `items add comment {number} --file {file}` | Works for Issues and PRs/Discussions, auto-saves to cache |
-| List comments | `items comments {number}` | JSON output |
-| Edit comment | `items update {number} --comment-id {comment-id} --body {file}` | Write file → update workflow |
+| Add comment | `issue comment {number} --file {file}` | Works for Issues and PRs/Discussions, auto-saves to cache |
+| List comments | `issue comments {number}` | JSON output |
+| Edit comment | `issue update {number} --comment-id {comment-id} --body {file}` | Write file → update workflow |
 
 ## Creating Items
 
@@ -100,7 +100,7 @@ When creating new items:
 
 ### Initial Status Guidelines
 
-`items add issue` automatically sets Status to **Backlog** by default. Override with `status` frontmatter field when needed:
+`issue add` automatically sets Status to **Backlog** by default. Override with `status` frontmatter field when needed:
 
 | Scenario | Status |
 |----------|--------|

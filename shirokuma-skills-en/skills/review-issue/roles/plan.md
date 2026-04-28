@@ -12,14 +12,14 @@ Quality review of the plan (plan issue or `## Plan` / `## 計画` section):
 - Risk analysis (breaking changes, performance impact oversight)
 - Issue description sufficiency (plan understandable from the plan issue body alone)
 
-> **Plan issue approach**: Plans are created as child issues of the parent issue (issues with titles starting with "Plan:" or "計画:"). Identify the plan issue from `subIssuesSummary`, fetch its body via `items context {plan-issue-number}`, and review. When no plan issue exists but the parent issue body contains a `## Plan` / `## 計画` section (legacy approach), use it as a fallback.
+> **Plan issue approach**: Plans are created as child issues of the parent issue (issues with titles starting with "Plan:" or "計画:"). Identify the plan issue from `subIssuesSummary`, fetch its body via `issue context {plan-issue-number}`, and review. When no plan issue exists but the parent issue body contains a `## Plan` / `## 計画` section (legacy approach), use it as a fallback.
 
 ## Distinction from `plan-issue`
 
 | Aspect | `plan-issue` built-in review | `analyze-issue` plan role |
 |--------|-------------------------------------|-------------------------------|
 | Timing | Immediate check right after planning | User-initiated at any time |
-| Data retrieval | Issue body embedded in Task agent | Plan issue identified from Issue number, fetched via `shirokuma-docs items context` |
+| Data retrieval | Issue body embedded in Task agent | Plan issue identified from Issue number, fetched via `shirokuma-docs issue context` |
 | Purpose | Initial quality gate for plan | Independent second opinion |
 | Invocation | Auto-executed at `plan-issue` step 4 | `analyze-issue plan #N` |
 
@@ -33,8 +33,8 @@ Load these files for context:
 
 ```
 1. Role selection: "plan review" or Review Issue
-2. Fetch Issue body: shirokuma-docs items context {number} (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
-3. Identify plan issue: Find child issue with title starting with "Plan:" from subIssuesSummary, fetch body via items context {plan-issue-number} (fallback: ## Plan section in body)
+2. Fetch Issue body: shirokuma-docs issue context {number} (→ Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md)
+3. Identify plan issue: Find child issue with title starting with "Plan:" from subIssuesSummary, fetch body via issue context {plan-issue-number} (fallback: ## Plan section in body)
 4. Lint execution: Skip (target is not code files)
 5. Plan analysis: Review plan issue body (or legacy plan section) against review criteria
 6. Report generation: Template format

@@ -12,9 +12,9 @@ A skill that auto-scans dependency vulnerabilities using `lint security` and pre
 
 - **Category:** Investigation Worker
 - **Scope:** Vulnerability scanning via `shirokuma-docs lint security` (Bash read-only commands), analyzing and prioritizing results, generating security reports, presenting Issue creation candidates.
-- **Out of scope:** Automatically updating dependency packages, auto-creating Issues without user confirmation. Issue creation is performed via CLI (`shirokuma-docs items add issue`) only after user confirmation
+- **Out of scope:** Automatically updating dependency packages, auto-creating Issues without user confirmation. Issue creation is performed via CLI (`shirokuma-docs issue add`) only after user confirmation
 
-> **Bash exception**: `shirokuma-docs lint security`, `shirokuma-docs items search`, and similar read/search commands are permitted. Package update commands (`pnpm update`, etc.) are prohibited.
+> **Bash exception**: `shirokuma-docs lint security`, `shirokuma-docs issue search`, and similar read/search commands are permitted. Package update commands (`pnpm update`, etc.) are prohibited.
 
 ## Workflow
 
@@ -60,13 +60,13 @@ Classify the `vulnerabilities` array in the JSON output by:
 ### 3. Duplicate Issue Check
 
 ```bash
-shirokuma-docs items list --search "security" --search "vulnerability"
+shirokuma-docs issue list --search "security" --search "vulnerability"
 ```
 
 Or search by package name:
 
 ```bash
-shirokuma-docs items search "{package-name} vulnerability"
+shirokuma-docs issue search "{package-name} vulnerability"
 ```
 
 If a duplicate Issue exists, skip creation and update the existing Issue instead.
@@ -102,7 +102,7 @@ Report to the user in this format:
 Create Issues only after confirming with the user. This skill does not auto-create Issues.
 
 ```bash
-shirokuma-docs items add issue --file /tmp/shirokuma-docs/security-issue.md
+shirokuma-docs issue add --file /tmp/shirokuma-docs/security-issue.md
 ```
 
 Issue body template:

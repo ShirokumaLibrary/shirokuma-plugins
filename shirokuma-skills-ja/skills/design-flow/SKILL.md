@@ -35,7 +35,7 @@ TaskUpdate で各ステップの実行開始時に `in_progress`、完了時に 
 Issue 番号を `AskUserQuestion` で確認するか、引数から取得する。Issue を取得して計画セクションとデザイン要件を把握する。
 
 ```bash
-shirokuma-docs items context {number}
+shirokuma-docs issue context {number}
 # → .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む
 ```
 
@@ -50,7 +50,7 @@ shirokuma-docs items context {number}
 Issue のステータスが Backlog の場合、In Progress に遷移して設計開始を記録する。
 
 ```bash
-shirokuma-docs items transition {number} --to "In Progress"
+shirokuma-docs status transition {number} --to "In progress"
 ```
 
 既に In Progress / Review の場合はステータス更新をスキップ（冪等）。
@@ -140,16 +140,16 @@ Skill(skill: "evaluating-design")
 デザイン作業が承認されたら完了。Issue の Status を Review に遷移する:
 
 ```bash
-shirokuma-docs items transition {number} --to Review
+shirokuma-docs status transition {number} --to Review
 ```
 
-> **ステータス遷移**: `create-item-flow` が `analyze-issue requirements` による設計要否判定で「NEEDED」と判定した場合、Issue は Backlog のまま `design-flow` に引き渡される。`design-flow` の完了時に無条件で Review に遷移することで設計完了を示す。Status が既に Review の場合は更新をスキップ（冪等）。
+> **ステータス遷移**: `create-item-flow` が `analyze-issue requirements` による設計要否判定で「NEEDED」と判定した場合、Issue は Backlog のまま `design-flow` に引き渡される。Phase 1b で Backlog → In progress に遷移した Issue を Phase 5 で In progress → Review に昇格させ、設計完了を示す。Status が既に Review の場合は更新をスキップ（冪等）。
 
 ## 次のステップ
 
 ```
 デザイン完了。次のステップ:
-→ 設計 Issue の承認: `/approve #{設計Issue番号}` または `shirokuma-docs items approve #{設計Issue番号}`
+→ 設計 Issue の承認: `/approve #{設計Issue番号}` または `shirokuma-docs status approve #{設計Issue番号}`
 → `/prepare-flow #{課題番号}` で計画フェーズへ（設計後は必ず計画を立てる）
 → 変更のみコミットする場合は `/commit-issue` を使用
 ```

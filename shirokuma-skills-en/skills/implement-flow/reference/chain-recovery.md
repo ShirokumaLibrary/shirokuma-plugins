@@ -36,7 +36,7 @@ Before recovery, identify where the chain stopped. Check the following in order:
 
 | Check | Command |
 |-------|---------|
-| Was a PR already created? | `gh pr list --head {branch}` (direct `gh` — `shirokuma-docs items pr list` does not support branch filter) |
+| Was a PR already created? | `gh pr list --head {branch}` (direct `gh` — `shirokuma-docs pr list` does not support branch filter) |
 | Are commits pushed to remote? | `git log --oneline origin/{branch}..HEAD` |
 
 **Idempotent**: Conditional — if the PR already exists, `open-pr-issue` will detect and skip creation. If not, it will create one.
@@ -47,7 +47,7 @@ Before recovery, identify where the chain stopped. Check the following in order:
 
 | Check | Command |
 |-------|---------|
-| Was a review report posted? | Check Issue comments via `shirokuma-docs items comments {number}` |
+| Was a review report posted? | Check Issue comments via `shirokuma-docs issue comments {number}` |
 
 **Idempotent**: Yes — re-invoking `review-issue` (Agent: `review-worker`) is safe. A new report will be generated.
 
@@ -85,13 +85,24 @@ Example: If "commit" is pending and "implement" is completed
 
 ## Recovery after PR Revert
 
-When a revert is required after a PR has been merged (issue is Done):
+When a revert is required after a PR has been merged (issue is Done), the canonical path is the CLI-integrated `issue rollback` command (#2024 Phase 1-D):
 
-1. Create and merge a revert PR (via GitHub UI or `git revert`)
-2. Manually update the original issue status to `Backlog` (re-implement) or `Cancelled` (cancelled)
-3. If re-implementing, run `/implement-flow #{number}` in a new conversation (a new branch will be created)
+```bash
+shirokuma-docs issue rollback {plan-issue#} --action revert
+```
 
-> Revert is a manual operation and is not part of the `implement-flow` chain.
+This command batch-executes:
+
+1. Create a revert branch (`revert/pr-{N}` branched from develop / parent base)
+2. Run `git revert -m 1 --no-commit` to undo the merge commit
+3. Create a revert PR (title: `Revert: PR #N`, body with `Closes #{plan-issue#}`)
+4. Reset the plan Issue status back to `Backlog` (slated for re-implementation)
+
+After the revert PR is merged, run `/implement-flow #{plan-issue#}` in a new conversation to re-implement (a new feature branch will be created).
+
+For "cancelled" decisions, after merging the revert PR, run `shirokuma-docs issue cancel {plan-issue#}` to mark it as Done(NOT_PLANNED).
+
+> The legacy procedure (manual revert + manual status change) was unified into `issue rollback --action revert` in #2024 Phase 1-D. Manual operation is still possible, but the CLI command is the canonical path.
 
 ## Idempotency Guarantees
 

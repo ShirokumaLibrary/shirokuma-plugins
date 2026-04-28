@@ -29,8 +29,8 @@ The `Testing` status is NOT automatically set by `implement-flow`. It is transit
 
 After `finalize-changes` completes, the next steps are manager-direct, not subagent. The post-processing completion gives a visual "done" feeling, but **TaskList still has pending steps**. Do NOT stop — execute the following via Bash tools **in the same response**:
 
-1. **Work Summary**: Post work summary as Issue comment (Bash: `shirokuma-docs items add comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md`)
-2. **Status Update**: `shirokuma-docs items transition {number} --to Review` (Bash)
+1. **Work Summary**: Post work summary as Issue comment (Bash: `shirokuma-docs issue comment {number} --file /tmp/shirokuma-docs/{number}-work-summary.md`)
+2. **Status Update**: `shirokuma-docs status transition {number} --to Review` (Bash)
 3. **Evolution**: Auto-record signals (Step 5)
 
 > **Why breaks happen here**: PR creation and the finalize-changes chain have strong visual "completion" cues that cause the LLM to output a summary and stop. But the chain is not done until TaskList pending count reaches 0.
@@ -70,9 +70,9 @@ invoke_skill("finalize-changes")
 TaskUpdate("finalize_changes", "completed")
 
 // Steps 5-6: work_summary, status_update (manager direct execution)
-post_work_summary()  // shirokuma-docs items add comment {N} --file /tmp/...
+post_work_summary()  // shirokuma-docs issue comment {N} --file /tmp/...
 TaskUpdate("work_summary", "completed")
-update_status_to_review()  // shirokuma-docs items transition {N} --to Review
+update_status_to_review()  // shirokuma-docs status transition {N} --to Review
 TaskUpdate("status_update", "completed")
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: requirements-flow
-description: "Orchestrator for the full requirements definition phase. Searches existing ADRs/Discussions for consistency, delegates ADR creation to write-adr, creates specification Discussions, and guides next steps. Triggers: \"requirements\", \"requirements definition\", \"create ADR\", \"create spec\", \"define requirements\", \"record architecture decision\", \"technology selection\". To simply register a GitHub Issue/Discussion right now, use /create-item-flow instead."
+description: "Orchestrator for the requirements definition phase at the Discussion level. Does not change Issue status; only searches existing ADRs/Discussions for consistency, delegates ADR creation to write-adr, and creates specification Discussions. Decision rule: if an Issue already exists and its status needs to move forward, use /prepare-flow; if you only need to record a decision at the Discussion level, use /requirements-flow; to simply register a GitHub Issue/Discussion right now, use /create-item-flow. Triggers: \"requirements\", \"requirements definition\", \"create ADR\", \"create spec\", \"define requirements\", \"record architecture decision\", \"technology selection\"."
 allowed-tools: Bash, AskUserQuestion, Agent, TaskCreate, TaskUpdate, TaskGet, TaskList
 ---
 
@@ -17,7 +17,7 @@ Register all chain steps via TaskCreate **before starting work**.
 | # | content | activeForm | Method |
 |---|---------|------------|--------|
 | 1 | Context analysis (task type detection) | Analyzing task type | Manager direct |
-| 2 | Search related Discussions | Searching existing Discussions | Bash: `shirokuma-docs items adr list` + `items discussions search` |
+| 2 | Search related Discussions | Searching existing Discussions | Bash: `shirokuma-docs discussion adr list` + `discussion search` |
 | 3 | Delegate to requirements-worker | Executing ADR creation / spec drafting | Agent: `requirements-worker` |
 | 4 | Complete and guide next steps | Creating completion report | Manager direct |
 
@@ -36,7 +36,7 @@ Determine the task type from the user's input and conversation context.
 | Condition | Route |
 |-----------|-------|
 | ADR-related keywords ("ADR", "architecture decision", "technology selection", "record decision", "tech choice") | `write-adr` (mode detection delegated to write-adr) |
-| Spec-related keywords ("spec", "requirements", "define requirements", "functional requirements", "non-functional requirements") | Specification Discussion creation (Bash: `shirokuma-docs items add discussion`) |
+| Spec-related keywords ("spec", "requirements", "define requirements", "functional requirements", "non-functional requirements") | Specification Discussion creation (Bash: `shirokuma-docs discussion add`) |
 | Contains both types of keywords (compound) | `write-adr` then specification Discussion creation, in sequence |
 | Cannot determine | Ask via AskUserQuestion |
 
@@ -54,10 +54,10 @@ Check for duplicates or contradictions with existing ADRs and specs.
 
 ```bash
 # List existing ADRs
-shirokuma-docs items adr list
+shirokuma-docs discussion adr list
 
 # Search by related keywords
-shirokuma-docs items discussions search "{keyword}"
+shirokuma-docs discussion search "{keyword}"
 ```
 
 Include search results in the delegation prompt to requirements-worker for duplicate/contradiction checking.
@@ -82,7 +82,7 @@ Agent(
 Agent(
   description: "requirements-worker spec",
   subagent_type: "requirements-worker",
-  prompt: "Create a specification Discussion.\nRun `shirokuma-docs items add discussion` directly via Bash (Ideas category, with [Spec] title prefix).\n\nContext:\n{user input}\n\nRelated Discussions (reference):\n{summary of Step 2 search results}"
+  prompt: "Create a specification Discussion.\nRun `shirokuma-docs discussion add` directly via Bash (Ideas category, with [Spec] title prefix).\n\nContext:\n{user input}\n\nRelated Discussions (reference):\n{summary of Step 2 search results}"
 )
 ```
 
@@ -92,7 +92,7 @@ Agent(
 Agent(
   description: "requirements-worker ADR+spec",
   subagent_type: "requirements-worker",
-  prompt: "Execute the following two tasks in order:\n1. Use write-adr to create an ADR\n2. Run `shirokuma-docs items add discussion` directly via Bash to create a specification Discussion (Ideas category, with [Spec] title prefix)\n\nContext:\n{user input}\n\nRelated Discussions (reference):\n{summary of Step 2 search results}"
+  prompt: "Execute the following two tasks in order:\n1. Use write-adr to create an ADR\n2. Run `shirokuma-docs discussion add` directly via Bash to create a specification Discussion (Ideas category, with [Spec] title prefix)\n\nContext:\n{user input}\n\nRelated Discussions (reference):\n{summary of Step 2 search results}"
 )
 ```
 
@@ -151,7 +151,7 @@ Both `write-adr` and specification Discussion creation can be invoked standalone
 
 | Tool | When |
 |------|------|
-| Bash | `shirokuma-docs items adr list` / `items discussions search` |
+| Bash | `shirokuma-docs discussion adr list` / `discussion search` |
 | AskUserQuestion | Confirm task type when it cannot be determined |
 | Agent (requirements-worker) | Step 3: Delegate ADR creation and spec drafting (subagent, context isolation) |
 | TaskCreate, TaskUpdate, TaskGet, TaskList | Progress tracking for all steps |

@@ -50,7 +50,7 @@ Discussion（アイデア）→ 実装決定 → Issue（Backlog）→ Ready →
 
 ## AI の行動指針
 
-1. **検索**: 新規作成前に `shirokuma-docs items discussions search "{keyword}"` または `shirokuma-docs items search --type discussions "{keyword}"` で確認
+1. **検索**: 新規作成前に `shirokuma-docs discussion search "{keyword}"` または `shirokuma-docs issue search --type discussions "{keyword}"` で確認
 2. **読む**: リサーチ時にコンテキストとして Discussions を確認
 3. **書く**: 重要な知見について Discussions を作成
 4. **抽出**: パターンが確認されたら `managing-rules` スキルで Rule 化を提案

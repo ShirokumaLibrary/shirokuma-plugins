@@ -35,7 +35,7 @@ Update each step to `in_progress` at start and `completed` on finish via TaskUpd
 Confirm issue number via `AskUserQuestion` or obtain from arguments. Fetch the issue to understand the plan section and design requirements.
 
 ```bash
-shirokuma-docs items context {number}
+shirokuma-docs issue context {number}
 # → Read .shirokuma/github/{org}/{repo}/issues/{number}/body.md
 ```
 
@@ -50,7 +50,7 @@ shirokuma-docs items context {number}
 If the Issue status is Backlog, transition to In Progress to record the start of design work.
 
 ```bash
-shirokuma-docs items transition {number} --to "In Progress"
+shirokuma-docs status transition {number} --to "In progress"
 ```
 
 Skip status update if already In Progress / Review (idempotent).
@@ -140,16 +140,16 @@ Skill(skill: "evaluating-design")
 Design work is complete once approved. Transition the Issue Status to Review:
 
 ```bash
-shirokuma-docs items transition {number} --to Review
+shirokuma-docs status transition {number} --to Review
 ```
 
-> **Status transition**: When `create-item-flow` determines a design phase is needed via design assessment (`analyze-issue requirements`), the Issue is handed off from Backlog to `design-flow`. Transitioning unconditionally to Review on `design-flow` completion signals design completion. Skip the update if Status is already Review (idempotent).
+> **Status transition**: When `create-item-flow` determines a design phase is needed via design assessment (`analyze-issue requirements`), the Issue is handed off from Backlog to `design-flow`. Phase 1b transitions Backlog → In progress, and Phase 5 promotes In progress → Review to signal design completion. Skip the update if Status is already Review (idempotent).
 
 ## Next Steps
 
 ```
 Design complete. Next steps:
-→ Approve the design Issue: `/approve #{design-issue-number}` or `shirokuma-docs items approve #{design-issue-number}`
+→ Approve the design Issue: `/approve #{design-issue-number}` or `shirokuma-docs status approve #{design-issue-number}`
 → `/prepare-flow #{issue number}` to move to the planning phase (always plan after design)
 → Use `/commit-issue` to commit changes only
 ```

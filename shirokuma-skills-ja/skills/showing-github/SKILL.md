@@ -23,10 +23,10 @@ allowed-tools: Bash, Read, Glob
 
 1. リポジトリ情報取得: `shirokuma-docs repo info --format json`（`nameWithOwner` フィールドを参照）
 2. 並列実行:
-   - `shirokuma-docs items list`（ステータス別アイテム + `total_issues` でオープン Issue 数を導出）
-   - `shirokuma-docs items pr list`（オープン PR 一覧 + 行数から PR 数を導出）
+   - `shirokuma-docs issue list`（ステータス別アイテム + `total_issues` でオープン Issue 数を導出）
+   - `shirokuma-docs pr list`（オープン PR 一覧 + 行数から PR 数を導出）
    - `gh api repos/{owner}/{repo}/commits?per_page=5`（最近のコミット）
-   - `shirokuma-docs items discussions list --category Handovers --limit 3`（最近の引き継ぎ）
+   - `shirokuma-docs discussion list --category Handovers --limit 3`（最近の引き継ぎ）
 
 ### 表示フォーマット
 
@@ -83,12 +83,12 @@ GitHub Project アイテムをステータスフィルター付きで表示。
 
 ```bash
 # デフォルト（オープン Issue）
-shirokuma-docs items list
+shirokuma-docs issue list
 
 # フィルター付き
-shirokuma-docs items list --all
-shirokuma-docs items list --status Ready
-shirokuma-docs items list --status "In Progress" --status Ready
+shirokuma-docs issue list --all
+shirokuma-docs issue list --status Ready
+shirokuma-docs issue list --status "In progress" --status Ready
 ```
 
 ### 表示フォーマット（グループ化ビュー）
@@ -134,7 +134,7 @@ GitHub Issue リストをフィルタリング付きで表示。
 ### ワークフロー
 
 ```bash
-shirokuma-docs items list --format json
+shirokuma-docs issue list --format json
 ```
 
 ### 表示フォーマット
@@ -169,17 +169,17 @@ PR 一覧・詳細を表示。
 
 ```bash
 # デフォルト（オープン PR）
-shirokuma-docs items pr list
+shirokuma-docs pr list
 
 # フィルター付き
-shirokuma-docs items pr list --state merged --limit 10
-shirokuma-docs items pr list --state all
+shirokuma-docs pr list --state merged --limit 10
+shirokuma-docs pr list --state all
 ```
 
 **詳細表示:**
 
 ```bash
-shirokuma-docs items pr show {number}
+shirokuma-docs pr show {number}
 ```
 
 ### 表示フォーマット（一覧）
@@ -235,10 +235,10 @@ shirokuma-docs items pr show {number}
 
 ```bash
 # Discussions から
-shirokuma-docs items discussions list --category Handovers --limit {count}
+shirokuma-docs discussion list --category Handovers --limit {count}
 
 # 特定の引き継ぎを取得
-shirokuma-docs items context {number}
+shirokuma-docs issue context {number}
 # → .shirokuma/github/{org}/{repo}/issues/{number}/body.md を Read ツールで読み込む
 
 # ローカルファイル（フォールバック）
